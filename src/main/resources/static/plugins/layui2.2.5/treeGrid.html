@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>layout Layui</title>
+    <link  rel="stylesheet" type="text/css" href="css/layui.css">
+    <script type="text/javascript" src="layui.js"></script>
+</head>
+<body class="layui-layout-body">
+<a href="#" class="layui-btn"></a>
+<table class="layui-hidden" id="treeTable" lay-filter="treeTable"></table>
+<script>
+    //JavaScript代码区域
+    layui.use(['element', 'layer', 'form', 'upload', 'treeGrid'], function () {
+        var treeGrid = layui.treeGrid; //很重要
+        var treeTable = treeGrid.render({
+            elem: '#treeTable'
+            ,id:'treeTable' //这一行一定需要,和上一行不一样,这个是需要用来作数据修改和定位的
+            ,levelField:'level' //表示树的级别字段,从1开始,从数据Json传回时必须是1,2,3,4,5...
+            ,paramName:'parentId' //表示树向下展开时向后端传弟的参数名称,值就是作用的paramValue
+            ,paramValue:'id' //表示树向下展开时向后端传弟的参数名称,一定是{url}+{paramName}={paramValue},现在就是{url}+parentId={id}
+            ,scopeField:'baseCode' //表示树的图标作用在哪个字段前面,并表示父亲需向下传递的参数,一定是{url}+{parentParame}={baseCode},该字段一定要显示
+            ,url: 'data.jsp'
+            ,cols: [[
+                {checkbox: true, fixed: true}
+                ,{field:'baseCode', title: '编号', width:140}
+                ,{field:'id', title: 'ID', width:80}
+                ,{field:'keyName', width:140 ,title: '键名称'}
+                ,{field:'keyShortName', width:140 ,title: '键简称'}
+                ,{field:'keyValue', width:140 ,title: '键值'}
+                ,{field:'typeValue', width:140 ,title: '类型值'}
+                ,{field:'note', width:140 ,title: '备注'}
+                ,{field:'sort', width:100 ,title: '排序',fixed: 'right'}
+                ,{field:'isPublic', width:100 ,title: '状态',fixed: 'right'}
+            ]]
+            ,limit:300
+            ,page: false
+            ,height: 'full-200'
+        });
+    });
+</script>
+</body>
+</html>
