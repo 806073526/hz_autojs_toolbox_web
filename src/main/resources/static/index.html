@@ -37,6 +37,47 @@
         }
         #previewImg{
         }
+        .positionListFixed{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 9999999999999999;
+            width: 200px;
+            height: calc(95vh - 20px);
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+        .positionTextarea{
+            height: 100% !important;
+        }
+        .positionTextarea .el-textarea__inner{
+            height: 100% !important;
+        }
+        .previewImgCls .el-form-item__content{
+            margin-left: 0px !important;
+        }
+        .mousePositionCls{
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            padding-right: 5px;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 999999999999999;
+        }
+        .buttonPanel{
+            display: inline-flex;
+            justify-content: center;
+            flex-direction: column;
+            width: 200px;
+            align-items: center;
+            background: white;
+        }
+        .buttonPanel .el-button{
+            width: 100%;
+            margin-left: 0px !important;
+            margin-bottom: 5px;
+        }
         .nodeDivCommon{
             height: 80vh;
             overflow-y: auto;
@@ -585,13 +626,17 @@
                         </el-row>
                         <el-row>
                             <div class="width100 d-flex a-center">
-                                <el-form-item label="显示坐标类型" class="width25">
+                                <el-form-item label="显示坐标类型" class="width20">
                                         <el-radio-group v-model="positionShowType">
                                             <el-radio label="cur">实际坐标</el-radio>
                                             <el-radio label="standard">转换为标准坐标</el-radio>
                                         </el-radio-group>
                                 </el-form-item>
-                                <el-form-item  prop="previewImg" class="width75" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;">
+                                <el-form-item  prop="previewImg" class="width80 previewImgCls" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;">
+                                        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                            <span>显示浮动控制面板：</span>
+                                            <el-switch v-model="remoteHandler.param1.showFixedPositionList" />
+                                        </div>
                                         <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                                             <span>开启快速裁剪：</span>
                                             <el-switch v-model="remoteHandler.param1.isOpenFastClip" @change="openFastClipChange"/>
@@ -683,7 +728,11 @@
                         <el-row>
                             <div class="width100 d-flex a-center">
                                 <el-form-item label="图片预览:" prop="previewImg" class="width100">
-                                    <div>x:{{imgMousePosition.x }} y:{{imgMousePosition.y}} color:{{imgMousePosition.color}}</div>
+                                    <div class="mousePositionCls" v-show="remoteHandler.param1.previewImg">
+                                        <span class="mousePositionX">x:{{imgMousePosition.x }}</span>
+                                        <span class="mousePositionY">y:{{imgMousePosition.y}}</span>
+                                        <span class="mousePositionColor">color:{{imgMousePosition.color}}</span>
+                                    </div>
                                     <div draggable="false"  style="user-select: none;min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
                                         <div id="drawArear" class="draw-box" v-if="remoteHandler.param1.previewImg" style="width: auto;margin: 0; padding: 0;height: auto;max-width: 100%;user-select: none;">
                                             <img id="previewImg" draggable="false" style="width: 100%;margin: 0; padding: 0;height: 100%;user-select: none;" alt=""/>
@@ -697,6 +746,35 @@
                                         <canvas id="canvas" style="display:none;"></canvas>
                                     </div>
                                 </el-form-item>
+                            </div>
+                            <div class="positionListFixed" v-show="remoteHandler.param1.showFixedPositionList" >
+                                <div class="buttonPanel">
+                                    <el-button type="primary" size="mini"
+                                               @click.stop.prevent="sendAction('param1','remoteClipGrayscaleAndThresholdToServer')">
+                                        图像处理(加载)
+                                    </el-button>
+                                    <el-button type="primary" size="mini"
+                                               @click.stop.prevent="sendAction('param1','remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                                        文字识别
+                                    </el-button>
+                                    <el-button type="info" size="mini"
+                                               @click.stop.prevent="loadPreviewImg">加载图片
+                                    </el-button>
+                                    <el-button type="danger" size="mini"
+                                               @click.stop.prevent="setParam1(true)">
+                                        坐标全屏
+                                    </el-button>
+                                    <el-button type="primary" size="mini"
+                                               @click.stop.prevent="readPositionList">
+                                        读取坐标列表
+                                    </el-button>
+                                    <el-button type="primary" size="mini"
+                                               @click.stop.prevent="clearPosition">
+                                        清空坐标列表
+                                    </el-button>
+                                </div>
+                                <el-input class="positionTextarea" type="textarea" v-model="remoteHandler.param1.positionList">
+                                </el-input>
                             </div>
                         </el-row>
                     </el-tab-pane>
@@ -1237,6 +1315,7 @@
                     isOpenGray:false,
                     isOpenThreshold: false,
                     isOpenColor:false,
+                    showFixedPositionList:false,
                     positionList: '',// 坐标列表
                     operatePositionKey: 'x1',// 操作key
                     operatePositionVal: 100,// 操作坐标值
