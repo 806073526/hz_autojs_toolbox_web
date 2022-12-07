@@ -1,26 +1,12 @@
-let template =
-    '<div class="container">' +
-    '            <el-form ref="commodityInfo" class="commodity mt-10 width100" label-width="100px">' +
-    '                <device-info ref="deviceInfo" @deviceSelectRowCallback="deviceSelectRowCallback" /> ' +
-    '                <el-tabs tab-position="left" style="height: auto;margin-top:5px;">' +
-    '                    <el-tab-pane label="图像处理">' +
-    '                           <img-handler :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="imgHandler"/> ' +
-    '                    </el-tab-pane>' +
-    '                    <el-tab-pane label="布局分析">' +
-    '                           <layout-analysis :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="layoutAnalysis"/> ' +
-    '                    </el-tab-pane>' +
-    '                    <el-tab-pane label="远程脚本">' +
-    '                           <remote-script :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteScript"/> ' +
-    '                    </el-tab-pane>' +
-    '                    <el-tab-pane label="预览设备">' +
-    '                           <preview-device :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="previewDevice"/> ' +
-    '                    </el-tab-pane>' +
-    '                    <el-tab-pane label="远程日志">' +
-    '                           <remote-log :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteLog"/> ' +
-    '                    </el-tab-pane>' +
-    '                </el-tabs>' +
-    '            </el-form>' +
-    '</div>';
+let template ='<div></div>';
+$.ajax({
+    url: "/module/template/main.html",
+    type:'get',
+    async:false,
+    success:function(res){
+        template = String(res);
+    }
+});
 import {getContext} from "./../utils/utils.js";
 import DeviceInfo from "./component/deviceInfo.js";
 import ImgHandler from "./component/imgHandler.js";

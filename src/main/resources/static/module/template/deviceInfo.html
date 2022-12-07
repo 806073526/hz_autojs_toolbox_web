@@ -1,0 +1,81 @@
+<div>
+    <p class="basicInfo" style="position: relative;">
+        已连接设备列表
+        <i class="el-icon-refresh-right" style="cursor: pointer;font-weight: 600!important;"
+           @click="getOnlineDevice">
+        </i>
+        <span style="position: absolute;right: 10px;">
+            <a href="https://www.zjh336.cn/?id=2109" target="_blank" style="margin-right: 5px;color: #2f871a">
+                博客地址
+            </a>
+            <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/releases" target="_blank"
+               style="margin-right: 5px;color: #2ECC40">
+                Web端本地部署
+            </a>
+            <a href="https://gitee.com/zjh336/hz_autojs_toolbox/releases" target="_blank"
+               style="color: blue;">
+                APP端下载
+            </a>
+            <a href="https://space.bilibili.com/69729485/channel/series" target="_blank"
+               style="margin-right: 5px;color:brown;">
+                演示(操作)视频
+            </a>
+            <a href="https://tool.gljlw.com/qq/?qq=806073526" target="_blank" style="color: #3c663f;">
+                联系QQ:806073526
+            </a>
+        </span>
+    </p>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-table :data="deviceList" v-loading="deviceLoading" border ref="deviceTable"
+                      highlight-current-row @current-change="selectRowChange" style="width: 100%">
+                <el-table-column prop="deviceUuid" align="left" label="设备UUID">
+                    <template slot-scope="{ row, $index}">
+                        {{ row.deviceUuid }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="connectTime" label="建立连接时间" align="left">
+                </el-table-column>
+                <el-table-column prop="lastHeartTime" label="最后一次心跳时间" align="left">
+                </el-table-column>
+                <el-table-column prop="screenHeight" label="屏幕高度" align="left">
+                </el-table-column>
+                <el-table-column prop="screenWidth" label="屏幕宽度" align="left">
+                </el-table-column>
+            </el-table>
+        </div>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+        <div class="width100 d-flex a-center">
+            <el-form-item label="标准宽度:" prop="x1" class="width20">
+                <el-input type="number" v-model="deviceInfo.standardWidth" placeholder="请设置标准宽度"
+                          class="width100" @change="syncWidthHeightToApp">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="标准高度:" prop="y1" class="width20">
+                <el-input type="number" v-model="deviceInfo.standardHeight" placeholder="请设置标准高度"
+                          class="width100" @change="syncWidthHeightToApp">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="x偏移系数:" prop="x1" class="width20">
+                <el-input type="number" v-model="deviceInfo.offsetX" placeholder="请设置x偏移系数"
+                          class="width100" @change="syncWidthHeightToApp">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="y偏移系数:" prop="y1" class="width20">
+                <el-input type="number" v-model="deviceInfo.offsetY" placeholder="请设置y偏移系数"
+                          class="width100" @change="syncWidthHeightToApp">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="标准坐标转换:" label-width="120px" class="width10">
+                <el-switch v-model="deviceInfo.standardConvert" @change="syncWidthHeightToApp"
+                />
+            </el-form-item>
+            <div class="width10 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
+                <el-button @click.stop="syncWidthHeightToApp">
+                    同步到APP
+                </el-button>
+            </div>
+        </div>
+    </el-row>
+</div>

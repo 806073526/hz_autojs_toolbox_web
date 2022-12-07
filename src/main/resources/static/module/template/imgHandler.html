@@ -1,0 +1,384 @@
+<div>
+    <p class="basicInfo">
+        远程图像处理及上传
+    </p>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="图片名称:" prop="localImageName" class="width100">
+                <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
+                          class="width100" />
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="坐标x1:" prop="x1" class="width25">
+                <el-input type="number" v-model="remoteHandler.param1.x1" oninput="if(value.length>10)value=value.slice(0,10)"
+                          min="0" placeholder="请输入坐标值" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="坐标y1:" prop="y1" class="width25">
+                <el-input type="number" min="0" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.y1" placeholder="请输入坐标值" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="坐标x2:" prop="x1" class="width25">
+                <el-input type="number" v-model="remoteHandler.param1.x2" oninput="if(value.length>10)value=value.slice(0,10)"
+                          min="0" placeholder="请输入坐标值" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="坐标y2:" prop="y2" class="width25">
+                <el-input type="number" min="0" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.y2" placeholder="请输入坐标值" class="width100">
+                </el-input>
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="阈值化相似度:" prop="threshold" class="width50">
+                <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.threshold" placeholder="请输入阈值化相似度" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="阈值化最大值:" prop="maxVal" class="width50">
+                <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.maxVal" placeholder="请输入阈值化最大值" class="width100">
+                </el-input>
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="图片相似度:" prop="threshold" class="width25">
+                <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.imgThreshold" placeholder="请输入图片相似度" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="颜色相似度:" prop="threshold" class="width25">
+                <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.colorThreshold" placeholder="请输入颜色相似度" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="大图缩放比例:" prop="bigScale" class="width25">
+                <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.bigScale" placeholder="请输入大图缩放比例" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="小图缩放比例:" prop="smallScale" class="width25">
+                <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
+                          v-model="remoteHandler.param1.smallScale" placeholder="请输入小图缩放比例" class="width100">
+                </el-input>
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="坐标列表:" class="width40">
+                <el-input type="textarea" v-model="remoteHandler.param1.positionList"
+                          :rows="5" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="代码预览:" class="width60">
+                <el-input type="textarea" v-model="remoteHandler.param1.scriptPreview"
+                          :rows="5" class="width100">
+                </el-input>
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="操作坐标key:" class="width25">
+                <el-select v-model="remoteHandler.param1.operatePositionKey" class="width100">
+                    <el-option value="x1">
+                        x1
+                    </el-option>
+                    <el-option value="y1">
+                        y1
+                    </el-option>
+                    <el-option value="x2">
+                        x2
+                    </el-option>
+                    <el-option value="y2">
+                        y2
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="操作坐标值:" class="width25">
+                <el-input type="number" :min="0" v-model="remoteHandler.param1.operatePositionVal"
+                          class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item class="width50" style="display: flex;justify-content: flex-end;">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <el-radio-group v-model="screenDirection">
+                        <el-radio label="横屏">
+                            横屏方向
+                        </el-radio>
+                        <el-radio label="竖屏">
+                            竖屏方向
+                        </el-radio>
+                    </el-radio-group>
+                </div>
+                <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="setParam1(true)">
+                    坐标全屏
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="readPositionList">
+                    读取坐标列表
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="clearPosition">
+                    清空坐标列表
+                </el-button>
+                <el-button type="warning" style="margin-left:10px" size="mini" @click.stop.prevent="param1Subtract">
+                    减去坐标值
+                </el-button>
+                <el-button type="warning" style="margin-left:10px" size="mini" @click.stop.prevent="param1Addition">
+                    加上坐标值
+                </el-button>
+                <!--<el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="copyPosition">
+                复制坐标
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini"
+                @click.stop.prevent="writePosition">
+                读取坐标
+                </el-button>-->
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="显示坐标类型" class="width20">
+                <el-radio-group v-model="positionShowType">
+                    <el-radio label="cur">
+                        实际坐标
+                    </el-radio>
+                    <el-radio label="standard">
+                        转换为标准坐标
+                    </el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item prop="previewImg" class="width80 previewImgCls" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <span>
+                        显示浮动控制面板：
+                    </span>
+                    <el-switch v-model="remoteHandler.param1.showFixedPositionList" />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <span>
+                        开启快速裁剪：
+                    </span>
+                    <el-switch v-model="remoteHandler.param1.isOpenFastClip" @change="openFastClipChange"
+                    />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <span>
+                        开启灰度化：
+                    </span>
+                    <el-switch v-model="remoteHandler.param1.isOpenGray" />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <span>
+                        开启阈值化：
+                    </span>
+                    <el-switch v-model="remoteHandler.param1.isOpenThreshold" />
+                </div>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
+                    图像处理(加载)
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                    文字识别
+                </el-button>
+                <el-button type="info" size="mini" style="margin-left:10px" id="loadPreviewImg"
+                           @click.stop.prevent="loadPreviewImg">
+                    加载图片
+                </el-button>
+                <el-dropdown trigger="click">
+                    <el-button type="primary" style="margin-left:10px" size="mini">
+                        生成代码(官方)
+                    </el-button>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('grayscale')">
+                            灰度化grayscale
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('threshold')">
+                            阈值化threshold
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('clip')">
+                            裁图clip
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('findImage')">
+                            找图findImage
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('detectAndComputeFeatures')">
+                            收集特征detectAndComputeFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('matchFeatures')">
+                            特征匹配matchFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('findMultiColors')">
+                            多点找色findMultiColors
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('MLKitOCR')">
+                            MLKitOCR文字识别
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('matchTemplate')">
+                            模板匹配matchTemplate
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-dropdown trigger="click">
+                    <el-button type="primary" style="margin-left:10px" size="mini">
+                        生成代码(基础)
+                    </el-button>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('getConvertCoefficient')">
+                            获取分辨率转换系数getConvertCoefficient
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('scaleSmallImg')">
+                            按照分辨率缩放小图scaleSmallImg
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('convertXY')">
+                            按照分辨率转换坐标convertXY
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('detectFeaturesScale')">
+                            图片特征匹配detectFeaturesScale
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('matchingFeatures')">
+                            灰度化阈值化特征匹配matchingFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('randomClick')">
+                            随机点击randomClick
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('grayscaleAndThreshold2')">
+                            灰度化阈值化图片grayscaleAndThreshold2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('grayThresholdFindImg2')">
+                            灰度化阈值化找图grayThresholdFindImg2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('grayThresholdFindMultipleColor2')">
+                            灰度化、阈值化多点找色grayThresholdFindMultipleColor2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('ocrGetContentStr')">
+                            ocr获取文字识别内容字符串结果ocrGetContentStr
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('ocrGetResultToCanvas')">
+                            ocr获取文字识别内容并绘图ocrGetResultToCanvas
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('canvasRect')">
+                            绘制方框canvasRect
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-dropdown trigger="click">
+                    <el-button type="primary" style="margin-left:10px" size="mini">
+                        生成代码(进阶)
+                    </el-button>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindImg2')">
+                            区域找图regionalFindImg2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalClickImg2')">
+                            区域找图点击regionalClickImg2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalAnalysisChart2')">
+                            区域识字获取文字regionalAnalysisChart2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalAnalysisChartPosition2')">
+                            区域识字获取坐标regionalAnalysisChartPosition2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalClickText2')">
+                            区域识字点击regionalClickText2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchTemplate2')">
+                            区域模板匹配regionalMatchTemplate2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchingFeatures')">
+                            区域特征匹配regionalMatchingFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchFeaturesTemplate')">
+                            区域特征匹配模板regionalMatchFeaturesTemplate
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalClickFeatures')">
+                            区域特征匹配点击regionalClickFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindMultipleColor2')">
+                            区域多点找色regionalFindMultipleColor2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalClickColor2')">
+                            区域多点找色点击regionalClickColor2
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindImgOrFeatures')">
+                            区域找图或者特征匹配regionalFindImgOrFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchTemplateOrMatchFeatures')">
+                            区域模板匹配或者特征匹配模板regionalMatchTemplateOrMatchFeatures
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindCircles2')">
+                            区域灰度化阈值化找圆regionalFindCircles2
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-button type="info" size="mini" style="margin-left:10px" @click.stop.prevent="execPreviewScript">
+                    执行代码
+                </el-button>
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="图片预览:" prop="previewImg" class="width100">
+                <div class="mousePositionCls" v-show="remoteHandler.param1.previewImg">
+                    <span class="mousePositionX">
+                        x:{{imgMousePosition.x }}
+                    </span>
+                    <span class="mousePositionY">
+                        y:{{imgMousePosition.y}}
+                    </span>
+                    <span class="mousePositionColor">
+                        color:{{imgMousePosition.color}}
+                    </span>
+                </div>
+                <div draggable="false" style="user-select: none;min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
+                    <div id="drawArear" class="draw-box" v-if="remoteHandler.param1.previewImg"
+                         style="width: auto;margin: 0; padding: 0;height: auto;max-width: 100%;user-select: none;">
+                        <img id="previewImg" draggable="false" style="width: 100%;margin: 0; padding: 0;height: 100%;user-select: none;"
+                             alt="" />
+                        <div class="react-box" id="drawReact" draggable="false" style="user-select: none;">
+                            <!-- 矩形框 -->
+                        </div>
+                    </div>
+                    <div v-else style="font-size: 20px;color: rgba(29,140,128,0.29)">
+                        暂无图片,请先发送指令,再加载图片
+                    </div>
+                    <canvas id="canvas" style="display:none;">
+                    </canvas>
+                </div>
+            </el-form-item>
+        </div>
+        <div class="positionListFixed" v-show="remoteHandler.param1.showFixedPositionList">
+            <div class="buttonPanel">
+                <el-button type="primary" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
+                    图像处理(加载)
+                </el-button>
+                <el-button type="primary" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                    文字识别
+                </el-button>
+                <el-button type="info" size="mini" @click.stop.prevent="loadPreviewImg">
+                    加载图片
+                </el-button>
+                <el-button type="danger" size="mini" @click.stop.prevent="setParam1(true)">
+                    坐标全屏
+                </el-button>
+                <el-button type="primary" size="mini" @click.stop.prevent="readPositionList">
+                    读取坐标列表
+                </el-button>
+                <el-button type="primary" size="mini" @click.stop.prevent="clearPosition">
+                    清空坐标列表
+                </el-button>
+            </div>
+            <el-input class="positionTextarea" type="textarea" v-model="remoteHandler.param1.positionList">
+            </el-input>
+        </div>
+    </el-row>
+</div>
