@@ -1,0 +1,80 @@
+.nodeDivCommon{
+    height: 80vh;
+    overflow-y: auto;
+    border:  1px solid #cdc4c4;
+}
+.nodeTreeClass{
+    width: 38%;
+}
+.tree{
+    overflow-x: scroll;
+}
+.el-tree::-webkit-scrollbar {
+    width: 4px;
+}
+.el-tree::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.el-tree:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.el-tree:hover::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+.el-tree {
+    display:inline-flex !important;
+}
+.nodePreviewClass{
+    margin-left: 5px;
+    width: 38%;
+}
+.nodeDetailDiv{
+    margin-left: 5px;
+    width: 24%;
+}
+.nodeDivCommon::-webkit-scrollbar {
+    width: 4px;
+}
+.nodeDivCommon::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.nodeDivCommon:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.nodeDivCommon:hover::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+.nodeDetailClass .el-dialog::-webkit-scrollbar {
+    width: 4px;
+}
+.nodeDetailClass .el-dialog::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.nodeDetailClass .el-dialog:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.nodeDetailClass .el-dialog:hover::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+.nodeDetailRow{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0px 2px 0px 6px!important;
+}
+.labelClass{
+    display: flex;
+    font-size: 20px;
+    font-weight: 600;
+    flex: 1;
+    margin:5px 10px 5px 0;
+}
+.contentClass{
+    display: flex;
+    font-size: 20px;
+    overflow: hidden;
+    cursor: pointer;
+}

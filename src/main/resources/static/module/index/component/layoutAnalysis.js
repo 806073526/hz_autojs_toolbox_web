@@ -1,7 +1,7 @@
-import {getContext, sortByKey} from "./../../utils/utils.js";
+import {getContext, sortByKey} from "./../../../utils/utils.js";
 let template='<div></div>';
 $.ajax({
-    url: "/module/template/layoutAnalysis.html",
+    url: "/module/index/template/layoutAnalysis.html",
     type:'get',
     async:false,
     success:function(res){

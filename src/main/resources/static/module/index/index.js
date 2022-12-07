@@ -1,13 +1,13 @@
 let template ='<div></div>';
 $.ajax({
-    url: "/module/template/main.html",
+    url: "/module/index/template/main.html",
     type:'get',
     async:false,
     success:function(res){
         template = String(res);
     }
 });
-import {getContext} from "./../utils/utils.js";
+import {getContext} from "./../../utils/utils.js";
 import DeviceInfo from "./component/deviceInfo.js";
 import ImgHandler from "./component/imgHandler.js";
 import LayoutAnalysis from "./component/layoutAnalysis.js"

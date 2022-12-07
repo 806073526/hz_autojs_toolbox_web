@@ -1,8 +1,8 @@
-import {getContext} from "./../../utils/utils.js";
+import {getContext} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
-    url: "/module/template/deviceInfo.html",
+    url: "/module/index/template/deviceInfo.html",
     type:'get',
     async:false,
     success:function(res){

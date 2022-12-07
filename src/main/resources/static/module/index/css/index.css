@@ -1,0 +1,125 @@
+html, body {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+textarea::-webkit-scrollbar {
+    width: 4px;
+}
+textarea::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+textarea:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+textarea:hover::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+.width100 {
+    width: 100% !important;
+}
+.width75 {
+    width: 75% !important;
+}
+.width50 {
+    width: 50% !important;
+}
+.width40{
+    width: 40% !important;
+}
+.width60{
+    width: 60% !important;
+}
+.width45 {
+    width: 45% !important;
+}
+.width30 {
+    width: 30% !important;
+}
+.width25 {
+    width: 25% !important;
+}
+.width20 {
+    width: 20% !important;
+}
+.width15 {
+    width: 15% !important;
+}
+.width10 {
+    width: 10% !important;
+}
+.width70 {
+    width: 80% !important;
+}
+.width80 {
+    width: 80% !important;
+}
+
+.width90 {
+    width: 90% !important;
+}
+
+.container {
+    padding: 15px 0;
+}
+
+.el-table .el-input--medium .el-input__inner {
+    height: 23px !important;
+    line-height: 23px !important;
+}
+
+.el-table .emptyRow {
+    display: inline-block;
+    height: 31px !important;
+    line-height: 31px !important;
+    margin-left: 10px
+}
+
+
+.el-form-item {
+    margin-bottom: 15px;
+}
+
+.el-row {
+    padding: 0px 30px 0px 15px;
+}
+
+.el-table .el-input--medium .el-input__inner {
+    height: 23px !important;
+    line-height: 23px !important;
+}
+
+.el-form-item {
+    margin-bottom: 15px;
+}
+
+table .el-input__inner, table .el-textarea textarea {
+    width: 100% !important;
+    border: none;
+    padding-left: 10px;
+    color: black;
+    font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif !important;
+}
+
+
+.basicInfo {
+    color: #364760;
+    font-size: 15px;
+    margin: 5px 15px 10px 20px;
+    background-color: #F0F2F4;
+    height: 34px;
+    line-height: 34px;
+    padding-left: 10px;
+}
+
+.basicInfo::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background-color: #364760;
+    vertical-align: text-bottom;
+    margin-right: 10px;
+    border-radius: 5px;
+}

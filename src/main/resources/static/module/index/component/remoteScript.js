@@ -1,7 +1,7 @@
-import {getContext} from "./../../utils/utils.js";
+import {getContext} from "./../../../utils/utils.js";
 let template='<div></div>';
 $.ajax({
-    url: "/module/template/remoteScript.html",
+    url: "/module/index/template/remoteScript.html",
     type:'get',
     async:false,
     success:function(res){

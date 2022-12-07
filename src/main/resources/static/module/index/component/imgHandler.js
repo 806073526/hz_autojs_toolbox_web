@@ -1,7 +1,7 @@
-import {getContext, rgb2hex} from "./../../utils/utils.js";
+import {getContext, rgb2hex} from "./../../../utils/utils.js";
 let template = '<div></div>';
 $.ajax({
-    url: "/module/template/imgHandler.html",
+    url: "/module/index/template/imgHandler.html",
     type:'get',
     async:false,
     success:function(res){

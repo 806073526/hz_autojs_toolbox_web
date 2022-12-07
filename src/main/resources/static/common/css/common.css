@@ -5,6 +5,7 @@ html {
 
 body {
     font-family: 'Microsoft YaHei' !important;
+    font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;
     line-height: 1.428571429;
     color: #444;
     margin: 0px;
