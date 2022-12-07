@@ -40,3 +40,51 @@ export const isNumber = (val) => {
         return false;
     }
 }
+
+
+
+/**
+ * 创建排序方法
+ * @param {Array} array 原数组
+ * @param {String} key 排序key
+ * @param {Boolean} order 排序方法 true正序 false倒序
+ * @returns
+ */
+export const sortByKey = (array, key, order) => {
+    return array.sort(function (a, b) {
+        let x = a[key]; let y = b[key];
+        if (order) {
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0))
+        } else {
+            return ((x < y) ? ((x > y) ? 1 : 0) : -1)
+        }
+    })
+};
+
+// 获取链接参数
+export const urlParam = (name)=> {
+    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    let r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return unescape(r[2]);
+    return null; //返回参数值
+};
+
+// 颜色转换
+export const rgb2hex = (rgb)=> {
+    let reg=/(\d{1,3}),(\d{1,3}),(\d{1,3})/;
+    let arr=reg.exec(rgb);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    let _hex="#" + hex(arr[1]) + hex(arr[2]) + hex(arr[3]);
+    return _hex.toUpperCase();
+};
+
+// 补0
+export const zeroFill = (i)=> {
+    if (i >= 0 && i <= 9) {
+        return "0" + i;
+    } else {
+        return String(i);
+    }
+};
