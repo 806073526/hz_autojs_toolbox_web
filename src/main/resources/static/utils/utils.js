@@ -1,30 +1,16 @@
 export const getContext = () => {
-    let contextPath = ""
-    const host = self.location.hostname
-    var protocol = self.location.protocol
-    var port = self.location.port
-    var path = self.location.pathname
+    let contextPath = "";
+    const host = self.location.hostname;
+    let protocol = self.location.protocol;
+    let port = self.location.port;
+    let path = self.location.pathname;
     if (port == null) {
-        contextPath = protocol + '//' + host
+        contextPath = protocol + '//' + host;
     } else {
-        contextPath = protocol + '//' + host + ':' + port
+        contextPath = protocol + '//' + host + ':' + port;
     }
-    return contextPath
-}
-
-export const initLoginUser = () => {
-    var adminUser = new Object();
-    $.ajax({
-        url: getContext() + "/adminUser/getLoginUser.do",
-        type: "post",
-        dataType: "json",
-        async: false,
-        success: function (data) {
-            adminUser = data.adminUser;
-        }
-    });
-    return adminUser;
-}
+    return contextPath;
+};
 
 
 /**
@@ -32,14 +18,10 @@ export const initLoginUser = () => {
  **/
 
 export const isNumber = (val) => {
-    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
-    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
-    if (regPos.test(val) || regNeg.test(val)) {
-        return true;
-    } else {
-        return false;
-    }
-}
+    let regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    let regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+    return regPos.test(val) || regNeg.test(val);
+};
 
 
 
