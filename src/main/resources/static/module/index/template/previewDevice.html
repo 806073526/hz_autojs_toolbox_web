@@ -57,22 +57,22 @@
                     x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}
                 </div>
                 <div style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
-                    <el-button type="warning" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
                         主页
                     </el-button>
-                    <el-button type="warning" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
                         返回
                     </el-button>
-                    <el-button type="warning" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
                         任务
                     </el-button>
-                    <el-button type="warning" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
                         通知
                     </el-button>
-                    <el-button type="warning" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
                         电源
                     </el-button>
-                    <el-button type="info" size="mini" style="margin-left:10px" @click.stop.prevent="devicePreviewParam.operateRecord = ''">
+                    <el-button type="primary" size="mini" style="margin-left:10px" @click.stop.prevent="devicePreviewParam.operateRecord = ''">
                         清空操作记录
                     </el-button>
                 </div>
@@ -97,11 +97,11 @@
                         </span>
                         <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
                     </div>
-                    <el-button type="primary" size="mini" style="margin-left:10px" id="loadPreviewImg"
+                    <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
                                @click.stop.prevent="startPreviewDevice(true)">
                         开始预览
                     </el-button>
-                    <el-button type="info" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
                         停止预览
                     </el-button>
                 </div>

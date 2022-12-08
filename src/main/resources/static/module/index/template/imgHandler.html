@@ -120,7 +120,7 @@
                         </el-radio>
                     </el-radio-group>
                 </div>
-                <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="setParam1(true)">
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="setParam1(true)">
                     坐标全屏
                 </el-button>
                 <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="readPositionList">
@@ -129,10 +129,10 @@
                 <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="clearPosition">
                     清空坐标列表
                 </el-button>
-                <el-button type="warning" style="margin-left:10px" size="mini" @click.stop.prevent="param1Subtract">
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="param1Subtract">
                     减去坐标值
                 </el-button>
-                <el-button type="warning" style="margin-left:10px" size="mini" @click.stop.prevent="param1Addition">
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="param1Addition">
                     加上坐标值
                 </el-button>
                 <!--<el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="copyPosition">
@@ -183,13 +183,13 @@
                     </span>
                     <el-switch v-model="remoteHandler.param1.isOpenThreshold" />
                 </div>
-                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
+                <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
                     图像处理(加载)
                 </el-button>
-                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
                     文字识别
                 </el-button>
-                <el-button type="info" size="mini" style="margin-left:10px" id="loadPreviewImg"
+                <el-button type="primary" size="mini" style="margin-left:10px" id="loadPreviewImg"
                            @click.stop.prevent="loadPreviewImg">
                     加载图片
                 </el-button>
@@ -319,7 +319,7 @@
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <el-button type="info" size="mini" style="margin-left:10px" @click.stop.prevent="execPreviewScript">
+                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="execPreviewScript">
                     执行代码
                 </el-button>
             </el-form-item>
@@ -358,16 +358,16 @@
         </div>
         <div class="positionListFixed" v-show="remoteHandler.param1.showFixedPositionList">
             <div class="buttonPanel">
-                <el-button type="primary" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
+                <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
                     图像处理(加载)
                 </el-button>
-                <el-button type="primary" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
                     文字识别
                 </el-button>
-                <el-button type="info" size="mini" @click.stop.prevent="loadPreviewImg">
+                <el-button type="primary" size="mini" @click.stop.prevent="loadPreviewImg">
                     加载图片
                 </el-button>
-                <el-button type="danger" size="mini" @click.stop.prevent="setParam1(true)">
+                <el-button type="primary" size="mini" @click.stop.prevent="setParam1(true)">
                     坐标全屏
                 </el-button>
                 <el-button type="primary" size="mini" @click.stop.prevent="readPositionList">

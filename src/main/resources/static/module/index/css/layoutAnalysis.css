@@ -24,6 +24,9 @@
 }
 .el-tree {
     display:inline-flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 .nodePreviewClass{
     margin-left: 5px;

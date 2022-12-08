@@ -38,6 +38,10 @@ export default {
                 param5: {
                     rootNodeJson: '',
                     rootNodeObj: [],
+                    filterRootNodeObj:[],// 条件过滤数据
+                    rootOneNodeArr:[],// 一维节点数组
+                    filterFunction:'(dataArr)=>{return dataArr.filter(item=>item.depth === 1);}',
+                    openCustomFilterFunction:false,// 开启自定义过滤函数处理
                     nodeKeyArr: [],// key数组
                     selectNode: {},
                     rectCanvasArr: [],// 绘制方框数组
@@ -48,7 +52,8 @@ export default {
                     isShowBgImg: true,
                     checkAll: false,//全选
                     scriptPreview: '',// 代码预览
-                    openClickGenerateCode: false,// 开启点击生成代码
+                    openClickGenerateCode: true,// 开启点击生成代码
+                    layoutAnalysisRange:'active',// 布局分析范围 active活跃窗口 all全部窗口
                     nodeInfo: '',// 节点信息
                     uiSelect: ['id', 'text', 'desc', 'className'],// ui选择器
                     uiSelectCondition: 'findOne',// ui选择器条件
@@ -60,13 +65,29 @@ export default {
                     },
                     nodeType: 'tree'
                 }
-            }
+            },
+            commonCustomFilterFunction:[
+                { name:'深度过滤(depth)',code:'(dataArr)=>{return dataArr.filter(item=>item.depth === 1);}' },
+                { name:'可点击过滤(clickable)',code:'(dataArr)=>{return dataArr.filter(item=>item.clickable);}' },
+                { name:'可长按过滤(longClickable)',code:'(dataArr)=>{return dataArr.filter(item=>item.longClickable);}' },
+                { name:'可滚动过滤(scrollable)',code:'(dataArr)=>{return dataArr.filter(item=>item.scrollable);}' },
+                { name:'有文字过滤(text)',code:'(dataArr)=>{return dataArr.filter(item=>item.text);}' },
+                { name:'有描述过滤(desc)',code:'(dataArr)=>{return dataArr.filter(item=>item.desc);}' },
+            ]
         }
     },
     computed: {
         param5DialogVisible() {
             return this.remoteHandler.param5.dialogVisible;
-        }
+        },
+        // 根节点数组
+        rootNodeObjArr(){
+            if(this.remoteHandler.param5.openCustomFilterFunction){
+                return this.remoteHandler.param5.filterRootNodeObj;
+            } else {
+                return this.remoteHandler.param5.rootNodeObj;
+            }
+        },
     },
     watch: {
         param5DialogVisible(val) {
@@ -78,6 +99,68 @@ export default {
         }
     },
     methods: {
+        // 开启自定义过滤函数处理开关change
+        openCustomFilterFunctionChange(){
+            this.remoteHandler.param5.filterRootNodeObj = [];
+            // 是否开启自定义节点过滤
+            let openCustomFilterFunction = this.remoteHandler.param5.openCustomFilterFunction;
+            // 开启了节点过滤 且 已挂载自定义节点过滤方法
+            if(openCustomFilterFunction){
+                if(!window.customFilterFunction){
+                    // 获取代码内容
+                    let scriptContent = "window.customFilterFunction="+this.remoteHandler.param5.filterFunction;
+                    // 执行代码
+                    eval(scriptContent);
+                }
+                this.remoteHandler.param5.filterRootNodeObj = window.customFilterFunction(this.remoteHandler.param5.rootOneNodeArr);
+            }
+        },
+        // 递归获取子节点
+        recursionNodeArr(allChildNodeArr,childNodeObj){
+            // 获取子节点数组
+            let children = childNodeObj.children ? childNodeObj.children : [];
+            if(children && children.length){
+                for (let i = 0; i < children.length; i++) {
+                    // 获取子节点
+                    let childNode = children[i];
+                    // 递归获取子节点
+                    this.recursionNodeArr(allChildNodeArr,childNode);
+                }
+            }
+            let copyObj = JSON.parse(JSON.stringify(childNodeObj));
+            copyObj.children = [];
+            allChildNodeArr.push(copyObj);
+        },
+        // 生成常用自定义过滤函数代码
+        generateCommonCustomFilterFunction(code){
+            this.remoteHandler.param5.filterFunction = code;
+            // 获取代码内容
+            let scriptContent = "window.customFilterFunction="+this.remoteHandler.param5.filterFunction;
+            // 执行代码
+            eval(scriptContent);
+            setTimeout(()=>{
+                // 触发过滤
+                this.openCustomFilterFunctionChange();
+            },200);
+            window.ZXW_VUE.$notify.success({message: '操作成功', duration: '1000'})
+        },
+        // 保存自定义过滤函数
+        saveCustomFilterFunction(){
+            // 获取代码内容
+            let scriptContent = "window.customFilterFunction="+this.remoteHandler.param5.filterFunction;
+            // 执行代码
+            eval(scriptContent);
+            setTimeout(()=>{
+                // 触发过滤
+                this.openCustomFilterFunctionChange();
+            },200);
+            window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'})
+        },
+        // 加载自定义过滤函数
+        loadCustomFilterFunction(){
+            this.remoteHandler.param5.filterFunction =  window.customFilterFunction ? String(window.customFilterFunction) : '';
+            window.ZXW_VUE.$notify.success({message: '加载成功', duration: '1000'})
+        },
         // 仅显示可见控件方法
         onlyShowVisible() {
             // 重置key数组
@@ -161,12 +244,12 @@ export default {
                 return
             }
             // 发送指令并上传文件
-            this.remoteExecuteScript('auto.clearCache();utilsObj.getRootNodeWriteLocal("tree");');
+            this.remoteExecuteScript('auto.clearCache();utilsObj.getRootNodeWriteLocal("tree","'+this.remoteHandler.param5.layoutAnalysisRange+'");');
         },
         // 远程限制应用布局分析
         remoteLimitLayoutAnalysis() {
             // 发送指令
-            this.remoteExecuteScript('utilsObj.remoteLimitLayoutAnalysis();');
+            this.remoteExecuteScript('utilsObj.remoteLimitLayoutAnalysis("'+this.remoteHandler.param5.layoutAnalysisRange+'");');
         },
         // 上传并加载布局分析json
         uploadAndLoadNodeJson() {
@@ -297,7 +380,7 @@ export default {
                 success: function (data) {//请求成功完成后要执行的方法
                     _that.remoteHandler.param5.rootNodeJson = JSON.stringify(data, "", "\t");
                     // 赋值对象
-                    _that.remoteHandler.param5.rootNodeObj = [data];
+                    _that.remoteHandler.param5.rootNodeObj = data.constructor === Array ? data :  [data] ;
                     // 删除节点信息显示
                     _that.remoteHandler.param5.dialogVisible = false;
                     // 加载控件图片
@@ -342,6 +425,13 @@ export default {
                     } else {
                         window.ZXW_VUE.$notify.success({message: '加载完成', duration: '1000'})
                     }
+                    // 读取一维节点数组
+                    let allChildNodeArr = [];
+                    for(let i=0;i<_that.remoteHandler.param5.rootNodeObj.length;i++){
+                        let cur = _that.remoteHandler.param5.rootNodeObj[i];
+                        _that.recursionNodeArr(allChildNodeArr,cur);
+                    }
+                    _that.remoteHandler.param5.rootOneNodeArr = allChildNodeArr;
                 },
                 error: function (msg) {
                 }
