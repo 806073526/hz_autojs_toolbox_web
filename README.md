@@ -8,5 +8,7 @@
 
 [《华仔AutoJs工具箱》图色(控件)脚本的好帮手](https://www.zjh336.cn/?id=2109)
 
+![输入图片说明](%E8%B5%9E%E8%B5%8F.png)
+
 #### 软件架构
 JAVA8+springboot+redis
