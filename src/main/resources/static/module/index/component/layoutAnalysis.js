@@ -284,7 +284,7 @@ export default {
         },
         // 节点信息点击
         nodeContentClick(e) {
-            this.remoteHandler.param5.nodeInfo = e.target.innerHTML;
+            this.remoteHandler.param5.nodeInfo = String(e.target.innerHTML).replace(/(^\s*)|(\s*$)/g, "");
         },
         // 节点左键点击
         nodeClickFun(data, node, component) {
@@ -557,6 +557,8 @@ export default {
                 let nodeObj = this.$refs.nodeTree.getNode(highlightRect.nodeKey);
                 this.remoteHandler.param5.selectNode = nodeObj.data;
                 this.remoteHandler.param5.dialogVisible = true;
+                // 更改选中树节点
+                this.$refs.nodeTree.setCurrentKey(highlightRect.nodeKey);
                 // 点击生成代码
                 this.nodeGenerateCode();
             }

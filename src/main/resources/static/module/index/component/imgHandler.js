@@ -419,7 +419,7 @@ export default {
                     'let options = { scale:' + this.remoteHandler.param1.bigScale + '};\r\n' +
                     'let result = images.detectAndComputeFeatures(img,options);\r\n' +
                     'utilsObj.recycleNull(img);\r\n' +
-                    'toastLog(result);\r\n' +
+                    'toastLog(JSON.stringify(result));\r\n' +
                     'utilsObj.recycleNull(result);';
                 // 特征匹配
             } else if ('matchFeatures' === codeType) {
@@ -600,7 +600,7 @@ export default {
                     'let result = utilsObj.detectFeaturesScale(img,targetImg,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ');\r\n' +
                     'utilsObj.recycleNull(img);\r\n' +
                     'utilsObj.recycleNull(targetImg);\r\n' +
-                    'toastLog(result);\r\n';
+                    'toastLog(JSON.stringify(result));\r\n';
                 // 灰度化阈值化特征匹配
             } else if ('matchingFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
@@ -608,14 +608,14 @@ export default {
                     'let result = utilsObj.matchingFeatures(img,targetImg,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"");\r\n' +
                     'utilsObj.recycleNull(img);\r\n' +
                     'utilsObj.recycleNull(targetImg);\r\n' +
-                    'toastLog(result);\r\n';
+                    'toastLog(JSON.stringify(result));\r\n';
                 // 随机点击
             } else if ('randomClick' === codeType) {
                 code = 'utilsObj.randomClick(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',5,false);\r\n';
                 // 灰度化阈值化图片
             } else if ('grayscaleAndThreshold2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.grayscaleAndThreshold2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'let result = utilsObj.grayscaleAndThreshold2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
