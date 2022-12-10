@@ -2,7 +2,10 @@ package com.zjh.zxw.controller;
 
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.exception.BusinessException;
+import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.service.AttachmentInfoService;
+import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+import static com.zjh.zxw.base.R.SERVICE_ERROR;
 
 
 /**
@@ -33,11 +40,7 @@ public class AttachmentInfoController extends BaseController {
     private AttachmentInfoService attachmentInfoService;
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
-
-
-
-
+    private RedisTemplate<String, Object> redisTemplate;
 
 
     /**
@@ -48,7 +51,148 @@ public class AttachmentInfoController extends BaseController {
     @ApiOperation(value = "上传附件(AutoJs专用)", notes = "上传附件(AutoJs专用)")
     @PostMapping("/uploadFileToAutoJs")
     public R<String> uploadFileToAutoJs(@RequestParam("file") MultipartFile file, @RequestParam("imageName") String imageName) {
-        String url = attachmentInfoService.uploadFileToAutoJs(file, imageName);
-        return success(url);
+        String url = "";
+        try {
+            url = attachmentInfoService.uploadFileToAutoJs(file, imageName);
+            return success(url);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("上传附件失败！请联系管理员");
+        }
     }
+
+    /**
+     * 根据路径获取子文件以及子目录
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "根据路径获取子文件以及子目录", notes = "根据路径获取子文件以及子目录")
+    @GetMapping("/queryAttachInfoListByPath")
+    public R<List<AttachInfo>> queryAttachInfoListByPath(@RequestParam("filePath") String filePath) {
+        try {
+            List<AttachInfo> attachInfos = attachmentInfoService.queryAttachInfoListByPath(filePath);
+            return success(attachInfos);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("查询文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 上传文件
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "上传文件", notes = "上传文件")
+    @PostMapping("/uploadFile")
+    public R<AttachInfo> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) {
+        try {
+            AttachInfo attachInfo = attachmentInfoService.uploadFile(file, fileName);
+            return success(attachInfo);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("上传文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 重命名文件
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "重命名文件", notes = "重命名文件")
+    @GetMapping("/reNameFile")
+    public R<Boolean> reNameFile(@RequestParam("oldFileName") String oldFileName,@RequestParam("newFileName") String newFileName) {
+        try {
+            Boolean isSuccess = attachmentInfoService.reNameFile(oldFileName, newFileName);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("重命名文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 复制文件
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "复制文件", notes = "复制文件")
+    @GetMapping("/copyFile")
+    public R<Boolean> copyFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetPath") String targetPath) {
+        try {
+            Boolean isSuccess = attachmentInfoService.copyFile(sourcePath, targetPath);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("复制文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 移动文件
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "移动文件", notes = "移动文件")
+    @GetMapping("/moveFile")
+    public R<Boolean> moveFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetPath") String targetPath) {
+        try {
+            Boolean isSuccess = attachmentInfoService.moveFile(sourcePath, targetPath);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("移动文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 创建文件夹
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "创建文件夹", notes = "创建文件夹")
+    @GetMapping("/createFolder")
+    public R<Boolean> createFolder(@RequestParam("folderName") String folderName) {
+        try {
+            Boolean isSuccess = attachmentInfoService.createFolder(folderName);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("创建文件夹异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 删除文件
+     *
+     */
+    @ApiOperation(value = "删除文件", notes = "删除文件")
+    @GetMapping("/deleteFile")
+    public R<Boolean> deleteFile(@RequestParam("filePath") String filePath) {
+        try {
+            Boolean isSuccess = attachmentInfoService.deleteFile(filePath);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("删除文件异常！请联系管理员");
+        }
+    }
+
 }
