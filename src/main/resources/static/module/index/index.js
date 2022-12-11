@@ -14,6 +14,7 @@ import LayoutAnalysis from "./component/layoutAnalysis.js"
 import RemoteScript from "./component/remoteScript.js"
 import PreviewDevice from "./component/previewDevice.js"
 import RemoteLog from "./component/remoteLog.js";
+import FileManage from "./component/fileManage.js"
 
 window.ZXW_VUE = new Vue({
     el: "#app",
@@ -23,7 +24,8 @@ window.ZXW_VUE = new Vue({
         LayoutAnalysis: LayoutAnalysis,
         RemoteScript: RemoteScript,
         PreviewDevice: PreviewDevice,
-        RemoteLog:RemoteLog
+        RemoteLog:RemoteLog,
+        FileManage:FileManage
     },
     template: template,
     data: {
@@ -78,6 +80,11 @@ window.ZXW_VUE = new Vue({
                     this.$refs.imgHandler.setParam1(true);
                 });
             }, 3000);
+
+            this.$nextTick(()=>{
+                // 初始化文件管理
+                this.$refs.fileManage.init();
+            })
         },
         // 验证是否已选设备
         validSelectDevice() {

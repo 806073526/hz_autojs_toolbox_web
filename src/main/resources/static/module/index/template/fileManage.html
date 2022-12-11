@@ -1,0 +1,102 @@
+<div @drop.prevent="onDrop">
+    <p class="basicInfo" style="position: relative;">
+        文件管理
+    </p>
+    <el-row style="margin-top: 10px;">
+        <div class="width100 d-flex a-center">
+            <el-form-item label="web端同步路径:" label-width="125px" class="width40">
+                <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径"
+                          class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="手机端同步路径:" label-width="125px" class="width40">
+                <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径"
+                          class="width100">
+                </el-input>
+            </el-form-item>
+            <div class="width20 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
+                <el-button @click.stop="syncFileToPhone">
+                    同步到手机端
+                </el-button>
+                <el-button @click.stop="syncFileToWeb">
+                    同步到web端
+                </el-button>
+            </div>
+        </div>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+        <div class="d-flex j-sb a-center width100">
+            <div class="d-flex a-center">
+                <el-button size="mini" type="primary" @click="uploadFile">上传文件</el-button>
+                <el-button size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
+            </div>
+         <div>
+    </el-row>
+    <el-row>
+        <div class="d-flex j-sb a-center breadcrumbWrap">
+            <!-- 面包屑-->
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" class="pointer textHover" :class="{'endBreadcrumb': i !== 0 && i === breadcrumbList.length - 1, 'hoverBreadcrumb': breadcrumbList.length > 1 && i !== breadcrumbList.length - 1 }">
+                    <span @click="breadcrumbChange(item, i)">{{ item.label }}</span>
+                </el-breadcrumb-item>
+            </el-breadcrumb>
+            <span class="primary-text-color font-14 keep-all">共{{ fileList.length }}个</span>
+        </div>
+    </el-row>
+   <!-- <el-row>
+        <div class="d-flex a-center fileOperate primary-text-color mt-10 pl-1">
+            <span class="mr-30">已选{{ checkFileCount }}个文件(夹)</span>
+            &lt;!&ndash; 菜单栏&ndash;&gt;
+            <div>
+                <el-link>移动</el-link>
+                <el-link>删除</el-link>
+            </div>
+        </div>
+    </el-row>-->
+    <el-row>
+        <div class="fileTableList" v-loading="fileLoading">
+            <div class="fileList-head d-flex a-center">
+                <div class="d-flex a-center fileName">
+                    <el-checkbox v-model="checkAllFile" @change="checkAllFileChange" />
+                    <span class="ml-8">文件名</span>
+                </div>
+                <div class="fileSize">文件大小</div>
+                <div class="lastUpdateTime">最后更新时间</div>
+                <div class="operate">操作</div>
+            </div>
+            <el-scrollbar class="right-scrollbar-wrap">
+                <div v-for="(item, index) in uploadFileList" :key="index" class="fileList-head fileList-body d-flex a-center uploadFileHover">
+                    <div class="d-flex a-center fileName">
+                        <el-checkbox v-model="item.check" disabled />
+                        <div class="fileNameWrap d-flex a-center flex-1">
+                            <span class="mr-16 text-fileName mt-0">{{ item.fileName }}</span>
+                        </div>
+                    </div>
+                    <span class="iconfont">取消</span>
+                   <!-- <el-progress :percentage="item.percentage" :stroke-width="3" />-->
+                </div>
+                <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
+                    <div class="d-flex a-center fileName">
+                        <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
+                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10">
+                            <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory">.{{ item.fileType }}</span></span>
+                        </div>
+                    </div>
+                    <div class="d-flex a-center fileSize">
+                        <span>{{ calculateSize(item.fileSize) }}</span>
+                    </div>
+                    <div class="d-flex a-center lastUpdateTime">
+                        <span>{{ item.lastUpdateTime }}</span>
+                    </div>
+                    <div class="operate d-flex a-center j-center">
+                        <el-link v-show="!item.isDirectory" :underline="false" type="info" class="mr-5" @click="previewFile(item.previewUrl)">预览</el-link>
+                        <!--<el-link>下载</el-link>
+                        <el-link>移动</el-link>
+                        <el-link>删除</el-link>-->
+                    </div>
+                </div>
+            </el-scrollbar>
+        </div>
+
+    </el-row>
+</div>

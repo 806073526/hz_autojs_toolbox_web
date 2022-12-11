@@ -1,0 +1,56 @@
+.fileList-head{
+    height: 34px;
+    background-color: #F6F6F6;
+    color: #364760;
+    padding-left: 8px;
+    font-size: 14px;
+}
+.fileList-head .caret-wrapper{
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+    vertical-align: middle;
+    cursor: pointer;
+    overflow: initial;
+    position: relative;
+}
+
+
+.fileList-head .fileName {
+    width: 50%;
+}
+.fileList-head .fileName .text-fileName{
+    display: inline-block;
+    flex: 1;
+    -webkit-box-flex: 1;
+}
+.fileList-head .fileName .fileNameWrap:hover{
+    color: #4BABF6 !important;
+}
+.fileList-head .lastUpdateTime {
+    width: 20%;
+}
+.fileList-head .fileSize{
+    width: 20%;
+}
+.fileList-head .operate {
+    width: 10%;
+    text-align: center;
+}
+
+
+.fileList-body{
+    position: relative;
+    height: 48px !important;
+}
+
+.fileList-body:nth-child(2n - 1) {
+    background-color: #FFFFFF;
+}
+
+.fileList-body:hover{
+    background-color: #eaecef !important;
+    color: #364760 !important;
+}
