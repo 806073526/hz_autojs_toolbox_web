@@ -45,10 +45,18 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
 
+    private String getRootPath() {
+        return uploadPath + "autoJsTools" + File.separator;
+    }
+
+    private String getPreviewRootUrl() {
+        return "uploadPath/autoJsTools/";
+    }
+
     @Override
     public List<AttachInfo> queryAttachInfoListByPath(String relativeFilePath){
         List<AttachInfo> attachInfos = new ArrayList<>();
-        File file = new File(uploadPath + "autoJsTools" + File.separator + relativeFilePath);
+        File file = new File(this.getRootPath() + relativeFilePath);
         // 当前不是一个目录，直接返回空集合
         if (!file.isDirectory()) {
             return attachInfos;
@@ -66,7 +74,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Override
     public List<AttachInfo> queryAllAttachInfoListByPath(String relativeFilePath, Boolean onlyQueryFolder) {
         List<AttachInfo> attachInfos = new ArrayList<>();
-        File file = new File(uploadPath + "autoJsTools" + File.separator + relativeFilePath);
+        File file = new File(this.getRootPath() + relativeFilePath);
         // 当前不是一个目录，直接返回空集合
         if (!file.isDirectory()) {
             return attachInfos;
@@ -107,7 +115,13 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         } else {
             attachInfo.setFileName(f.getName());
         }
-        attachInfo.setPathName(f.getPath());
+        String filePath = f.getPath();
+        String rootPath = this.getRootPath();
+        String previewRootUrl = this.getPreviewRootUrl();
+        String previewUrl =  previewRootUrl + filePath.replace(rootPath,"");
+        previewUrl = previewUrl.replace("\\","/");
+        attachInfo.setPreviewUrl(previewUrl);
+        attachInfo.setPathName(filePath);
         attachInfo.setParentPathName(f.getParent());
         attachInfo.setAbsolutePathName(f.getAbsolutePath());
         attachInfo.setFileSize(f.length());
@@ -118,7 +132,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Override
     public AttachInfo uploadFile(MultipartFile multipartFile, String fileName){
         this.uploadFileToAutoJs(multipartFile,fileName);
-        File file = new File(uploadPath + "autoJsTools" + File.separator + fileName);
+        File file = new File(this.getRootPath() + fileName);
         AttachInfo attachInfo = convertAttachInfo(file);
         return attachInfo;
     }
@@ -127,7 +141,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Override
     public String uploadFileToAutoJs(MultipartFile multipartFile, String imageName) {
         //判断文件保存是否存在
-        File file = new File(uploadPath + "autoJsTools" + File.separator + imageName);
+        File file = new File(this.getRootPath() + imageName);
         if (file.getParentFile() != null || !Objects.requireNonNull(file.getParentFile()).isDirectory()) {
             //创建文件
             file.getParentFile().mkdirs();
@@ -161,7 +175,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean copyFile(String sourcePath, String targetFolderPath) throws IOException {
-        String prePath = uploadPath + "autoJsTools" + File.separator;
+        String prePath = this.getRootPath();
         if(!sourcePath.contains(prePath) || !targetFolderPath.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
@@ -203,7 +217,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean moveFile(String sourcePath, String targetFolderPath) throws IOException {
-        String prePath = uploadPath + "autoJsTools" + File.separator;
+        String prePath = this.getRootPath();
         if(!sourcePath.contains(prePath) || !targetFolderPath.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
@@ -218,15 +232,15 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean reNameFile(String oldFileName, String newFileName) {
-        File file = new File(uploadPath + "autoJsTools" + File.separator + oldFileName);
-        File newFile = new File(uploadPath + "autoJsTools" + File.separator + newFileName);
+        File file = new File(this.getRootPath() + oldFileName);
+        File newFile = new File(this.getRootPath() + newFileName);
         boolean renameTo = file.renameTo(newFile);
         return renameTo;
     }
 
     @Override
     public Boolean deleteFile(String filePath) throws IOException {
-        String prePath = uploadPath + "autoJsTools" + File.separator;
+        String prePath = this.getRootPath();
         if(!filePath.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
@@ -236,7 +250,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean createFolder(String folderName) {
-        String folderPath = uploadPath + "autoJsTools" + File.separator + folderName;
+        String folderPath = this.getRootPath() + folderName;
         FileUtil.createFolder(folderPath);
         return true;
     }

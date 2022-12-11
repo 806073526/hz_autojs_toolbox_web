@@ -33,6 +33,9 @@ public class AttachInfo implements Serializable {
     @ApiModelProperty(value = "文件长度")
     private Long fileSize;
 
+    @ApiModelProperty(value = "访问地址")
+    private String previewUrl;
+
     @ApiModelProperty(value = "文件路径")
     private String pathName; // 文件路径
 
