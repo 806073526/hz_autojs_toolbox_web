@@ -4,6 +4,7 @@ import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AttachInfo;
+import com.zjh.zxw.domain.dto.BatchFileDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
@@ -121,15 +122,16 @@ public class AttachmentInfoController extends BaseController {
     }
 
     /**
-     * 复制文件
-     *
+     * 复制文件(单个文件，递归复制)
+     * @param sourcePath  原文件路径
+     * @param targetFolderPath 目标文件夹路径
      * @return 新增结果
      */
-    @ApiOperation(value = "复制文件", notes = "复制文件")
+    @ApiOperation(value = "复制文件(单个文件，递归复制)", notes = "复制文件(单个文件，递归复制)")
     @GetMapping("/copyFile")
-    public R<Boolean> copyFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetPath") String targetPath) {
+    public R<Boolean> copyFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetFolderPath") String targetFolderPath) {
         try {
-            Boolean isSuccess = attachmentInfoService.copyFile(sourcePath, targetPath);
+            Boolean isSuccess = attachmentInfoService.copyFile(sourcePath, targetFolderPath);
             return success(isSuccess);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
@@ -140,21 +142,59 @@ public class AttachmentInfoController extends BaseController {
     }
 
     /**
-     * 移动文件
+     * 批量复制文件(多个文件，递归复制)
+     * @param batchFileDTO  批量文件对象
+     */
+    @ApiOperation(value = "批量复制文件(多个文件，递归复制)", notes = "批量复制文件(多个文件，递归复制)")
+    @GetMapping("/copyFileBatch")
+    public R<Boolean> copyFileBatch(@RequestBody BatchFileDTO batchFileDTO) {
+        try {
+            Boolean isSuccess = attachmentInfoService.copyFileBatch(batchFileDTO);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("批量复制文件异常！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 移动文件(单个文件，递归移动)
      *
      * @return 新增结果
      */
-    @ApiOperation(value = "移动文件", notes = "移动文件")
+    @ApiOperation(value = "移动文件(单个文件，递归移动)", notes = "移动文件(单个文件，递归移动)")
     @GetMapping("/moveFile")
-    public R<Boolean> moveFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetPath") String targetPath) {
+    public R<Boolean> moveFile(@RequestParam("sourcePath") String sourcePath, @RequestParam("targetFolderPath") String targetFolderPath) {
         try {
-            Boolean isSuccess = attachmentInfoService.moveFile(sourcePath, targetPath);
+            Boolean isSuccess = attachmentInfoService.moveFile(sourcePath, targetFolderPath);
             return success(isSuccess);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return fail("移动文件异常！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 批量移动文件(多个文件，递归移动)
+     * @param batchFileDTO  批量文件对象
+     */
+    @ApiOperation(value = "批量移动文件(多个文件，递归移动)", notes = "批量移动文件(多个文件，递归移动)")
+    @GetMapping("/moveFileBatch")
+    public R<Boolean> moveFileBatch(@RequestBody BatchFileDTO batchFileDTO) {
+        try {
+            Boolean isSuccess = attachmentInfoService.moveFileBatch(batchFileDTO);
+            return success(isSuccess);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("批量移动文件异常！请联系管理员");
         }
     }
 
@@ -178,10 +218,10 @@ public class AttachmentInfoController extends BaseController {
     }
 
     /**
-     * 删除文件
+     * 删除文件(递归删除)
      *
      */
-    @ApiOperation(value = "删除文件", notes = "删除文件")
+    @ApiOperation(value = "删除文件(递归删除)", notes = "删除文件(递归删除)")
     @GetMapping("/deleteFile")
     public R<Boolean> deleteFile(@RequestParam("filePath") String filePath) {
         try {

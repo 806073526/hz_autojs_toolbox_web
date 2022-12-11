@@ -1,8 +1,10 @@
 package com.zjh.zxw.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.common.util.FileUtil;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AttachInfo;
+import com.zjh.zxw.domain.dto.BatchFileDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -52,10 +54,11 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
             return attachInfos;
         }
         File[] files = file.listFiles();
-        assert files != null;
-        for (File f : files) {
-            AttachInfo attachInfo = convertAttachInfo(f);
-            attachInfos.add(attachInfo);
+        if(Objects.nonNull(files) && files.length>0){
+            for (File f : files) {
+                AttachInfo attachInfo = convertAttachInfo(f);
+                attachInfos.add(attachInfo);
+            }
         }
         return attachInfos;
     }
@@ -126,22 +129,57 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     }
 
     @Override
-    public Boolean copyFile(String sourcePath, String targetPath) throws IOException {
+    public Boolean copyFile(String sourcePath, String targetFolderPath) throws IOException {
         String prePath = uploadPath + "autoJsTools" + File.separator;
-        if(!sourcePath.contains(prePath) || !targetPath.contains(prePath)){
+        if(!sourcePath.contains(prePath) || !targetFolderPath.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
-        FileUtil.copyFile(sourcePath,targetPath);
+        // 读取源文件
+        File sourceFile = new File(sourcePath);
+        if(!sourceFile.exists()){
+            // throw new BusinessException("源文件不存在");
+            return false;
+        }
+        //创建目标目录的File对象
+        File targetDir = new File(targetFolderPath);
+        //如果目的目录不存在
+        if(!targetDir.exists()){
+            //创建目的目录
+            targetDir.mkdirs();
+        }
+        // 如果是目录
+        if(sourceFile.isDirectory()){
+            // 先复制目录
+            String targetFilePath = targetFolderPath + File.separator + sourceFile.getName();
+            FileUtil.copyFile(sourcePath,targetFilePath);
+            // 遍历源文件子目录
+            File[] files = sourceFile.listFiles();
+            if(Objects.nonNull(files) && files.length>0){
+                // 遍历文件
+                for (File file : files) {
+                    // 子文件原始路径
+                    String childSourcePath = sourcePath + File.separator + file.getName();
+                    // 递归调用复制文件方法
+                    this.copyFile(childSourcePath,targetFilePath);
+                }
+            }
+        } else {
+            String targetFilePath = targetFolderPath + File.separator + sourceFile.getName();
+            FileUtil.copyFile(sourcePath,targetFilePath);
+        }
         return true;
     }
 
     @Override
-    public Boolean moveFile(String sourcePath, String targetPath) throws IOException {
+    public Boolean moveFile(String sourcePath, String targetFolderPath) throws IOException {
         String prePath = uploadPath + "autoJsTools" + File.separator;
-        if(!sourcePath.contains(prePath) || !targetPath.contains(prePath)){
+        if(!sourcePath.contains(prePath) || !targetFolderPath.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
-        FileUtil.moveFile(sourcePath,targetPath);
+        // 先复制
+        this.copyFile(sourcePath,targetFolderPath);
+        // 再删除
+        this.deleteFile(sourcePath);
         return true;
     }
 
@@ -169,6 +207,30 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     public Boolean createFolder(String folderName) {
         String folderPath = uploadPath + "autoJsTools" + File.separator + folderName;
         FileUtil.createFolder(folderPath);
+        return true;
+    }
+
+    @Override
+    public Boolean copyFileBatch(BatchFileDTO batchFileDTO) throws IOException {
+        List<String> sourcePathList = batchFileDTO.getSourcePathList();
+        String targetFolderPath = batchFileDTO.getTargetFolderPath();
+        if(CollectionUtils.isNotEmpty(sourcePathList)){
+            for (String s : sourcePathList) {
+                this.copyFile(s,targetFolderPath);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean moveFileBatch(BatchFileDTO batchFileDTO) throws IOException {
+        List<String> sourcePathList = batchFileDTO.getSourcePathList();
+        String targetFolderPath = batchFileDTO.getTargetFolderPath();
+        if(CollectionUtils.isNotEmpty(sourcePathList)){
+            for (String s : sourcePathList) {
+                this.moveFile(s,targetFolderPath);
+            }
+        }
         return true;
     }
 

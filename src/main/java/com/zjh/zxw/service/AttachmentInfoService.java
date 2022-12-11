@@ -1,6 +1,7 @@
 package com.zjh.zxw.service;
 
 import com.zjh.zxw.domain.dto.AttachInfo;
+import com.zjh.zxw.domain.dto.BatchFileDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,13 +26,17 @@ public interface AttachmentInfoService {
 
     String uploadFileToAutoJs(MultipartFile file, String imageName);
 
-    Boolean copyFile(String sourcePath, String targetPath) throws IOException;
+    Boolean copyFile(String sourcePath, String targetFolderPath) throws IOException;
 
-    Boolean moveFile(String sourcePath, String targetPath) throws IOException;
+    Boolean moveFile(String sourcePath, String targetFolderPath) throws IOException;
 
     Boolean reNameFile(String oldFileName, String newFileName);
 
     Boolean deleteFile(String filePath) throws IOException;
 
     Boolean createFolder(String folderName);
+
+    Boolean copyFileBatch(BatchFileDTO batchFileDTO) throws IOException;
+
+    Boolean moveFileBatch(BatchFileDTO batchFileDTO) throws IOException;
 }
