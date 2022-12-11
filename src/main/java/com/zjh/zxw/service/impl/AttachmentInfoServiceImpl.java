@@ -23,11 +23,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * <p>
@@ -125,7 +123,10 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         attachInfo.setParentPathName(f.getParent());
         attachInfo.setAbsolutePathName(f.getAbsolutePath());
         attachInfo.setFileSize(f.length());
-        attachInfo.setLastUpdateTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(f.lastModified()), TimeZone.getDefault().toZoneId()));
+        // LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(f.lastModified()), ZoneId.systemDefault());
+        Date date = new Date(f.lastModified());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        attachInfo.setLastUpdateTime(localDateTime);
         return attachInfo;
     }
 
