@@ -46,9 +46,9 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     private String uploadPath;
 
     @Override
-    public List<AttachInfo> queryAttachInfoListByPath(String filePath){
+    public List<AttachInfo> queryAttachInfoListByPath(String relativeFilePath){
         List<AttachInfo> attachInfos = new ArrayList<>();
-        File file = new File(uploadPath + "autoJsTools" + File.separator + filePath);
+        File file = new File(uploadPath + "autoJsTools" + File.separator + relativeFilePath);
         // 当前不是一个目录，直接返回空集合
         if (!file.isDirectory()) {
             return attachInfos;
@@ -57,6 +57,37 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         if(Objects.nonNull(files) && files.length>0){
             for (File f : files) {
                 AttachInfo attachInfo = convertAttachInfo(f);
+                attachInfos.add(attachInfo);
+            }
+        }
+        return attachInfos;
+    }
+
+    @Override
+    public List<AttachInfo> queryAllAttachInfoListByPath(String relativeFilePath, Boolean onlyQueryFolder) {
+        List<AttachInfo> attachInfos = new ArrayList<>();
+        File file = new File(uploadPath + "autoJsTools" + File.separator + relativeFilePath);
+        // 当前不是一个目录，直接返回空集合
+        if (!file.isDirectory()) {
+            return attachInfos;
+        }
+        File[] files = file.listFiles();
+        if(Objects.nonNull(files) && files.length>0){
+            for (File f : files) {
+                // 仅查询文件夹 且当前是文件
+                if(onlyQueryFolder && f.isFile()){
+                    continue;
+                }
+                AttachInfo attachInfo = convertAttachInfo(f);
+                // 如果文件是一个目录
+                if(f.isDirectory()){
+                    // 获取子文件夹的绝对路径
+                    String childRelativeFilePath = relativeFilePath + File.separator + f.getName();
+                    // 获取子目录的附件信息
+                    List<AttachInfo> childAttachList =  this.queryAllAttachInfoListByPath(childRelativeFilePath,onlyQueryFolder);
+                    // 设置children
+                    attachInfo.setChildren(childAttachList);
+                }
                 attachInfos.add(attachInfo);
             }
         }

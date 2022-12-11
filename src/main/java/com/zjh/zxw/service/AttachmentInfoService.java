@@ -19,8 +19,9 @@ import java.util.List;
  */
 public interface AttachmentInfoService {
 
+    List<AttachInfo> queryAttachInfoListByPath(String relativeFilePath);
 
-    List<AttachInfo> queryAttachInfoListByPath(String path);
+    List<AttachInfo> queryAllAttachInfoListByPath(String relativeFilePath,Boolean onlyQueryFolder);
 
     AttachInfo uploadFile(MultipartFile multipartFile, String fileName);
 

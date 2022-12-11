@@ -65,15 +65,13 @@ public class AttachmentInfoController extends BaseController {
     }
 
     /**
-     * 根据路径获取子文件以及子目录
-     *
-     * @return 新增结果
+     * 根据相对路径获取子文件以及子目录(不递归)
      */
-    @ApiOperation(value = "根据路径获取子文件以及子目录", notes = "根据路径获取子文件以及子目录")
+    @ApiOperation(value = "根据相对路径获取子文件以及子目录(不递归)", notes = "根据相对路径获取子文件以及子目录(不递归)")
     @GetMapping("/queryAttachInfoListByPath")
-    public R<List<AttachInfo>> queryAttachInfoListByPath(@RequestParam("filePath") String filePath) {
+    public R<List<AttachInfo>> queryAttachInfoListByPath(@RequestParam("relativeFilePath") String relativeFilePath) {
         try {
-            List<AttachInfo> attachInfos = attachmentInfoService.queryAttachInfoListByPath(filePath);
+            List<AttachInfo> attachInfos = attachmentInfoService.queryAttachInfoListByPath(relativeFilePath);
             return success(attachInfos);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
@@ -82,6 +80,24 @@ public class AttachmentInfoController extends BaseController {
             return fail("查询文件异常！请联系管理员");
         }
     }
+
+    /**
+     * 根据相对路径获取子文件以及子目录(递归)
+     */
+    @ApiOperation(value = "根据相对路径获取子文件以及子目录(递归)", notes = "根据相对路径获取子文件以及子目录(递归)")
+    @GetMapping("/queryAllAttachInfoListByPath")
+    public R<List<AttachInfo>> queryAllAttachInfoListByPath(@RequestParam("relativeFilePath") String relativeFilePath,@RequestParam("onlyQueryFolder") Boolean onlyQueryFolder) {
+        try {
+            List<AttachInfo> attachInfos = attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath,onlyQueryFolder);
+            return success(attachInfos);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("查询文件异常！请联系管理员");
+        }
+    }
+
 
     /**
      * 上传文件
@@ -146,7 +162,7 @@ public class AttachmentInfoController extends BaseController {
      * @param batchFileDTO  批量文件对象
      */
     @ApiOperation(value = "批量复制文件(多个文件，递归复制)", notes = "批量复制文件(多个文件，递归复制)")
-    @GetMapping("/copyFileBatch")
+    @PostMapping("/copyFileBatch")
     public R<Boolean> copyFileBatch(@RequestBody BatchFileDTO batchFileDTO) {
         try {
             Boolean isSuccess = attachmentInfoService.copyFileBatch(batchFileDTO);
@@ -185,7 +201,7 @@ public class AttachmentInfoController extends BaseController {
      * @param batchFileDTO  批量文件对象
      */
     @ApiOperation(value = "批量移动文件(多个文件，递归移动)", notes = "批量移动文件(多个文件，递归移动)")
-    @GetMapping("/moveFileBatch")
+    @PostMapping("/moveFileBatch")
     public R<Boolean> moveFileBatch(@RequestBody BatchFileDTO batchFileDTO) {
         try {
             Boolean isSuccess = attachmentInfoService.moveFileBatch(batchFileDTO);

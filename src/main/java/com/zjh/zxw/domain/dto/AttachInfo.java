@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -47,4 +48,7 @@ public class AttachInfo implements Serializable {
     @ApiModelProperty(value = "最后修改日期")
     @JsonFormat(shape =JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
+
+    @ApiModelProperty(value = "子集数据")
+    private List<AttachInfo> children;
 }
