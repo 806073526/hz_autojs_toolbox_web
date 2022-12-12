@@ -11,11 +11,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -43,6 +46,8 @@ public class AttachmentInfoController extends BaseController {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Value("${com.zjh.uploadPath}")
+    private String uploadPath;
 
     /**
      * 上传图片附件(AutoJs专用)
@@ -63,6 +68,17 @@ public class AttachmentInfoController extends BaseController {
             return fail("上传附件失败！请联系管理员");
         }
     }
+
+
+    /**
+     * 获取绝对路径前缀
+     */
+    @ApiOperation(value = "获取绝对路径前缀", notes = "获取绝对路径前缀")
+    @GetMapping("/getAbsolutePrePath")
+    public R<String> getAbsolutePrePath() {
+        return success(uploadPath + "autoJsTools" + File.separator);
+    }
+
 
     /**
      * 根据相对路径获取子文件以及子目录(不递归)

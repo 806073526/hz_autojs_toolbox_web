@@ -81,6 +81,9 @@ textarea:hover::-webkit-scrollbar-track {
 .pointer{
     cursor: pointer;
 }
+.el-message-box__message p {
+    word-break: break-all;
+}
 
 .el-form-item {
     margin-bottom: 15px;

@@ -200,6 +200,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         if(sourceFile.isDirectory()){
             // 先复制目录
             String targetFilePath = targetFolderPath + File.separator + sourceFile.getName();
+            targetFilePath = getTargetFilePathNoExit(targetFilePath,true);
             FileUtil.copyFile(sourcePath,targetFilePath);
             // 遍历源文件子目录
             File[] files = sourceFile.listFiles();
@@ -214,9 +215,32 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
             }
         } else {
             String targetFilePath = targetFolderPath + File.separator + sourceFile.getName();
+            // 获取不重复的名称
+            targetFilePath = getTargetFilePathNoExit(targetFilePath,false);
             FileUtil.copyFile(sourcePath,targetFilePath);
         }
         return true;
+    }
+
+    /**
+     * 返回一个不存在的名称
+     * @param targetFilePath
+     * @return
+     */
+    private String getTargetFilePathNoExit(String targetFilePath,Boolean isDirectory){
+        File targetFile = new File(targetFilePath);
+        if(targetFile.exists()){
+            if(isDirectory){
+                targetFilePath = targetFilePath+"(1)";
+                return getTargetFilePathNoExit(targetFilePath,isDirectory);
+            } else {
+                List<String> stringList = new ArrayList<String>(Arrays.asList(StringUtils.split(targetFilePath,".")));
+                targetFilePath = stringList.get(0) +  "(1)." + stringList.get(stringList.size()-1);
+                return getTargetFilePathNoExit(targetFilePath,isDirectory);
+            }
+        } else {
+            return targetFilePath;
+        }
     }
 
     @Override

@@ -30,11 +30,10 @@
                 <el-button size="mini" type="primary" @click="uploadFile">上传文件</el-button>
                 <el-button size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
             </div>
-         <div>
+         </div>
     </el-row>
     <el-row>
         <div class="d-flex j-sb a-center breadcrumbWrap" style="margin-top: 10px;margin-bottom: 10px;">
-            <!-- 面包屑-->
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" class="pointer textHover" :class="{'endBreadcrumb': i !== 0 && i === breadcrumbList.length - 1, 'hoverBreadcrumb': breadcrumbList.length > 1 && i !== breadcrumbList.length - 1 }">
                     <span @click="breadcrumbChange(item, i)">{{ item.label }}</span>
@@ -43,22 +42,25 @@
             <span class="primary-text-color font-14 keep-all">共{{ fileList.length }}个</span>
         </div>
     </el-row>
-   <!-- <el-row>
-        <div class="d-flex a-center fileOperate primary-text-color mt-10 pl-1">
+   <el-row>
+        <div class="d-flex a-center fileOperate primary-text-color pl-1">
             <span class="mr-30">已选{{ checkFileCount }}个文件(夹)</span>
-            &lt;!&ndash; 菜单栏&ndash;&gt;
-            <div>
-                <el-link>移动</el-link>
-                <el-link>删除</el-link>
+            <div class="operate d-flex a-center j-center">
+                <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('copy')">复制</el-link>
+                <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('move')">移动</el-link>
+                <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('remove')">删除</el-link>
+                <el-link v-if="copyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('paste')">粘贴到</el-link>
+                <el-link v-if="moveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('moveTo')">移动到</el-link>
+                <el-link v-if="copyFileList.length>0 || moveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('cancel')">取消</el-link>
             </div>
         </div>
-    </el-row>-->
+    </el-row>
     <el-row>
         <div class="fileTableList" v-loading="fileLoading">
             <div class="fileList-head d-flex a-center">
                 <div class="d-flex a-center fileName">
                     <el-checkbox v-model="checkAllFile" @change="checkAllFileChange" />
-                    <span class="ml-8">文件名</span>
+                    <span style="margin-left: 8px">文件名</span>
                 </div>
                 <div class="fileSize">文件大小</div>
                 <div class="lastUpdateTime">最后更新时间</div>
@@ -78,7 +80,7 @@
                 <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
                     <div class="d-flex a-center fileName">
                         <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
-                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)">
+                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
                             <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory">.{{ item.fileType }}</span></span>
                         </div>
                     </div>

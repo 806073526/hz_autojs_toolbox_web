@@ -37,9 +37,21 @@
     flex: 1;
     -webkit-box-flex: 1;
 }
+.fileList-head .fileName .fileNameWrap{
+    margin-left: 5px;
+}
 .fileList-head .fileName .fileNameWrap:hover{
     color: #4BABF6 !important;
 }
+
+.fileOperate{
+    height: 34px;
+    background-color: #edf6fe;
+    border: 1px solid #dcedfd;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
 .fileList-head .lastUpdateTime {
     width: 20%;
 }

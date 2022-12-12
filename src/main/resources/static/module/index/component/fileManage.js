@@ -38,16 +38,39 @@ export default {
         return {
             webSyncPath:"/",
             phoneSyncPath:"/sdcard/appSync/",
-            breadcrumbList: [{ label: '全部文件', value: '' }], // 面包屑
-            checkFileCount:0, // 已选文件数量
+            breadcrumbList: [{ label: '根目录', value: '' }], // 面包屑
             fileLoading:false,// 加载文件loading
             checkAllFile:false,// 全选文件
             uploadFileList:[],// 需要上传的文件列表
             curFileData:{},// 选中的文件数据
+            copyFileList:[],// 复制文件列表
+            moveFileList:[],// 移动文件列表
+            absolutePrePath:'',// 绝对路径前缀
             fileList: [] // 文件列表
         }
     },
     mounted(){
+        let _that = this;
+        $.ajax({
+            url: getContext() + "/attachmentInfo/getAbsolutePrePath",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (data) {
+                if (data) {
+                    if (data.isSuccess) {
+                        _that.absolutePrePath = data.data;
+                    }
+                }
+            },
+            error: function (msg) {
+            }
+        });
+    },
+    computed:{
+        checkFileCount(){ // 已选文件数量
+            return this.fileList.filter(item=>item.check).length;
+        }
     },
     methods: {
         // 初始化方法
@@ -55,7 +78,7 @@ export default {
             let relativeFilePath = this.deviceInfo.deviceUuid;
             // 加载文件列表
             this.queryFileList(relativeFilePath);
-            this.breadcrumbList = [{label:'全部文件',value: this.deviceInfo.deviceUuid}]
+            this.breadcrumbList = [{label:'根目录',value: this.deviceInfo.deviceUuid}]
         },
         // 查询文件列表
         queryFileList(relativeFilePath){
@@ -72,6 +95,7 @@ export default {
                 success: function (data) {
                     if (data) {
                         if (data.isSuccess) {
+                            data.data.forEach(item=> item.check = false);
                             _that.fileList = data.data;
                         }
                     }
@@ -90,11 +114,123 @@ export default {
         onDrop(e){
 
         },
+        // 操作
+        operateFun(code){
+            switch (code) {
+                case 'copy': {
+                    if(this.moveFileList && this.moveFileList.length>0){
+                        this.moveFileList = [];
+                    }
+                    // 设置复制文件集合
+                    this.copyFileList =  this.fileList.filter(item=>item.check);
+                    break;
+                }
+                case 'paste':{
+                    let fileNames = this.copyFileList.map(item=>{
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    }).join(',');
+                    let toName = this.breadcrumbList[this.breadcrumbList.length-1].label;
+                    let toPath = this.breadcrumbList[this.breadcrumbList.length-1].value;
+                    window.ZXW_VUE.$confirm('是否确认将'+fileNames+'复制到'+toName+'?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        let sourcePathList = this.copyFileList.map(item=>item.pathName);
+                        let _that = this;
+                        $.ajax({
+                            url: getContext() + "/attachmentInfo/copyFileBatch",
+                            type: "POST",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data:JSON.stringify({
+                                "sourcePathList":sourcePathList,
+                                "targetFolderPath":_that.absolutePrePath + toPath
+                            }),
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '复制成功', duration: '1000'});
+                                        // 清空文件列表
+                                        _that.copyFileList = [];
+                                        // 重新加载文件列表
+                                        _that.queryFileList(toPath);
+                                    }
+                                }
+                            },
+                            error: function (msg) {
+                            }
+                        });
+                    });
+                    break;
+                }
+                case 'cancel': {
+                    this.copyFileList = [];
+                    this.moveFileList = [];
+                    break;
+                }
+                case 'move':{
+                    if(this.copyFileList && this.copyFileList.length>0){
+                        this.copyFileList = [];
+                    }
+                    // 设置移动文件集合
+                    this.moveFileList =   this.fileList.filter(item=>item.check);
+                    break;
+                }
+                case 'moveTo':{
+                    break;
+                    // 需要过滤 考虑多种情况 TODO
+                    // 已选文件在当前目录下的
+                    let fileNames = this.moveFileList.filter(item=>{
+
+                    }).map(item=>{
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    }).join(',');
+                    let toName = this.breadcrumbList[this.breadcrumbList.length-1].label;
+                    let toPath = this.breadcrumbList[this.breadcrumbList.length-1].value;
+                    window.ZXW_VUE.$confirm('是否确认将'+fileNames+'移动到'+toName+'?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        let sourcePathList = this.moveFileList.map(item=>item.pathName);
+                        let _that = this;
+                        $.ajax({
+                            url: getContext() + "/attachmentInfo/moveFileBatch",
+                            type: "POST",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data:JSON.stringify({
+                                "sourcePathList":sourcePathList,
+                                "targetFolderPath":_that.absolutePrePath + toPath
+                            }),
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '移动成功', duration: '1000'});
+                                        // 清空文件列表
+                                        _that.copyFileList = [];
+                                        // 重新加载文件列表
+                                        _that.queryFileList(toPath);
+                                    }
+                                }
+                            },
+                            error: function (msg) {
+                            }
+                        });
+                    });
+                }
+            }
+        },
         // 全选
         checkAllFileChange(){
-            if(!this.validSelectDevice()){
-                return;
-            }
+            this.fileList.forEach(item=>{
+                this.$set(item,'check',this.checkAllFile);
+            });
+        },
+        // 文件名点击
+        fileClick(row){
+            // this.$set(row,'check',!row.check);
         },
         // 文件名双击
         fileNameDbClick(row){
@@ -112,7 +248,7 @@ export default {
                 for(let i=0;i<array.length;i++){
                     pathArr.push(array[i]);
                     breadcrumbArr.push({
-                        label:i === 0 ? "全部文件" : array[i],
+                        label:i === 0 ? "根目录" : array[i],
                         value:pathArr.join("/")
                     });
                 }
