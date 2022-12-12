@@ -17,6 +17,17 @@
     position: relative;
 }
 
+.breadcrumbWrap .hoverBreadcrumb .el-breadcrumb__inner:hover{
+     color: #4BABF6 !important;
+}
+.breadcrumbWrap .hoverBreadcrumb .endBreadcrumb .el-breadcrumb__inner{
+    color: #97a1af !important;
+    cursor: pointer !important;
+}
+
+.el-breadcrumb__item:last-child .el-breadcrumb__inner{
+    cursor: pointer !important;
+}
 
 .fileList-head .fileName {
     width: 50%;

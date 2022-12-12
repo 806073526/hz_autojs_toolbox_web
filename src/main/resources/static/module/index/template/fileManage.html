@@ -33,7 +33,7 @@
          <div>
     </el-row>
     <el-row>
-        <div class="d-flex j-sb a-center breadcrumbWrap">
+        <div class="d-flex j-sb a-center breadcrumbWrap" style="margin-top: 10px;margin-bottom: 10px;">
             <!-- 面包屑-->
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" class="pointer textHover" :class="{'endBreadcrumb': i !== 0 && i === breadcrumbList.length - 1, 'hoverBreadcrumb': breadcrumbList.length > 1 && i !== breadcrumbList.length - 1 }">
@@ -78,7 +78,7 @@
                 <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
                     <div class="d-flex a-center fileName">
                         <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
-                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10">
+                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)">
                             <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory">.{{ item.fileType }}</span></span>
                         </div>
                     </div>
@@ -97,6 +97,5 @@
                 </div>
             </el-scrollbar>
         </div>
-
     </el-row>
 </div>

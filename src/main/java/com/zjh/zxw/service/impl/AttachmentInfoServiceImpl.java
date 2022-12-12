@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -66,6 +67,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
                 attachInfos.add(attachInfo);
             }
         }
+        attachInfos = attachInfos.stream().sorted(Comparator.comparing(attachInfo -> !attachInfo.getIsDirectory())).collect(Collectors.toList());
         return attachInfos;
     }
 
@@ -97,6 +99,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
                 attachInfos.add(attachInfo);
             }
         }
+        attachInfos = attachInfos.stream().sorted(Comparator.comparing(attachInfo -> !attachInfo.getIsDirectory())).collect(Collectors.toList());
         return attachInfos;
     }
 

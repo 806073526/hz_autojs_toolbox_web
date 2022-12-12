@@ -52,12 +52,13 @@ export default {
     methods: {
         // 初始化方法
         init(){
+            let relativeFilePath = this.deviceInfo.deviceUuid;
             // 加载文件列表
-            this.queryFileList();
+            this.queryFileList(relativeFilePath);
+            this.breadcrumbList = [{label:'全部文件',value: this.deviceInfo.deviceUuid}]
         },
         // 查询文件列表
-        queryFileList(){
-            let relativeFilePath = this.deviceInfo.deviceUuid;
+        queryFileList(relativeFilePath){
             this.fileLoading = true;
             let _that = this;
             $.ajax({
@@ -95,9 +96,37 @@ export default {
                 return;
             }
         },
-        // 面包屑change
-        breadcrumbChange(){
+        // 文件名双击
+        fileNameDbClick(row){
+            // 如果是目录
+            if(row.isDirectory){
+                // 记录到面包屑导航栏
+                let pathName = row.pathName;
+                let index = pathName.indexOf(this.deviceInfo.deviceUuid);
+                pathName = pathName.substring(index,pathName.length);
+                let array = pathName.split("\\");
 
+                // 面包屑数组
+                let breadcrumbArr = [];
+                let pathArr = [];
+                for(let i=0;i<array.length;i++){
+                    pathArr.push(array[i]);
+                    breadcrumbArr.push({
+                        label:i === 0 ? "全部文件" : array[i],
+                        value:pathArr.join("/")
+                    });
+                }
+                this.breadcrumbList = breadcrumbArr;
+                // 默认加载最后一个
+                this.breadcrumbChange(this.breadcrumbList[this.breadcrumbList.length - 1],(this.breadcrumbList.length - 1))
+            }
+        },
+        // 面包屑change
+        breadcrumbChange(item,index){
+            // 加载文件列表
+            this.queryFileList(item.value);
+            // 重新加载面包屑
+            this.breadcrumbList = this.breadcrumbList.slice(0,index+1);
         },
         // 计算文件大小
         calculateSize(fileSize){

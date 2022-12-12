@@ -75,7 +75,12 @@ textarea:hover::-webkit-scrollbar-track {
     line-height: 31px !important;
     margin-left: 10px
 }
-
+.textHover:hover {
+     color: #4babf6 !important;
+}
+.pointer{
+    cursor: pointer;
+}
 
 .el-form-item {
     margin-bottom: 15px;
