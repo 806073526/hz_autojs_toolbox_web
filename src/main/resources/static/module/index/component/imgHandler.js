@@ -365,8 +365,9 @@ export default {
             // 灰度化
             if ('grayscale' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let afterImg = images.grayscale(img);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -374,13 +375,14 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(afterImg);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(afterImg);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 阈值化
             } else if ('threshold' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let afterImg = images.threshold(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -388,13 +390,14 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(afterImg);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(afterImg);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 裁图
             } else if ('clip' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let afterImg = images.clip(img, ' + this.remoteHandler.param1.x1 + ', ' + this.remoteHandler.param1.y1 + ', ' + (this.remoteHandler.param1.x2 - this.remoteHandler.param1.x1) + ', ' + (this.remoteHandler.param1.y2 - this.remoteHandler.param1.y1) + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -402,28 +405,31 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(afterImg);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(afterImg);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 找图
             } else if ('findImage' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
                     'let options = { threshold:' + this.remoteHandler.param1.imgThreshold + '};\r\n' +
                     'let result = images.findImage(img,targetImg,options);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 收集特征
             } else if ('detectAndComputeFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let options = { scale:' + this.remoteHandler.param1.bigScale + '};\r\n' +
                     'let result = images.detectAndComputeFeatures(img,options);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));\r\n' +
-                    'utilsObj.recycleNull(result);';
+                    'utils.recycleNull(result);';
                 // 特征匹配
             } else if ('matchFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
                     'let options1 = { scale:' + this.remoteHandler.param1.bigScale + '};\r\n' +
                     'let options2 = { scale:' + this.remoteHandler.param1.smallScale + '};\r\n' +
@@ -434,151 +440,171 @@ export default {
                     'files.remove(newFilepath);\r\n' +
                     'let options3 = { drawMatches:newFilepath,thredshold:' + this.remoteHandler.param1.imgThreshold + '};\r\n' +
                     'let result = images.matchFeatures(bigFeatures,smallFeatures,options3);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
-                    'utilsObj.recycleNull(bigFeatures);\r\n' +
-                    'utilsObj.recycleNull(smallFeatures);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
+                    'utils.recycleNull(bigFeatures);\r\n' +
+                    'utils.recycleNull(smallFeatures);\r\n' +
                     'toastLog(JSON.stringify(result));\r\n' +
                     'toastLog("图片已存入本地:" + newFilepath);\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 多点找色
             } else if ('findMultiColors' === codeType) {
                 // 获取多点转换参数
                 let multipleParam = this.multipleConvert();
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let options = {threshold:' + this.remoteHandler.param1.colorThreshold + '}\r\n' +
                     'let result = images.findMultiColors(img,' + multipleParam + ',options);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 谷歌MLKITOCR
             } else if ('MLKitOCR' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let MLKitOCR = $plugins.load("org.autojs.autojspro.plugin.mlkit.ocr");\r\n' +
                     'let googleOcr = new MLKitOCR();\r\n' +
                     'let resultMlk = googleOcr.detect(img);\r\n' +
                     'let contentMlkArr = Object.values(resultMlk).map(item => item.text) || [];\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(contentMlkArr));';
                 // 模板匹配
             } else if ('matchTemplate' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
                     'let matchingResult = images.matchTemplate(img,targetImg,{\r\n' +
                     '       threshold:' + this.remoteHandler.param1.imgThreshold + ',\r\n' +
                     '       max:5,\r\n' +
                     '       transparentMask:false,\r\n' +
                     '});\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(matchingResult));';
                 // 区域找图
             } else if ('regionalFindImg2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalFindImg2(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域找图测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalFindImg2(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域找图测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域找图点击
             } else if ('regionalClickImg2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let tempImgPath = "' + this.remoteHandler.param1.previewImg + '";\r\n' +
-                    'utilsObj.regionalClickImg2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',tempImgPath,' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到图片") });\r\n' +
-                    'utilsObj.recycleNull(img);'
+                    'utils.regionalClickImg2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',tempImgPath,' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到图片") });\r\n' +
+                    'utils.recycleNull(img);'
                 // 区域识字
             } else if ('regionalAnalysisChart2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.regionalAnalysisChart2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域识字测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.regionalAnalysisChart2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域识字测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域识字获取文字坐标
             } else if ('regionalAnalysisChartPosition2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域模板匹配
             } else if ('regionalMatchTemplate2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalMatchTemplate2(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',5,false,' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域模板匹配测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalMatchTemplate2(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',5,false,' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域模板匹配测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域识字点击
             } else if ('regionalClickText2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'utilsObj.regionalClickText2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
-                    'utilsObj.recycleNull(img);'
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'utils.regionalClickText2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
+                    'utils.recycleNull(img);'
                 // 区域特征匹配点击
             } else if ('regionalClickFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let tempImgPath = "' + this.remoteHandler.param1.previewImg + '";\r\n' +
-                    'utilsObj.regionalClickFeatures(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',tempImgPath,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到特征") });\r\n' +
-                    'utilsObj.recycleNull(img);'
+                    'utils.regionalClickFeatures(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',tempImgPath,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到特征") });\r\n' +
+                    'utils.recycleNull(img);'
                 // 区域特征匹配
             } else if ('regionalMatchingFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalMatchingFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域特征匹配测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalMatchingFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域特征匹配测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域特征匹配模板
             } else if ('regionalMatchFeaturesTemplate' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalMatchFeaturesTemplate(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',5,"区域特征匹配测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalMatchFeaturesTemplate(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',5,"区域特征匹配测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域多点找色
             } else if ('regionalFindMultipleColor2' === codeType) {
                 // 获取多点转换参数
                 let multipleParam = this.multipleConvert();
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.regionalFindMultipleColor2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域多点找色测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.regionalFindMultipleColor2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域多点找色测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 //   区域多点找色点击
             } else if ('regionalClickColor2' === codeType) {
                 // 获取多点转换参数
                 let multipleParam = this.multipleConvert();
                 code = 'let img = captureScreen();\r\n' +
-                    'utilsObj.regionalClickColor2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到多点颜色") });\r\n' +
-                    'utilsObj.recycleNull(img);'
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'utils.regionalClickColor2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到多点颜色") });\r\n' +
+                    'utils.recycleNull(img);'
                 // 区域找图或者特征匹配
             } else if ('regionalFindImgOrFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalFindImgOrFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域找图或者特征匹配测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalFindImgOrFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域找图或者特征匹配测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域模板匹配或者特征匹配模板
             } else if ('regionalMatchTemplateOrMatchFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.regionalMatchTemplateOrMatchFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',5,false,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域模板匹配或者特征匹配模板测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.regionalMatchTemplateOrMatchFeatures(img,targetImg,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',5,false,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域模板匹配或者特征匹配模板测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域灰度化阈值化找圆
             } else if ('regionalFindCircles2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.regionalFindCircles2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域灰度化阈值化找圆测试代码");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.regionalFindCircles2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"区域灰度化阈值化找圆测试代码");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 获取分辨率转换系数
             } else if ('getConvertCoefficient' === codeType) {
-                code = 'let result = utilsObj.getConvertCoefficient();\r\n' +
+                code =
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.getConvertCoefficient();\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 缩放小图
             } else if ('scaleSmallImg' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let smallImg = utilsObj.scaleSmallImg(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let smallImg = utils.scaleSmallImg(img);\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -586,36 +612,43 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(smallImg);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(smallImg);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 按照分辨率转换坐标
             } else if ('convertXY' === codeType) {
-                code = 'let result = utilsObj.convertXY(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',"");\r\n' +
+                code =
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.convertXY(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',"");\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 图片特征匹配
             } else if ('detectFeaturesScale' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.detectFeaturesScale(img,targetImg,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.detectFeaturesScale(img,targetImg,' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ');\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));\r\n';
                 // 灰度化阈值化特征匹配
             } else if ('matchingFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.matchingFeatures(img,targetImg,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"");\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.matchingFeatures(img,targetImg,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.bigScale + ',' + this.remoteHandler.param1.smallScale + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',"");\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));\r\n';
                 // 随机点击
             } else if ('randomClick' === codeType) {
-                code = 'utilsObj.randomClick(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',5,false);\r\n';
+                code =
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'utils.randomClick(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',5,false);\r\n';
                 // 灰度化阈值化图片
             } else if ('grayscaleAndThreshold2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.grayscaleAndThreshold2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.grayscaleAndThreshold2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -623,36 +656,40 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(result);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(result);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 //灰度化阈值化找图
             } else if ('grayThresholdFindImg2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'let targetImg = images.load("' + this.remoteHandler.param1.previewImg + '");\r\n' +
-                    'let result = utilsObj.grayThresholdFindImg2(img,targetImg,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.recycleNull(targetImg);\r\n' +
+                    'let result = utils.grayThresholdFindImg2(img,targetImg,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + this.remoteHandler.param1.imgThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.recycleNull(targetImg);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 //灰度化、阈值化多点找色
             } else if ('grayThresholdFindMultipleColor2' === codeType) {
                 // 获取多点转换参数
                 let multipleParam = this.multipleConvert();
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.grayThresholdFindMultipleColor2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.grayThresholdFindMultipleColor2(img,' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',' + multipleParam + ',' + this.remoteHandler.param1.colorThreshold + ',' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 //ocr获取文字识别内容字符串结果
             } else if ('ocrGetContentStr' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.ocrGetContentStr(img);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.ocrGetContentStr(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 //ocr获取文字识别内容字符串结果并绘图
             } else if ('ocrGetResultToCanvas' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
-                    'let result = utilsObj.ocrGetResultToCanvas(img);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'let result = utils.ocrGetResultToCanvas(img);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
                     'let newFilepath = "/sdcard/autoJsTools/imageHandlerAfter.png";\r\n' +
                     'files.createWithDirs("/sdcard/autoJsTools/");\r\n' +
                     'files.remove(newFilepath);\r\n' +
@@ -660,12 +697,14 @@ export default {
                     'toastLog("图片已存入本地:" + newFilepath)\r\n' +
                     'sleep(500);\r\n' +
                     'app.viewFile(newFilepath);\r\n' +
-                    'utilsObj.recycleNull(result);\r\n' +
-                    'utilsObj.recycleNull(img);\r\n' +
-                    'utilsObj.textFindOneClick("仅此一次", 2000);';
+                    'utils.recycleNull(result);\r\n' +
+                    'utils.recycleNull(img);\r\n' +
+                    'utils.textFindOneClick("仅此一次", 2000);';
                 // 绘制方框canvasRect
             } else if ('canvasRect' === codeType) {
-                code = 'utilsObj.canvasRect(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',"img","绘图");\r\n';
+                code =
+                    'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
+                    'utils.canvasRect(' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',"img","绘图");\r\n';
             }
             this.remoteHandler.param1.scriptPreview = code;
             window.ZXW_VUE.$notify.success({message: '生成代码成功', duration: '1000'})
