@@ -374,7 +374,7 @@ export default {
             // 设置key数组
             _that.remoteHandler.param5.nodeKeyArr = [];
             $.ajax({
-                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/rootNode.json",
+                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/rootNode.json?"+(new Date().getTime()),
                 type: "GET",//请求方式为get
                 dataType: "json", //返回数据格式为json
                 success: function (data) {//请求成功完成后要执行的方法
