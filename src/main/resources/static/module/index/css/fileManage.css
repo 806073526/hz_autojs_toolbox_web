@@ -28,6 +28,9 @@
 .el-breadcrumb__item:last-child .el-breadcrumb__inner{
     cursor: pointer !important;
 }
+.fileTips{
+    cursor: pointer;
+}
 
 .fileList-head .fileName {
     width: 50%;
@@ -59,10 +62,23 @@
     width: 20%;
 }
 .fileList-head .operate {
-    width: 10%;
+    width: 20%;
     text-align: center;
 }
 
+.fileList-head .el-progress {
+    position: absolute;
+    bottom: -3px;
+    width: 100%;
+    left: 0;
+}
+.fileList-head .el-progress .el-progress__text{
+    position: absolute;
+    top: -20px;
+}
+.fileList-head .el-progress .el-progress-bar{
+    padding-right: 0 !important;
+}
 
 .fileList-body{
     position: relative;

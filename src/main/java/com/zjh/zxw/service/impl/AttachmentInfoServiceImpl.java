@@ -259,9 +259,17 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
 
     @Override
-    public Boolean reNameFile(String oldFileName, String newFileName) {
-        File file = new File(this.getRootPath() + oldFileName);
-        File newFile = new File(this.getRootPath() + newFileName);
+    public Boolean reNameFile(String oldFilePathName, String newFilePathName) {
+        String prePath = this.getRootPath();
+        if(!oldFilePathName.contains(prePath) || !newFilePathName.contains(prePath)){
+            throw new BusinessException("非指定目录,不可进行操作");
+        }
+
+        File file = new File(oldFilePathName);
+        File newFile = new File(newFilePathName);
+        if(newFile.exists()){
+            throw new BusinessException("当前名称已存在");
+        }
         boolean renameTo = file.renameTo(newFile);
         return renameTo;
     }
@@ -279,6 +287,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Override
     public Boolean createFolder(String folderName) {
         String folderPath = this.getRootPath() + folderName;
+        folderPath = this.getTargetFilePathNoExit(folderPath,true);
         FileUtil.createFolder(folderPath);
         return true;
     }

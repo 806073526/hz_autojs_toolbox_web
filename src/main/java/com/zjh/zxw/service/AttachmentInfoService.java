@@ -31,7 +31,7 @@ public interface AttachmentInfoService {
 
     Boolean moveFile(String sourcePath, String targetFolderPath) throws IOException;
 
-    Boolean reNameFile(String oldFileName, String newFileName);
+    Boolean reNameFile(String oldFilePathName, String newFilePathName);
 
     Boolean deleteFile(String filePath) throws IOException;
 

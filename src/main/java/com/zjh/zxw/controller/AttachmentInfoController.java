@@ -1,5 +1,6 @@
 package com.zjh.zxw.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.exception.BusinessException;
@@ -48,6 +49,27 @@ public class AttachmentInfoController extends BaseController {
 
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
+
+    /**
+     * 上传附件
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "上传附件", notes = "上传附件")
+    @PostMapping("/uploadFileSingle")
+    public R<String> uploadFileSingle(@RequestParam("file") MultipartFile file,@RequestParam("pathName")String pathName) {
+        String url = "";
+        try {
+            url = attachmentInfoService.uploadFileToAutoJs(file,pathName + File.separator + file.getOriginalFilename());
+            return success(url);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("上传附件失败！请联系管理员");
+        }
+    }
+
 
     /**
      * 上传图片附件(AutoJs专用)
@@ -141,9 +163,9 @@ public class AttachmentInfoController extends BaseController {
      */
     @ApiOperation(value = "重命名文件", notes = "重命名文件")
     @GetMapping("/reNameFile")
-    public R<Boolean> reNameFile(@RequestParam("oldFileName") String oldFileName,@RequestParam("newFileName") String newFileName) {
+    public R<Boolean> reNameFile(@RequestParam("oldFilePathName") String oldFilePathName,@RequestParam("newFilePathName") String newFilePathName) {
         try {
-            Boolean isSuccess = attachmentInfoService.reNameFile(oldFileName, newFileName);
+            Boolean isSuccess = attachmentInfoService.reNameFile(oldFilePathName, newFilePathName);
             return success(isSuccess);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
@@ -267,4 +289,26 @@ public class AttachmentInfoController extends BaseController {
         }
     }
 
+
+    /**
+     * 批量删除文件(递归删除)
+     *
+     */
+    @ApiOperation(value = "批量删除文件(递归删除)", notes = "批量删除文件(递归删除)")
+    @PostMapping("/deleteFileBatch")
+    public R<Boolean> deleteFileBatch(@RequestBody List<String> filePathList) {
+        try {
+            if(CollectionUtils.isNotEmpty(filePathList)){
+                for (String filePath : filePathList) {
+                    attachmentInfoService.deleteFile(filePath);
+                }
+            }
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("删除文件异常！请联系管理员");
+        }
+    }
 }
