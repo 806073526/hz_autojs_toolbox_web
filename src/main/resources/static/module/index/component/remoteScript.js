@@ -334,7 +334,7 @@ export default {
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
-                    console.log(msg);
+                    window.ZXW_VUE.$notify.fail({message: '读取失败', duration: '1000'});
                 }
             });
         },
