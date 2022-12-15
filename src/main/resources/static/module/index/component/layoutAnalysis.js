@@ -34,6 +34,7 @@ export default {
     },
     data() {
         return {
+            defaultExpandedKeys:[],// 默认展开节点key数组
             remoteHandler: {
                 param5: {
                     rootNodeJson: '',
@@ -44,7 +45,6 @@ export default {
                     openCustomFilterFunction:false,// 开启自定义过滤函数处理
                     nodeKeyArr: [],// key数组
                     selectNode: {},
-                    defaultExpandedKeys:[],// 默认展开节点key数组
                     rectCanvasArr: [],// 绘制方框数组
                     highlightRect: null,// 高亮方框
                     dialogVisible: false,
@@ -563,7 +563,6 @@ export default {
 
                 // 默认展开keys
                 this.defaultExpandedKeys = [highlightRect.nodeKey];
-
                 this.$nextTick(()=>{
                     // 获取高亮节点
                     let highlightNode = $('.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content');
@@ -571,6 +570,7 @@ export default {
                         highlightNode[0].scrollIntoView();
                     }
                 });
+
                 // 点击生成代码
                 this.nodeGenerateCode();
             }

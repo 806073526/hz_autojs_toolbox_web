@@ -128,10 +128,12 @@ window.ZXW_VUE = new Vue({
             if (!this.validSelectDevice()) {
                 return
             }
+            // 存在中文的进行encodeURIComponent编码
+            let message = messageStr && escape(messageStr).indexOf("%u") > 0 ? btoa(encodeURIComponent(messageStr)) : btoa(messageStr);
             let dataParam = {
                 action: action, // 指令 websocketHandler.js中内置的指令  forcedExit 强制退出 remoteHandler 远程处理方法  startPreviewDevice 预览设备  stopPreviewDevice 停止预览设备
                 deviceUuid: this.deviceInfo.deviceUuid, // 设备uuid
-                message: btoa(messageStr)  // 消息内容  指令为remoteHandler时的参数
+                message: message   // 消息内容  指令为remoteHandler时的参数
                 // functionName为utils.js中的方法 functionParam为对应方法的参数
                 // '{"functionName":"remoteExecScript","functionParam":["' + encodeURIComponent(scriptContent) + '"]}';
             };
