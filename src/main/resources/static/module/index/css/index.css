@@ -134,3 +134,11 @@ table .el-input__inner, table .el-textarea textarea {
     margin-right: 10px;
     border-radius: 5px;
 }
+
+.el-popover{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    transform: translate(-50%, -50%);
+}

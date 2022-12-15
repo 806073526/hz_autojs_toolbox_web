@@ -84,6 +84,8 @@ window.ZXW_VUE = new Vue({
             this.$nextTick(()=>{
                 // 初始化文件管理
                 this.$refs.fileManage.init();
+                // 初始化远程脚本自定义模块
+                this.$refs.remoteScript.initCustomScript();
             })
         },
         // 验证是否已选设备

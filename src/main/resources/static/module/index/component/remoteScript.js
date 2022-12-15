@@ -1,3 +1,5 @@
+import {getContext} from "../../../utils/utils.js";
+
 let template = '<div></div>';
 $.ajax({
     url: "/module/index/template/remoteScript.html",
@@ -50,10 +52,13 @@ export default {
         return {
             remoteHandler: {
                 param4: {
+                    scriptName:'remoteScript.js',
                     scriptText: '',
                     scriptImmediatelyExec: true
                 }
             },
+            tempCustomScript:[],// 自定义模块缓存数据
+            customScript:[],// 自定义模块 [{moduleName:'',scriptName:''}]
             remoteScript: {
                 AppVersionCode: {type: 'app', name: '读取版本号', code: 'toastLog(app.versionCode);'},
                 AppVersionName: {type: 'app', name: '读取版本名称', code: 'toastLog(app.versionName);'},
@@ -151,9 +156,156 @@ export default {
         }
     },
     methods: {
+        // 初始自定义模块
+        initCustomScript(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/remoteCustomScriptSetting.json?t="+(new Date().getTime()),
+                type: 'get',
+                async: false,
+                success: function (res) {
+                    // 初始自定义模块
+                    _that.customScript = JSON.parse(JSON.stringify(res));
+                    _that.tempCustomScript = JSON.parse(JSON.stringify(res));
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
+        },
+        // 自定义模块设置
+        customScriptSetting(){
+            this.tempCustomScript = JSON.parse(JSON.stringify(this.customScript));
+            this.$refs['customScriptSettingPopover'].doShow();
+        },
+        // 取消自定义模块设置
+        cancelCustomScriptSetting(){
+            this.$refs['customScriptSettingPopover'].doClose();
+        },
+        // 保存自定义模块设置
+        saveCustomScriptSetting(){
+            this.$refs['customScriptSettingPopover'].doClose();
+            // 过滤掉未填写的数据
+            this.customScript = JSON.parse(JSON.stringify(this.tempCustomScript.filter(item=> item.moduleName && item.scriptName)));
+            let scriptFile = new File([JSON.stringify(this.customScript)], 'remoteCustomScriptSetting.json', {
+                type: "application/json",
+            });
+            const param = new FormData();
+            param.append('file', scriptFile);
+            param.append('pathName', this.deviceInfo.deviceUuid+"/");
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/uploadFileSingle",
+                type: 'post',
+                data: param,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
+        // 添加行
+        addRow(){
+            this.tempCustomScript.push({ moduleName: '', scriptName: '' })
+        },
+        // 删除行
+        delRow(index) {
+            // 删除行数据
+            this.tempCustomScript.splice(index, 1)
+        },
         // 清空脚本
         clearScript() {
             this.remoteHandler.param4.scriptText = '';
+        },
+        // 保存到草稿
+        saveToDraft(){
+            if(!this.remoteHandler.param4.scriptName){
+                window.ZXW_VUE.$message.warning('请设置脚本名称');
+                return false;
+            }
+            window.localStorage.setItem("remoteScriptText_"+this.remoteHandler.param4.scriptName,this.remoteHandler.param4.scriptText);
+            window.ZXW_VUE.$notify.success({message: '保存草稿成功', duration: '1000'});
+        },
+        // 从草稿读取
+        readForDraft(){
+            if(!this.remoteHandler.param4.scriptName){
+                window.ZXW_VUE.$message.warning('请设置脚本名称');
+                return false;
+            }
+            this.remoteHandler.param4.scriptText = window.localStorage.getItem("remoteScriptText_"+this.remoteHandler.param4.scriptName);
+            window.ZXW_VUE.$notify.success({message: '读取草稿成功', duration: '1000'});
+        },
+        // 存为文件
+        saveToFile(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            if(!this.remoteHandler.param4.scriptName){
+                window.ZXW_VUE.$message.warning('请设置脚本名称');
+                return;
+            }
+            window.ZXW_VUE.$confirm('是否确认将当前脚本内容存为' + this.remoteHandler.param4.scriptName + '?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let scriptFile = new File([this.remoteHandler.param4.scriptText], this.remoteHandler.param4.scriptName, {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.deviceInfo.deviceUuid+"/");
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
+        },
+        // 从文件读取
+        readForFile(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            if(!this.remoteHandler.param4.scriptName){
+                window.ZXW_VUE.$message.warning('请设置脚本名称');
+                return;
+            }
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.remoteHandler.param4.scriptName,
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    _that.remoteHandler.param4.scriptText = String(res);
+                    window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
         },
         // 获取远程代码
         getRemoteScript(code) {
@@ -164,6 +316,27 @@ export default {
                 }
                 this.remoteHandler.param4.scriptText += code +"\n";
             }
+        },
+        // 获取自定义模块远程代码
+        getCustomRemoteScript(scriptName){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+scriptName,
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    if (_that.remoteHandler.param4.scriptImmediatelyExec && _that.validSelectDevice()) {
+                        // 远程执行
+                        _that.remoteExecuteScript(_that.remoteHandler.param4.scriptText);
+                    }
+                    _that.remoteHandler.param4.scriptText += String(res) + "\n";
+                    window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
         },
         // 远程运行脚本
         remoteRunScript() {

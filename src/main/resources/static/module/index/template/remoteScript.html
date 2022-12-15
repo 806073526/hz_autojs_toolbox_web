@@ -3,6 +3,14 @@
         远程脚本执行
     </p>
     <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="脚本名称:"  class="width100">
+                <el-input v-model="remoteHandler.param4.scriptName" placeholder="请输入图片名称"
+                          class="width100" />
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
         <div class="width100 d-flex a-start">
             <el-form-item label="脚本内容:" prop="scriptText" class="width100">
                 <el-input v-model="remoteHandler.param4.scriptText" :rows="20" type="textarea"
@@ -24,6 +32,30 @@
         <el-button type="primary" size="mini" style="margin-bottom: 5px;"
                    @click.stop.prevent="clearScript">
             清空脚本
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="saveToDraft">
+            存为草稿
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="readForDraft">
+            从草稿读取
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="saveToFile">
+            存为文件
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="readForFile">
+            从文件读取
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="customScriptSetting">
+            自定义模块设置
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="initCustomScript">
+            加载自定义模块
         </el-button>
     </el-row>
     <el-row style="margin-top: 10px">
@@ -47,4 +79,46 @@
             </el-button>
         </el-form-item>
     </el-row>
+    <el-row style="margin-top: 10px">
+        <el-form-item label="自定义模块" class="width100">
+            <el-button v-for="(btn,index) in customScript" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getCustomRemoteScript(btn.scriptName)">
+                {{btn.moduleName}}
+            </el-button>
+        </el-form-item>
+    </el-row>
+
+    <el-popover
+            ref="customScriptSettingPopover"
+            placement="right"
+            trigger="click"
+    >
+        <div style="margin-bottom: 12px;text-align: center;">自定义模块设置</div>
+        <el-table :data="tempCustomScript"  max-height="300" height="300">
+            <el-table-column  property="key" label="编码">
+                <template v-slot="scope1">
+                    <el-input v-model="scope1.row.moduleName" placeholder="请输入模块名称" size="mini" class="input-width" />
+                </template>
+            </el-table-column>
+            <el-table-column property="name" label="名称">
+                <template v-slot="scope1">
+                    <el-input v-model="scope1.row.scriptName" placeholder="请输入脚本名称" size="mini" class="input-width" />
+                </template>
+            </el-table-column>
+            <el-table-column >
+                <template slot="header">
+                    <div class="d-flex a-center">
+                        <span>操作</span>
+                        <i class="el-icon-circle-plus" @click="addRow" />
+                    </div>
+                </template>
+                <template v-slot="scope1">
+                    <el-link :underline="false" class="cancel" type="danger" @click="delRow(scope1.$index)">删除</el-link>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="d-flex j-center">
+            <el-button class="mt-1" type="primary" @click="saveCustomScriptSetting">保存</el-button>
+            <el-button class="mt-1" type="info" @click="cancelCustomScriptSetting">取消</el-button>
+        </div>
+    </el-popover>
 </div>
