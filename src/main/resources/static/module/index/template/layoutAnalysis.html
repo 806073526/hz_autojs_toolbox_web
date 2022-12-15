@@ -197,9 +197,9 @@
     <el-row>
         <div class="width100 d-flex a-center mt-1">
             <el-tree :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
-                     empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree"
+                     empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
                      :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
-                     :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
+                     :default-expanded-keys="defaultExpandedKeys" :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
                      @node-click="nodeClickFun" @current-change="currentChangeFun" class="nodeTreeClass nodeDivCommon">
             </el-tree>
             <div class="nodePreviewClass nodeDivCommon">
