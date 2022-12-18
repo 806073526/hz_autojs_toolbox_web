@@ -142,3 +142,7 @@ table .el-input__inner, table .el-textarea textarea {
     width: 500px;
     transform: translate(-50%, -50%);
 }
+
+.el-table__empty-block {
+    height: 60px !important;
+}

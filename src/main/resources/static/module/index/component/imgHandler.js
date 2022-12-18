@@ -42,6 +42,7 @@ export default {
             positionShowType: 'cur', // 坐标显示类型
             remoteHandler: {
                 param1: {
+                    paramJson:"",
                     x1: 0,
                     y1: 0,
                     x2: 1080,
@@ -62,7 +63,6 @@ export default {
                     isOpenFastClip: false,
                     isOpenGray: false,
                     isOpenThreshold: false,
-                    isOpenColor: false,
                     showFixedPositionList: false,
                     positionList: '',// 坐标列表
                     operatePositionKey: 'x1',// 操作key
@@ -136,6 +136,76 @@ export default {
         clearPosition() {
             this.remoteHandler.param1.positionList = '';
             window.ZXW_VUE.$notify.success({message: '清空坐标成功', duration: '1000'})
+        },
+        // 从json读取参数
+        readParamFromJson(){
+            let paramJson = this.remoteHandler.param1.paramJson;
+            if(!paramJson){
+                window.ZXW_VUE.$message.warning('请先填写参数Json');
+                return false;
+            }
+            // 解析对象
+            let jsonObj = JSON.parse(paramJson);
+            Object.keys(jsonObj).forEach(key=>{
+                if(key === 'position'){
+                    let position = jsonObj.position;
+                    this.remoteHandler.param1.x1 = position[0];
+                    this.remoteHandler.param1.y1 = position[1];
+                    this.remoteHandler.param1.x2 = position[2];
+                    this.remoteHandler.param1.y2 = position[3];
+                } else if(key === 'isOpenGray'){
+                    this.remoteHandler.param1[key] = jsonObj[key] === 1;
+                } else if(key === 'isOpenThreshold'){
+                    this.remoteHandler.param1[key] = jsonObj[key] === 1;
+                } else {
+                    this.remoteHandler.param1[key] = jsonObj[key];
+                }
+            });
+            window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'})
+        },
+        // 生成参数到json
+        generateParamToJson(){
+            let pageObj = JSON.parse(JSON.stringify(this.remoteHandler.param1));
+            pageObj.position = [pageObj.x1,pageObj.y1,pageObj.x2,pageObj.y2];// 坐标
+            pageObj.featuresThreshold = pageObj.imgThreshold;
+            pageObj.isOpenGray = pageObj.isOpenGray ? 1 : 0;
+            pageObj.isOpenThreshold = pageObj.isOpenThreshold ? 1 : 0;
+            let positionList = this.remoteHandler.param1.positionList;
+            let tempArr = (positionList || '').split('\n') || [];
+            if (tempArr.length !== 0) {
+                // 例子 基于第一个点的坐标偏移值 [[35, 30, "#FFFFFF"], [-28, -2, "#000000"], [-23, 20, "#000000"]]
+                let multipleArr = [];
+                // 获取第一个点
+                let firstPoint = tempArr[0];
+                // 第一个点数组
+                let firstPointArr = firstPoint.split(',') || [];
+                let firstX = firstPointArr[0];
+                let firstY = firstPointArr[1];
+                let firstColor = firstPointArr[2];
+                for (let i = 1; i < tempArr.length; i++) {
+                    let curPoint = tempArr[i];
+                    if (!curPoint) {
+                        continue;
+                    }
+                    // 当前点的数组
+                    let curPointArr = curPoint.split(',') || [];
+
+                    let curX = curPointArr[0];
+                    let curY = curPointArr[1];
+                    let curColor = curPointArr[2];
+                    // 添加元素
+                    multipleArr.push([(curX - firstX), (curY - firstY), curColor])
+                }
+                pageObj.color = firstColor;
+                pageObj.colorOther = multipleArr;
+            }
+            let needDeleteKeys = ['paramJson','x1','y1','x2','y2','cache_x1','cache_y1','cache_x2','cache_y2',
+                'localImageName','scriptPreview','previewImg','isOpenFastClip','showFixedPositionList','positionList','operatePositionKey','operatePositionVal'];
+            needDeleteKeys.forEach(key=>{
+                delete pageObj[key];
+            });
+            this.remoteHandler.param1.paramJson = JSON.stringify(pageObj);
+            window.ZXW_VUE.$notify.success({message: '生成成功', duration: '1000'})
         },
         // 读取坐标
         readPositionList() {
@@ -319,8 +389,14 @@ export default {
                 xCoefficient = xCoefficient * (this.deviceInfo.screenHeight || this.deviceInfo.standardHeight) / this.deviceInfo.standardHeight;
                 yCoefficient = yCoefficient * (this.deviceInfo.screenWidth || this.deviceInfo.standardWidth) / this.deviceInfo.standardWidth;
             }
-            this.imgMousePosition.x = Number((e.offsetX * xMul) / xCoefficient).toFixed(0);
-            this.imgMousePosition.y = Number((e.offsetY * yMul) / yCoefficient).toFixed(0);
+            let offsetX = e.offsetX;
+            let offsetY = e.offsetY;
+            if(e.srcElement.id === 'drawReact'){
+                offsetX = e.offsetX + Number(e.srcElement.style.left.replace("px","")) + 4;
+                offsetY = e.offsetY + Number(e.srcElement.style.top.replace("px","")) + 4;
+            }
+            this.imgMousePosition.x = Number((offsetX * xMul) / xCoefficient).toFixed(0);
+            this.imgMousePosition.y = Number((offsetY * yMul) / yCoefficient).toFixed(0);
             if (window.ctx) {
                 // 获取图片像素信息
                 let pixel = window.ctx.getImageData(this.imgMousePosition.x, this.imgMousePosition.y, 1, 1);

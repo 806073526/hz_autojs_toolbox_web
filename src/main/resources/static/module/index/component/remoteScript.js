@@ -304,6 +304,7 @@ export default {
                 },
                 error: function (msg) {
                     console.log(msg);
+                    window.ZXW_VUE.$notify.error({message: _that.remoteHandler.param4.scriptName+'文件不存在', duration: '1000'});
                 }
             });
         },

@@ -1,0 +1,405 @@
+<div>
+    <p class="basicInfo">
+        页面匹配
+    </p>
+    <el-row>
+        <div class="width100 d-flex a-center">
+            <el-form-item label="页面配置名称:"  class="width100">
+                <el-input v-model="pageSettingParam.pageSettingParamName" placeholder="请输入页面配置名称"
+                          class="width100" />
+            </el-form-item>
+        </div>
+    </el-row>
+    <el-row>
+        <el-form-item label="调试图片路径:" class="width100" label-width="100px">
+            <div class="d-flex">
+                <el-input v-model="sourcePathName" placeholder="替换源路径" class="flex-1"/>
+                <el-input v-model="targetPathName" placeholder="替换目标路径" class="flex-1" style="margin-left: 5px;"/>
+            </div>
+        </el-form-item>
+    </el-row>
+    <el-row>
+        <el-button type="danger" size="mini" style="" id="remoteRunScript"
+                   @click.stop.prevent="remotePageMatching">
+            远程页面匹配
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-bottom: 5px;"
+                   @click.stop.prevent="initPageSettingParam">
+            页面配置示例
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="saveToDraft">
+            存为草稿
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="readForDraft">
+            从草稿读取
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="saveToFile">
+            存为文件
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="readForFile">
+            从文件读取
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="settingToJson">
+            页面配置转换为json
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                   @click.stop.prevent="jsonToSetting">
+            json转换为页面配置
+        </el-button>
+
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;"
+                   @click.stop.prevent="expandAll">
+            全部展开
+        </el-button>
+        <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;"
+                   @click.stop.prevent="packUpAll">
+            全部收缩
+        </el-button>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+        <el-card class="box-card" v-for="(page,pageIndex) in pageSettingParam.pageSettingParamArray" :key="'pageIndex'+pageIndex">
+            <div slot="header" class="clearfix">
+                <div class="d-flex j-center a-center">
+                    <el-form-item label="页面名称:" class="width25" label-width="85px" style="margin-bottom: 0px;">
+                        <el-input v-model="page.pageName" placeholder="请输入页面名称" />
+                    </el-form-item>
+                    <el-checkbox v-model="page.joinDebug" style="margin-left: 10px;">参与调试</el-checkbox>
+                    <div class="flex-1 d-flex j-end">
+                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop.prevent="addPage(pageIndex)"/>
+                        <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop.prevent="deletePage(pageIndex)"/>
+                        <el-link :underline="false" type="info" style="margin-right: 10px;" @click="page.expand = !page.expand">{{ page.expand ? '收缩':'展开' }}</el-link>
+                    </div>
+                </div>
+            </div>
+            <el-card v-for="(setting,settingIndex) in page.pageSettingArray" :key="'settingIndex'+settingIndex" v-show="page.expand"  style="margin: 20px;">
+                <div slot="header" class="clearfix">
+                    <div class="d-flex j-center a-center width100">
+                        <el-form-item label="分辨率:" class="width35" label-width="75px" style="margin-bottom: 0px;">
+                            <div class="d-flex">
+                                <el-input v-model="setting.width" placeholder="请输入宽度" class="flex-1"/>
+                                <el-input v-model="setting.height" placeholder="请输入高度" class="flex-1" style="margin-left: 10px;"/>
+                                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                                           @click.stop.prevent="writeStandWidthHeight(setting)">
+                                    写入标准分辨率
+                                </el-button>
+                            </div>
+                        </el-form-item>
+                        <div class="flex-1 d-flex j-end">
+                            <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop.prevent="addWidthHeight(pageIndex,settingIndex)"/>
+                            <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop.prevent="deleteWidthHeight(pageIndex,settingIndex)"/>
+                            <el-link :underline="false" type="info" style="margin-right: 10px;" @click="setting.expand = !setting.expand">{{ setting.expand ? '收缩':'展开' }}</el-link>
+                        </div>
+                    </div>
+                </div>
+                <div v-show="setting.expand" style="margin: 20px;">
+                    <div class="d-flex">
+                    <el-form-item label="总关系:" class="width25" label-width="60px">
+                        <el-select v-model="setting.relation.total" class="width100">
+                            <el-option label="或者" value="or"/>
+                            <el-option label="并且" value="and"/>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="文字识别:" class="width25" label-width="80px">
+                        <el-select v-model="setting.relation.analysisChart" class="width100">
+                            <el-option label="或者" value="or"/>
+                            <el-option label="并且" value="and"/>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="多点找色:" class="width25" label-width="80px">
+                        <el-select v-model="setting.relation.multipleColor" class="width100">
+                            <el-option label="或者" value="or"/>
+                            <el-option label="并且" value="and"/>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="区域找图:" class="width25" label-width="80px">
+                        <el-select v-model="setting.relation.multipleImg" class="width100">
+                            <el-option label="或者" value="or"/>
+                            <el-option label="并且" value="and"/>
+                        </el-select>
+                    </el-form-item>
+                </div>
+                <div>
+                    <div class="tableTitle">文字识别</div>
+                    <el-table :data="setting.analysisChart" border ref="analysisChart"
+                              highlight-current-row  style="width: 100%" :key="setting.analysisChartKey">
+                        <el-table-column prop="position" align="left" label="区域坐标" width="200">
+                            <template slot-scope="{ row, $index}">
+                                <div class="d-flex">
+                                    <el-input v-model="row.position[0]" placeholder="x1" class="flex-1"/>
+                                    <el-input v-model="row.position[1]" placeholder="y1" class="flex-1" style="margin-left:5px;"/>
+                                    <el-input v-model="row.position[2]" placeholder="x2" class="flex-1" style="margin-left:5px;"/>
+                                    <el-input v-model="row.position[3]" placeholder="y2" class="flex-1" style="margin-left:5px;"/>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="isOpenGray" label="灰度化" align="left" width="100">
+                            <template slot-scope="{ row, $index}">
+                                <el-select v-model="row.isOpenGray" class="width100">
+                                    <el-option label="开启" :value="1"/>
+                                    <el-option label="关闭" :value="0"/>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="isOpenThreshold" label="阈值化" align="left" width="100">
+                            <template slot-scope="{ row, $index}">
+                                <el-select v-model="row.isOpenThreshold" class="width100">
+                                    <el-option label="开启" :value="1"/>
+                                    <el-option label="关闭" :value="0"/>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="threshold" label="阈值相似度" align="left" width="120">
+                            <template slot-scope="{ row, $index}">
+                                <el-input type="number" :min="0" :max="255" v-model="row.threshold" placeholder="阈值相似度" class="flex-1"/>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="maxVal" label="阈值最大值" align="left" width="120">
+                            <template slot-scope="{ row, $index}">
+                                <el-input type="number" :min="0" :max="255" v-model="row.maxVal" placeholder="阈值最大值" class="flex-1"/>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="context" label="文字内容" align="left">
+                            <template slot-scope="{ row, $index}">
+                                <el-input v-model="row.context" placeholder="文字内容" class="flex-1"/>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="matchingType" label="匹配类型" align="left" width="200">
+                            <template slot-scope="{ row, $index}">
+                                <el-radio-group v-model="row.matchingType">
+                                    <el-radio label="contains">
+                                        包含
+                                    </el-radio>
+                                    <el-radio label="equals">
+                                        等于
+                                    </el-radio>
+                                </el-radio-group>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="canvasMsg" label="绘制信息" align="left" width="160">
+                            <template slot-scope="{ row, $index}">
+                                <el-input v-model="row.canvasMsg" placeholder="绘制信息" class="flex-1"/>
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="100">
+                            <template slot="header">
+                                <div class="d-flex a-center">
+                                    操作
+                                    <i class="el-icon-setting" style="font-size: 18px;margin-left: 5px;" @click.stop="openJsonContentPopover('analysisChart',pageIndex,settingIndex,-1)"/>
+                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="tableAddRow('analysisChart',pageIndex,settingIndex,-1)"/>
+                                </div>
+                            </template>
+                            <template slot-scope="{ row, $index }">
+                                <div class="d-flex j-start a-center">
+                                    <i class="el-icon-setting" style="font-size: 18px;margin-right: 5px;" @click.stop="openJsonContentPopover('analysisChart',pageIndex,settingIndex,$index)"/>
+                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('analysisChart',pageIndex,settingIndex,$index)"/>
+                                    <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('analysisChart',pageIndex,settingIndex,$index)"/>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                    <div>
+                        <div class="tableTitle">多点识色</div>
+                        <el-table :data="setting.multipleColor" border ref="multipleColor"
+                                  highlight-current-row  style="width: 100%" :key="setting.multipleColorKey">
+                            <el-table-column prop="position" align="left" label="区域坐标" width="200">
+                                <template slot-scope="{ row, $index}">
+                                    <div class="d-flex">
+                                        <el-input v-model="row.position[0]" placeholder="x1" class="flex-1"/>
+                                        <el-input v-model="row.position[1]" placeholder="y1" class="flex-1" style="margin-left:5px;"/>
+                                        <el-input v-model="row.position[2]" placeholder="x2" class="flex-1" style="margin-left:5px;"/>
+                                        <el-input v-model="row.position[3]" placeholder="y2" class="flex-1" style="margin-left:5px;"/>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="isOpenGray" label="灰度化" align="left" width="100">
+                                <template slot-scope="{ row, $index}">
+                                    <el-select v-model="row.isOpenGray" class="width100">
+                                        <el-option label="开启" :value="1"/>
+                                        <el-option label="关闭" :value="0"/>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="isOpenThreshold" label="阈值化" align="left" width="100">
+                                <template slot-scope="{ row, $index}">
+                                    <el-select v-model="row.isOpenThreshold" class="width100">
+                                        <el-option label="开启" :value="1"/>
+                                        <el-option label="关闭" :value="0"/>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="threshold" label="阈值相似度" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" :min="0" :max="255" v-model="row.threshold" placeholder="阈值相似度" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="maxVal" label="阈值最大值" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" :min="0" :max="255" v-model="row.maxVal" placeholder="阈值最大值" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="color" label="首点颜色值" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input v-model="row.color" placeholder="首点颜色值" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="colorThreshold" label="颜色相似度" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input v-model="row.colorThreshold" placeholder="颜色相似度" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="colorOther" label="颜色其他参数" align="left">
+                                <template slot-scope="{ row, $index}">
+                                    <div class="d-flex flex-column">
+                                        <i v-if="row.colorOther.length === 0" class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="colorOtherAddRow(pageIndex,settingIndex,$index,-1)"/>
+                                        <div v-for="(colorArr,index) in row.colorOther" :key="index" class="d-flex">
+                                            <el-input v-model="colorArr[0]" placeholder="x" class="flex-1"/>
+                                            <el-input v-model="colorArr[1]" placeholder="y" class="flex-1" style="margin-left:5px;"/>
+                                            <el-input v-model="colorArr[2]" placeholder="color" class="flex-1" style="margin-left:5px;"/>
+                                            <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="colorOtherAddRow(pageIndex,settingIndex,$index,index)"/>
+                                            <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="colorOtherDeleteRow(pageIndex,settingIndex,$index,index)"/>
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="canvasMsg" label="绘制信息" align="left"  width="160">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input v-model="row.canvasMsg" placeholder="绘制信息" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column width="100">
+                                <template slot="header">
+                                    <div class="d-flex a-center">
+                                        操作
+                                        <i class="el-icon-setting" style="font-size: 18px;margin-left: 5px;" @click.stop="openJsonContentPopover('multipleColor',pageIndex,settingIndex,-1)"/>
+                                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;"   @click.stop="tableAddRow('multipleColor',pageIndex,settingIndex,-1)"/>
+                                    </div>
+                                </template>
+                                <template slot-scope="{ row, $index }">
+                                    <div class="d-flex j-start a-center">
+                                        <i class="el-icon-setting" style="font-size: 18px;margin-right: 5px;" @click.stop="openJsonContentPopover('multipleColor',pageIndex,settingIndex,$index)"/>
+                                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('multipleColor',pageIndex,settingIndex,$index)"/>
+                                        <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('multipleColor',pageIndex,settingIndex,$index)"/>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                    <div>
+                        <div class="tableTitle">区域找图</div>
+                        <el-table :data="setting.multipleImg" border ref="multipleImg"
+                                  highlight-current-row  style="width: 100%" :key="setting.multipleImgKey">
+                            <el-table-column prop="position" align="left" label="区域坐标" width="200">
+                                <template slot-scope="{ row, $index}">
+                                    <div class="d-flex">
+                                        <el-input v-model="row.position[0]" placeholder="x1" class="flex-1"/>
+                                        <el-input v-model="row.position[1]" placeholder="y1" class="flex-1" style="margin-left:5px;"/>
+                                        <el-input v-model="row.position[2]" placeholder="x2" class="flex-1" style="margin-left:5px;"/>
+                                        <el-input v-model="row.position[3]" placeholder="y2" class="flex-1" style="margin-left:5px;"/>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="isOpenGray" label="灰度化" align="left" width="100">
+                                <template slot-scope="{ row, $index}">
+                                    <el-select v-model="row.isOpenGray" class="width100">
+                                        <el-option label="开启" :value="1"/>
+                                        <el-option label="关闭" :value="0"/>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="isOpenThreshold" label="阈值化" align="left" width="100">
+                                <template slot-scope="{ row, $index}">
+                                    <el-select v-model="row.isOpenThreshold" class="width100">
+                                        <el-option label="开启" :value="1"/>
+                                        <el-option label="关闭" :value="0"/>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="threshold" label="阈值相似度" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" :min="0" :max="255" v-model="row.threshold" placeholder="阈值相似度" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="maxVal" label="阈值最大值" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" :min="0" :max="255" v-model="row.maxVal" placeholder="阈值最大值" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="pathName" label="图片路径" align="left">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input v-model="row.pathName" placeholder="图片路径" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="imgThreshold" label="图片相似度" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" min="0" step="0.1" max="1" v-model="row.imgThreshold" placeholder="图片相似度" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="bigScale" label="大图缩放比例" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" min="0" step="0.1" max="1" v-model="row.bigScale" placeholder="大图缩放比例" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="smallScale" label="小图缩放比例" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" min="0" step="0.1" max="1" v-model="row.smallScale" placeholder="小图缩放比例" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="featuresThreshold" label="特征相似度" align="left" width="120">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input type="number" min="0" step="0.1" max="1" v-model="row.featuresThreshold" placeholder="特征相似度" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="canvasMsg" label="绘制信息" align="left" width="160">
+                                <template slot-scope="{ row, $index}">
+                                    <el-input v-model="row.canvasMsg" placeholder="绘制信息" class="flex-1"/>
+                                </template>
+                            </el-table-column>
+                            <el-table-column width="100">
+                                <template slot="header">
+                                    <div class="d-flex a-center">
+                                        操作
+                                        <i class="el-icon-setting" style="font-size: 18px;margin-left: 5px;" @click.stop="openJsonContentPopover('multipleImg',pageIndex,settingIndex,-1)"/>
+                                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="tableAddRow('multipleImg',pageIndex,settingIndex,-1)"/>
+                                    </div>
+                                </template>
+                                <template slot-scope="{ row, $index }">
+                                    <div class="d-flex j-start a-center">
+                                        <i class="el-icon-setting" style="font-size: 18px;margin-right: 5px;" @click.stop="openJsonContentPopover('multipleImg',pageIndex,settingIndex,$index)"/>
+                                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('multipleImg',pageIndex,settingIndex,$index)"/>
+                                        <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('multipleImg',pageIndex,settingIndex,$index)"/>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+            </el-card>
+        </el-card>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+        <div style="color: #606266;">配置js内容：</div>
+        <div class="width100 d-flex a-start" style="margin-top: 5px;">
+            <el-input v-model="pageSettingParamJson" :rows="20" type="textarea" label-width="0"
+                      placeholder="配置js内容" class="width100" />
+        </div>
+    </el-row>
+    <el-popover
+            ref="jsonContentPopover"
+            placement="right"
+            trigger="click"
+    >
+        <div style="margin-bottom: 12px;text-align: center;">json配置</div>
+        <el-input v-model="selectRowObj.rowJs" :rows="4" type="textarea" label-width="0"
+                  placeholder="json内容" class="width100" />
+        <div class="d-flex j-center">
+            <el-button class="mt-1" type="primary" @click="readJsonContentPopover">从json读取</el-button>
+            <el-button class="mt-1" type="info" @click="closeJsonContentPopover">关闭</el-button>
+        </div>
+    </el-popover>
+</div>

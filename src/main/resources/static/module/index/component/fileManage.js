@@ -129,6 +129,10 @@ export default {
             this.queryFileList(relativeFilePath);
             this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
         },
+        // 取消上传
+        cancelUpload(i) {
+            this.uploadFileList.splice(i, 1)
+        },
         // 文件上传按钮点击
         uploadFileClick(){
             this.$refs.input.value = null;

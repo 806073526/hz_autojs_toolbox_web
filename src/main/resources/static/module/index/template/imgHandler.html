@@ -76,19 +76,26 @@
         <div class="width100 d-flex a-center">
             <el-form-item label="坐标列表:" class="width40">
                 <el-input type="textarea" v-model="remoteHandler.param1.positionList"
-                          :rows="5" class="width100">
+                          placeholder="点击预览图片,获取点击位置的坐标,坐标列表可以用于解析坐标区域,多点找色等" :rows="5" class="width100">
                 </el-input>
             </el-form-item>
             <el-form-item label="代码预览:" class="width60">
                 <el-input type="textarea" v-model="remoteHandler.param1.scriptPreview"
-                          :rows="5" class="width100">
+                          placeholder="点击生成代码后,预览代码显示的区域" :rows="5" class="width100">
                 </el-input>
             </el-form-item>
         </div>
     </el-row>
     <el-row>
+        <el-form-item label="参数JSON:" class="width100">
+            <el-input type="textarea" v-model="remoteHandler.param1.paramJson"
+                      placeholder="参数的JSON形式,快速解析参数,可用于页面匹配功能" :rows="4" class="width100">
+            </el-input>
+        </el-form-item>
+    </el-row>
+    <el-row>
         <div class="width100 d-flex a-center">
-            <el-form-item label="操作坐标key:" class="width25">
+            <el-form-item label="操作坐标key:" class="width15">
                 <el-select v-model="remoteHandler.param1.operatePositionKey" class="width100">
                     <el-option value="x1">
                         x1
@@ -104,12 +111,12 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="操作坐标值:" class="width25">
+            <el-form-item label="操作坐标值:" class="width15">
                 <el-input type="number" :min="0" v-model="remoteHandler.param1.operatePositionVal"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item class="width50" style="display: flex;justify-content: flex-end;">
+            <el-form-item class="width70" style="display: flex;justify-content: flex-end;">
                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                     <el-radio-group v-model="screenDirection">
                         <el-radio label="横屏">
@@ -134,6 +141,12 @@
                 </el-button>
                 <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="param1Addition">
                     加上坐标值
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="readParamFromJson">
+                    从json读取参数
+                </el-button>
+                <el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="generateParamToJson">
+                    参数生成json
                 </el-button>
                 <!--<el-button type="primary" style="margin-left:10px" size="mini" @click.stop.prevent="copyPosition">
                 复制坐标

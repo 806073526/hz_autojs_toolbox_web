@@ -14,7 +14,8 @@ import LayoutAnalysis from "./component/layoutAnalysis.js"
 import RemoteScript from "./component/remoteScript.js"
 import PreviewDevice from "./component/previewDevice.js"
 import RemoteLog from "./component/remoteLog.js";
-import FileManage from "./component/fileManage.js"
+import FileManage from "./component/fileManage.js";
+import PageMatching from "./component/pageMatching.js";
 
 window.ZXW_VUE = new Vue({
     el: "#app",
@@ -25,12 +26,15 @@ window.ZXW_VUE = new Vue({
         RemoteScript: RemoteScript,
         PreviewDevice: PreviewDevice,
         RemoteLog:RemoteLog,
-        FileManage:FileManage
+        FileManage:FileManage,
+        PageMatching:PageMatching
     },
     template: template,
     data: {
         otherProperty: {// 其他属性对象 同步app端
-            orientation: 1  // 屏幕方向
+            orientation: 1,  // 屏幕方向
+            debugModel: true,// 调试模式
+            debugSleep: 1000,// 调试延时
         },
         deviceInfo: {// 当前设备信息
             startPreview: false,
@@ -39,7 +43,9 @@ window.ZXW_VUE = new Vue({
             standardHeight: null,
             standardConvert: false,
             offsetX: 0,
-            offsetY: 0
+            offsetY: 0,
+            debugModel:true,
+            debugSleep:1000
         },
         screenDirection: '横屏'
     },
@@ -54,6 +60,7 @@ window.ZXW_VUE = new Vue({
         }
     },
     mounted() {
+        this.timeSyncOtherProperty();
         // 每3秒同步一次其他属性
         setInterval(() => {
             this.timeSyncOtherProperty()
@@ -77,9 +84,14 @@ window.ZXW_VUE = new Vue({
             setTimeout(() => {
                 this.$nextTick(() => {
                     // 坐标全屏
-                    this.$refs.imgHandler.setParam1(true);
+                    this.$refs.imgHandler.setParam1(false);
                 });
-            }, 3000);
+                // 选择表格行时 立即同步一次属性 并且赋值调试模式 调试时长
+                this.timeSyncOtherProperty(()=>{
+                    this.deviceInfo.debugModel = this.otherProperty.debugModel;
+                    this.deviceInfo.debugSleep = this.otherProperty.debugSleep;
+                });
+            }, 2000);
 
             this.$nextTick(()=>{
                 // 初始化文件管理
@@ -97,7 +109,7 @@ window.ZXW_VUE = new Vue({
             return true;
         },
         // 定时同步其他属性
-        timeSyncOtherProperty() {
+        timeSyncOtherProperty(callback) {
             if (!this.deviceInfo.deviceUuid) {
                 return
             }
@@ -117,6 +129,9 @@ window.ZXW_VUE = new Vue({
                             if (json) {
                                 // 解析对象
                                 _that.otherProperty = JSON.parse(json);
+                                if(callback){
+                                    callback();
+                                }
                             }
                         }
                     }

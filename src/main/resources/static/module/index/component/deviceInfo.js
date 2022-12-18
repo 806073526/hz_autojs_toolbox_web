@@ -26,7 +26,9 @@ export default {
                 standardHeight: null,
                 standardConvert: false,
                 offsetX: 0,
-                offsetY: 0
+                offsetY: 0,
+                debugModel:true,
+                debugSleep:1000
             }
         }
     },
@@ -43,12 +45,16 @@ export default {
                 this.$set(row, 'standardConvert', false);
                 this.$set(row, 'offsetX', 0);
                 this.$set(row, 'offsetY', 0);
+                this.$set(row, 'debugModel', true);
+                this.$set(row, 'debugSleep', 1000);
                 this.deviceInfo = row;
                 this.$set(this.deviceInfo, 'standardWidth', row.screenWidth);
                 this.$set(this.deviceInfo, 'standardHeight', row.screenHeight);
                 this.$set(this.deviceInfo, 'standardConvert', false);
                 this.$set(this.deviceInfo, 'offsetX', 0);
                 this.$set(this.deviceInfo, 'offsetY', 0);
+                this.$set(this.deviceInfo, 'debugModel', true);
+                this.$set(this.deviceInfo, 'debugSleep', 1000);
                 // 同步设备信息
                 this.$emit('deviceSelectRowCallback', {
                     deviceInfo: this.deviceInfo,
@@ -159,7 +165,14 @@ export default {
             if (!this.validSelectDevice()) {
                 return
             }
-            let script = "commonStorage.put('x偏移系数'," + this.deviceInfo.offsetX + ");commonStorage.put('y偏移系数'," + this.deviceInfo.offsetY + ");commonStorage.put('standardConvert'," + this.deviceInfo.standardConvert + ");commonStorage.put('standardWidth'," + this.deviceInfo.standardWidth + ");commonStorage.put('standardHeight'," + this.deviceInfo.standardHeight + ");events.broadcast.emit('refreshUI');";
+            let script = "commonStorage.put('x偏移系数'," + this.deviceInfo.offsetX + ");" +
+                "commonStorage.put('y偏移系数'," + this.deviceInfo.offsetY + ");" +
+                "commonStorage.put('standardConvert'," + this.deviceInfo.standardConvert + ");" +
+                "commonStorage.put('standardWidth'," + this.deviceInfo.standardWidth + ");" +
+                "commonStorage.put('standardHeight'," + this.deviceInfo.standardHeight + ");" +
+                "commonStorage.put('debugModel'," + this.deviceInfo.debugModel + ");" +
+                "commonStorage.put('debugSleep'," + this.deviceInfo.debugSleep + ");" +
+                "events.broadcast.emit('refreshUI');";
             this.remoteExecuteScript(script);
         },
     }

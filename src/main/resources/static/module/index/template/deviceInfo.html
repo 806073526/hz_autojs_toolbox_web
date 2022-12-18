@@ -51,29 +51,36 @@
     </el-row>
     <el-row style="margin-top: 10px;">
         <div class="width100 d-flex a-center">
-            <el-form-item label="标准宽度:" prop="x1" class="width20">
+            <el-form-item label="标准宽度:" prop="x1" class="width15">
                 <el-input type="number" v-model="deviceInfo.standardWidth" placeholder="请设置标准宽度"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="标准高度:" prop="y1" class="width20">
+            <el-form-item label="标准高度:" prop="y1" class="width15">
                 <el-input type="number" v-model="deviceInfo.standardHeight" placeholder="请设置标准高度"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="x偏移系数:" prop="x1" class="width20">
+            <el-form-item label="x偏移系数:" prop="x1" class="width15">
                 <el-input type="number" v-model="deviceInfo.offsetX" placeholder="请设置x偏移系数"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="y偏移系数:" prop="y1" class="width20">
+            <el-form-item label="y偏移系数:" prop="y1" class="width15">
                 <el-input type="number" v-model="deviceInfo.offsetY" placeholder="请设置y偏移系数"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
+            <el-form-item label="调试模式:" label-width="100px" class="width20">
+                <div class="d-flex j-center a-center">
+                    <el-switch v-model="deviceInfo.debugModel" @change="syncWidthHeightToApp" style="margin-right: 5px;"/>
+                    <el-input type="number" v-model="deviceInfo.debugSleep" placeholder="请设置调试延时" class="flex-1"
+                              @change="syncWidthHeightToApp">
+                    </el-input>
+                </div>
+            </el-form-item>
             <el-form-item label="标准坐标转换:" label-width="120px" class="width10">
-                <el-switch v-model="deviceInfo.standardConvert" @change="syncWidthHeightToApp"
-                />
+                <el-switch v-model="deviceInfo.standardConvert" @change="syncWidthHeightToApp"/>
             </el-form-item>
             <div class="width10 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
                 <el-button @click.stop="syncWidthHeightToApp">

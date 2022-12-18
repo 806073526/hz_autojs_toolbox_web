@@ -1,0 +1,22 @@
+.box-card .el-card__header{
+    padding: 18px 0;
+}
+.box-card .el-input__inner{
+    padding: 0 0 0 10px!important;
+}
+.box-card .el-select .el-input .el-select__caret{
+    height: 23px !important;
+    line-height: 23px !important;
+    font-size: 13px;
+}
+.el-card__body{
+    padding: 0 !important;
+}
+.el-icon-remove,.el-icon-circle-plus,.el-icon-setting{
+    cursor: pointer;
+}
+.tableTitle{
+    margin-top: 10px;
+    font-size: 14px;
+    color: #606266;
+}
