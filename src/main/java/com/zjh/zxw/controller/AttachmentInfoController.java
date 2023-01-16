@@ -136,6 +136,23 @@ public class AttachmentInfoController extends BaseController {
         }
     }
 
+    /**
+     * 根据相对路径获取文件信息
+     */
+    @ApiOperation(value = "根据相对路径获取文件信息", notes = "根据相对路径获取文件信息")
+    @GetMapping("/querySingleAttachInfoByPath")
+    public R<AttachInfo> querySingleAttachInfoByPath(@RequestParam("relativeFilePath") String relativeFilePath) {
+        try {
+            AttachInfo attachInfo = attachmentInfoService.querySingleAttachInfoByPath(relativeFilePath);
+            return success(attachInfo);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("查询文件异常！请联系管理员");
+        }
+    }
+
 
     /**
      * 上传文件

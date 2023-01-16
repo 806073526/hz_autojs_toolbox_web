@@ -352,7 +352,7 @@
                         color:{{imgMousePosition.color}}
                     </span>
                 </div>
-                <div draggable="false" style="user-select: none;min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
+                <div draggable="false" v-loading="imgDrawLoading" style="user-select: none;min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
                     <div id="drawArear" class="draw-box" v-if="remoteHandler.param1.previewImg"
                          style="width: auto;margin: 0; padding: 0;height: auto;max-width: 100%;user-select: none;">
                         <img id="previewImg" draggable="false" style="width: 100%;margin: 0; padding: 0;height: 100%;user-select: none;"

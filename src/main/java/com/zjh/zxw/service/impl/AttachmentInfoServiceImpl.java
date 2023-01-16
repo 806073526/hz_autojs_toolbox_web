@@ -316,5 +316,19 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         return true;
     }
 
+    @Override
+    public AttachInfo querySingleAttachInfoByPath(String relativeFilePath) {
+        File file = new File(this.getRootPath() + relativeFilePath);
+        if(!file.exists()){
+            return null;
+        }
+        // 当前是一个目录，直接返回空集合
+        if (file.isDirectory()) {
+            return null;
+        }
+        AttachInfo attachInfo = convertAttachInfo(file);
+        return attachInfo;
+    }
+
 
 }

@@ -39,6 +39,7 @@ export default {
                 y: 0,
                 color: ''
             },
+            imgDrawLoading:false,
             positionShowType: 'cur', // 坐标显示类型
             remoteHandler: {
                 param1: {
@@ -242,10 +243,48 @@ export default {
             this.remoteHandler.param1.cache_y2 = this.remoteHandler.param1.y2;
             // 调用utils.js中 对应的functionName
             let messageStr = '{"functionName":"' + functionName + '","functionParam":[' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"' + this.remoteHandler.param1.localImageName + '",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ']}';
+            // 相对路径
+            let relativeFilePath = this.deviceInfo.deviceUuid + "/" + this.remoteHandler.param1.localImageName;
+            // 原始文件信息
+            let sourceFileInfo = this.getFileInfoByPath(relativeFilePath);
+            let sourceFileSize = sourceFileInfo ? sourceFileInfo.fileSize : 0;
+            let sourceLastUpdateTime = sourceFileInfo ? sourceFileInfo.lastUpdateTime : '';
+            this.imgDrawLoading = true;
             this.sendMsgToClient('remoteHandler',messageStr,()=>{
-                setTimeout(() => {
-                    this.loadPreviewImg()
-                }, 1200)
+                let fileNoChangeCount = 0;//连续未变化次数
+                let startFlag = false; //开始处理标志
+                // 每隔200毫秒执行一次查询
+                let refreshTimer = setInterval(()=>{
+                    // 当前文件信息
+                    let curFileInfo = this.getFileInfoByPath(relativeFilePath);
+                    let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
+                    let curLastUpdateTime = curFileInfo ? curFileInfo.lastUpdateTime : '';
+
+                    if(sourceFileSize !== curFileSize || sourceLastUpdateTime !== curLastUpdateTime){
+                        // 内容有变化时开始记录
+                        startFlag = true;
+                    }
+                    // 有一次变化后 文件大小和时间连续没有变化
+                    if(sourceFileSize === curFileSize && sourceLastUpdateTime === curLastUpdateTime && startFlag){
+                        // 文件未变化计数加一
+                        fileNoChangeCount++;
+                    } else {
+                        sourceFileSize = curFileSize;
+                        sourceLastUpdateTime = curLastUpdateTime;
+                        fileNoChangeCount = 0;// 重置次数
+                    }
+                    // 200*3 0.6秒钟未变化 认为图片上传完成
+                    if(fileNoChangeCount >= 3){
+                        // 执行加载图片
+                        this.loadPreviewImg();
+                        setTimeout(()=>{
+                            this.imgDrawLoading = false;
+                        },200);
+                        // 关闭定时器
+                        clearInterval(refreshTimer);
+                        refreshTimer = null;
+                    }
+                },200);
             });
         },
         // 开启快速裁图change方法
@@ -255,6 +294,29 @@ export default {
                 // 自动设置全屏
                 this.setParam1(false);
             }
+        },
+        // 根据路径获取文件信息
+        getFileInfoByPath(relativeFilePath){
+            let fileInfo = null;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/querySingleAttachInfoByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": relativeFilePath
+                },
+                async:false,
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            fileInfo = data.data;
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return fileInfo;
         },
         // 加载预览图片
         loadPreviewImg() {

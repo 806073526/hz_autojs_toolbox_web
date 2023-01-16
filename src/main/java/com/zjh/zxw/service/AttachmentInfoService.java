@@ -40,4 +40,6 @@ public interface AttachmentInfoService {
     Boolean copyFileBatch(BatchFileDTO batchFileDTO) throws IOException;
 
     Boolean moveFileBatch(BatchFileDTO batchFileDTO) throws IOException;
+
+    AttachInfo querySingleAttachInfoByPath(String relativeFilePath);
 }
