@@ -159,7 +159,7 @@ export default {
     methods: {
         init(){
             this.$nextTick(()=>{
-                this.scriptEditor = this.scriptEditor || monaco.editor.create(document.getElementById('scriptTextEditor'), {
+                this.scriptEditor = this.scriptEditor ? this.scriptEditor : monaco.editor.create(document.getElementById('scriptTextEditor'), {
                     value:'',
                     language: 'javascript',
                     theme: 'vs-dark'
