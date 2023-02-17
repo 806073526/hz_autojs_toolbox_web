@@ -159,14 +159,31 @@ export default {
     methods: {
         init(){
             this.$nextTick(()=>{
-                this.scriptEditor = this.scriptEditor ? this.scriptEditor : monaco.editor.create(document.getElementById('scriptTextEditor'), {
-                    value:'',
-                    language: 'javascript',
-                    theme: 'vs-dark'
-                });
-                this.scriptEditor.onDidChangeModelContent((e)=>{
-                    this.remoteHandler.param4.scriptText = this.scriptEditor.getValue()
-                })
+                let interval = null;
+                // 初始化编辑器
+                let initEditorFun = ()=>{
+                    // 校验依赖是否已初始化完成
+                    let flag = this.getMonacoEditorComplete();
+                    if(flag){
+                        // 再初始化编辑器组件
+                        this.scriptEditor = this.scriptEditor ? this.scriptEditor : monaco.editor.create(document.getElementById('scriptTextEditor'), {
+                            value:'',
+                            language: 'javascript',
+                            theme: 'vs-dark'
+                        });
+                        this.scriptEditor.onDidChangeModelContent((e)=>{
+                            this.remoteHandler.param4.scriptText = this.scriptEditor.getValue()
+                        });
+                        // 关闭定时器
+                        clearInterval(interval);
+                    }
+                };
+                // 立即触发一次
+                initEditorFun();
+                // 再开启定时器
+                interval = setInterval(()=>{
+                    initEditorFun();
+                },200);
             })
         },
         // 初始自定义模块
