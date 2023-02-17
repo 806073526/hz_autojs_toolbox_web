@@ -13,8 +13,9 @@
     <el-row>
         <div class="width100 d-flex a-start">
             <el-form-item label="脚本内容:" prop="scriptText" class="width100">
-                <el-input v-model="remoteHandler.param4.scriptText" :rows="20" type="textarea"
+                <el-input v-show="false" v-model="remoteHandler.param4.scriptText" :rows="20" type="textarea"
                           placeholder="请输入脚本内容" class="width100" />
+                <div id="scriptTextEditor" style="width: 100%;margin-top:10px;height: 500px;"></div>
             </el-form-item>
         </div>
     </el-row>
@@ -86,7 +87,6 @@
             </el-button>
         </el-form-item>
     </el-row>
-
     <el-popover
             ref="customScriptSettingPopover"
             placement="right"

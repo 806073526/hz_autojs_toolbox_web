@@ -31,6 +31,8 @@ window.ZXW_VUE = new Vue({
     },
     template: template,
     data: {
+        monacoEditorComplete: false,
+        activeTab:'imgHandler',
         otherProperty: {// 其他属性对象 同步app端
             orientation: 1,  // 屏幕方向
             debugModel: true,// 调试模式
@@ -57,9 +59,17 @@ window.ZXW_VUE = new Vue({
                 return;
             }
             this.screenDirection = val.orientation === 1 ? "竖屏" : "横屏";
+        },
+        activeTab(val){
+            // 执行页面组件初始化方法
+            if(this.$refs[val] && this.$refs[val].init){
+                this.$refs[val].init()
+            }
         }
     },
     mounted() {
+        require.config({ paths: { 'vs': '/plugins/monaco-editor/min/vs' }});
+        require(['vs/editor/editor.main'],()=>{ this.monacoEditorComplete = true });
         this.timeSyncOtherProperty();
         // 每3秒同步一次其他属性
         setInterval(() => {
@@ -70,7 +80,8 @@ window.ZXW_VUE = new Vue({
         return {
             validSelectDevice: this.validSelectDevice, // 检验设备选择情况
             sendMsgToClient: this.sendMsgToClient, // 发送websocket消息到app
-            remoteExecuteScript: this.remoteExecuteScript // app端远程执行代码
+            remoteExecuteScript: this.remoteExecuteScript, // app端远程执行代码
+            getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete }
         }
     },
     methods: {

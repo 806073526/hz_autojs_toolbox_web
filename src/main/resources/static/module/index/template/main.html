@@ -2,32 +2,32 @@
     <el-form ref="commodityInfo" class="commodity mt-10 width100" label-width="100px">
         <!-- 设备信息组件 -->
         <device-info ref="deviceInfo" @deviceSelectRowCallback="deviceSelectRowCallback"/>
-        <el-tabs tab-position="left" style="height: auto;margin-top:5px;">
-            <el-tab-pane label="图像处理">
+        <el-tabs tab-position="left" style="height: auto;margin-top:5px;" v-model="activeTab">
+            <el-tab-pane label="图像处理" name="imgHandler">
                 <!-- 图像处理组件 -->
                 <img-handler :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="imgHandler" />
             </el-tab-pane>
-            <el-tab-pane label="布局分析">
+            <el-tab-pane label="布局分析" name="layoutAnalysis">
                 <!-- 布局分析组件 -->
                 <layout-analysis :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="layoutAnalysis" />
             </el-tab-pane>
-            <el-tab-pane label="远程脚本">
+            <el-tab-pane label="远程脚本" name="remoteScript">
                 <!-- 远程脚本组件 -->
                 <remote-script :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteScript" />
             </el-tab-pane>
-            <el-tab-pane label="预览设备">
+            <el-tab-pane label="预览设备" name="previewDevice">
                 <!-- 预览设备组件 -->
                 <preview-device :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="previewDevice" />
             </el-tab-pane>
-            <el-tab-pane label="远程日志">
+            <el-tab-pane label="远程日志" name="remoteLog">
                 <!-- 远程日志组件 -->
                 <remote-log :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteLog" />
             </el-tab-pane>
-            <el-tab-pane label="文件管理">
+            <el-tab-pane label="文件管理" name="fileManage">
                 <!-- 文件管理组件  -->
                 <file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="fileManage" />
             </el-tab-pane>
-            <el-tab-pane label="页面匹配">
+            <el-tab-pane label="页面匹配" name="pageMatching">
                 <!-- 页面匹配组件 -->
                 <page-matching :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="pageMatching" />
             </el-tab-pane>

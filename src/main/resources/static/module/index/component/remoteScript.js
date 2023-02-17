@@ -13,7 +13,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -57,6 +57,7 @@ export default {
                     scriptImmediatelyExec: true
                 }
             },
+            scriptEditor: null,
             tempCustomScript:[],// 自定义模块缓存数据
             customScript:[],// 自定义模块 [{moduleName:'',scriptName:''}]
             remoteScript: {
@@ -156,6 +157,18 @@ export default {
         }
     },
     methods: {
+        init(){
+            this.$nextTick(()=>{
+                this.scriptEditor = this.scriptEditor || monaco.editor.create(document.getElementById('scriptTextEditor'), {
+                    value:'',
+                    language: 'javascript',
+                    theme: 'vs-dark'
+                });
+                this.scriptEditor.onDidChangeModelContent((e)=>{
+                    this.remoteHandler.param4.scriptText = this.scriptEditor.getValue()
+                })
+            })
+        },
         // 初始自定义模块
         initCustomScript(){
             let _that = this;
@@ -223,7 +236,8 @@ export default {
         },
         // 清空脚本
         clearScript() {
-            this.remoteHandler.param4.scriptText = '';
+            // this.remoteHandler.param4.scriptText = '';
+            this.scriptEditor.setValue('')
         },
         // 保存到草稿
         saveToDraft(){
@@ -231,7 +245,7 @@ export default {
                 window.ZXW_VUE.$message.warning('请设置脚本名称');
                 return false;
             }
-            window.localStorage.setItem("remoteScriptText_"+this.remoteHandler.param4.scriptName,this.remoteHandler.param4.scriptText);
+            window.localStorage.setItem("remoteScriptText_"+this.remoteHandler.param4.scriptName,this.scriptEditor.getValue());
             window.ZXW_VUE.$notify.success({message: '保存草稿成功', duration: '1000'});
         },
         // 从草稿读取
@@ -240,7 +254,7 @@ export default {
                 window.ZXW_VUE.$message.warning('请设置脚本名称');
                 return false;
             }
-            this.remoteHandler.param4.scriptText = window.localStorage.getItem("remoteScriptText_"+this.remoteHandler.param4.scriptName);
+            this.scriptEditor.setValue( window.localStorage.getItem("remoteScriptText_"+this.remoteHandler.param4.scriptName));
             window.ZXW_VUE.$notify.success({message: '读取草稿成功', duration: '1000'});
         },
         // 存为文件
@@ -257,7 +271,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'info'
             }).then(() => {
-                let scriptFile = new File([this.remoteHandler.param4.scriptText], this.remoteHandler.param4.scriptName, {
+                let scriptFile = new File([this.scriptEditor.getValue()], this.remoteHandler.param4.scriptName, {
                     type: "text/plain",
                 });
                 const param = new FormData();
@@ -299,7 +313,7 @@ export default {
                 async: false,
                 dataType:"TEXT", //返回值的类型
                 success: function (res) {
-                    _that.remoteHandler.param4.scriptText = String(res);
+                    _that.scriptEditor.setValue(String(res));
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
@@ -315,7 +329,9 @@ export default {
                     // 远程执行
                     this.remoteExecuteScript(code);
                 }
-                this.remoteHandler.param4.scriptText += code +"\n";
+                let scriptText = this.scriptEditor.getValue();
+                this.scriptEditor.setValue(scriptText+=code+"\n");
+                // this.remoteHandler.param4.scriptText += code +"\n";
             }
         },
         // 获取自定义模块远程代码
@@ -329,9 +345,11 @@ export default {
                 success: function (res) {
                     if (_that.remoteHandler.param4.scriptImmediatelyExec && _that.validSelectDevice()) {
                         // 远程执行
-                        _that.remoteExecuteScript(_that.remoteHandler.param4.scriptText);
+                        _that.remoteExecuteScript(_that.scriptEditor.getValue());
                     }
-                    _that.remoteHandler.param4.scriptText += String(res) + "\n";
+                    //_that.remoteHandler.param4.scriptText += String(res) + "\n";
+                    let scriptText = _that.scriptEditor.getValue();
+                    _that.scriptEditor.setValue(scriptText+=String(res)+"\n");
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
