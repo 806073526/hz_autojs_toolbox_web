@@ -40,12 +40,16 @@ export default {
             fileEditorName:'',// 文件编辑器名称
             fileSavePath: '',// 文件保存路径
             scriptEditor:null,
+            fileActiveName:'web',
             webSyncPath: "/",
             phoneSyncPath: "/appSync/",
             autoSyncWebSyncPath:true,
             breadcrumbList: [{label: '根目录', value: ''}], // 面包屑
+            phoneBreadcrumbList: [{label: '根目录', value: ''}],
             fileLoading: false,// 加载文件loading
+            phoneFileLoading: false,// 手机端加载文件loading
             checkAllFile: false,// 全选文件
+            phoneCheckAllFile: false,// 手机端全选文件
             previewList: [],// 单个上传
             uploadFileList: [],// 需要上传的文件列表
             accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js',
@@ -53,7 +57,8 @@ export default {
             copyFileList: [],// 复制文件列表
             moveFileList: [],// 移动文件列表
             absolutePrePath: '',// 绝对路径前缀
-            fileList: [] // 文件列表
+            fileList: [], // 文件列表
+            phoneFileList:[] // 手机文件列表
         }
     },
     mounted() {
@@ -499,6 +504,12 @@ export default {
                 this.$set(item, 'check', this.checkAllFile);
             });
         },
+        // 手机端全选
+        phoneCheckAllFileChange(){
+            this.phoneFileList.forEach(item => {
+                this.$set(item, 'check', this.phoneCheckAllFile);
+            });
+        },
         // 文件名点击
         fileClick(row) {
             // this.$set(row,'check',!row.check);
@@ -554,6 +565,10 @@ export default {
                     });
                 }
             }
+        },
+        // 手机端文件双击
+        phoneFileNameDbClick(row){
+
         },
         // 压缩文件
         zipFile(row){
@@ -692,6 +707,12 @@ export default {
                 let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
                 let replacePath = toPath.replace(this.deviceInfo.deviceUuid,"");
                 this.webSyncPath =  replacePath + "/";
+            }
+        },
+        // 面包屑导航
+        phoneBreadcrumbChange(item, index){
+            if (!this.validSelectDevice()) {
+                return;
             }
         },
         // 计算文件大小
@@ -971,6 +992,45 @@ export default {
             // 触发点击事件
             dom.click();
             document.getElementById("upload-file-dom")?.remove();
+        },
+        // 更新手机端目录缓存
+        updatePhoneDirCache(){
+            // 远程执行脚本内容
+            let remoteScript = "let targetPath = '/sdcard/appSync/'\n" +
+                "function convertFile(item, baseUrl) {\n" +
+                "    let fileObj = {};\n" +
+                "    fileObj.fileName = item\n" +
+                "    fileObj.filePath = baseUrl + item\n" +
+                "    fileObj.parentPath = baseUrl\n" +
+                "    fileObj.isDirectory = files.isDir(fileObj.filePath)\n" +
+                "    return fileObj;\n" +
+                "}\n" +
+                "function getFileByPath(filePath) {\n" +
+                "    let fileArr = files.listDir(filePath);\n" +
+                "    let fileList = [];\n" +
+                "    fileArr.forEach(item => {\n" +
+                "        let fileObj = convertFile(item, filePath);\n" +
+                "        if (fileObj.isDirectory) {\n" +
+                "            //let childrenFileList = getFileByPath(fileObj.filePath);\n" +
+                "            //fileObj.children = childrenFileList;\n" +
+                "        }\n" +
+                "        fileList.push(fileObj);\n" +
+                "    })\n" +
+                "    return fileList;\n" +
+                "}\n" +
+                "let appSyncFileList = getFileByPath(targetPath);\n" +
+                "// url编码base64加密\n" +
+                "let result = $base64.encode(encodeURI(JSON.stringify(appSyncFileList)));\n" +
+                "http.request(commonStorage.get(\"服务端IP\") + ':9998/attachmentInfo/updateFileDirectoryMap', {\n" +
+                "    headers: {\n" +
+                "        \"deviceUUID\": commonStorage.get('deviceUUID')\n" +
+                "    },\n" +
+                "    method: 'POST',\n" +
+                "    contentType: 'application/json',\n" +
+                "    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + targetPath, 'fileDirectoryJson': result })\n" +
+                "},(e)=>{});"
+
+
         }
     }
 }

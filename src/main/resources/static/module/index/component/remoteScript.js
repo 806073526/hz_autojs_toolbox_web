@@ -158,8 +158,10 @@ export default {
     },
     methods: {
         init(){
+            let fileContent = this.remoteHandler.param4.scriptText ? this.remoteHandler.param4.scriptText : "";
             // 初始化文件编辑器
-            initFileEditor(this,'scriptEditor','scriptTextEditor',this.getMonacoEditorComplete,'','javascript','vs-dark',(e,value)=>{
+            initFileEditor(this,'scriptEditor','scriptTextEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
+                this.remoteHandler.param4.scriptText = value
             });
         },
         // 初始自定义模块

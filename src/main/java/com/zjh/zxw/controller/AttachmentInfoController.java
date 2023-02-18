@@ -10,6 +10,7 @@ import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
 
@@ -49,6 +52,35 @@ public class AttachmentInfoController extends BaseController {
 
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
+
+
+    // 文件目录 key为deviceUUID value为当前设备的日志目录结构json
+    private final static ConcurrentHashMap<String, String> fileDirectoryMap = new ConcurrentHashMap<String,String>();
+
+    // 文件内容 key为deviceUUID_日期文件夹名_日志名  value为日志内容
+    private final static ConcurrentHashMap<String, String> fileMap = new ConcurrentHashMap<String,String>();
+
+
+    @ApiOperation(value = "清理文件目录结构", notes = "清理文件目录结构")
+    @PostMapping("/clearFileDirectoryMap")
+    public R<Boolean> clearFileDirectoryMap(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
+        fileDirectoryMap.remove(dirPathKey);
+        return success(true);
+    }
+
+    @ApiOperation(value = "更新文件目录结构", notes = "更新文件目录结构")
+    @PostMapping("/updateFileDirectoryMap")
+    public R<Boolean> updateFileDirectoryMap(@RequestBody Map<String,String> mapParam){
+        fileDirectoryMap.put(mapParam.get("dirPathKey"),mapParam.get("fileDirectoryJson"));
+        return success(true);
+    }
+
+    @ApiOperation(value = "查询文件目录结构", notes = "查询文件目录结构")
+    @PostMapping("/queryFileDirectory")
+    public R<String> queryFileDirectory(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
+        String fileDirectoryJson = fileDirectoryMap.getOrDefault(dirPathKey,"");
+        return success(fileDirectoryJson);
+    }
 
     /**
      * 上传附件

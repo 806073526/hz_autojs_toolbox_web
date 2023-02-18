@@ -35,6 +35,9 @@
 .fileList-head .fileName {
     width: 50%;
 }
+.fileList-head .phoneFileName{
+    width: 70%;
+}
 .fileList-head .fileName .text-fileName{
     display: inline-block;
     flex: 1;
@@ -63,6 +66,11 @@
 }
 .fileList-head .operate {
     width: 20%;
+    text-align: center;
+}
+
+.fileList-head .phoneOperate {
+    width: 30%;
     text-align: center;
 }
 
