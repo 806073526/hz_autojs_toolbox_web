@@ -70,6 +70,41 @@ public class AttachmentInfoController extends BaseController {
         }
     }
 
+    /**
+     * 解压服务端zip文件
+     */
+    @ApiOperation(value = "解压服务端zip文件", notes = "解压服务端zip文件")
+    @GetMapping("/unServerFileZip")
+    public R<Boolean> unServerFileZip(@RequestParam("sourcePathName")String sourcePathName,@RequestParam(value = "targetPathName",required = false)String targetPathName) {
+        try {
+            attachmentInfoService.unServerFileZip(sourcePathName,targetPathName);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("解压服务端zip文件失败！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 压缩服务端zip文件
+     */
+    @ApiOperation(value = "压缩服务端zip文件", notes = "压缩服务端zip文件")
+    @GetMapping("/zipServerFileZip")
+    public R<Boolean> zipServerFileZip(@RequestParam("sourceFolderPathName")String sourceFolderPathName,@RequestParam(value = "targetFilePathName")String targetFilePathName,@RequestParam(value = "zipPathName",required = false)String zipPathName) {
+        try {
+            attachmentInfoService.zipServerFileZip(sourceFolderPathName,targetFilePathName,zipPathName);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("压缩服务端zip文件失败！请联系管理员");
+        }
+    }
+
 
     /**
      * 上传图片附件(AutoJs专用)

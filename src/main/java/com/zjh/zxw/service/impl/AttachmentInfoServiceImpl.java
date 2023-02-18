@@ -2,6 +2,8 @@ package com.zjh.zxw.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.common.util.FileUtil;
+import com.zjh.zxw.common.util.UnZipUtils;
+import com.zjh.zxw.common.util.ZipUtils;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
@@ -27,6 +29,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * <p>
@@ -41,6 +45,7 @@ import java.util.stream.Collectors;
 @Service
 public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
+    private static final int BUFFER_SIZE = 1024;
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
 
@@ -109,10 +114,14 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         boolean isDirectory = f.isDirectory();
         attachInfo.setIsDirectory(isDirectory);
         if(!isDirectory){
-            String poFileName = fileName.substring(0,fileName.lastIndexOf("."));
-            String fileType = fileName.substring(fileName.lastIndexOf(".") + 1);
-            attachInfo.setFileName(poFileName);
-            attachInfo.setFileType(fileType);
+            if(fileName.lastIndexOf(".")!=-1){
+                String poFileName = fileName.substring(0,fileName.lastIndexOf("."));
+                String fileType = fileName.substring(fileName.lastIndexOf(".") + 1);
+                attachInfo.setFileName(poFileName);
+                attachInfo.setFileType(fileType);
+            } else {
+                attachInfo.setFileName(fileName);
+            }
         } else {
             attachInfo.setFileName(f.getName());
         }
@@ -330,5 +339,32 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         return attachInfo;
     }
 
+    @Override
+    public void unServerFileZip(String sourcePathName,String targetPathName) throws Exception {
+        File file = new File(sourcePathName);
+        // 判断源文件是否存在
+        if (!file.exists()) {
+            throw new BusinessException(file.getPath() + "所指文件不存在");
+        }
+        String fileName = file.getName();
+        String fileType = fileName.substring(fileName.lastIndexOf(".") + 1);
+        if(!"zip".equals(fileType)){
+            throw new BusinessException(file.getPath() + "不是zip格式文件");
+        }
+        if(StringUtils.isBlank(targetPathName)){
+            UnZipUtils.decompress(sourcePathName);
+        } else {
+            UnZipUtils.decompress(sourcePathName,targetPathName);
+        }
+    }
 
+    @Override
+    public void zipServerFileZip(String sourceFolderPathName, String targetFilePathName, String zipPathName) throws Exception {
+        File file = new File(sourceFolderPathName);
+        // 判断源文件是否存在
+        if (!file.exists()) {
+            throw new BusinessException(file.getPath() + "所指文件夹不存在");
+        }
+        ZipUtils.zip(targetFilePathName,sourceFolderPathName,zipPathName);
+    }
 }

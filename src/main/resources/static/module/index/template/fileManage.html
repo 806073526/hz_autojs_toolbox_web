@@ -107,7 +107,9 @@
                         <span>{{ item.lastUpdateTime }}</span>
                     </div>
                     <div class="operate d-flex a-center j-center">
-                        <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="previewFile(item.previewUrl)">预览</el-link>
+                        <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>
+                        <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
+                        <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
                         <el-link :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
                         <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;" @click="syncToPhoneSingle(item)">同步到手机</el-link>
                         <el-link :underline="false" type="info" style="margin-left: 5px;" @click="removeFile(item)">删除</el-link>
@@ -116,4 +118,16 @@
             </el-scrollbar>
         </div>
     </el-row>
+    <el-dialog  :visible.sync="fileEditVisible" :title="navigatePath + '/' + fileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+        <div id="fileEditor" style="height: 85vh;width: 100%;">
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary"  @click.stop.native="saveFileEditorContent">
+            保存
+          </el-button>
+          <el-button type="info" @click.stop.native="closeFileEditorDialog">
+            关闭
+          </el-button>
+        </span>
+    </el-dialog>
 </div>

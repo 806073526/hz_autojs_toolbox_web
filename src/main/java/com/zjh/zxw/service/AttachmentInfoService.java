@@ -4,6 +4,7 @@ import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,4 +43,8 @@ public interface AttachmentInfoService {
     Boolean moveFileBatch(BatchFileDTO batchFileDTO) throws IOException;
 
     AttachInfo querySingleAttachInfoByPath(String relativeFilePath);
+
+    void unServerFileZip(String sourcePathName,String targetPathName) throws Exception;
+
+    void zipServerFileZip(String sourceFolderPathName, String targetFilePathName, String zipPathName) throws Exception;
 }

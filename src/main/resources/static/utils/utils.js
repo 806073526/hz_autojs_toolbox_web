@@ -70,3 +70,52 @@ export const zeroFill = (i)=> {
         return String(i);
     }
 };
+
+
+/**
+ * 初始化文件编辑器
+ * @param _that this对象
+ * @param editorKey 编辑器key
+ * @param containerId 容器id
+ * @param getEditorCompleteFun 获取编辑器依赖加载完成方法
+ * @param fileContent 文件内容
+ * @param language 语言 默认javascript
+ * @param theme 主题 vs-dark
+ * @param editorChangeCallBack 编辑器值变化回调函数 e对象 value编辑器值
+ */
+export const initFileEditor = (_that,editorKey,containerId,getEditorCompleteFun,fileContent,language='javascript',theme='vs-dark',editorChangeCallBack) =>{
+    _that.$nextTick(()=>{
+        let interval = null;
+        // 初始化编辑器
+        let initEditorFun = ()=>{
+            // 校验依赖是否已初始化完成
+            let flag = getEditorCompleteFun();
+            if(flag){
+                // 已经初始化 则直接设置值
+                if(_that[editorKey]){
+                    _that[editorKey].setValue(fileContent)
+                    // 未初始化则 初始化
+                } else {
+                    _that[editorKey] = monaco.editor.create(document.getElementById(containerId), {
+                        value: fileContent,
+                        language: language,
+                        theme: theme
+                    });
+                    _that[editorKey].onDidChangeModelContent((e)=>{
+                        if(editorChangeCallBack){
+                            editorChangeCallBack(e,_that[editorKey].getValue())
+                        }
+                    });
+                }
+                // 关闭定时器
+                clearInterval(interval);
+            }
+        };
+        // 立即触发一次
+        initEditorFun();
+        // 再开启定时器
+        interval = setInterval(()=>{
+            initEditorFun();
+        },200);
+    })
+};

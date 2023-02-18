@@ -1,4 +1,4 @@
-import {getContext} from "./../../../utils/utils.js";
+import {getContext,initFileEditor} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -13,7 +13,7 @@ $.ajax({
 export default {
     template: template,
     name: 'FileManage',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -36,6 +36,10 @@ export default {
     },
     data() {
         return {
+            fileEditVisible:false, // 文件编辑器可见
+            fileEditorName:'',// 文件编辑器名称
+            fileSavePath: '',// 文件保存路径
+            scriptEditor:null,
             webSyncPath: "/",
             phoneSyncPath: "/appSync/",
             autoSyncWebSyncPath:true,
@@ -44,7 +48,7 @@ export default {
             checkAllFile: false,// 全选文件
             previewList: [],// 单个上传
             uploadFileList: [],// 需要上传的文件列表
-            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv',
+            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js',
             curFileData: {},// 选中的文件数据
             copyFileList: [],// 复制文件列表
             moveFileList: [],// 移动文件列表
@@ -74,6 +78,10 @@ export default {
         uploadPrePathName() {
             let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
             return toPath.replace(/\//g, "\\");
+        },
+        navigatePath(){
+            let toPath = this.breadcrumbList.map(item=>item.label).join('/');
+            return toPath
         },
         checkFileCount() { // 已选文件数量
             return this.fileList.filter(item => item.check).length;
@@ -125,9 +133,11 @@ export default {
         // 初始化方法
         init() {
             let relativeFilePath = this.deviceInfo.deviceUuid;
-            // 加载文件列表
-            this.queryFileList(relativeFilePath);
-            this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
+            if(relativeFilePath){
+                // 加载文件列表
+                this.queryFileList(relativeFilePath);
+                this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
+            }
         },
         // 取消上传
         cancelUpload(i) {
@@ -518,8 +528,154 @@ export default {
                 this.breadcrumbChange(this.breadcrumbList[this.breadcrumbList.length - 1], (this.breadcrumbList.length - 1))
                 // 文件 空白窗口打开
             } else {
-                window.open(getContext() + "/" + row.previewUrl)
+                if(['png','jpg','jpeg'].includes(row.fileType)){
+                    window.open(getContext() + "/" + row.previewUrl)
+                } else if(['zip','rar'].includes(row.fileType)){
+                    window.ZXW_VUE.$message.warning('暂不支持编辑压缩文件,请解压后查看');
+                    return false;
+                } else {
+                    this.fileEditVisible = true;
+                    this.fileEditorName = row.fileName + '.' + row.fileType;
+                    this.fileSavePath = row.previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
+                    let _that = this;
+                    $.ajax({
+                        url: getContext() + "/" +row.previewUrl +"?t="+(new Date().getTime()),
+                        type: 'get',
+                        async: false,
+                        dataType:"TEXT", //返回值的类型
+                        success: function (res) {
+                            // 初始化文件编辑器
+                            initFileEditor(_that,'scriptEditor','fileEditor',_that.getMonacoEditorComplete,res,'javascript','vs-dark',(e,value)=>{
+                            })
+                        },
+                        error: function (msg) {
+                            console.log(msg);
+                        }
+                    });
+                }
             }
+        },
+        // 压缩文件
+        zipFile(row){
+            let path = this.navigatePath.replace('根目录','');
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            window.ZXW_VUE.$prompt('请输入要压缩到的目录及文件名(第一个/表示根目录)', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: path + '/' +row.fileName + '.zip',
+                inputValidator: function(val) {
+                    if (!val) {
+                        return '不能为空！'
+                    } else {
+                        return true;
+                    }
+                }
+            }).then(({value}) => {
+                let _that = this;
+                let pathName = this.absolutePrePath + this.deviceInfo.deviceUuid + value;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/zipServerFileZip",
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "sourceFolderPathName": row.absolutePathName,
+                        "targetFilePathName": pathName,
+                        "zipPathName":""
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '压缩成功', duration: '1000'});
+                                // 重新加载文件列表
+                                _that.queryFileList(toPath);
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                        console.log(msg)
+                    }
+                });
+            }).catch(() => {
+            });
+        },
+        // 解压文件
+        unZipFile(row){
+            let path = this.navigatePath.replace('根目录','');
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            window.ZXW_VUE.$prompt('请输入要解压到的目录(第一个/表示根目录)', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: path + '/' +row.fileName,
+                inputValidator: function(val) {
+                    if (!val) {
+                        return '不能为空！'
+                    } else {
+                        return true;
+                    }
+                }
+            }).then(({value}) => {
+                let _that = this;
+                let pathName = this.absolutePrePath + this.deviceInfo.deviceUuid + value;
+               $.ajax({
+                    url: getContext() + "/attachmentInfo/unServerFileZip",
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        "sourcePathName": row.absolutePathName,
+                        "targetPathName": pathName
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '解压成功', duration: '1000'});
+                                // 重新加载文件列表
+                                _that.queryFileList(toPath);
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                        console.log(msg)
+                    }
+                });
+            }).catch(() => {
+            });
+        },
+        // 关闭编辑器
+        closeFileEditorDialog(){
+            this.fileEditVisible = false;
+        },
+        // 保存文件编辑器内容
+        saveFileEditorContent(){
+            window.ZXW_VUE.$confirm('确认保存文件【' + this.navigatePath + '/' + this.fileEditorName + '】?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let scriptFile = new File([this.scriptEditor.getValue()], this.fileEditorName, {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.fileSavePath);
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
         },
         // 面包屑change
         breadcrumbChange(item, index) {
@@ -802,6 +958,19 @@ export default {
         // 预览文件
         previewFile(previewUrl) {
             window.open(getContext() + "/" + previewUrl)
+        },
+        // 下载文件
+        downloadFile(row){
+            // 创建a标签，通过a标签实现下载
+            const dom = document.createElement("a");
+            dom.download = row.fileName + '.' + row.fileType;
+            dom.href = getContext() +  "/" + row.previewUrl;
+            dom.id = "upload-file-dom";
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            // 触发点击事件
+            dom.click();
+            document.getElementById("upload-file-dom")?.remove();
         }
     }
 }
