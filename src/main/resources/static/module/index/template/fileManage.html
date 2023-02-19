@@ -4,22 +4,28 @@
     </p>
     <el-row style="margin-top: 10px;">
         <div class="width100 d-flex a-center">
-            <el-form-item label="web端同步路径:" label-width="125px" class="width35">
+            <el-form-item label="web端同步路径:" label-width="125px" class="width30">
                 <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="手机端同步路径:" label-width="125px" class="width35">
+            <el-form-item label="手机端同步路径:" label-width="125px" class="width30">
                 <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <div class="width30 d-flex a-center" style="justify-content: right;margin-bottom:10px;">
+            <div class="width40 d-flex a-center" style="justify-content: right;margin-bottom:10px;">
                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;">
                     <span>
                         自动同步web同步路径：
                     </span>
                     <el-switch v-model="autoSyncWebSyncPath"/>
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;">
+                    <span>
+                        自动同步手机同步路径：
+                    </span>
+                    <el-switch v-model="autoSyncPhoneSyncPath"/>
                 </div>
                 <el-button @click.stop="syncFileToPhone">
                     同步到手机端
@@ -124,6 +130,15 @@
         </el-tab-pane>
         <el-tab-pane label="手机端文件" name="phone">
             <el-row style="padding-left: 0!important;">
+                <div class="d-flex j-sb a-center width100">
+                    <div class="d-flex a-center">
+                        <el-button size="mini" type="primary" @click="phoneCreateFile">新建文件</el-button>
+                        <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="phoneCreateFolder">新建文件夹</el-button>
+                        <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="phoneInitFile">初始化运行程序文件</el-button>
+                    </div>
+                </div>
+            </el-row>
+            <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center breadcrumbWrap" style="margin-top: 10px;margin-bottom: 10px;">
                     <el-breadcrumb separator="/">
                         <el-breadcrumb-item v-for="(item, i) in phoneBreadcrumbList" :key="i" class="pointer textHover" :class="{'endBreadcrumb': i !== 0 && i === phoneBreadcrumbList.length - 1, 'hoverBreadcrumb': phoneBreadcrumbList.length > 1 && i !== phoneBreadcrumbList.length - 1 }">
@@ -131,6 +146,28 @@
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                     <span class="primary-text-color font-14 keep-all">共{{ phoneFileList.length }}个</span>
+                </div>
+            </el-row>
+            <el-row style="padding-left: 0!important;">
+                <div class="d-flex a-center fileOperate primary-text-color pl-1">
+                    <el-tooltip class="item" v-if="phoneCopyFileList.length>0" effect="dark" :disabled="!phoneCopyFileNames" :content="phoneCopyFileNames" placement="top-start">
+                        <span class="fileTips" >复制{{ phoneCopyFileList.length }}个文件(夹)</span>
+                    </el-tooltip>
+                    <el-tooltip class="item" v-else-if="phoneMoveFileList.length>0" effect="dark" :disabled="!phoneAllowMoveFileNames" :content="phoneAllowMoveFileNames" placement="top-start">
+                        <span class="fileTips" >移动{{ phoneAllowMoveFileList.length }}个文件(夹)</span>
+                    </el-tooltip>
+                    <el-tooltip class="item" v-else="phoneCheckFileCount>0" effect="dark" :disabled="!phoneCheckFileNames" :content="phoneCheckFileNames" placement="top-start">
+                        <span class="fileTips" >已选{{ phoneCheckFileCount }}个文件(夹)</span>
+                    </el-tooltip>
+                    <div class="operate d-flex a-center j-center">
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('copy')">复制</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('move')">移动</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('remove')">删除</el-link>
+                        <el-link v-if="phoneCopyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('paste')">粘贴到</el-link>
+                        <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>
+                        <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
+                    </div>
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
@@ -143,8 +180,7 @@
                         <div class="phoneOperate">操作</div>
                     </div>
                     <el-scrollbar class="right-scrollbar-wrap">
-                        <div>功能建设中！！！</div>
-                        <div v-for="(item,index) in phoneFileList" :key="index" class="fileList-head fileList-body d-flex a-center">
+                        <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center">
                             <div class="d-flex a-center phoneFileName">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">

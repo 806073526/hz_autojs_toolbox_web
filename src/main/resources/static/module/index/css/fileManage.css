@@ -50,6 +50,13 @@
     color: #4BABF6 !important;
 }
 
+.fileList-head .phoneFileName .fileNameWrap{
+    margin-left: 5px;
+}
+.fileList-head .phoneFileName .fileNameWrap:hover{
+    color: #4BABF6 !important;
+}
+
 .fileOperate{
     height: 34px;
     background-color: #edf6fe;

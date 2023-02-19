@@ -62,7 +62,7 @@ public class AttachmentInfoController extends BaseController {
 
 
     @ApiOperation(value = "清理文件目录结构", notes = "清理文件目录结构")
-    @PostMapping("/clearFileDirectoryMap")
+    @GetMapping("/clearFileDirectoryMap")
     public R<Boolean> clearFileDirectoryMap(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
         fileDirectoryMap.remove(dirPathKey);
         return success(true);
@@ -76,7 +76,7 @@ public class AttachmentInfoController extends BaseController {
     }
 
     @ApiOperation(value = "查询文件目录结构", notes = "查询文件目录结构")
-    @PostMapping("/queryFileDirectory")
+    @GetMapping("/queryFileDirectory")
     public R<String> queryFileDirectory(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
         String fileDirectoryJson = fileDirectoryMap.getOrDefault(dirPathKey,"");
         return success(fileDirectoryJson);

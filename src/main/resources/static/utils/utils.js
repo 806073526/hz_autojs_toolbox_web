@@ -33,6 +33,24 @@ export const isNumber = (val) => {
  * @returns
  */
 export const sortByKey = (array, key, order) => {
+        return array.sort(function (a, b) {
+            let x = a[key]; let y = b[key];
+            if (order) {
+                return ((x < y) ? -1 : ((x > y) ? 1 : 0))
+            } else {
+                return ((x < y) ? ((x > y) ? 1 : 0) : -1)
+            }
+        })
+    };
+
+/**
+ * 创建排序方法
+ * @param {Array} array 原数组
+ * @param {String} key 排序key
+ * @param {Boolean} order 排序方法 true正序 false倒序
+ * @returns
+ */
+export const sortByKeyFirst = (array, key, order) => {
     return array.sort(function (a, b) {
         let x = a[key]; let y = b[key];
         if (order) {
@@ -42,7 +60,6 @@ export const sortByKey = (array, key, order) => {
         }
     })
 };
-
 // 获取链接参数
 export const urlParam = (name)=> {
     let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
@@ -118,4 +135,40 @@ export const initFileEditor = (_that,editorKey,containerId,getEditorCompleteFun,
             initEditorFun();
         },200);
     })
+};
+
+
+/**
+ * 查询缓存数据方法
+ * @param clearCacheFun 清除缓存方法
+ * @param queryCacheFun 查询缓存方法
+ * @param intervalTime 定时间隔
+ * @param intervalCount 定时间隔次数
+ * @param completeCallBack 完成回调
+ */
+export const queryCacheData = (clearCacheFun,queryCacheFun,intervalTime,intervalCount,completeCallBack)=>{
+    // 调用清除缓存方法
+    clearCacheFun();
+    // 清除成功后立即执行查询缓存方法
+    let cacheResult = queryCacheFun();
+    // 有返回结果
+    if(cacheResult){
+        // 返回缓存数据
+        completeCallBack(cacheResult);
+        return;
+    }
+    // 累计次数
+    let totalCount = 0;
+    // 开启定时器
+    let intervalTimer = setInterval(()=>{
+        // 调用查询缓存方法
+        cacheResult = queryCacheFun();
+        totalCount+=1;
+        // 结果有值 或者超过次数
+        if(cacheResult || totalCount>=intervalCount){
+            // 执行回调
+            completeCallBack(cacheResult);
+            clearInterval(intervalTimer);
+        }
+    },intervalTime);
 };

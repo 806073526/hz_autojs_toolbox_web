@@ -1,4 +1,4 @@
-import {getContext,initFileEditor} from "./../../../utils/utils.js";
+import {getContext, initFileEditor, queryCacheData} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -42,10 +42,11 @@ export default {
             scriptEditor:null,
             fileActiveName:'web',
             webSyncPath: "/",
-            phoneSyncPath: "/appSync/",
+            phoneSyncPath: "/",
             autoSyncWebSyncPath:true,
+            autoSyncPhoneSyncPath:true,
             breadcrumbList: [{label: '根目录', value: ''}], // 面包屑
-            phoneBreadcrumbList: [{label: '根目录', value: ''}],
+            phoneBreadcrumbList: [{label: '根目录', value: '/sdcard/'}],
             fileLoading: false,// 加载文件loading
             phoneFileLoading: false,// 手机端加载文件loading
             checkAllFile: false,// 全选文件
@@ -55,7 +56,9 @@ export default {
             accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js',
             curFileData: {},// 选中的文件数据
             copyFileList: [],// 复制文件列表
+            phoneCopyFileList:[],// 手机端复制文件列表
             moveFileList: [],// 移动文件列表
+            phoneMoveFileList: [],// 手机端移动文件列表
             absolutePrePath: '',// 绝对路径前缀
             fileList: [], // 文件列表
             phoneFileList:[] // 手机文件列表
@@ -91,6 +94,9 @@ export default {
         checkFileCount() { // 已选文件数量
             return this.fileList.filter(item => item.check).length;
         },
+        phoneCheckFileCount(){ // 手机端已选文件数量
+            return this.phoneFileList.filter(item => item.check).length;
+        },
         allowMoveFileList() { // 允许移动的文件列表
             let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
             let replacePath = toPath.replace(/\//g, "\\");
@@ -101,14 +107,30 @@ export default {
                 return !curToPath.startsWith(item.pathName) && curToPath !== item.parentPathName
             });
         },
+        phoneAllowMoveFileList() { // 手机端允许移动的文件列表
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            // 当前目录是已选文件子目录的 需要过滤掉  当前目录是已选文件所在的目录是需要过滤掉
+            return this.phoneMoveFileList.filter(item => {
+                return !toPath.startsWith(item.pathName) && toPath !== item.parentPathName
+            });
+        },
         copyFileNames() {
             return this.copyFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+        },
+        phoneCopyFileNames() {
+            return this.phoneCopyFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         allowMoveFileNames() {
             return this.allowMoveFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
+        phoneAllowMoveFileNames() {
+            return this.phoneAllowMoveFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+        },
         checkFileNames() {
             return this.fileList.filter(item => item.check).map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+        },
+        phoneCheckFileNames() {
+            return this.phoneFileList.filter(item => item.check).map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         // 上传进度数组
         uploadPercentageArr(){
@@ -143,6 +165,8 @@ export default {
                 this.queryFileList(relativeFilePath);
                 this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
             }
+            // 获取手机端文件目录
+            this.updatePhoneDirCache(this.phoneBreadcrumbList.map(item => item.value).join('/'));
         },
         // 取消上传
         cancelUpload(i) {
@@ -475,6 +499,149 @@ export default {
                 }
             }
         },
+        // 手机端文件操作
+        phoneOperateFun(code){
+            switch (code) {
+                case 'copy': {
+                    if (this.phoneMoveFileList && this.phoneMoveFileList.length > 0) {
+                        this.phoneMoveFileList = [];
+                    }
+                    // 设置复制文件集合
+                    this.phoneCopyFileList = this.phoneFileList.filter(item => item.check);
+                    break;
+                }
+                case 'paste': {
+                    // TODO 手机端复制不支持文件夹
+                    let fileNames = this.phoneCopyFileList.map(item => {
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    }).join(',');
+                    let toName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label;
+                    let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '复制到' + toName + '?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        let sourcePathList = this.phoneCopyFileList.map(item => item);
+                        let remoteScript = '';
+                        sourcePathList.forEach(item=>{
+                            remoteScript += `files.copy('${item.pathName}', '${toPath}'+'${item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)}');`;
+                        });
+                        this.remoteExecuteScript(remoteScript);
+                        setTimeout(()=>{
+                            // 刷新手机目录
+                            this.refreshPhoneDir();
+                        },500);
+                    });
+                    break;
+                }
+                case 'cancel': {
+                    this.phoneCopyFileList = [];
+                    this.phoneMoveFileList = [];
+                    break;
+                }
+                case 'move': {
+                    if (this.phoneCopyFileList && this.phoneCopyFileList.length > 0) {
+                        this.phoneCopyFileList = [];
+                    }
+                    // 设置移动文件集合
+                    this.phoneMoveFileList = this.phoneFileList.filter(item => item.check);
+                    break;
+                }
+                case 'moveTo': {
+                    let toName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label;
+                    let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+
+                    // 当前目录是已选文件子目录的
+                    let fileNames = this.phoneAllowMoveFileList.map(item => {
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    }).join(',');
+
+                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '移动到' + toName + '?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        let sourcePathList = this.phoneAllowMoveFileList.map(item => item.pathName);
+                        let remoteScript = '';
+                        sourcePathList.forEach(item=>{
+                            remoteScript += `files.move('${item}', '${toPath}');`;
+                        });
+                        this.remoteExecuteScript(remoteScript);
+                        setTimeout(()=>{
+                            // 刷新手机目录
+                            this.refreshPhoneDir();
+                        },500);
+                    });
+                    break;
+                }
+                case 'remove': {
+                    // 当前目录是已选文件子目录的
+                    let checkFileList = this.phoneFileList.filter(item => item.check);
+                    let fileNames = checkFileList.map(item => {
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    }).join(',');
+                    window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        let filePathList = checkFileList.map(item => item.pathName);
+                        let remoteScript = '';
+                        filePathList.forEach(item=>{
+                            remoteScript += `files.removeDir('${item}');`;
+                        });
+                        this.remoteExecuteScript(remoteScript);
+                        setTimeout(()=>{
+                            // 刷新手机目录
+                            this.refreshPhoneDir();
+                        },500);
+                    });
+                    break;
+                }
+                case 'syncToWeb':{
+                    let checkFileList = this.phoneFileList.filter(item => item.check);
+                    let fileNames = checkFileList.map(item => {
+                        return item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType);
+                    });
+                    window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到web端,文件夹内部不会递归同步,请输入web端路径', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        inputValue: this.webSyncPath,
+                        inputValidator: function(val) {
+                            if(val){
+                                if(!val.startsWith("/")){
+                                    return "必须以/开头"
+                                }
+                                if(!val.endsWith("/")){
+                                    return "必须以/结尾"
+                                }
+                            } else {
+                                return "不能为空";
+                            }
+                            return true;
+                        }
+                    }).then(({value}) => {
+                        // 设置同步文件集合  暂不支持同步目录
+                        let remoteScript = `let webPath = utilsObj.getDeviceUUID()+ '${value}';\r\n`;
+                        checkFileList.forEach(item=>{
+                            if(item.isDirectory){
+                                remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${item.fileName}',"GET",null,()=>{});\r\n`;
+                            } else {
+                                remoteScript +=`utilsObj.uploadFileToServer('${item.pathName}',webPath + '${item.fileName}' + '.'+ '${item.fileType}',()=>{});\r\n`;
+                            }
+                        });
+                        this.remoteExecuteScript(remoteScript);
+                        setTimeout(()=>{
+                            // 刷新web目录
+                            this.refreshWebDir();
+                        },500);
+                    }).catch(() => {
+                    });
+                    break;
+                }
+            }
+        },
         // web端同步到手机公共方法
         webSyncToPhoneFun(webSyncToPhoneArr,value){
             let remoteExecuteScriptContent = "";
@@ -568,7 +735,53 @@ export default {
         },
         // 手机端文件双击
         phoneFileNameDbClick(row){
-
+            // 如果是目录
+            if (row.isDirectory) {
+                // 记录到面包屑导航栏
+                let pathName = row.pathName;
+                pathName = row.pathName.replace('/','');
+                let array = pathName.split("/");
+                  // 面包屑数组
+                 let breadcrumbArr = [];
+                 let pathArr = [];
+                 for (let i = 0; i < array.length; i++) {
+                     pathArr.push(array[i]);
+                     breadcrumbArr.push({
+                         label: i === 0 ? "根目录" : array[i],
+                         value: '/'+pathArr.join("/")+'/'
+                     });
+                 }
+                this.phoneBreadcrumbList = breadcrumbArr;
+                 // 默认加载最后一个
+                this.refreshPhoneDir();
+                // 文件 空白窗口打开
+            } else {
+                /*if(['png','jpg','jpeg'].includes(row.fileType)){
+                    window.open(getContext() + "/" + row.previewUrl)
+                } else if(['zip','rar'].includes(row.fileType)){
+                    window.ZXW_VUE.$message.warning('暂不支持编辑压缩文件,请解压后查看');
+                    return false;
+                } else {
+                    this.fileEditVisible = true;
+                    this.fileEditorName = row.fileName + '.' + row.fileType;
+                    this.fileSavePath = row.previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
+                    let _that = this;
+                    $.ajax({
+                        url: getContext() + "/" +row.previewUrl +"?t="+(new Date().getTime()),
+                        type: 'get',
+                        async: false,
+                        dataType:"TEXT", //返回值的类型
+                        success: function (res) {
+                            // 初始化文件编辑器
+                            initFileEditor(_that,'scriptEditor','fileEditor',_that.getMonacoEditorComplete,res,'javascript','vs-dark',(e,value)=>{
+                            })
+                        },
+                        error: function (msg) {
+                            console.log(msg);
+                        }
+                    });
+                }*/
+            }
         },
         // 压缩文件
         zipFile(row){
@@ -613,6 +826,30 @@ export default {
             }).catch(() => {
             });
         },
+        // 手机端压缩文件
+        phoneZipFile(row){
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            window.ZXW_VUE.$prompt('请输入要压缩到的目录及文件名(根目录是/sdcard/)', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: toPath + row.fileName + '.zip',
+                inputValidator: function(val) {
+                    if (!val) {
+                        return '不能为空！'
+                    } else {
+                        return true;
+                    }
+                }
+            }).then(({value}) => {
+                let remoteScript = `$zip.zipDir('${row.pathName}', '${value}')`;
+                this.remoteExecuteScript(remoteScript);
+                setTimeout(()=>{
+                    // 刷新手机目录
+                    this.refreshPhoneDir();
+                },500);
+            }).catch(() => {
+            });
+        },
         // 解压文件
         unZipFile(row){
             let path = this.navigatePath.replace('根目录','');
@@ -652,6 +889,30 @@ export default {
                         console.log(msg)
                     }
                 });
+            }).catch(() => {
+            });
+        },
+        // 手机端解压文件
+        phoneUnZipFile(row){
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            window.ZXW_VUE.$prompt('请输入要解压到的目录(根目录是/sdcard/)', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: toPath +row.fileName,
+                inputValidator: function(val) {
+                    if (!val) {
+                        return '不能为空！'
+                    } else {
+                        return true;
+                    }
+                }
+            }).then(({value}) => {
+                let remoteScript = `$zip.unzip('${row.pathName}', '${value}')`;
+                this.remoteExecuteScript(remoteScript);
+                setTimeout(()=>{
+                    // 刷新手机目录
+                    this.refreshPhoneDir();
+                },500);
             }).catch(() => {
             });
         },
@@ -714,6 +975,23 @@ export default {
             if (!this.validSelectDevice()) {
                 return;
             }
+            this.updatePhoneDirCache(item.value);
+            // 重新加载面包屑
+            this.phoneBreadcrumbList = this.phoneBreadcrumbList.slice(0, index + 1);
+            if(this.autoSyncPhoneSyncPath){
+                let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+                this.phoneSyncPath =  toPath.replace("/sdcard", "");
+            }
+        },
+        // 刷新手机端路径
+        refreshPhoneDir(){
+            // 默认加载最后一个
+            this.phoneBreadcrumbChange(this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1], (this.phoneBreadcrumbList.length - 1))
+        },
+        // 刷新web端目录
+        refreshWebDir(){
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            this.queryFileList(toPath);
         },
         // 计算文件大小
         calculateSize(fileSize) {
@@ -876,6 +1154,27 @@ export default {
             }).catch(() => {
             });
         },
+        // 手机端重命名
+        phoneReName(row){
+            window.ZXW_VUE.$prompt('请输入新的名称', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValidator: function(val) {
+                    if (!val) {
+                        return '不能为空！'
+                    } else {
+                        return true;
+                    }
+                }
+            }).then(({value}) => {
+                let remoteScript = `files.rename('${row.pathName}', '${value}')`;
+                this.remoteExecuteScript(remoteScript);
+                // 刷新手机目录
+                this.refreshPhoneDir();
+            }).catch(() => {
+            });
+
+        },
         // 删除单个文件
         removeFile(row){
             let fileNames =  row.isDirectory ? row.fileName : (row.fileName + "." + row.fileType);
@@ -905,6 +1204,20 @@ export default {
                     error: function (msg) {
                     }
                 });
+            });
+        },
+        // 手机删除单个文件
+        phoneRemoveFile(row){
+            let fileNames =  row.isDirectory ? row.fileName : (row.fileName + "." + row.fileType);
+            window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let remoteScript = row.isDirectory ? `files.removeDir('${row.pathName}')` : `files.remove('${row.pathName}')`;
+                this.remoteExecuteScript(remoteScript);
+                // 刷新手机目录
+                this.refreshPhoneDir();
             });
         },
         // 单个文件同步到手机
@@ -976,6 +1289,15 @@ export default {
             }).catch(() => {
             });
         },
+        phoneCreateFile(){
+
+        },
+        phoneCreateFolder(){
+
+        },
+        phoneInitFile(){
+
+        },
         // 预览文件
         previewFile(previewUrl) {
             window.open(getContext() + "/" + previewUrl)
@@ -994,43 +1316,125 @@ export default {
             document.getElementById("upload-file-dom")?.remove();
         },
         // 更新手机端目录缓存
-        updatePhoneDirCache(){
-            // 远程执行脚本内容
-            let remoteScript = "let targetPath = '/sdcard/appSync/'\n" +
-                "function convertFile(item, baseUrl) {\n" +
-                "    let fileObj = {};\n" +
-                "    fileObj.fileName = item\n" +
-                "    fileObj.filePath = baseUrl + item\n" +
-                "    fileObj.parentPath = baseUrl\n" +
-                "    fileObj.isDirectory = files.isDir(fileObj.filePath)\n" +
-                "    return fileObj;\n" +
-                "}\n" +
-                "function getFileByPath(filePath) {\n" +
-                "    let fileArr = files.listDir(filePath);\n" +
-                "    let fileList = [];\n" +
-                "    fileArr.forEach(item => {\n" +
-                "        let fileObj = convertFile(item, filePath);\n" +
-                "        if (fileObj.isDirectory) {\n" +
-                "            //let childrenFileList = getFileByPath(fileObj.filePath);\n" +
-                "            //fileObj.children = childrenFileList;\n" +
-                "        }\n" +
-                "        fileList.push(fileObj);\n" +
-                "    })\n" +
-                "    return fileList;\n" +
-                "}\n" +
-                "let appSyncFileList = getFileByPath(targetPath);\n" +
-                "// url编码base64加密\n" +
-                "let result = $base64.encode(encodeURI(JSON.stringify(appSyncFileList)));\n" +
-                "http.request(commonStorage.get(\"服务端IP\") + ':9998/attachmentInfo/updateFileDirectoryMap', {\n" +
-                "    headers: {\n" +
-                "        \"deviceUUID\": commonStorage.get('deviceUUID')\n" +
-                "    },\n" +
-                "    method: 'POST',\n" +
-                "    contentType: 'application/json',\n" +
-                "    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + targetPath, 'fileDirectoryJson': result })\n" +
-                "},(e)=>{});"
+        updatePhoneDirCache(targetPath) {
+            this.phoneFileLoading = false;
+            // 关键key
+            let dirPathKey = this.deviceInfo.deviceUuid + '_' + targetPath;
+            // 更新手机端目录缓存
+            let updatePhoneDirCacheFun = () => {
+                // 远程执行脚本内容
+                let remoteScript = `let targetPath = '${targetPath}'
+                function convertFile(item, baseUrl) {
+                    let fileObj = {};
+                    fileObj.pathName = baseUrl + item
+                    fileObj.parentPathName = baseUrl
+                    fileObj.isDirectory = files.isDir(fileObj.pathName)
+                    fileObj.fileName = item
+                    if(!fileObj.isDirectory){
+                        if(item.lastIndexOf('.')!==-1){
+                            fileObj.fileName = item.substring(0,item.lastIndexOf('.'))
+                            fileObj.fileType = item.substring(item.lastIndexOf('.')+1,item.length)
+                        }
+                    }
+                    return fileObj;
+                }
+                function getFileByPath(filePath) {
+                    let fileArr = files.listDir(filePath);
+                    let fileList = [];
+                    fileArr.forEach(item => {
+                        let fileObj = convertFile(item, filePath);
+                        if (fileObj.isDirectory) {
+                            //let childrenFileList = getFileByPath(fileObj.filePath);
+                            //fileObj.children = childrenFileList;
+                        }
+                        fileList.push(fileObj);
+                    })
+                    return fileList;
+                }
+                let appSyncFileList = getFileByPath(targetPath);
+                // url编码base64加密
+                let result = $base64.encode(encodeURI(JSON.stringify(appSyncFileList)));
+                http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateFileDirectoryMap', {
+                    headers: {
+                        "deviceUUID": commonStorage.get('deviceUUID')
+                    },
+                    method: 'POST',
+                    contentType: 'application/json',
+                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + targetPath, 'fileDirectoryJson': result })
+                }, (e) => { });`;
+                this.remoteExecuteScript(remoteScript);
+            };
+            this.phoneFileLoading = true;
+            // 查询缓存数据方法
+            queryCacheData(() => {
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/clearFileDirectoryMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                    },
+                    error: function (msg) {
+                    }
+                });
+                // 清除完成后执行
+                updatePhoneDirCacheFun();
+            }, () => {
+                let cacheData = null;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryFileDirectory",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                cacheData = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                return cacheData;
+            }, 200, 30,(cacheResultData)=>{
+                let fileAllArr = cacheResultData ? JSON.parse(decodeURI(atob(cacheResultData))) : [];
+                let allArr = [];
+                // 目录
+                let dirArr = fileAllArr.filter(item=>item.isDirectory).sort((item1, item2) => {
+                    let a=item1.fileName||'';
+                    let b=item2.fileName||'';
+                    for(let i=0; i<a.length;i++){
+                        if(a.charCodeAt(i)===b.charCodeAt(i)) continue;
+                        return a.charCodeAt(i) - b.charCodeAt(i);
+                    }
+                });
+                // 文件
+                let fileArr = fileAllArr.filter(item=>!item.isDirectory).sort((item1, item2) => {
+                    let a=item1.fileName||'';
+                    let b=item2.fileName||'';
+                    for(let i=0; i<a.length;i++){
+                        if(a.charCodeAt(i)===b.charCodeAt(i)) continue;
+                        return a.charCodeAt(i) - b.charCodeAt(i);
+                    }
+                });
+                allArr = allArr.concat(dirArr);
+                allArr = allArr.concat(fileArr);
 
-
+                let pathNameArr = this.phoneCopyFileList.map(item => item.pathName);
+                let pathNameArr2 = this.phoneMoveFileList.map(item => item.pathName);
+                allArr.forEach(item => {
+                    item.check = pathNameArr.includes(item.pathName) || pathNameArr2.includes(item.pathName) || false
+                });
+                this.phoneFileList = allArr;
+                this.phoneFileLoading = false;
+            });
         }
     }
 }
