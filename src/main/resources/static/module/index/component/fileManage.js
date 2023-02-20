@@ -650,6 +650,40 @@ export default {
                 }
             }
         },
+        syncToWebSingle(row){
+            window.ZXW_VUE.$prompt('是否确认同步'+row.pathName+'到web端,文件夹内部不会递归同步,请输入web端路径', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: this.webSyncPath,
+                inputValidator: function(val) {
+                    if(val){
+                        if(!val.startsWith("/")){
+                            return "必须以/开头"
+                        }
+                        if(!val.endsWith("/")){
+                            return "必须以/结尾"
+                        }
+                    } else {
+                        return "不能为空";
+                    }
+                    return true;
+                }
+            }).then(({value}) => {
+                // 设置同步文件集合  暂不支持同步目录
+                let remoteScript = `let webPath = utilsObj.getDeviceUUID()+ '${value}';\r\n`;
+                if(row.isDirectory){
+                    remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${row.fileName}',"GET",null,()=>{});\r\n`;
+                } else {
+                    remoteScript +=`utilsObj.uploadFileToServer('${row.pathName}',webPath + '${row.fileName}' + '.'+ '${row.fileType}',()=>{});\r\n`;
+                }
+                this.remoteExecuteScript(remoteScript);
+                setTimeout(()=>{
+                    // 刷新web目录
+                    this.refreshWebDir();
+                },500);
+            }).catch(() => {
+            });
+        },
         // web端同步到手机公共方法
         webSyncToPhoneFun(webSyncToPhoneArr,value){
             let remoteExecuteScriptContent = "";
