@@ -60,6 +60,12 @@ public class AttachmentInfoController extends BaseController {
     // 文件内容 key为deviceUUID_日期文件夹名_日志名  value为日志内容
     private final static ConcurrentHashMap<String, String> fileMap = new ConcurrentHashMap<String,String>();
 
+    @ApiOperation(value = "清理全部文件目录结构", notes = "清理全部文件目录结构")
+    @GetMapping("/clearFileDirectoryMapAll")
+    public R<Boolean> clearFileDirectoryMapAll(){
+        fileDirectoryMap.clear();
+        return success(true);
+    }
 
     @ApiOperation(value = "清理文件目录结构", notes = "清理文件目录结构")
     @GetMapping("/clearFileDirectoryMap")
@@ -80,6 +86,34 @@ public class AttachmentInfoController extends BaseController {
     public R<String> queryFileDirectory(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
         String fileDirectoryJson = fileDirectoryMap.getOrDefault(dirPathKey,"");
         return success(fileDirectoryJson);
+    }
+
+    @ApiOperation(value = "清理全部文件内容", notes = "清理全部文件内容")
+    @GetMapping("/clearFileMapAll")
+    public R<Boolean> clearFileMapAll(){
+        fileMap.clear();
+        return success(true);
+    }
+
+    @ApiOperation(value = "清理文件内容", notes = "清理文件内容")
+    @GetMapping("/clearFileMap")
+    public R<Boolean> clearFileMap(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
+        fileMap.remove(dirPathKey);
+        return success(true);
+    }
+
+    @ApiOperation(value = "更新文件内容", notes = "更新文件内容")
+    @PostMapping("/updateFileMap")
+    public R<Boolean> updateFileMap(@RequestBody Map<String,String> mapParam){
+        fileMap.put(mapParam.get("dirPathKey"),mapParam.get("fileJson"));
+        return success(true);
+    }
+
+    @ApiOperation(value = "查询文件内容", notes = "查询文件内容")
+    @GetMapping("/queryFileMap")
+    public R<String> queryFileMap(@ApiParam("deviceUUID_pathName") @RequestParam(value = "dirPathKey") String dirPathKey){
+        String fileJson = fileMap.getOrDefault(dirPathKey,"");
+        return success(fileJson);
     }
 
     /**

@@ -106,7 +106,7 @@
                             <div class="d-flex a-center fileName">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
-                                    <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory">.{{ item.fileType }}</span></span>
+                                    <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                 </div>
                             </div>
                             <div class="d-flex a-center fileSize">
@@ -116,7 +116,7 @@
                                 <span>{{ item.lastUpdateTime }}</span>
                             </div>
                             <div class="operate d-flex a-center j-center">
-                                <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>
+                                <!--<el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>-->
                                 <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
@@ -132,9 +132,11 @@
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
                     <div class="d-flex a-center">
-                        <el-button size="mini" type="primary" @click="phoneCreateFile">新建文件</el-button>
-                        <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="phoneCreateFolder">新建文件夹</el-button>
-                        <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="phoneInitFile">初始化运行程序文件</el-button>
+                        <el-button size="mini" type="primary" @click="phoneCreateFile">新建文件(夹)</el-button>
+                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
+                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneDownLoadGameScript">初始化脚手架项目</el-button>
+                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
+                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
                     </div>
                 </div>
             </el-row>
@@ -167,6 +169,7 @@
                         <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
                         <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>
                         <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
+                        <span v-if="phoneCheckFileCount>0" style="font-size: 12px;margin-left: 5px;color: #cf0808">文件夹不支持复制！！！</span>
                     </div>
                 </div>
             </el-row>
@@ -179,12 +182,12 @@
                         </div>
                         <div class="phoneOperate">操作</div>
                     </div>
-                    <el-scrollbar class="right-scrollbar-wrap">
+                    <el-scrollbar class="right-scrollbar-wrap" :key="phoneFileTableRandomKey">
                         <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center">
                             <div class="d-flex a-center phoneFileName">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">
-                                    <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory">.{{ item.fileType }}</span></span>
+                                    <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                 </div>
                             </div>
                             <div class="phoneOperate d-flex a-center j-center">
@@ -209,6 +212,28 @@
             保存
           </el-button>
           <el-button type="info" @click.stop.native="closeFileEditorDialog">
+            关闭
+          </el-button>
+        </span>
+    </el-dialog>
+    <el-dialog  :visible.sync="phoneFileEditVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+        <div id="phoneFileEditor" style="height: 85vh;width: 100%;">
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+            保存
+          </el-button>
+          <el-button type="info" @click.stop.native="phoneCloseFileEditorDialog">
+            关闭
+          </el-button>
+        </span>
+    </el-dialog>
+    <el-dialog :visible.sync="phoneImagePreviewVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+        <div style="height: 85vh;width: 100%;display: inline-flex;justify-content: center;align-items: center;">
+            <img id="imagePreview" :src="phoneImageBase64" />
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="info" @click.stop.native="phoneCloseImagePreviewDialog">
             关闭
           </el-button>
         </span>
