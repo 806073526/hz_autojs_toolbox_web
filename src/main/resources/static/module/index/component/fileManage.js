@@ -122,22 +122,22 @@ export default {
             });
         },
         copyFileNames() {
-            return this.copyFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.copyFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         phoneCopyFileNames() {
-            return this.phoneCopyFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.phoneCopyFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         allowMoveFileNames() {
-            return this.allowMoveFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.allowMoveFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         phoneAllowMoveFileNames() {
-            return this.phoneAllowMoveFileList.map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.phoneAllowMoveFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         checkFileNames() {
-            return this.fileList.filter(item => item.check).map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.fileList.filter(item => item.check).map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         phoneCheckFileNames() {
-            return this.phoneFileList.filter(item => item.check).map(item => item.isDirectory ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+            return this.phoneFileList.filter(item => item.check).map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         // 上传进度数组
         uploadPercentageArr(){
@@ -339,7 +339,7 @@ export default {
                 }
                 case 'paste': {
                     let fileNames = this.copyFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toName = this.breadcrumbList[this.breadcrumbList.length - 1].label;
                     let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
@@ -398,7 +398,7 @@ export default {
 
                     // 当前目录是已选文件子目录的
                     let fileNames = this.allowMoveFileList.map(item => {
-                        return item.isDirectory && item.fileType ? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
 
                     window.ZXW_VUE.$confirm('是否确认将' + fileNames + '移动到' + toName + '?', '提示', {
@@ -438,7 +438,7 @@ export default {
                     // 当前目录是已选文件子目录的
                     let checkFileList = this.fileList.filter(item => item.check);
                     let fileNames = checkFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
                     window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
@@ -472,7 +472,7 @@ export default {
                 case 'syncToPhone':{
                     let checkFileList = this.fileList.filter(item => item.check);
                     let fileNames = checkFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     });
                     window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到手机端,文件夹内部不会递归同步,请输入手机端路径(以/sdcard为根目录的相对路径)!', '提示', {
                         confirmButtonText: '确定',
@@ -518,7 +518,7 @@ export default {
                 case 'paste': {
                     // TODO 手机端复制不支持文件夹
                     let fileNames = this.phoneCopyFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label;
                     let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
@@ -530,7 +530,7 @@ export default {
                         let sourcePathList = this.phoneCopyFileList.map(item => item);
                         let remoteScript = '';
                         sourcePathList.forEach(item=>{
-                            remoteScript += `files.copy('${item.pathName}', '${toPath}'+'${item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType)}');`;
+                            remoteScript += `files.copy('${item.pathName}', '${toPath}'+'${(item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType)}');`;
                         });
                         this.remoteExecuteScript(remoteScript);
                         setTimeout(()=>{
@@ -561,7 +561,7 @@ export default {
 
                     // 当前目录是已选文件子目录的
                     let fileNames = this.phoneAllowMoveFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
 
                     window.ZXW_VUE.$confirm('是否确认将' + fileNames + '移动到' + toName + '?', '提示', {
@@ -572,7 +572,7 @@ export default {
                         let sourcePathList = this.phoneAllowMoveFileList;
                         let remoteScript = '';
                         sourcePathList.forEach(item=>{
-                            remoteScript += `files.move('${item.pathName}', '${toPath}'+'${item.isDirectory && item.fileType ? item.fileName : (item.fileName + "." + item.fileType)}');`;
+                            remoteScript += `files.move('${item.pathName}', '${toPath}'+'${(item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)}');`;
                         });
                         this.remoteExecuteScript(remoteScript);
                         setTimeout(()=>{
@@ -587,7 +587,7 @@ export default {
                     // 当前目录是已选文件子目录的
                     let checkFileList = this.phoneFileList.filter(item => item.check);
                     let fileNames = checkFileList.map(item => {
-                        return item.isDirectory && item.fileType? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
                         confirmButtonText: '确定',
@@ -610,7 +610,7 @@ export default {
                 case 'syncToWeb':{
                     let checkFileList = this.phoneFileList.filter(item => item.check);
                     let fileNames = checkFileList.map(item => {
-                        return item.isDirectory && item.fileType ? item.fileName : (item.fileName + "." + item.fileType);
+                        return (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType);
                     });
                     window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到web端,文件夹内部不会递归同步,请输入web端路径', '提示', {
                         confirmButtonText: '确定',
@@ -697,7 +697,7 @@ export default {
                     remoteExecuteScriptContent += createWithDirsCode;
                 } else {
                     // 如果有值且  是以/开头
-                    let localFileUrl = value  + (row.isDirectory && row.fileType ? row.fileName : (row.fileName + "." + row.fileType));
+                    let localFileUrl = value  + ((row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType));
                     // 创建目录代码 如果不是/ 则需要创建目录
                     let createWithDirsCode = value !=='/' ? "files.createWithDirs('/sdcard"+value+"');" : "";
                     let script = createWithDirsCode + "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{});";
@@ -1221,7 +1221,7 @@ export default {
         },
         // 删除单个文件
         removeFile(row){
-            let fileNames =  row.isDirectory && row.fileType ? row.fileName : (row.fileName + "." + row.fileType);
+            let fileNames =  (row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType);
             let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
             window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
                 confirmButtonText: '确定',
@@ -1252,7 +1252,7 @@ export default {
         },
         // 手机删除单个文件
         phoneRemoveFile(row){
-            let fileNames =  row.isDirectory && row.fileType ? row.fileName : (row.fileName + "." + row.fileType);
+            let fileNames =  (row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType);
             window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
