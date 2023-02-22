@@ -341,6 +341,9 @@
     <el-row>
         <div class="width100 d-flex a-center">
             <el-form-item label="图片预览:" prop="previewImg" class="width100">
+                <el-button type="primary" size="mini" @click.stop.prevent="saveImage" v-if="remoteHandler.param1.previewImg">
+                    保存图片
+                </el-button>
                 <div class="mousePositionCls" v-show="remoteHandler.param1.previewImg">
                     <span class="mousePositionX">
                         x:{{imgMousePosition.x }}

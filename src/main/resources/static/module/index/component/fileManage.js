@@ -36,14 +36,23 @@ export default {
     },
     data() {
         return {
+            isInit:false,
             fileEditVisible:false, // 文件编辑器可见
             phoneFileEditVisible:false,
             phoneImagePreviewVisible:false,// 手机端图片预览
             phoneImageBase64:'',// 图片内容
             fileEditorName:'',// 文件编辑器名称
-            phoneFileEditorName:'',//
+            phoneFileEditorName:'',
             fileSavePath: '',// 文件保存路径
             phoneFileSavePath:'',// 手机端文件保存路径
+            fileDialogIsMin:false,
+            phoneFileCacheArr:[],// 手机端文件缓存列表
+            phoneFileSelectIndex:-1, // 手机端文件选择下标
+            /**
+             * fileSavePath:文件保存路径
+             * fileName: 文件名
+             * fileContent: 文件内容
+             */
             scriptEditor:null,
             phoneScriptEditor:null,
             fileActiveName:'web',
@@ -142,6 +151,10 @@ export default {
         // 上传进度数组
         uploadPercentageArr(){
             return this.uploadFileList.map(item=>item.percentage);
+        },
+        // 手机端编辑器缓存数组文件是否修改记录数组
+        phoneFileChangeArr(){
+           return this.phoneFileCacheArr.map(item=> item.sourceFileContent !== item.fileContent);
         }
     },
     watch:{
@@ -164,14 +177,17 @@ export default {
     methods: {
         // 初始化方法
         init() {
-            let relativeFilePath = this.deviceInfo.deviceUuid;
-            if(relativeFilePath){
-                // 加载文件列表
-                this.queryFileList(relativeFilePath);
-                this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
+            if(!this.isInit){
+                let relativeFilePath = this.deviceInfo.deviceUuid;
+                if(relativeFilePath){
+                    // 加载文件列表
+                    this.queryFileList(relativeFilePath);
+                    this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
+                }
+                // 获取手机端文件目录
+                this.updatePhoneDirCache(this.phoneBreadcrumbList.map(item => item.value).join('/'));
             }
-            // 获取手机端文件目录
-            this.updatePhoneDirCache(this.phoneBreadcrumbList.map(item => item.value).join('/'));
+            this.isInit = true;
         },
         // 取消上传
         cancelUpload(i) {
@@ -947,7 +963,36 @@ export default {
         closeFileEditorDialog(){
             this.fileEditVisible = false;
         },
+        // 关闭确认
+        confirmClose(done){
+            // 如果存在有修改 未保存的情况 提示保存
+            if(this.phoneFileChangeArr.filter(item=>item).length>0){
+                window.ZXW_VUE.$confirm('确认关闭编辑器,未保存文件将不会保留更改?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    this.phoneCloseFileEditorDialog();
+                });
+            } else {
+                this.phoneCloseFileEditorDialog();
+            }
+        },
+        // 关闭弹窗
         phoneCloseFileEditorDialog(){
+            this.phoneFileEditVisible = false;
+            this.fileDialogIsMin = false;
+            this.phoneFileCacheArr = []; // 手机端文件缓存列表
+            this.phoneFileSelectIndex = -1
+        },
+        // 最大化弹窗
+        phoneMaxFileEditorDialog(){
+            this.fileDialogIsMin = false;
+            this.phoneFileEditVisible = true;
+        },
+        // 最小化弹窗
+        phoneMinFileEditorDialog(){
+            this.fileDialogIsMin = true;
             this.phoneFileEditVisible = false;
         },
         phoneCloseImagePreviewDialog(){
@@ -988,13 +1033,21 @@ export default {
         },
         // 手机端保存文件编辑器内容
         phoneSaveFileEditorContent(){
-            window.ZXW_VUE.$confirm('确认保存手机端文件【' + this.phoneFileSavePath + '】?', '提示', {
+            // 获取当前点击的文件对象
+            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            if(!fileObj){
+                window.ZXW_VUE.$message.warning('未获取到文件,请重试！');
+                return;
+            }
+            window.ZXW_VUE.$confirm('确认保存手机端文件【' + fileObj.fileSavePath + '】?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'info'
             }).then(() => {
-                let remoteScript = `let writableTextFile = files.write('${this.phoneFileSavePath}',decodeURI($base64.decode('${btoa(encodeURI(this.phoneScriptEditor.getValue()))}')));`;
+                let remoteScript = `let writableTextFile = files.write('${fileObj.fileSavePath}',decodeURI($base64.decode('${btoa(encodeURI(fileObj.fileContent))}')));`;
                 this.remoteExecuteScript(remoteScript);
+                // 更新原始缓存值
+                fileObj.sourceFileContent = fileObj.fileContent;
             });
         },
         // 面包屑change
@@ -1551,6 +1604,69 @@ export default {
                 this.phoneFileLoading = false;
             });
         },
+        // 手机文件编辑器数组点击
+        phoneFileEditorArrClick(index){
+            // 切换记录索引
+            this.phoneFileSelectIndex = index;
+            // 获取当前点击的文件对象
+            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            // 重置文本编辑器内容
+            this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+        },
+        // 手机文件编辑器关闭文件缓存
+        closePhoneEditorArrClick(index){
+            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            // 关闭之前记录当前文件路径
+            let curFileSavePath = fileObj ? fileObj.fileSavePath : '';
+
+            // 公共方法
+            let commonFun = ()=>{
+                // 清除当前项缓存
+                this.phoneFileCacheArr.splice(index, 1);
+                // 最后一个关闭，直接关闭弹窗
+                if(this.phoneFileCacheArr.length === 0){
+                    this.phoneCloseFileEditorDialog();
+                    return;
+                }
+                // 获取文件路径数组
+                let fileSavePathArr = this.phoneFileCacheArr.map(item=>item.fileSavePath);
+                // 当前文件索引
+                let curExitIndex = fileSavePathArr.indexOf(curFileSavePath);
+
+                // 未找到索引 说明当前关闭的就是选中文件
+                if(curExitIndex === -1){
+                    // 索引位置不变，如果索引位置超出长度则取最后一个
+                    // 当前索引项大于等于长度
+                    if(this.phoneFileSelectIndex >= this.phoneFileCacheArr.length){
+                        // 重置为最后一项
+                        this.phoneFileSelectIndex = this.phoneFileCacheArr.length - 1;
+                    }
+                    // 找到索引，替换选中值
+                } else {
+                    this.phoneFileSelectIndex = curExitIndex;
+                }
+                // 最后重新赋值编辑器内容
+                fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                if(fileObj){
+                    this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+                }
+            };
+
+            // 获取当前关闭的项是否存未保存的情况
+            let isNotSave = this.phoneFileChangeArr[index];
+            // 未保存的要提示，已保存的直接关闭
+            if(isNotSave){
+                window.ZXW_VUE.$confirm('当前文件未保存，是否确认关闭?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    commonFun()
+                });
+            } else {
+                commonFun();
+            }
+        },
         // 更新手机端文件缓存
         updatePhoneFileCache(row) {
             let targetPath = row.pathName;
@@ -1628,11 +1744,40 @@ export default {
                 if(isText){
                     this.phoneFileEditVisible = true;
                     fileContent = cacheResultData ? decodeURI(atob(cacheResultData)) : '';
-                    this.phoneFileEditorName = row.fileName + (row.fileType ? ('.' + row.fileType) : '');
+                    this.phoneFileEditorName = '文本编辑';
                     this.phoneFileSavePath = row.pathName;
-                    // 初始化文件编辑器
-                    initFileEditor(this,'phoneScriptEditor','phoneFileEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
-                    })
+
+                    // 获取保存路径的数组
+                    let fileSavePathArr = this.phoneFileCacheArr.map(item=>item.fileSavePath);
+
+                    // 当前文件在已有文件列表中的下标
+                    let curExitsIndex = fileSavePathArr.indexOf(row.pathName);
+                    // 当前文件已打开
+                    if(curExitsIndex!==-1){
+                        // 显示编辑器 切换索引位置即可
+                        this.phoneFileSelectIndex = curExitsIndex;
+                        let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                        if(fileObj){
+                            this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+                        }
+                    } else {
+                        let fileObj = {
+                            fileSavePath:row.pathName,
+                            fileName: row.fileName + (row.fileType ? ('.' + row.fileType) : ''),
+                            sourceFileContent: fileContent,
+                            fileContent: fileContent
+                        };
+                        this.phoneFileCacheArr.push(fileObj);
+                        // 记录索引
+                        this.phoneFileSelectIndex = this.phoneFileCacheArr.length - 1;
+                        // 初始化文件编辑器
+                        initFileEditor(this,'phoneScriptEditor','phoneFileEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
+                            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                            if(fileObj && fileObj.fileContent){
+                                this.phoneFileCacheArr[this.phoneFileSelectIndex].fileContent = value;
+                            }
+                        })
+                    }
                 }
                 if(isImage){
                     this.phoneImagePreviewVisible = true;

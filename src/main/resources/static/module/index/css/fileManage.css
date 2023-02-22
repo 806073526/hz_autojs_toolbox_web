@@ -114,3 +114,25 @@
     width: 100vw;
     margin: 0 !important;
 }
+
+.fileNameArr{
+    display: flex;
+    border: 1px solid #cfbfbf;
+    height: 25px;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 2px;
+    margin-bottom: 2px;
+    padding: 4px 0;
+}
+.fileNameArr .fileNameItem{
+    border: 1px solid #d9c5c1;
+    margin-left: 5px;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+.fileNameArr .fileNameSelectItem{
+   border: 1px solid #5c6bcd !important;
+}

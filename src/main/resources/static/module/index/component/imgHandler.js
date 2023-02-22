@@ -492,6 +492,69 @@ export default {
             drawReact.style.width = absoluteWidth + 'px'; // 宽
             drawReact.style.height = absoluteHeight + 'px'; // 高
         },
+        // 保存图片
+        saveImage(){
+            window.ZXW_VUE.$prompt('是否确认保存图片到web端,请输入保存路径和名称!', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: "/"+this.remoteHandler.param1.localImageName,
+                inputValidator: function(val) {
+                    if(val){
+                        if(!val.startsWith("/")){
+                            return "必须以/开头"
+                        }
+                        if(!val.endsWith(".png")){
+                            return "必须以.png结尾"
+                        }
+                    } else {
+                        return "不能为空";
+                    }
+                    return true;
+                }
+            }).then(({value}) => {
+                // 获取最后一个斜杠的下标
+                let lastIndex =  value.lastIndexOf('/');
+                // 文件名
+               let fileName = value.substring(lastIndex+1,value.length);
+               // 文件路径
+               let filePath = value.substring(0,lastIndex+1);
+               console.log(fileName,filePath);
+                let previewImg=document.getElementById("previewImg");
+                let tempCanvas = document.createElement('canvas');
+                tempCanvas.width= previewImg.width;
+                tempCanvas.height = previewImg.height;
+                let ctx = tempCanvas.getContext('2d');
+                ctx.drawImage(previewImg,0,0,);
+                tempCanvas.toBlob((blob)=>{
+                    let file = new File([blob],fileName,{type:'image/png'});
+                    let scriptFile = new File([file], fileName, {
+                        type: "image/png",
+                    });
+                    const param = new FormData();
+                    param.append('file', scriptFile);
+                    param.append('pathName', this.deviceInfo.deviceUuid + filePath);
+                    let _that = this;
+                    $.ajax({
+                        url: getContext() + "/attachmentInfo/uploadFileSingle",
+                        type: 'post',
+                        data: param,
+                        processData: false,
+                        contentType: false,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data) {
+                                if (data.isSuccess) {
+                                    window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                                }
+                            }
+                        },
+                        error: function (msg) {
+                        }
+                    });
+                });
+            }).catch(() => {
+            });
+        },
         // 生成代码
         generateCode(codeType) {
             if (!this.validSelectDevice()) {

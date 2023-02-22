@@ -216,15 +216,26 @@
           </el-button>
         </span>
     </el-dialog>
-    <el-dialog  :visible.sync="phoneFileEditVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+    <!-- width="100vw" height="100vh" custom-class="fileEditorDialog" -->
+    <el-dialog  :visible.sync="phoneFileEditVisible" :title="phoneFileEditorName"  fullscreen center :close-on-click-modal="false" :close-on-press-escape="false" :modal="false" :before-close="confirmClose">
+        <div class="fileNameArr">
+            <div v-for="(item,index) in phoneFileCacheArr" :key="index"  :class="{'fileNameItem': true,'fileNameSelectItem': index === phoneFileSelectIndex}">
+                <el-tooltip class="item"  effect="dark" :disabled="!item.fileSavePath" :content="item.fileSavePath" placement="top-start">
+                    <div @click.stop="phoneFileEditorArrClick(index)">
+                        <span> {{item.sourceFileContent === item.fileContent ? item.fileName : '*'+ item.fileName }}</span>
+                        <span @click.stop="closePhoneEditorArrClick(index)">关闭</span>
+                    </div>
+                </el-tooltip>
+            </div>
+        </div>
         <div id="phoneFileEditor" style="height: 85vh;width: 100%;">
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+          <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent">
             保存
           </el-button>
-          <el-button type="info" @click.stop.native="phoneCloseFileEditorDialog">
-            关闭
+          <el-button type="info" @click.stop.native="phoneMinFileEditorDialog">
+            最小化
           </el-button>
         </span>
     </el-dialog>
@@ -238,4 +249,5 @@
           </el-button>
         </span>
     </el-dialog>
+    <el-button v-show="fileDialogIsMin" type="danger" @click.stop.native="phoneMaxFileEditorDialog" style="position: fixed;right: 10px;bottom: 10px;">还原文件编辑器</el-button>
 </div>
