@@ -1465,6 +1465,17 @@ export default {
             let remoteScript = `engines.execScriptFile("/sdcard/appSync/main.js");`;
             this.remoteExecuteScript(remoteScript);
         },
+        // 手机端远程停止程序
+        phoneRemoteStopScript(){
+            let remoteScript = `let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js']
+                                const all = engines.all()
+                                all.forEach(item => {
+                                    if (!notCloseSourceArr.includes(String(item.source))) {
+                                        item.forceStop()
+                                    }
+                                });`;
+            this.remoteExecuteScript(remoteScript);
+        },
         // 预览文件
         previewFile(previewUrl) {
             window.open(getContext() + "/" + previewUrl)
