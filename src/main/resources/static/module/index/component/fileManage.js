@@ -1621,8 +1621,19 @@ export default {
             this.phoneFileSelectIndex = index;
             // 获取当前点击的文件对象
             let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            // 设置默认值
+            if(!fileObj.scroll){
+                fileObj.scroll = {
+                    scrollLeft:0,
+                    scrollTop:0
+                }
+            }
+            // 缓存的记录
+            let cacheScroll = JSON.parse(JSON.stringify(fileObj.scroll));
             // 重置文本编辑器内容
             this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+            // 滚动到记录位置
+            this.phoneScriptEditor.setScrollPosition(cacheScroll,1);
         },
         // 手机文件编辑器关闭文件缓存
         closePhoneEditorArrClick(index){
@@ -1659,7 +1670,19 @@ export default {
                 // 最后重新赋值编辑器内容
                 fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                 if(fileObj){
+                    // 设置默认值
+                    if(!fileObj.scroll){
+                        fileObj.scroll = {
+                            scrollLeft:0,
+                            scrollTop:0
+                        }
+                    }
+                    // 缓存的记录
+                    let cacheScroll = JSON.parse(JSON.stringify(fileObj.scroll));
+                    // 重置文本编辑器内容
                     this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+                    // 滚动到记录位置
+                    this.phoneScriptEditor.setScrollPosition(cacheScroll,1);
                 }
             };
 
@@ -1770,6 +1793,8 @@ export default {
                         let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                         if(fileObj){
                             this.phoneScriptEditor.setValue(fileObj.fileContent || '');
+                            // 滚动到记录位置
+                            this.phoneScriptEditor.setScrollPosition(fileObj.scroll,1);
                         }
                     } else {
                         let fileObj = {
@@ -1787,7 +1812,17 @@ export default {
                             if(fileObj && fileObj.fileContent){
                                 this.phoneFileCacheArr[this.phoneFileSelectIndex].fileContent = value;
                             }
-                        })
+                        },(e)=>{
+                            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                            if(fileObj){
+                                this.phoneFileCacheArr[this.phoneFileSelectIndex].scroll = {
+                                    scrollLeft: e.scrollLeft,
+                                    scrollTop: e.scrollTop
+                                };
+                            }
+                        });
+                        // 滚动到记录位置
+                        this.phoneScriptEditor.setScrollPosition({scrollLeft: 0,scrollTop: 0},1);
                     }
                 }
                 if(isImage){

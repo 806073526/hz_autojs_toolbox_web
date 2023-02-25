@@ -99,8 +99,9 @@ export const zeroFill = (i)=> {
  * @param language 语言 默认javascript
  * @param theme 主题 vs-dark
  * @param editorChangeCallBack 编辑器值变化回调函数 e对象 value编辑器值
+ * @param editorScrollChangeCallBack 编辑器滚动变化回调函数
  */
-export const initFileEditor = (_that,editorKey,containerId,getEditorCompleteFun,fileContent,language='javascript',theme='vs-dark',editorChangeCallBack) =>{
+export const initFileEditor = (_that,editorKey,containerId,getEditorCompleteFun,fileContent,language='javascript',theme='vs-dark',editorChangeCallBack,editorScrollChangeCallBack) =>{
     _that.$nextTick(()=>{
         let interval = null;
         // 初始化编辑器
@@ -121,6 +122,11 @@ export const initFileEditor = (_that,editorKey,containerId,getEditorCompleteFun,
                     _that[editorKey].onDidChangeModelContent((e)=>{
                         if(editorChangeCallBack){
                             editorChangeCallBack(e,_that[editorKey].getValue())
+                        }
+                    });
+                    _that[editorKey].onDidScrollChange((e)=>{
+                        if(editorScrollChangeCallBack){
+                            editorScrollChangeCallBack(e)
                         }
                     });
                 }
