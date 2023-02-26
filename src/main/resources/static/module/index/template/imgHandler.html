@@ -4,8 +4,12 @@
     </p>
     <el-row>
         <div class="width100 d-flex a-center">
-            <el-form-item label="图片名称:" prop="localImageName" class="width100">
+            <el-form-item label="图片名称:" prop="localImageName" class="width50">
                 <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
+                          class="width100" />
+            </el-form-item>
+            <el-form-item label="文字识别:" prop="context" class="width50">
+                <el-input v-model="remoteHandler.param1.context" placeholder="请输入文字识别内容"
                           class="width100" />
             </el-form-item>
         </div>

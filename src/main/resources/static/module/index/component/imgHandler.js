@@ -59,6 +59,7 @@ export default {
                     bigScale: 1,
                     smallScale: 1,
                     localImageName: 'allScreen.png',
+                    context:'',// 文字内容
                     scriptPreview: '',
                     previewImg: '',
                     isOpenFastClip: false,
@@ -710,7 +711,7 @@ export default {
             } else if ('regionalAnalysisChartPosition2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
                     'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
-                    'let result = utils.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'let result = utils.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"'+this.remoteHandler.param1.context+'",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
                     'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域模板匹配
@@ -726,7 +727,7 @@ export default {
             } else if ('regionalClickText2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
                     'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
-                    'utils.regionalClickText2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
+                    'utils.regionalClickText2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"'+this.remoteHandler.param1.context+'",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
                     'utils.recycleNull(img);'
                 // 区域特征匹配点击
             } else if ('regionalClickFeatures' === codeType) {
