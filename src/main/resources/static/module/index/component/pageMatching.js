@@ -19,21 +19,46 @@ let defaultPageSettingParamExample = { // 默认页面设置参数 设置
     pageSettingParamArray:[ // 页面设置参数数组
         {
             pageName:'页面1', // 页面名称
+            operateScript:'',
             joinDebug:true,
             expand:true,
             pageSettingArray:[ // 页面设置数组
                 {
-                    'settingKey':'1080_1920',
+                    'settingKey':'1080_2400',
                     'expand':true,
                     'width':1080,
                     'height':1920,
                     'relation':{"total": "or", "analysisChart": "or", "multipleColor": "or", "multipleImg": "or" },
                     'analysisChart':[{ "position": [0, 0, 1080, 1920], "threshold": 180, "maxVal": 255, "context": "测试文字", "matchingType": "contains", "isOpenGray": 0, "isOpenThreshold": 0, "canvasMsg": "测试文字" }],
-                    'multipleColor':[{ "position": [0, 0, 1080, 1920], "threshold": 25, "maxVal": 255, "color": "#FFFFFF", "colorThreshold": 26, "colorOther": [[35, 30, "#FFFFFF"], [-28, -2, "#000000"], [-23, 20, "#000000"]], "isOpenGray": 1, "isOpenThreshold": 1, "canvasMsg": "测试颜色" }],
+                    'multipleColor':[{ "position": [0, 0, 1080, 1920], "threshold": 25, "maxVal": 255, "color": "#FFFFFF", "colorThreshold": 26, "colorOther": [[100, 30, "#FFFFFF"], [-28, -2, "#000000"], [-23, 20, "#000000"]], "isOpenGray": 1, "isOpenThreshold": 1, "canvasMsg": "测试颜色" }],
                     'multipleImg':[{ "position": [0, 0, 1080, 1920], "threshold": 120, "maxVal": 255, "pathName": "/sdcard/测试找图.png", "imgThreshold": 0.8, "bigScale":1, "smallScale": 1, "featuresThreshold": 0.8, "isOpenGray": 1, "isOpenThreshold": 1, "canvasMsg": "测试找图" }],
+                    'serviceOperateParam':[],
                     'analysisChartKey':Math.random(),
                     'multipleColorKey':Math.random(),
                     'multipleImgKey':Math.random(),
+                    'serviceOperateParamKey':Math.random()
+                }
+            ]
+        },{
+            pageName:'华仔工具箱页面', // 页面名称
+            operateScript:'utilsObj.executeServiceOperate("华仔工具箱页面","点击日志","regionalClickText2");',
+            joinDebug:true,
+            expand:true,
+            pageSettingArray:[ // 页面设置数组
+                {
+                    'settingKey':'1080_2400',
+                    'expand':true,
+                    'width':1080,
+                    'height':2400,
+                    'relation':{"total": "or", "analysisChart": "or", "multipleColor": "or", "multipleImg": "or" },
+                    'analysisChart':[{"threshold":60,"maxVal":255,"imgThreshold":0.7,"colorThreshold":26,"bigScale":1,"smallScale":1,"context":"华仔","isOpenGray":0,"isOpenThreshold":0,"position":["36","104","525","200"],"featuresThreshold":0.7,"color":"#009688","colorOther":[[489,96,"#009688"]],"matchingType":"contains"}],
+                    'multipleColor':[],
+                    'multipleImg':[],
+                    'serviceOperateParam':[{'paramKey':'点击日志','paramJson':'{"threshold":60,"maxVal":255,"imgThreshold":0.7,"colorThreshold":26,"bigScale":1,"smallScale":1,"context":"日志","isOpenGray":0,"isOpenThreshold":0,"position":["842","254","1035","321"],"featuresThreshold":0.7,"color":"#009688","colorOther":[[489,96,"#009688"],[806,150,"#009688"],[999,217,"#009688"]]}'}],
+                    'analysisChartKey':Math.random(),
+                    'multipleColorKey':Math.random(),
+                    'multipleImgKey':Math.random(),
+                    'serviceOperateParamKey':Math.random()
                 }
             ]
         }
@@ -45,6 +70,7 @@ let defaultPageSettingParam = { // 默认页面设置参数
     pageSettingParamArray:[ // 页面设置参数数组
         {
             pageName:'', // 页面名称
+            operateScript:'',// 页面操作代码
             joinDebug:true,
             expand:true,
             pageSettingArray:[ // 页面设置数组
@@ -57,9 +83,14 @@ let defaultPageSettingParam = { // 默认页面设置参数
                     'analysisChart':[],
                     'multipleColor':[],
                     'multipleImg':[],
+                    'serviceOperateParam':[
+                        /*{"paramKey": "水晶就绪_识字点击", "paramJson":JSON.stringify({{"position": [784, 761, 1858, 954], "threshold": 60, "maxVal": 255, "context": "就绪", "isOpenGray": 0, "isOpenThreshold": 0, "canvasMsg": "就绪"}}) }
+                        */
+                    ],// 业务操作参数
                     'analysisChartKey':Math.random(),
                     'multipleColorKey':Math.random(),
                     'multipleImgKey':Math.random(),
+                    'serviceOperateParamKey':Math.random()
                 }
             ]
         }
@@ -99,6 +130,8 @@ export default {
             pageSettingParam: JSON.parse(JSON.stringify(defaultPageSettingParam)),
             // 页面设置参数json内容
             pageSettingParamJson:'',
+            // 业务参数json内容
+            serviceOperateParamJson: '',
             // 选中行
             selectRowObj: {
                 tableName: '',
@@ -120,12 +153,148 @@ export default {
                 return;
             }
             let joinMatchingPageKeysArray = this.pageSettingParam.pageSettingParamArray.filter(item=>item.joinDebug).map(item=>item.pageName);
-            let scriptContent = "let pageSetting="+this.convertToJson(true)+";";
-            scriptContent += "let allScreenImg = captureScreen();";
-            scriptContent += "let joinMatchingPageKeysArray = "+JSON.stringify(joinMatchingPageKeysArray)+";";
-            scriptContent += "let matchingPage = utilsObj.multipleConditionMatchingByPageSetting(pageSetting, allScreenImg, joinMatchingPageKeysArray);";
-            scriptContent += "toastLog(matchingPage ? '当前匹配页面为'+matchingPage : '未匹配到页面');";
-            this.remoteExecuteScript(scriptContent);
+
+            // 操作代码
+            let pageOperateScriptObj = {};
+            let pageSettingParamArray = this.pageSettingParam.pageSettingParamArray;
+            pageSettingParamArray.forEach((page,pageIndex)=>{
+                pageOperateScriptObj[page.pageName]=page.operateScript;
+            });
+            let remoteScript = `
+/**
+ * 获取业务操作参数
+ * @param {*} pageName 页面名称
+ * @param {*} operateSymbol 操作标志
+ */
+utilsObj.getServiceOperateParam = (pageName, operateSymbol) => {
+    let serviceOperateParam = ${this.operateConvertToJson()};
+    // 获取页面参数
+    let pageParam = serviceOperateParam[pageName];
+    // 获取业务参数
+    let serviceParam = pageParam ? pageParam[operateSymbol] : null
+    // 未取到业务参数直接返回
+    if (!serviceParam) {
+        return null;
+    }
+    // 获取分辨率对应的值
+    let serviceParamObj = serviceParam[device.width + "_" + device.height]
+    // 未适配当前设备 则读取标准的
+    serviceParamObj = serviceParamObj || serviceParamObj[config.screenWidth + "_" + config.screenHeight]
+    return serviceParamObj;
+}
+/**
+ * 执行业务操作
+ * @param {*} pageName 页面名称
+ * @param {*} operateSymbol 操作标志
+ * @param {*} functionName 方法名称
+ * @param {*} successCall 回调函数
+ */
+utilsObj.executeServiceOperate = (pageName,operateSymbol,functionName,successCall)=>{
+     // 获取业务参数对象
+     let serviceOperateParam = utilsObj.getServiceOperateParam(pageName, operateSymbol);
+     if(!serviceOperateParam){
+      // 未获取到直接返回
+      return;
+     }
+    // 截全屏
+    let img = captureScreen();
+ 
+    // 解构参数
+    let { position, context, threshold, maxVal, pathName, imgThreshold, color, colorOther, colorThreshold, matchingCount, transparentMask, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg } = serviceOperateParam
+ 
+     let x1 = position[0];
+     let y1 = position[1];
+     let x2 = position[2];
+     let y2 = position[3];
+     let matchingImgPath = pathName ? pathName.replace('${this.sourcePathName}','${this.targetPathName}') : pathName;
+     let matchingContent = context;
+     // 读取图片
+     let targetImg = null;
+     
+     // 结果
+     let result;
+     
+     // 根据方法名执行参数
+     switch (functionName) {
+      // 区域找图
+      case "regionalFindImg2":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+       break;
+      //  区域找图点击
+      case "regionalClickImg2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingImgPath, imgThreshold, isOpenGray, isOpenThreshold, successCall);
+       break;
+      // 区域文字识别 
+      case "regionalAnalysisChart2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold, canvasMsg);
+       break;
+      //  区域文字识别获取坐标
+      case "regionalAnalysisChartPosition2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold);
+       break;
+      //  区域文字识别点击
+      case "regionalClickText2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
+       break;
+            //  区域文字识别点击 支持多条件匹配
+      case "regionalClickText3":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
+       break;    
+      //  区域匹配图片
+      case "regionalMatchTemplate2":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, matchingCount, transparentMask, isOpenGray, isOpenThreshold, canvasMsg);
+       break;
+      //  区域特征匹配
+      case "regionalMatchingFeatures":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+       break;
+      //  区域匹配特征
+      case "regionalMatchFeaturesTemplate":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, matchingCount, canvasMsg);
+       break; 
+      //  区域多点找色
+      case "regionalFindMultipleColor2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+       break; 
+      //  区域多点找色点击
+      case "regionalClickColor2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, successCall);
+       break; 
+      //  区域找图或者特征匹配
+      case "regionalFindImgOrFeatures":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+       break; 
+      //  区域匹配图片或者特征
+      case "regionalMatchTemplateOrMatchFeatures":
+       targetImg = images.read(pathName);
+       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+       break; 
+      //  区域找圆
+      case "regionalFindCircles2":
+       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold);
+       break;
+      default:
+     }
+   // 回收图片
+   utilsObj.recycleNull(img);
+   utilsObj.recycleNull(targetImg);
+   return result;
+}            
+let pageSetting=${this.convertToJson(true)};
+let pageOperateScriptObj=${JSON.stringify(pageOperateScriptObj)};
+let allScreenImg = captureScreen();
+let joinMatchingPageKeysArray = ${JSON.stringify(joinMatchingPageKeysArray)};
+let matchingPage = utilsObj.multipleConditionMatchingByPageSetting(pageSetting, allScreenImg, joinMatchingPageKeysArray);
+toastLog(matchingPage ? '当前匹配页面为'+matchingPage : '未匹配到页面');
+let pageExecuteScript = matchingPage ? pageOperateScriptObj[matchingPage] : "";
+eval(pageExecuteScript);
+            `;
+            this.remoteExecuteScript(remoteScript);
         },
         // 验证页面参数
         validatePageSetting(){
@@ -319,9 +488,11 @@ export default {
                         settingObj.analysisChart = setting.analysisChart;
                         settingObj.multipleColor = setting.multipleColor;
                         settingObj.multipleImg = setting.multipleImg;
+                        settingObj.serviceOperateParam = [];
                         settingObj.analysisChartKey = Math.random();
                         settingObj.multipleColorKey = Math.random();
                         settingObj.multipleImgKey = Math.random();
+                        settingObj.serviceOperateParamKey = Math.random();
                         pageSettingArray.push(settingObj);
                     });
                     pageSettingParam.pageSettingArray = pageSettingArray;
@@ -353,6 +524,101 @@ export default {
             } else {
                 window.ZXW_VUE.$notify.error({message: '转换失败！', duration: '1000'})
             }
+        },
+        operateConvertToJson(){
+            let serviceOperateParamObj = {};
+            try{
+                // 遍历对象
+                this.pageSettingParam.pageSettingParamArray.forEach((page,pageIndex)=>{
+                    let pageName = page.pageName;
+                    let serviceOperateParam = {};
+                    page.pageSettingArray.forEach((pageSetting,pageSettingIndex)=>{
+                        // 获取该分辨率下的业务参数
+                        let serviceOperateParamArr = pageSetting.serviceOperateParam;
+                        // 分辨率值
+                        let widthHeight = pageSetting.width+'_'+pageSetting.height;
+                        // 遍历业务操作参数
+                        serviceOperateParamArr.forEach(operateParam=>{
+                            // 获取参数key
+                            let paramKey = operateParam['paramKey'];
+                            // 获取参数json
+                            let paramJson = operateParam['paramJson'];
+                            // 获取参数对象
+                            let paramObj = serviceOperateParam[paramKey]||{};
+                            // 获取分辨率对应参数
+                            let widthHeightObj = paramObj[widthHeight];
+                            // 设置参数
+                            paramObj[widthHeight] = widthHeightObj || (paramJson ? JSON.parse(paramJson) : {});
+                            // 重新赋值
+                            serviceOperateParam[paramKey] = paramObj;
+                        })
+
+                    });
+                    // 赋值对象
+                    serviceOperateParamObj[pageName] = serviceOperateParam;
+                });
+            }catch (e) {
+                console.error(e);
+            }
+            if(serviceOperateParamObj && Object.keys(serviceOperateParamObj).length){
+                return JSON.stringify(serviceOperateParamObj);
+            }
+            return "";
+        },
+        // 业务参数配置转换为json
+        serviceOperateParamToJson(){
+            let serviceOperateParamJson = this.operateConvertToJson();
+            if(serviceOperateParamJson){
+                this.serviceOperateParamJson = serviceOperateParamJson;
+                window.ZXW_VUE.$notify.success({message: '转换成功', duration: '1000'});
+            } else {
+                window.ZXW_VUE.$notify.error({message: '转换失败！', duration: '1000'})
+            }
+        },
+        // json转换为业务参数配置
+        jsonToServiceOperateParam(){
+            // 获取业务操作配置对象
+            let paramJsonPageObj = JSON.parse(this.serviceOperateParamJson);
+
+           // 获取所有的页面配置
+           let pageSettingParamArray = this.pageSettingParam.pageSettingParamArray;
+            pageSettingParamArray.forEach((page,pageIndex)=>{
+                // 获取页面名称
+                let pageName = page.pageName;
+                // 获取当前页面key的业务操作参数
+                let paramServiceOperatePageObj = paramJsonPageObj[pageName];
+                // 当前有这个业务操作参数
+                if(paramServiceOperatePageObj){
+                    // 获取业务名称key数组
+                    let serviceKeyArr = Object.keys(paramServiceOperatePageObj) || [];
+
+                    // 遍历业务设置数组
+                    page.pageSettingArray.forEach((pageSetting,pageSettingIndex)=>{
+                        // 业务操作参数对象
+                        let serviceOperateParam = pageSetting.serviceOperateParam||[];
+                        // 获取keys
+                        let serviceOperateParamKeys = serviceOperateParam.map(item=>item.paramKey);
+                        // 分辨率
+                        let widthHeight = pageSetting.width + '_' + pageSetting.height;
+                        // 遍历业务名称key数组
+                        serviceKeyArr.forEach(serviceKey=>{
+                            let serviceParam = paramServiceOperatePageObj[serviceKey];
+                            // 获取分辨率对应参数
+                            let widthHeightObj = serviceParam[widthHeight];
+                            // 分辨率参数有值
+                            if(widthHeightObj && !serviceOperateParamKeys.includes(serviceKey)){
+                                serviceOperateParam.push({
+                                    "paramKey":serviceKey,
+                                    "paramJson":JSON.stringify(widthHeightObj)
+                                });
+                            }
+                        });
+                        // 重新赋值
+                        pageSetting.serviceOperateParam = serviceOperateParam;
+                    })
+                }
+            });
+            window.ZXW_VUE.$notify.success({message: '转换成功', duration: '1000'});
         },
         // 展开全部
         expandAll(){
@@ -477,6 +743,32 @@ export default {
                 window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
             });
 
+        },
+        // 业务参数添加行
+        serviceOperateAddRow(pageIndex,settingIndex,index){
+            let pageSettingParam = this.pageSettingParam.pageSettingParamArray[pageIndex];
+            let pageSetting = pageSettingParam.pageSettingArray[settingIndex];
+            let serviceOperateParam = pageSetting['serviceOperateParam'];
+            let defaultObj = {"paramKey":"","paramJson":""};
+            if(index === -1){
+                serviceOperateParam.push(JSON.parse(JSON.stringify(defaultObj)));
+            } else {
+                serviceOperateParam.splice(index + 1, 0 ,JSON.parse(JSON.stringify(defaultObj)));
+            }
+        },
+        // 业务参数删除行
+        serviceOperateDeleteRow(pageIndex,settingIndex,index){
+            let pageSettingParam = this.pageSettingParam.pageSettingParamArray[pageIndex];
+            let pageSetting = pageSettingParam.pageSettingArray[settingIndex];
+            let serviceOperateParam = pageSetting['serviceOperateParam'];
+            window.ZXW_VUE.$confirm('是否确认删除?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                serviceOperateParam.splice(index, 1);
+                window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+            });
         },
         // 颜色其他值添加行
         colorOtherAddRow(pageIndex,settingIndex,tableIndex,index){
