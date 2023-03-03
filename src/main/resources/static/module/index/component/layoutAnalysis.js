@@ -35,6 +35,7 @@ export default {
     data() {
         return {
             defaultExpandedKeys:[],// 默认展开节点key数组
+            layoutLoading:false,
             remoteHandler: {
                 param5: {
                     rootNodeJson: '',
@@ -238,6 +239,87 @@ export default {
                  this.remoteHandler.param5.nodeKeyArr = nodeKeyArr;*/
             }
             return true;
+        },
+        // 根据路径获取文件信息
+        getFileInfoByPath(relativeFilePath){
+            let fileInfo = null;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/querySingleAttachInfoByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": relativeFilePath
+                },
+                async:false,
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            fileInfo = data.data;
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return fileInfo;
+        },
+        // 一键远程布局分析
+        remoteLayoutAnalysisOneKey(){
+            if (!this.validSelectDevice()) {
+                return
+            }
+            this.layoutLoading = true;
+            this.clearNodeJson();
+            let remoteScript = `auto.clearCache();
+            utilsObj.getRootNodeWriteLocal("tree","${this.remoteHandler.param5.layoutAnalysisRange}");
+            utilsObj.remoteUploadRootNodeJsonToServer();
+            utilsObj.uploadNodePreviewImg();`;
+            this.remoteExecuteScript(remoteScript);
+
+            let fileNoChangeCount = 0;//连续未变化次数
+            let startFlag = false; //开始处理标志
+            let relativeFilePath = this.deviceInfo.deviceUuid + "/rootNode.json";
+            // 原始文件信息
+            let sourceFileInfo = this.getFileInfoByPath(relativeFilePath);
+            let sourceFileSize = sourceFileInfo ? sourceFileInfo.fileSize : 0;
+            let sourceLastUpdateTime = sourceFileInfo ? sourceFileInfo.lastUpdateTime : '';
+            // 每隔200毫秒执行一次查询
+            let refreshTimer = setInterval(()=>{
+                // 当前文件信息
+                let curFileInfo = this.getFileInfoByPath(relativeFilePath);
+                let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
+                let curLastUpdateTime = curFileInfo ? curFileInfo.lastUpdateTime : '';
+
+                if(sourceFileSize !== curFileSize || sourceLastUpdateTime !== curLastUpdateTime){
+                    // 内容有变化时开始记录
+                    startFlag = true;
+                }
+                // 有一次变化后 文件大小和时间连续没有变化
+                if(sourceFileSize === curFileSize && sourceLastUpdateTime === curLastUpdateTime && startFlag){
+                    // 文件未变化计数加一
+                    fileNoChangeCount++;
+                } else {
+                    sourceFileSize = curFileSize;
+                    sourceLastUpdateTime = curLastUpdateTime;
+                    fileNoChangeCount = 0;// 重置次数
+                }
+                // 200*3 0.6秒钟未变化 认为图片上传完成
+                if(fileNoChangeCount >= 3){
+                    // 执行加载图片
+                    this.loadNodeJson();
+                    setTimeout(()=>{
+                        this.layoutLoading = false;
+                        this.$nextTick(()=>{
+                            this.remoteHandler.param5.checkAll = true;
+                            this.checkAllNode();
+                        })
+                    },200);
+                    // 关闭定时器
+                    clearInterval(refreshTimer);
+                    refreshTimer = null;
+                }
+            },200);
+
         },
         // 远程布局分析
         remoteLayoutAnalysis() {

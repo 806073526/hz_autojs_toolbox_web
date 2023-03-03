@@ -86,6 +86,10 @@
         <div class="width100 d-flex a-center" style="margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;text-align: center;">
             <div>
                 <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                           size="mini" @click.stop.prevent="remoteLayoutAnalysisOneKey">
+                    一键远程布局分析
+                </el-button>
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
                            size="mini" @click.stop.prevent="remoteLayoutAnalysis">
                     远程布局分析
                 </el-button>
@@ -195,7 +199,7 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center mt-1">
+        <div class="width100 d-flex a-center mt-1" v-loading="layoutLoading">
             <el-tree :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
                      empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
                      :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
