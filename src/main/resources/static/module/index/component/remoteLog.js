@@ -154,7 +154,6 @@ export default {
                                 }
                             }
                         }
-                        console.log(data)
                     },
                     error: function (msg) {
                         console.log(msg)
