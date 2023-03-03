@@ -26,22 +26,34 @@
                                           max="5000" class="width100">
                                 </el-input>
                             </el-form-item>
-                            <div class="width25">
-                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                            <div class="width25 d-flex" style="justify-content: flex-end;">
+                                <el-form-item  style="margin-bottom: 0;text-align: left;" label="实时日志类型:"  >
+                                    <el-radio-group v-model="logDirectoryType" >
+                                        <el-radio label="tools">
+                                            工具箱日志
+                                        </el-radio>
+                                        <el-radio label="falsework">
+                                            脚手架日志
+                                        </el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: inline-flex;width: 100%;justify-content: flex-end;margin-top: 10px;">
+                            <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                                     <span>
                                         自动滚动到底部：
                                     </span>
-                                    <el-switch v-model="autoScroll"/>
-                                </div>
-                                <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="startOnLineLog">
-                                    开启实时日志
-                                </el-button>
-                                <el-button type="primary" size="mini" style="margin-left:10px" id="stopOnLineLog"
-                                           @click.stop.prevent="stopOnLineLog ">
-                                    停止实时日志
-                                </el-button>
+                                <el-switch v-model="autoScroll"/>
                             </div>
-                        </div>
+                            <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="startOnLineLog">
+                                开启实时日志
+                            </el-button>
+                            <el-button type="primary" size="mini" style="margin-left:10px" id="stopOnLineLog"
+                                       @click.stop.prevent="stopOnLineLog ">
+                                停止实时日志
+                            </el-button>
                     </div>
                     <div style="min-height: 40vh;display: flex;justify-content: flex-end;align-items: center;width: 100%;margin-top: 10px;">
                         <!--<el-input type="textarea" style="height: 70vh;" :rows="25" id="scroll_text" v-model="onlineLogContent"/>-->

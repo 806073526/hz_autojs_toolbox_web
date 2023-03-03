@@ -36,6 +36,7 @@ export default {
     data() {
         return {
             logType:'online',
+            logDirectoryType:'tools',
             logTimer:null,
             logEditor:null,
             autoScroll:true,
@@ -84,10 +85,10 @@ export default {
                 }
             }
             utilsObj.getOnlineLog =()=> {
-                files.createWithDirs("/sdcard/autoJsToolsLog/")
+                files.createWithDirs("/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/")
                 // 获取当前时间字符串
                 let currenTimes = utilsObj.getCurrentTime()
-                let fileName = "/sdcard/autoJsToolsLog/log" + currenTimes + ".txt";
+                let fileName = "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/log" + currenTimes + ".txt";
                 let fileObj = files.open(fileName, "r");
                 let allLines = fileObj.readlines();
                 fileObj.close();
