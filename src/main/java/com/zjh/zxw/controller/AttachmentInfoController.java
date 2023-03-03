@@ -60,6 +60,9 @@ public class AttachmentInfoController extends BaseController {
     // 文件内容 key为deviceUUID_日期文件夹名_日志名  value为日志内容
     private final static ConcurrentHashMap<String, String> fileMap = new ConcurrentHashMap<String,String>();
 
+    // 在线日志map key为deviceUUID
+    private final static ConcurrentHashMap<String, String> onlineLogMap = new ConcurrentHashMap<String,String>();
+
     @ApiOperation(value = "清理全部文件目录结构", notes = "清理全部文件目录结构")
     @GetMapping("/clearFileDirectoryMapAll")
     public R<Boolean> clearFileDirectoryMapAll(){
@@ -73,6 +76,28 @@ public class AttachmentInfoController extends BaseController {
         fileDirectoryMap.remove(dirPathKey);
         return success(true);
     }
+
+    @ApiOperation(value = "更新在线日志map", notes = "更新在线日志map")
+    @PostMapping("/updateLogMap")
+    public R<Boolean> updateLogMap(@RequestBody Map<String,String> mapParam){
+        onlineLogMap.put(mapParam.get("key"),mapParam.get("logJson"));
+        return success(true);
+    }
+
+    @ApiOperation(value = "查询在线日志", notes = "查询在线日志")
+    @GetMapping("/queryLog")
+    public R<String> queryLog(@ApiParam("key") @RequestParam(value = "key") String key){
+        String logContentJson = onlineLogMap.getOrDefault(key,"");
+        return success(logContentJson);
+    }
+
+    @ApiOperation(value = "清理在线日志", notes = "清理在线日志")
+    @GetMapping("/clearLogMap")
+    public R<Boolean> clearLogMap(@ApiParam("key") @RequestParam(value = "key") String key){
+        onlineLogMap.remove(key);
+        return success(true);
+    }
+
 
     @ApiOperation(value = "更新文件目录结构", notes = "更新文件目录结构")
     @PostMapping("/updateFileDirectoryMap")
