@@ -41,6 +41,7 @@ export default {
             autoScroll:true,
             appSpace:500,
             clientSpace:500,
+            onlineLogMaxLen: 500,// 最大日志行
             onlineLogContent:"",
             remoteHandler: {
                 param2: {
@@ -90,7 +91,7 @@ export default {
                 let fileObj = files.open(fileName, "r");
                 let allLines = fileObj.readlines();
                 fileObj.close();
-                let targetLines = allLines.slice(-500)
+                let targetLines = allLines.slice(-${this.onlineLogMaxLen})
                 return targetLines.join("\\r\\n");
             }
             utilsObj.timerStartPushLog=()=> {
@@ -103,7 +104,7 @@ export default {
                         timerFlag = false;
                     }
                     sleep(100);
-                    sleep(Number('${this.appSpace}'));
+                    sleep(${this.appSpace});
                     let logContent = utilsObj.getOnlineLog();
                     // url编码base64加密
                     let result = $base64.encode(encodeURI(logContent));
