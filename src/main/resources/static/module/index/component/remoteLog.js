@@ -39,6 +39,8 @@ export default {
             logTimer:null,
             logEditor:null,
             autoScroll:true,
+            appSpace:500,
+            clientSpace:500,
             onlineLogContent:"",
             remoteHandler: {
                 param2: {
@@ -100,7 +102,8 @@ export default {
                     if (stop !== undefined) {
                         timerFlag = false;
                     }
-                    sleep(300)
+                    sleep(100);
+                    sleep(Number('${this.appSpace}'));
                     let logContent = utilsObj.getOnlineLog();
                     // url编码base64加密
                     let result = $base64.encode(encodeURI(logContent));
@@ -156,14 +159,16 @@ export default {
                         console.log(msg)
                     }
                 });
-            },200);
+            },100 + Number(this.clientSpace));
         },
         // 停止实时日志
         stopOnLineLog(){
             // 推送日志
             let remoteScript = `utilsObj.timerStopPushLog();`;
             this.remoteExecuteScript(remoteScript);
-            clearInterval(this.logTimer);
+            if(this.logTimer){
+                clearInterval(this.logTimer);
+            }
             this.logTimer = null;
         },
         getText(){
