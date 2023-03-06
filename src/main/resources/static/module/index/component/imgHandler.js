@@ -671,6 +671,16 @@ export default {
                     'let contentMlkArr = Object.values(resultMlk).map(item => item.text) || [];\r\n' +
                     'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(contentMlkArr));';
+                // 谷歌MLKITOCR autox版本
+            } else if('MLKitOCR_AUTO_X' === codeType){
+code = `let img = captureScreen();
+let resultMlk = gmlkit.ocr(img,"zh").toArray(3);
+let contentMlkArr=[];
+for(let i=0;i<resultMlk.length;i++){
+contentMlkArr.push(resultMlk[i].text);
+}
+utils.recycleNull(img);
+toastLog(JSON.stringify(contentMlkArr.join('')));`;
                 // 模板匹配
             } else if ('matchTemplate' === codeType) {
                 code = 'let img = captureScreen();\r\n' +

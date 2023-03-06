@@ -228,16 +228,19 @@
                             找图findImage
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('detectAndComputeFeatures')">
-                            收集特征detectAndComputeFeatures
+                            收集特征detectAndComputeFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('matchFeatures')">
-                            特征匹配matchFeatures
+                            特征匹配matchFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('findMultiColors')">
                             多点找色findMultiColors
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('MLKitOCR')">
-                            MLKitOCR文字识别
+                            MLKitOCR文字识别(AutoX不适用)
+                        </el-dropdown-item>
+                        <el-dropdown-item @click.native.prevent.stop="generateCode('MLKitOCR_AUTO_X')">
+                            MLKitOCR_AUTO_X文字识别
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('matchTemplate')">
                             模板匹配matchTemplate
@@ -259,10 +262,10 @@
                             按照分辨率转换坐标convertXY
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('detectFeaturesScale')">
-                            图片特征匹配detectFeaturesScale
+                            图片特征匹配detectFeaturesScale(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('matchingFeatures')">
-                            灰度化阈值化特征匹配matchingFeatures
+                            灰度化阈值化特征匹配matchingFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('randomClick')">
                             随机点击randomClick
@@ -311,13 +314,13 @@
                             区域模板匹配regionalMatchTemplate2
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchingFeatures')">
-                            区域特征匹配regionalMatchingFeatures
+                            区域特征匹配regionalMatchingFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchFeaturesTemplate')">
-                            区域特征匹配模板regionalMatchFeaturesTemplate
+                            区域特征匹配模板regionalMatchFeaturesTemplate(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalClickFeatures')">
-                            区域特征匹配点击regionalClickFeatures
+                            区域特征匹配点击regionalClickFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindMultipleColor2')">
                             区域多点找色regionalFindMultipleColor2
@@ -326,10 +329,10 @@
                             区域多点找色点击regionalClickColor2
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindImgOrFeatures')">
-                            区域找图或者特征匹配regionalFindImgOrFeatures
+                            区域找图或者特征匹配regionalFindImgOrFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalMatchTemplateOrMatchFeatures')">
-                            区域模板匹配或者特征匹配模板regionalMatchTemplateOrMatchFeatures
+                            区域模板匹配或者特征匹配模板regionalMatchTemplateOrMatchFeatures(AutoX不适用)
                         </el-dropdown-item>
                         <el-dropdown-item @click.native.prevent.stop="generateCode('regionalFindCircles2')">
                             区域灰度化阈值化找圆regionalFindCircles2
