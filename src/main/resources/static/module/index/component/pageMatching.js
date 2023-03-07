@@ -188,8 +188,9 @@ utilsObj.getServiceOperateParam = (pageName, operateSymbol) => {
  * @param {*} operateSymbol 操作标志
  * @param {*} functionName 方法名称
  * @param {*} successCall 回调函数
+ * @param {*} extendParam 扩展参数
  */
-utilsObj.executeServiceOperate = (pageName,operateSymbol,functionName,successCall)=>{
+utilsObj.executeServiceOperate = (pageName,operateSymbol,functionName,successCall,extendParam)=>{
      // 获取业务参数对象
      let serviceOperateParam = utilsObj.getServiceOperateParam(pageName, operateSymbol);
      if(!serviceOperateParam){
@@ -198,7 +199,10 @@ utilsObj.executeServiceOperate = (pageName,operateSymbol,functionName,successCal
      }
     // 截全屏
     let img = captureScreen();
- 
+    
+    if(extendParam){
+        Object.assign(serviceOperateParam,extendParam);
+    }
     // 解构参数
     let { position, context, threshold, maxVal, pathName, imgThreshold, color, colorOther, colorThreshold, matchingCount, transparentMask, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg } = serviceOperateParam
  
