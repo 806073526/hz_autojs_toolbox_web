@@ -192,7 +192,7 @@
                                 </div>
                             </div>
                             <div class="phoneOperate d-flex a-center j-center">
-                                <!--<el-link v-show="!item.isDirectory" :underline="false" type="info" @click="phoneDownloadFile(item)">下载</el-link>-->
+                                <el-link :underline="false" type="info" @click="phoneOneKeyDownLoad(item)">下载</el-link>
                                 <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phoneReName(item)">重命名</el-link>
@@ -250,5 +250,4 @@
           </el-button>
         </span>
     </el-dialog>
-    <el-button v-show="fileDialogIsMin" type="danger" @click.stop.native="phoneMaxFileEditorDialog" style="position: fixed;right: 10px;bottom: 10px;">还原文件编辑器</el-button>
 </div>

@@ -178,3 +178,75 @@ export const queryCacheData = (clearCacheFun,queryCacheFun,intervalTime,interval
         }
     },intervalTime);
 };
+
+const getFileInfoByPath = (relativeFilePath)=>{
+    let fileInfo = null;
+    $.ajax({
+        url: getContext() + "/attachmentInfo/querySingleAttachInfoByPath",
+        type: "GET",
+        dataType: "json",
+        data: {
+            "relativeFilePath": relativeFilePath
+        },
+        async:false,
+        success: function (data) {
+            if (data) {
+                if (data.isSuccess) {
+                    fileInfo = data.data;
+                }
+            }
+        },
+        error: function (msg) {
+        }
+    });
+    return fileInfo;
+};
+
+/**
+ * 处理数据在文件变化后
+ * @param changeFilePath 变化文件路径
+ * @param changeBeforeFun 变化前处理函数
+ * @param changeAfterFun 变化后处理函数
+ */
+export const handlerByFileChange = (changeFilePath,changeBeforeFun,changeAfterFun)=>{
+    let fileNoChangeCount = 0;//连续未变化次数
+    let startFlag = false; //开始处理标志
+    // 原始文件信息
+    let sourceFileInfo = getFileInfoByPath(changeFilePath);
+    let sourceFileSize = sourceFileInfo ? sourceFileInfo.fileSize : 0;
+    let sourceLastUpdateTime = sourceFileInfo ? sourceFileInfo.lastUpdateTime : '';
+    if(changeBeforeFun){
+        changeBeforeFun()
+    }
+    // 每隔200毫秒执行一次查询
+    let refreshTimer = setInterval(()=>{
+        // 当前文件信息
+        let curFileInfo = getFileInfoByPath(changeFilePath);
+        let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
+        let curLastUpdateTime = curFileInfo ? curFileInfo.lastUpdateTime : '';
+        if(sourceFileSize !== curFileSize || sourceLastUpdateTime !== curLastUpdateTime){
+            // 内容有变化时开始记录
+            startFlag = true;
+        }
+        // 有一次变化后 文件大小和时间连续没有变化
+        if(sourceFileSize === curFileSize && sourceLastUpdateTime === curLastUpdateTime && startFlag){
+            // 文件未变化计数加一
+            fileNoChangeCount++;
+        } else {
+            sourceFileSize = curFileSize;
+            sourceLastUpdateTime = curLastUpdateTime;
+            fileNoChangeCount = 0;// 重置次数
+        }
+        // 200*3 0.6秒钟未变化 认为图片上传完成
+        if(fileNoChangeCount >= 3){
+            setTimeout(()=>{
+               if(changeAfterFun){
+                   changeAfterFun();
+               }
+            },200);
+            // 关闭定时器
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+    },200);
+};

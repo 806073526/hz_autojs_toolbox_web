@@ -1,4 +1,4 @@
-import {getContext, initFileEditor, queryCacheData} from "./../../../utils/utils.js";
+import {getContext, initFileEditor, queryCacheData, handlerByFileChange} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -13,7 +13,7 @@ $.ajax({
 export default {
     template: template,
     name: 'FileManage',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete', 'updateFileDialogIsMin'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -45,7 +45,6 @@ export default {
             phoneFileEditorName:'',
             fileSavePath: '',// 文件保存路径
             phoneFileSavePath:'',// 手机端文件保存路径
-            fileDialogIsMin:false,
             phoneFileCacheArr:[],// 手机端文件缓存列表
             phoneFileSelectIndex:-1, // 手机端文件选择下标
             /**
@@ -869,6 +868,62 @@ export default {
             }).catch(() => {
             });
         },
+        // 手机端下载目录
+        phoneDownLoadDirectory(row){
+            this.phoneFileLoading = true;
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let phoneZipPath = toPath + row.fileName + '.zip';
+            let relativeFilePath = this.deviceInfo.deviceUuid  + '/tempPhoneDownLoad/' + row.fileName + '.zip';
+            row.previewUrl = '/uploadPath/autoJsTools/'+relativeFilePath;
+            row.fileType = 'zip';
+            // 文件内容变化后处理函数
+            handlerByFileChange(relativeFilePath,()=>{
+                let remoteScript = `
+                files.remove('${phoneZipPath}')
+                $zip.zipDir('${row.pathName}', '${phoneZipPath}')
+                utilsObj.uploadFileToServer('${phoneZipPath}','${relativeFilePath}',()=>{});
+                `;
+                // 删除本地压缩文件-压缩目标文件夹-上传web端
+                this.remoteExecuteScript(remoteScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.downloadFile(row)
+            });
+        },
+        // 手机端下载文件
+        phoneDownLoadFile(row){
+            this.phoneFileLoading = true;
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let phonePath = toPath + row.fileName + '.' + row.fileType;
+            let relativeFilePath = this.deviceInfo.deviceUuid  + '/tempPhoneDownLoad/' + row.fileName + '.' +row.fileType;
+            row.previewUrl = '/uploadPath/autoJsTools/'+relativeFilePath;
+            // 文件内容变化后处理函数
+            handlerByFileChange(relativeFilePath,()=>{
+                let remoteScript = `
+                utilsObj.uploadFileToServer('${phonePath}','${relativeFilePath}',()=>{});
+                `;
+                // 上传web端
+                this.remoteExecuteScript(remoteScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.downloadFile(row)
+            });
+        },
+        // 手机端一键下载
+        phoneOneKeyDownLoad(row){
+            let fileNames = (row.isDirectory || !row.fileType) ? row.fileName : row.fileName +'.' + row.fileType;
+            window.ZXW_VUE.$confirm('是否确认下载' + fileNames + '?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                if((row.isDirectory || !row.fileType)){
+                    this.phoneDownLoadDirectory(row);
+                } else {
+                    this.phoneDownLoadFile(row);
+                }
+            });
+        },
         // 手机端压缩文件
         phoneZipFile(row){
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
@@ -981,18 +1036,18 @@ export default {
         // 关闭弹窗
         phoneCloseFileEditorDialog(){
             this.phoneFileEditVisible = false;
-            this.fileDialogIsMin = false;
+            this.updateFileDialogIsMin(false);
             this.phoneFileCacheArr = []; // 手机端文件缓存列表
             this.phoneFileSelectIndex = -1
         },
         // 最大化弹窗
         phoneMaxFileEditorDialog(){
-            this.fileDialogIsMin = false;
+            this.updateFileDialogIsMin(false);
             this.phoneFileEditVisible = true;
         },
         // 最小化弹窗
         phoneMinFileEditorDialog(){
-            this.fileDialogIsMin = true;
+            this.updateFileDialogIsMin(true);
             this.phoneFileEditVisible = false;
         },
         phoneCloseImagePreviewDialog(){
@@ -1793,8 +1848,16 @@ export default {
                         let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                         if(fileObj){
                             this.phoneScriptEditor.setValue(fileObj.fileContent || '');
-                            // 滚动到记录位置
-                            this.phoneScriptEditor.setScrollPosition(fileObj.scroll,1);
+                            if(!fileObj.scroll){
+                                fileObj.scroll = {
+                                    scrollLeft: 0,
+                                    scrollTop: 0
+                                }
+                            }
+                            if(this.phoneScriptEditor){
+                                // 滚动到记录位置
+                                this.phoneScriptEditor.setScrollPosition(fileObj.scroll,1);
+                            }
                         }
                     } else {
                         let fileObj = {
@@ -1821,8 +1884,10 @@ export default {
                                 };
                             }
                         });
-                        // 滚动到记录位置
-                        this.phoneScriptEditor.setScrollPosition({scrollLeft: 0,scrollTop: 0},1);
+                        if(this.phoneScriptEditor){
+                            // 滚动到记录位置
+                            this.phoneScriptEditor.setScrollPosition({scrollLeft: 0,scrollTop: 0},1);
+                        }
                     }
                 }
                 if(isImage){

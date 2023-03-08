@@ -49,6 +49,9 @@ window.ZXW_VUE = new Vue({
             debugModel:true,
             debugSleep:1000
         },
+        fileDialogIsMin: false,
+        showFileDialogTab:'',
+        showTabScrollTop:0,
         screenDirection: '横屏'
     },
     computed: {
@@ -81,7 +84,19 @@ window.ZXW_VUE = new Vue({
             validSelectDevice: this.validSelectDevice, // 检验设备选择情况
             sendMsgToClient: this.sendMsgToClient, // 发送websocket消息到app
             remoteExecuteScript: this.remoteExecuteScript, // app端远程执行代码
-            getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete }
+            getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete },
+            updateFileDialogIsMin: (value)=>{
+                this.fileDialogIsMin = value;
+                // 当前是最小化操作 且记录了历史tab
+                if(value && this.showFileDialogTab){
+                    // 跳转历史tab
+                    this.activeTab = this.showFileDialogTab;
+                    this.$nextTick(()=>{
+                        // 滚动高度
+                        scrollTo(0,this.showTabScrollTop)
+                    })
+                }
+            }
         }
     },
     methods: {
@@ -200,6 +215,20 @@ window.ZXW_VUE = new Vue({
             let messageStr = '{"functionName":"remoteExecScript","functionParam":["' + encodeURIComponent(scriptContent) + '"]}';
             this.sendMsgToClient('remoteHandler', messageStr, () => {
             })
+        },
+        // 编辑器最大化
+        phoneMaxFileEditorDialog(){
+            this.$nextTick(()=>{
+                // 记录当前tab
+                this.showFileDialogTab = this.activeTab;
+
+                // 获取当前body高度
+                this.showTabScrollTop =  document.documentElement.scrollTop;
+
+                // 然后切换到文件管理
+                this.activeTab = 'fileManage';
+                this.$refs.fileManage.phoneMaxFileEditorDialog();
+            });
         }
     }
 });
