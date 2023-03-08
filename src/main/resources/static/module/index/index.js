@@ -229,6 +229,12 @@ window.ZXW_VUE = new Vue({
                 this.activeTab = 'fileManage';
                 this.$refs.fileManage.phoneMaxFileEditorDialog();
             });
+        },
+        bodyScrollTop(){
+            window.scrollTo(0, 0);
+        },
+        bodyScrollBottom(){
+            window.scrollTo(0, document.documentElement.scrollHeight);
         }
     }
 });
