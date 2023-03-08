@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.zjh.zxw.common.util.CacheMapUtils;
 import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
@@ -39,7 +40,7 @@ public class AutoJsWsServerEndpoint {
      */
     private static AtomicInteger onlineCount = new AtomicInteger(0);
 
-    private static RedisTemplate<String, Object> redisTemplate;
+//    private static RedisTemplate<String, Object> redisTemplate;
 
     private static ConcurrentHashMap<String, AutoJsSession> sessionMap = new ConcurrentHashMap<String, AutoJsSession>();
 
@@ -133,15 +134,16 @@ public class AutoJsWsServerEndpoint {
         autoJsSession.setScreenHeight(deviceHeight);
         sessionMap.put(deviceUuid, autoJsSession);
         this.autoJsSession = autoJsSession;
-        redisTemplate.opsForHash().put(SESSION_CODE, deviceUuid, JSONUtil.toJsonStr(autoJsSession));
+//        redisTemplate.opsForHash().put(SESSION_CODE, deviceUuid, JSONUtil.toJsonStr(autoJsSession));
+//        CacheMapUtils.Put(SESSION_CODE);
 
-        String key = "already_connect_"+deviceUuid;
-        String value = StrHelper.getObjectValue(redisTemplate.opsForValue().get(key));
-        if(StringUtils.isBlank(value) && Objects.nonNull(emailConfig) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
-            // 间隔分钟
-            redisTemplate.opsForValue().set(key, deviceUuid, NumberHelper.getOrDef(emailConfig.getReceiveSpaceMinute(),0) * 60, TimeUnit.SECONDS);
-            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","设备uuid："+deviceUuid+"\r\n设备宽度："+deviceWidth+"\r\n设备高度:"+deviceHeight+"\r\n连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT));
-        }
+//        String key = "already_connect_"+deviceUuid;
+//        String value = StrHelper.getObjectValue(redisTemplate.opsForValue().get(key));
+//        if(StringUtils.isBlank(value) && Objects.nonNull(emailConfig) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
+//            // 间隔分钟
+//            redisTemplate.opsForValue().set(key, deviceUuid, NumberHelper.getOrDef(emailConfig.getReceiveSpaceMinute(),0) * 60, TimeUnit.SECONDS);
+//            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","设备uuid："+deviceUuid+"\r\n设备宽度："+deviceWidth+"\r\n设备高度:"+deviceHeight+"\r\n连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT));
+//        }
         autoJsSession.sendText("连接成功！" + deviceUuid);
     }
 
@@ -171,7 +173,7 @@ public class AutoJsWsServerEndpoint {
             // 设置到本地缓存
             sessionMap.put(deviceUUID, autoJsSession);
             // 设置redis缓存
-            redisTemplate.opsForHash().put(SESSION_CODE, deviceUUID, JSONUtil.toJsonStr(autoJsSession));
+//            redisTemplate.opsForHash().put(SESSION_CODE, deviceUUID, JSONUtil.toJsonStr(autoJsSession));
             return;
         }
         // 判断字符串不为空 且可以解析为json字符串
@@ -201,7 +203,7 @@ public class AutoJsWsServerEndpoint {
                     this.autoJsSession.setScreenHeight(deviceHeight);
                     this.autoJsSession.setScreenWidth(deviceWidth);
                     this.autoJsSession.setPassword(password);
-                    this.autoJsSession.setOtherPropertyJson(new String(Base64.getDecoder().decode(otherPropertyJson.getBytes())));
+//                    this.autoJsSession.setOtherPropertyJson(new String(Base64.getDecoder().decode(otherPropertyJson.getBytes())));
                     // 设置到本地缓存
                     sessionMap.put(deviceUUID, this.autoJsSession);
                 }
@@ -234,7 +236,7 @@ public class AutoJsWsServerEndpoint {
 
     @Autowired
     public void setApplicationContext(RedisTemplate<String, Object> redisTemplateParam) throws BeansException {
-        AutoJsWsServerEndpoint.redisTemplate = redisTemplateParam;
+//        AutoJsWsServerEndpoint.redisTemplate = redisTemplateParam;
     }
 
     @Autowired

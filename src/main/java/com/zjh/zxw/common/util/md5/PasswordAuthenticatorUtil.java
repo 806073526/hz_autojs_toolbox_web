@@ -1,13 +1,12 @@
 package com.zjh.zxw.common.util.md5;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 
 /**
@@ -22,6 +21,7 @@ public class PasswordAuthenticatorUtil {
 	public static final int ALEN = 16;
 	
 	public static final String defaultPassWord="123456abc";
+
 
 	/**
 	 * @param password
@@ -40,9 +40,8 @@ public class PasswordAuthenticatorUtil {
 			md.update(salt);
 			md.update(password.getBytes("UTF8"));
 			byte digest[] = md.digest();
-			BASE64Encoder encoder = new BASE64Encoder();
-			String saltText = encoder.encode(salt);
-			String encryptPwd = encoder.encode(digest);
+			String saltText = new String(Base64.getEncoder().encode(salt));
+			String encryptPwd = new String(Base64.getEncoder().encode(digest));
 			return saltText + encryptPwd;
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
@@ -62,18 +61,20 @@ public class PasswordAuthenticatorUtil {
 		String encryptPwd = originalPassword.substring(
 				PasswordAuthenticatorUtil.ALEN, originalPassword.length());
 		String salt = originalPassword.substring(0, PasswordAuthenticatorUtil.ALEN);
-		boolean flag = false;
+		boolean flag;
 		try {
-			BASE64Decoder dncoder = new BASE64Decoder();
-			byte saltData[] = dncoder.decodeBuffer(salt);
+//			BASE64Decoder dncoder = new BASE64Decoder();
+//			byte saltData[] = dncoder.decodeBuffer(salt);
+			byte[] saltData = Base64.getDecoder().decode(salt);
 			MessageDigest md;
 			md = MessageDigest.getInstance("MD5");
 			md.update(saltData);
 			md.update(inputPassword.getBytes("UTF8"));
-			byte digest[] = md.digest();
-			BASE64Encoder encoder = new BASE64Encoder();
-			String encryptInputPwd = encoder.encode(digest);
-			flag = encryptPwd.equals(encryptInputPwd);
+			byte[] digest = md.digest();
+//			BASE64Encoder encoder = new BASE64Encoder();
+//			String encryptInputPwd = encoder.encode(digest);
+			byte[] encryptInputPwd = Base64.getDecoder().decode(digest);
+			flag = encryptPwd.equals(new String(encryptInputPwd));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (NoSuchAlgorithmException e) {
