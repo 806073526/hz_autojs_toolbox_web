@@ -51,12 +51,18 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     private String uploadPath;
 
     private String getRootPath() {
+        File file = new File(uploadPath);
+        if(!file.exists()){
+            uploadPath = "C:\\zxwAjUpload\\";
+        }
         return uploadPath + "autoJsTools" + File.separator;
     }
 
     private String getPreviewRootUrl() {
         return "uploadPath/autoJsTools/";
     }
+
+
 
     @Override
     public List<AttachInfo> queryAttachInfoListByPath(String relativeFilePath){

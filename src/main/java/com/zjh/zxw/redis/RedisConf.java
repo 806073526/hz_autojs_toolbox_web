@@ -1,3 +1,4 @@
+/*
 package com.zjh.zxw.redis;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,7 +15,6 @@ public class RedisConf {
     @Bean
     @ConditionalOnMissingBean
     public RedisTemplate<String,Object> rt(RedisConnectionFactory factory) {
-        System.out.println(1111);
         RedisTemplate<String,Object> template = new RedisTemplate<String,Object>();
         template.setConnectionFactory(factory);
         RedisSerializer<String> stringSerializer = new StringRedisSerializer();
@@ -22,3 +22,4 @@ public class RedisConf {
         return template;
     }
 }
+*/

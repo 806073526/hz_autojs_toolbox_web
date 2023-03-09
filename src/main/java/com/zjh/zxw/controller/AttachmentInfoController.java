@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,9 +45,6 @@ public class AttachmentInfoController extends BaseController {
 
     @Autowired
     private AttachmentInfoService attachmentInfoService;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
@@ -224,6 +220,10 @@ public class AttachmentInfoController extends BaseController {
     @ApiOperation(value = "获取绝对路径前缀", notes = "获取绝对路径前缀")
     @GetMapping("/getAbsolutePrePath")
     public R<String> getAbsolutePrePath() {
+        File file = new File(uploadPath);
+        if(!file.exists()){
+            uploadPath = "C:\\zxwAjUpload\\";
+        }
         return success(uploadPath + "autoJsTools" + File.separator);
     }
 

@@ -15,21 +15,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@ServerEndpoint("/autoJsWs/{deviceUuid}/{deviceHeight}/{deviceWidth}")
+@ServerEndpoint(value = "/autoJsWs/{deviceUuid}/{deviceHeight}/{deviceWidth}", configurator = WebSocketConfigurator.class)
 @Slf4j
 @EnableAutoConfiguration
 @Component
@@ -39,9 +38,9 @@ public class AutoJsWsServerEndpoint {
      */
     private static AtomicInteger onlineCount = new AtomicInteger(0);
 
-    private static RedisTemplate<String, Object> redisTemplate;
-
     private static ConcurrentHashMap<String, AutoJsSession> sessionMap = new ConcurrentHashMap<String, AutoJsSession>();
+
+    private static ConcurrentHashMap<String, Object> curConnectMap = new ConcurrentHashMap<String, Object>();
 
     private static String SESSION_CODE = "autoJsSession";
 
@@ -131,16 +130,17 @@ public class AutoJsWsServerEndpoint {
         autoJsSession.setConnectTime(LocalDateTime.now());
         autoJsSession.setScreenWidth(deviceWidth);
         autoJsSession.setScreenHeight(deviceHeight);
+
+        Map<String, Object> userProperties = session.getUserProperties();
+        String IP = (String) userProperties.get("IP");
         sessionMap.put(deviceUuid, autoJsSession);
         this.autoJsSession = autoJsSession;
-        redisTemplate.opsForHash().put(SESSION_CODE, deviceUuid, JSONUtil.toJsonStr(autoJsSession));
-
-        String key = "already_connect_"+deviceUuid;
-        String value = StrHelper.getObjectValue(redisTemplate.opsForValue().get(key));
-        if(StringUtils.isBlank(value) && Objects.nonNull(emailConfig) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
-            // 间隔分钟
-            redisTemplate.opsForValue().set(key, deviceUuid, NumberHelper.getOrDef(emailConfig.getReceiveSpaceMinute(),0) * 60, TimeUnit.SECONDS);
-            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","设备uuid："+deviceUuid+"\r\n设备宽度："+deviceWidth+"\r\n设备高度:"+deviceHeight+"\r\n连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT));
+        // 未包含的设备id
+        if(!curConnectMap.containsKey(deviceUuid) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
+            // 推送上线消息
+            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","设备uuid："+deviceUuid+"<br>设备宽度："+deviceWidth+"<br>设备高度："+deviceHeight+"<br>连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT)+"<br>服务端IP："+ InetAddress.getLocalHost().getHostAddress() +"<br>客户端IP："+IP);
+            // 记录
+            curConnectMap.put(deviceUuid,LocalDateTime.now());
         }
         autoJsSession.sendText("连接成功！" + deviceUuid);
     }
@@ -150,7 +150,6 @@ public class AutoJsWsServerEndpoint {
      */
     @OnClose
     public void onClose(@PathParam("deviceUuid") String deviceUuid) {
-        // redisTemplate.opsForHash().delete(SESSION_CODE, deviceUuid);
         sessionMap.remove(deviceUuid);
         System.out.println("关闭连接:" + deviceUuid);
     }
@@ -170,8 +169,6 @@ public class AutoJsWsServerEndpoint {
             this.autoJsSession.setLastHeartTime(LocalDateTime.now());
             // 设置到本地缓存
             sessionMap.put(deviceUUID, autoJsSession);
-            // 设置redis缓存
-            redisTemplate.opsForHash().put(SESSION_CODE, deviceUUID, JSONUtil.toJsonStr(autoJsSession));
             return;
         }
         // 判断字符串不为空 且可以解析为json字符串
@@ -230,11 +227,6 @@ public class AutoJsWsServerEndpoint {
     @OnError
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
-    }
-
-    @Autowired
-    public void setApplicationContext(RedisTemplate<String, Object> redisTemplateParam) throws BeansException {
-        AutoJsWsServerEndpoint.redisTemplate = redisTemplateParam;
     }
 
     @Autowired

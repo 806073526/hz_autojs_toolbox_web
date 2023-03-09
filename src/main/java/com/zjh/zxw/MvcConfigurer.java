@@ -16,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class MvcConfigurer extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        File file = new File(uploadPath);
+        if(!file.exists()){
+            uploadPath = "C:\\zxwAjUpload\\";
+        }
         //静态资源访问路径配置
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
         //本地资源访问路径配置

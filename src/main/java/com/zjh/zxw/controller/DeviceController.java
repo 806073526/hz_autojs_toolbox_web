@@ -12,7 +12,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,10 +36,6 @@ import static com.zjh.zxw.base.R.SERVICE_ERROR;
 @RequestMapping("/device")
 @Api(value = "DeviceController", tags = "设备控制")
 public class DeviceController extends BaseController {
-
-
-    @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
 
 
     /**
