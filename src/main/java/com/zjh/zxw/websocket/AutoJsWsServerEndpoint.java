@@ -214,7 +214,7 @@ public class AutoJsWsServerEndpoint {
      */
     @OnMessage
     public void onMessage(String message, Session session, @PathParam("deviceUuid") String deviceUuid) throws IOException {
-        log.info("用户消息:" + deviceUuid + ",报文:" + message);
+        // log.info("用户消息:" + deviceUuid + ",报文:" + message);
         receiveMessage(session, message);
     }
 
