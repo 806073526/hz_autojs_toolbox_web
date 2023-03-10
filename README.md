@@ -13,4 +13,4 @@
 ![输入图片说明](%E8%B5%9E%E8%B5%8F.png)
 
 #### 软件架构
-JAVA8+springboot+redis
+JAVA8+springboot
