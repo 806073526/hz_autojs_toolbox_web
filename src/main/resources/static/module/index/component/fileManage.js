@@ -649,9 +649,9 @@ export default {
                         let remoteScript = `let webPath = utilsObj.getDeviceUUID()+ '${value}';\r\n`;
                         checkFileList.forEach(item=>{
                             if(item.isDirectory){
-                                remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${item.fileName}',"GET",null,()=>{});\r\n`;
+                                remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${item.fileName}',"GET",null,()=>{toastLog("同步完成")});\r\n`;
                             } else {
-                                remoteScript +=`utilsObj.uploadFileToServer('${item.pathName}',webPath + '${item.fileName}' + '.'+ '${item.fileType}',()=>{});\r\n`;
+                                remoteScript +=`utilsObj.uploadFileToServer('${item.pathName}',webPath + '${item.fileName}' + '.'+ '${item.fileType}',()=>{toastLog("同步完成")});\r\n`;
                             }
                         });
                         this.remoteExecuteScript(remoteScript);
@@ -684,18 +684,23 @@ export default {
                     return true;
                 }
             }).then(({value}) => {
-                // 设置同步文件集合  暂不支持同步目录
-                let remoteScript = `let webPath = utilsObj.getDeviceUUID()+ '${value}';\r\n`;
-                if(row.isDirectory){
-                    remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${row.fileName}',"GET",null,()=>{});\r\n`;
-                } else {
-                    remoteScript +=`utilsObj.uploadFileToServer('${row.pathName}',webPath + '${row.fileName}' + '.'+ '${row.fileType}',()=>{});\r\n`;
-                }
-                this.remoteExecuteScript(remoteScript);
-                setTimeout(()=>{
+                this.phoneFileLoading = true;
+                let relativeFilePath = this.deviceInfo.deviceUuid  + value + ((row.isDirectory || !row.fileType) ? row.fileName : row.fileName +'.' + row.fileType);
+                // 文件内容变化后处理函数
+                handlerByFileChange(relativeFilePath,()=>{
+                    // 设置同步文件集合  暂不支持同步目录
+                    let remoteScript = ``;
+                    if(row.isDirectory){
+                        remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="${relativeFilePath},"GET",null,()=>{toastLog("同步完成")});\r\n`;
+                    } else {
+                        remoteScript +=`utilsObj.uploadFileToServer('${row.pathName}','${relativeFilePath}',()=>{toastLog("同步完成")});\r\n`;
+                    }
+                    this.remoteExecuteScript(remoteScript);
+                },()=>{
+                    this.phoneFileLoading = false;
                     // 刷新web目录
                     this.refreshWebDir();
-                },500);
+                });
             }).catch(() => {
             });
         },

@@ -3,6 +3,7 @@ package com.zjh.zxw.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.common.util.FileUtil;
 import com.zjh.zxw.common.util.UnZipUtils;
+import com.zjh.zxw.common.util.ZipApacheUtils;
 import com.zjh.zxw.common.util.ZipUtils;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AttachInfo;
@@ -351,11 +352,20 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         if(!"zip".equals(fileType)){
             throw new BusinessException(file.getPath() + "不是zip格式文件");
         }
-        if(StringUtils.isBlank(targetPathName)){
-            UnZipUtils.decompress(sourcePathName);
-        } else {
-            UnZipUtils.decompress(sourcePathName,targetPathName);
+
+        try {
+            if(StringUtils.isBlank(targetPathName)){
+                UnZipUtils.decompress(sourcePathName);
+            } else {
+                UnZipUtils.decompress(sourcePathName,targetPathName);
+            }
+        }catch (Exception e){
+            if(e.getMessage().contains("only DEFLATED entries can have EXT descriptor")){
+                log.info("解压失败，尝试另外的解压方法");
+                ZipApacheUtils.unZip(sourcePathName);
+            }
         }
+
     }
 
     @Override
