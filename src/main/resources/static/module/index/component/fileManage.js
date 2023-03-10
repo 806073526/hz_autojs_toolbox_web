@@ -1877,7 +1877,7 @@ export default {
                         // 初始化文件编辑器
                         initFileEditor(this,'phoneScriptEditor','phoneFileEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
                             let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
-                            if(fileObj && fileObj.fileContent){
+                            if(fileObj && fileObj.fileContent!==undefined){
                                 this.phoneFileCacheArr[this.phoneFileSelectIndex].fileContent = value;
                             }
                         },(e)=>{
