@@ -250,3 +250,77 @@ export const handlerByFileChange = (changeFilePath,changeBeforeFun,changeAfterFu
         }
     },200);
 };
+
+
+const clearAppMsgServiceKey = (appMsgServiceKey)=>{
+    $.ajax({
+        url: getContext() + "/attachmentInfo/clearAppMsgServiceKey",
+        type: "GET",
+        dataType: "json",
+        data: {
+            "appMsgServiceKey": appMsgServiceKey
+        },
+        async:false,
+        success: function (data) {
+            if (data) {
+            }
+        },
+        error: function (msg) {
+        }
+    });
+};
+
+const queryAppMsgServiceKey = (appMsgServiceKey)=>{
+    let serviceValue = null;
+    $.ajax({
+        url: getContext() + "/attachmentInfo/queryAppMsgServiceKey",
+        type: "GET",
+        dataType: "json",
+        data: {
+            "appMsgServiceKey": appMsgServiceKey
+        },
+        async:false,
+        success: function (data) {
+            if (data) {
+                if (data.isSuccess) {
+                    serviceValue = data.data;
+                }
+            }
+        },
+        error: function (msg) {
+        }
+    });
+    return serviceValue;
+};
+
+
+
+/**
+ * 处理数据在app消息缓存变化后
+ * @param appMsgServiceKey
+ * @param changeBeforeFun
+ * @param changeAfterFun
+ */
+export const handlerAppByCacheChange = (appMsgServiceKey,changeBeforeFun,changeAfterFun)=>{
+    // 先清除缓存
+    clearAppMsgServiceKey(appMsgServiceKey);
+    // 原始文件信息
+    let sourceServiceValue = queryAppMsgServiceKey(appMsgServiceKey);
+    if(changeBeforeFun){
+        changeBeforeFun()
+    }
+    // 每隔200毫秒执行一次查询
+    let refreshTimer = setInterval(()=>{
+        let curServiceValue =  queryAppMsgServiceKey(appMsgServiceKey);
+        if(sourceServiceValue !== curServiceValue){
+            setTimeout(()=>{
+                if(changeAfterFun){
+                    changeAfterFun();
+                }
+            },200);
+            // 关闭定时器
+            clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+    },200);
+};

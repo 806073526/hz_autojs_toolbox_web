@@ -122,13 +122,13 @@ export default {
             if ("竖屏" === this.screenDirection) {
                 this.remoteHandler.param1.x1 = 0;
                 this.remoteHandler.param1.y1 = 0;
-                this.remoteHandler.param1.x2 = this.deviceInfo.screenWidth;
-                this.remoteHandler.param1.y2 = this.deviceInfo.screenHeight;
+                this.remoteHandler.param1.x2 = this.deviceInfo.standardWidth;
+                this.remoteHandler.param1.y2 = this.deviceInfo.standardHeight;
             } else {
                 this.remoteHandler.param1.x1 = 0;
                 this.remoteHandler.param1.y1 = 0;
-                this.remoteHandler.param1.x2 = this.deviceInfo.screenHeight;
-                this.remoteHandler.param1.y2 = this.deviceInfo.screenWidth;
+                this.remoteHandler.param1.x2 = this.deviceInfo.standardHeight;
+                this.remoteHandler.param1.y2 = this.deviceInfo.standardWidth;
             }
             if (showMessage) {
                 window.ZXW_VUE.$notify.success({message: '操作成功', duration: '1000'});

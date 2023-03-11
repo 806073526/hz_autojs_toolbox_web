@@ -1,4 +1,4 @@
-import {getContext, initFileEditor, queryCacheData, handlerByFileChange} from "./../../../utils/utils.js";
+import {getContext, initFileEditor, queryCacheData, handlerByFileChange, handlerAppByCacheChange} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -1485,14 +1485,27 @@ export default {
         },
         // 手机端下载脚手架项目
         phoneDownLoadGameScript(){
-            let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/")
-            utilsObj.downLoadFile("https://www.zjh336.cn/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{$zip.unzip('/sdcard/appSync/hz_autojs_game_script.zip', '/sdcard/appSync/');toastLog("初始化脚手架项目完成");});`
-            this.remoteExecuteScript(downLoadGameScript);
-            this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
-            setTimeout(()=>{
+            this.phoneFileLoading = true;
+            // 手机端下载脚手架项目 并且zip解压完成后 web端刷新手机目录
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished",()=>{
+                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                utilsObj.downLoadFile("https://www.zjh336.cn/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{
+                    $zip.unzip('/sdcard/appSync/hz_autojs_game_script.zip', '/sdcard/appSync/');
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"unzipFinished",
+                        "serviceValue":"true"
+                    }
+                    events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    toastLog("初始化脚手架项目完成");
+                })`;
+                this.remoteExecuteScript(downLoadGameScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
-            },500);
+            });
         },
         // 手机端初始化运行文件
         phoneInitFile(){

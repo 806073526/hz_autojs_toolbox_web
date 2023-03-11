@@ -46,10 +46,25 @@ public class AutoJsWsServerEndpoint {
 
     private static EmailConfig emailConfig;
 
+    // app消息map
+    // key deviceUUID_serviceKey   value:具体值
+    private static ConcurrentHashMap<String, String> appMessageMap = new ConcurrentHashMap<String,String>();
+
+
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     private AutoJsSession autoJsSession;
+
+    // 清除业务key的值
+    public static void clearServiceKey(String appMsgServiceKey){
+        appMessageMap.remove(appMsgServiceKey);
+    }
+
+    // 查询业务key的值
+    public static String queryServiceKey(String appMsgServiceKey){
+        return appMessageMap.get(appMsgServiceKey);
+    }
 
     public static String getOtherPropertyJson(String deviceUUID){
         if(!sessionMap.containsKey(deviceUUID)){
@@ -201,6 +216,18 @@ public class AutoJsWsServerEndpoint {
                     this.autoJsSession.setOtherPropertyJson(new String(Base64.getDecoder().decode(otherPropertyJson.getBytes())));
                     // 设置到本地缓存
                     sessionMap.put(deviceUUID, this.autoJsSession);
+                }
+            // 更新业务key
+            } else if("updateServiceKey".equals(action)){
+                if(StringUtils.isNotBlank(messageStr)){
+                    // 解析json对象
+                    JSONObject messageStrData = JSONObject.parseObject(new String(Base64.getDecoder().decode(messageStr.getBytes())));
+                    String deviceUUID = messageStrData.getString("deviceUUID");
+                    String serviceKey = messageStrData.getString("serviceKey");
+                    String serviceValue =  messageStrData.getString("serviceValue");
+                    log.info("action:"+action+" deviceUUID:"+deviceUUID +" serviceKey:"+serviceKey + "serviceValue:"+serviceValue);
+                    // 设置到本地缓存
+                    appMessageMap.put(deviceUUID+"_"+serviceKey,serviceValue);
                 }
             }
         }

@@ -160,8 +160,8 @@ export default {
             pageSettingParamArray.forEach((page,pageIndex)=>{
                 pageOperateScriptObj[page.pageName]=page.operateScript;
             });
-            let remoteScript = `
-/**
+            let remoteScript = `      
+ /**
  * 获取业务操作参数
  * @param {*} pageName 页面名称
  * @param {*} operateSymbol 操作标志
@@ -178,8 +178,15 @@ utilsObj.getServiceOperateParam = (pageName, operateSymbol) => {
     }
     // 获取分辨率对应的值
     let serviceParamObj = serviceParam[device.width + "_" + device.height]
+  
+    let notNeedConvert = false;
+   // 如果当前不是标准的分辨率 且获取到了特定的分辨率的配置
+    if(!utilsObj.getIsStandard() && serviceParamObj){
+        notNeedConvert = true;
+    }
     // 未适配当前设备 则读取标准的
-    serviceParamObj = serviceParamObj || serviceParamObj[config.screenWidth + "_" + config.screenHeight]
+    serviceParamObj = serviceParamObj || serviceParam[commonStorage.get('standardWidth') + "_" + commonStorage.get('standardHeight')]
+    serviceParamObj.notNeedConvert = notNeedConvert;
     return serviceParamObj;
 }
 /**
@@ -188,107 +195,112 @@ utilsObj.getServiceOperateParam = (pageName, operateSymbol) => {
  * @param {*} operateSymbol 操作标志
  * @param {*} functionName 方法名称
  * @param {*} successCall 回调函数
- * @param {*} extendParam 扩展参数
+ * @param {*} extendParam 拓展参数
  */
-utilsObj.executeServiceOperate = (pageName,operateSymbol,functionName,successCall,extendParam)=>{
-     // 获取业务参数对象
-     let serviceOperateParam = utilsObj.getServiceOperateParam(pageName, operateSymbol);
-     if(!serviceOperateParam){
-      // 未获取到直接返回
-      return;
-     }
+utilsObj.executeServiceOperate = (pageName, operateSymbol, functionName, successCall, extendParam) => {
+    // 获取业务参数对象
+    let serviceOperateParam = utilsObj.getServiceOperateParam(pageName, operateSymbol);
+    if (!serviceOperateParam) {
+        // 未获取到直接返回
+        return;
+    }
     // 截全屏
     let img = captureScreen();
-    
-    if(extendParam){
-        Object.assign(serviceOperateParam,extendParam);
+
+    if (extendParam) {
+        Object.assign(serviceOperateParam, extendParam);
     }
+    // 设置临时参数
+    commonStorage.put("notNeedConvert", serviceOperateParam.notNeedConvert ? true : false)
+
     // 解构参数
     let { position, context, threshold, maxVal, pathName, imgThreshold, color, colorOther, colorThreshold, matchingCount, transparentMask, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg } = serviceOperateParam
- 
-     let x1 = position[0];
-     let y1 = position[1];
-     let x2 = position[2];
-     let y2 = position[3];
-     let matchingImgPath = pathName ? pathName.replace('${this.sourcePathName}','${this.targetPathName}') : pathName;
-     let matchingContent = context;
-     // 读取图片
-     let targetImg = null;
-     
-     // 结果
-     let result;
-     
-     // 根据方法名执行参数
-     switch (functionName) {
-      // 区域找图
-      case "regionalFindImg2":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, isOpenGray, isOpenThreshold, canvasMsg);
-       break;
-      //  区域找图点击
-      case "regionalClickImg2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingImgPath, imgThreshold, isOpenGray, isOpenThreshold, successCall);
-       break;
-      // 区域文字识别 
-      case "regionalAnalysisChart2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold, canvasMsg);
-       break;
-      //  区域文字识别获取坐标
-      case "regionalAnalysisChartPosition2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold);
-       break;
-      //  区域文字识别点击
-      case "regionalClickText2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
-       break;
-            //  区域文字识别点击 支持多条件匹配
-      case "regionalClickText3":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
-       break;    
-      //  区域匹配图片
-      case "regionalMatchTemplate2":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, matchingCount, transparentMask, isOpenGray, isOpenThreshold, canvasMsg);
-       break;
-      //  区域特征匹配
-      case "regionalMatchingFeatures":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
-       break;
-      //  区域匹配特征
-      case "regionalMatchFeaturesTemplate":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, matchingCount, canvasMsg);
-       break; 
-      //  区域多点找色
-      case "regionalFindMultipleColor2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, canvasMsg);
-       break; 
-      //  区域多点找色点击
-      case "regionalClickColor2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, successCall);
-       break; 
-      //  区域找图或者特征匹配
-      case "regionalFindImgOrFeatures":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
-       break; 
-      //  区域匹配图片或者特征
-      case "regionalMatchTemplateOrMatchFeatures":
-       targetImg = images.read(pathName);
-       result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
-       break; 
-      //  区域找圆
-      case "regionalFindCircles2":
-       result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold);
-       break;
-      default:
-     }
-   // 回收图片
-   utilsObj.recycleNull(img);
-   utilsObj.recycleNull(targetImg);
-   return result;
-}            
+
+    let x1 = position[0];
+    let y1 = position[1];
+    let x2 = position[2];
+    let y2 = position[3];
+    let matchingImgPath = pathName;
+    let matchingContent = context;
+    // 读取图片
+    let targetImg = null;
+
+    // 结果
+    let result;
+
+    // 根据方法名执行参数
+    switch (functionName) {
+        // 区域找图
+        case "regionalFindImg2":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域找图点击
+        case "regionalClickImg2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingImgPath, imgThreshold, isOpenGray, isOpenThreshold, successCall);
+            break;
+        // 区域文字识别
+        case "regionalAnalysisChart2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域文字识别获取坐标
+        case "regionalAnalysisChartPosition2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold);
+            break;
+        // 区域文字识别点击
+        case "regionalClickText2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
+            break;
+        // 区域文字识别点击 支持多条件匹配
+        case "regionalClickText3":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, successCall);
+            break;
+        // 区域匹配图片
+        case "regionalMatchTemplate2":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, matchingCount, transparentMask, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域特征匹配
+        case "regionalMatchingFeatures":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域匹配特征
+        case "regionalMatchFeaturesTemplate":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, matchingCount, canvasMsg);
+            break;
+        // 区域多点找色
+        case "regionalFindMultipleColor2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域多点找色点击
+        case "regionalClickColor2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, color, colorOther, colorThreshold, isOpenGray, isOpenThreshold, successCall);
+            break;
+        // 区域找图或者特征匹配
+        case "regionalFindImgOrFeatures":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域匹配图片或者特征
+        case "regionalMatchTemplateOrMatchFeatures":
+            targetImg = images.read(pathName);
+            result = utilsObj[functionName](img, targetImg, x1, y1, x2, y2, threshold, maxVal, imgThreshold, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg);
+            break;
+        // 区域找圆
+        case "regionalFindCircles2":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold);
+            break;
+        default:
+    }
+    utilsObj.recycleNull(targetImg);
+    // 回收图片
+    utilsObj.recycleNull(img);
+    // 清除临时参数
+    commonStorage.remove("notNeedConvert")
+    return result;
+}
 let pageSetting=${this.convertToJson(true)};
 let pageOperateScriptObj=${JSON.stringify(pageOperateScriptObj)};
 let allScreenImg = captureScreen();

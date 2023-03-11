@@ -1,28 +1,41 @@
 package com.zjh.zxw.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
+import com.zjh.zxw.domain.dto.FileBase64DTO;
+import com.zjh.zxw.domain.dto.FileBase64ParamDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Decoder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
 
@@ -58,6 +71,21 @@ public class AttachmentInfoController extends BaseController {
 
     // 在线日志map key为deviceUUID
     private final static ConcurrentHashMap<String, String> onlineLogMap = new ConcurrentHashMap<String,String>();
+
+    @ApiOperation(value = "清理app消息业务key", notes = "清理app消息业务key")
+    @GetMapping("/clearAppMsgServiceKey")
+    public R<Boolean> clearAppMsgServiceKey(@ApiParam("deviceUUID_serviceKey") @RequestParam(value = "appMsgServiceKey") String appMsgServiceKey){
+        AutoJsWsServerEndpoint.clearServiceKey(appMsgServiceKey);
+        return success(true);
+    }
+
+    @ApiOperation(value = "查询app消息业务key", notes = "查询app消息业务key")
+    @GetMapping("/queryAppMsgServiceKey")
+    public R<String> queryAppMsgServiceKey(@ApiParam("deviceUUID_serviceKey") @RequestParam(value = "appMsgServiceKey") String appMsgServiceKey){
+        String serviceValue = AutoJsWsServerEndpoint.queryServiceKey(appMsgServiceKey);
+        return success(serviceValue);
+    }
+
 
     @ApiOperation(value = "清理全部文件目录结构", notes = "清理全部文件目录结构")
     @GetMapping("/clearFileDirectoryMapAll")
@@ -452,6 +480,58 @@ public class AttachmentInfoController extends BaseController {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return fail("删除文件异常！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 接口开放给前端 用于那些多个文件压缩的 支持多层级
+     * @param data
+     */
+    @ApiOperation(value = "将base64字符串格式文件压缩导出(支持多个文件,也包括可以压缩多层级的文件夹)", notes = "将base64字符串格式文件压缩导出(支持多个文件,也包括可以压缩多层级的文件夹)")
+    @PostMapping(value = "/exportBase64StrFileAndCompressV2", produces = "application/octet-stream")
+    public void exportBase64StrFileAndCompressComV2(@RequestBody FileBase64DTO data) {
+//        MultipartFile file = Base64DecodeMultipartFile.base64Convert(base);
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream())) {
+            //下载压缩包
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(StrHelper.getOrDef(data.getZipName(),"附件") +".zip", "UTF-8"));
+            for (FileBase64ParamDTO field : data.getData()) {
+                recursionCompressExport(zipOutputStream, field,"");
+            }
+            zipOutputStream.flush();
+            // zipOutputStream.write( base.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void recursionCompressExport(ZipOutputStream zipOutputStream, FileBase64ParamDTO field,String folderSuffix) throws IOException {
+        if ((!field.getIsCatalogue()|| Objects.isNull(field.getIsCatalogue()))&& CollectionUtil.isEmpty(field.getChildren())){
+            String fileSuffix= field.getFileSuffix();
+            String fileName= StringUtils.isNotBlank(field.getFileName())? field.getFileName():"excel";
+            ZipEntry zipEntry = new ZipEntry(folderSuffix+fileName+fileSuffix);
+            zipOutputStream.putNextEntry(zipEntry);
+            BASE64Decoder decoder = new BASE64Decoder();
+            byte[] bytes = decoder.decodeBuffer(field.getBase64Str().split(StringPool.COMMA)[1].trim());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write(bytes);
+            zipOutputStream.write(baos.toByteArray());
+            baos.flush();
+        }else {
+            folderSuffix=folderSuffix+field.getFileName()+"\\";
+            if (CollectionUtil.isEmpty(field.getChildren())){
+                String fileName= StringUtils.isNotBlank(field.getFileName())? field.getFileName():"excel";
+                ZipEntry zipEntry = new ZipEntry(folderSuffix);
+                zipOutputStream.putNextEntry(zipEntry);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                zipOutputStream.write(baos.toByteArray());
+                zipOutputStream.closeEntry();
+            }else {
+                for (FileBase64ParamDTO child : field.getChildren()) {
+                    recursionCompressExport(zipOutputStream, child, folderSuffix);
+                }
+            }
         }
     }
 }
