@@ -104,19 +104,23 @@ export default {
                     if (stop !== undefined) {
                         timerFlag = false;
                     }
-                    sleep(100);
-                    sleep(${this.appSpace});
-                    let logContent = utilsObj.getOnlineLog();
-                    // url编码base64加密
-                    let result = $base64.encode(encodeURI(logContent));
-                    http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateLogMap', {
-                        headers: {
-                            "deviceUUID": commonStorage.get('deviceUUID')
-                        },
-                        method: 'POST',
-                        contentType: 'application/json',
-                        body: JSON.stringify({ 'key': commonStorage.get('deviceUUID'), 'logJson': result })
-                    }, (e) => { });
+                    try{
+                        sleep(100);
+                        sleep(${this.appSpace});
+                        let logContent = utilsObj.getOnlineLog();
+                        // url编码base64加密
+                        let result = $base64.encode(encodeURI(logContent));
+                        http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateLogMap', {
+                            headers: {
+                                "deviceUUID": commonStorage.get('deviceUUID')
+                            },
+                            method: 'POST',
+                            contentType: 'application/json',
+                            body: JSON.stringify({ 'key': commonStorage.get('deviceUUID'), 'logJson': result })
+                        }, (e) => { });
+                    }catch(e){
+                        console.error("同步日志失败！",e);
+                    }
                 }
             }
             utilsObj.timerStopPushLog=()=> {
