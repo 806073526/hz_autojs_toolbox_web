@@ -26,8 +26,14 @@
                 </span>
             <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>
         </div>
+        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;">
+                <span>
+                    Node脚本：
+                </span>
+            <el-switch v-model="remoteHandler.param4.isNodeScript"/>
+        </div>
         <el-button type="danger" size="mini" style="margin-left: 10px !important;" id="remoteRunScript"
-                   @click.stop.prevent="remoteExecuteScript(remoteHandler.param4.scriptText)">
+                   @click.stop.prevent="remoteExecuteScriptFun(remoteHandler.param4.scriptText)">
             运行脚本
         </el-button>
         <el-button type="primary" size="mini" style="margin-bottom: 5px;"

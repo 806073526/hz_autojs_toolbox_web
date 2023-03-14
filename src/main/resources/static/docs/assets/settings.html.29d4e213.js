@@ -1,0 +1,17 @@
+import{_ as e}from"./_plugin-vue_export-helper.cdc0426e.js";import{o as s,c as t,e as n}from"./app.6aa2b576.js";const i={},l=n(`<h1 id="settings" tabindex="-1"><a class="header-anchor" href="#settings" aria-hidden="true">#</a> settings</h1><p><strong>[New in v8.2.0]</strong></p><p>This module allows you to control some Auto.js internal settings, such as stable mode, volume up key off script, etc.; it will also support modifying some system settings in the future.</p><h2 id="settings-setenabled-key-value" tabindex="-1"><a class="header-anchor" href="#settings-setenabled-key-value" aria-hidden="true">#</a> $settings.setEnabled(key, value)</h2><ul><li><code><span class="token property">key</span></code> {string} The key name of the function to be set. Currently includes. <ul><li><code><span class="token property">stable_mode</span></code> Stable mode. Takes effect the next time accessibility is enabled after setting.</li><li><code>enable_accessibility_service_by_root</code> Whether to enable the accessibility service using Root privileges.</li><li><code><span class="token property">stop_all_on_volume_up</span></code> Whether to stop all scripts when volume up key is pressed (this feature is enabled by default)</li><li><code><span class="token property">not_show_console</span></code> Whether to not show the log screen when booting</li><li><code><span class="token property">foreground_service</span></code> whether to enable foreground service notifications (used for live retention)</li></ul></li><li><code><span class="token property">value</span></code> {boolean} whether to enable this feature</li></ul><p>Set whether a feature/setting item is enabled or not.</p><p>\`\`javascript // Enable stable mode $settings.setEnabled(&#39;stable_mode&#39;, true);</p><p>// Disable foreground services $settings.setEnabled(&#39;foreground_service&#39;, false);</p><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>
+## $settings.isEnabled(key)
+* \`key\` {string} The key name of the function to be set. See \`$settings.setEnabled()\`
+* Returns {boolean} whether the feature is enabled or not
+
+Determines if a feature/settings is enabled.
+
+\`\`\`javascript
+// Print whether a series of settings switches are turned on or not
+log(&#39;Stable mode: &#39; + $settings.isEnabled(&#39;stable_mode&#39;));
+log(&#39;Enable accessibility service with Root: &#39; + $settings.isEnabled(&#39;enable_accessibility_service_by_root&#39;));
+log(&#39;Volume up key stops all scripts: &#39; + $settings.isEnabled(&#39;stop_all_on_volume_up&#39;));
+log(&#39;Not showing log screen on startup: &#39; + $settings.isEnabled(&#39;not_show_console&#39;));
+log(&#39;Foreground service: &#39; + $settings.isEnabled(&#39;foreground_service&#39;));
+\`\`\`js
+
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div>`,9),o=[l];function a(r,d){return s(),t("div",null,o)}const b=e(i,[["render",a],["__file","settings.html.vue"]]);export{b as default};

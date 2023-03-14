@@ -54,7 +54,8 @@ export default {
                 param4: {
                     scriptName:'remoteScript.js',
                     scriptText: '',
-                    scriptImmediatelyExec: true
+                    scriptImmediatelyExec: true,
+                    isNodeScript: false
                 }
             },
             scriptEditor: null,
@@ -327,6 +328,21 @@ export default {
                 let scriptText = this.scriptEditor.getValue();
                 this.scriptEditor.setValue(scriptText+=code+"\n");
                 // this.remoteHandler.param4.scriptText += code +"\n";
+            }
+        },
+        // 远程执行脚本
+        remoteExecuteScriptFun(code){
+            if(!this.remoteHandler.param4.isNodeScript){
+                this.remoteExecuteScript(code);
+            // NODE脚本 先写入手机端再执行文件
+            } else {
+                let remoteScript = `
+                    let remoteScriptPath = '/sdcard/appSync/nodeRemoteScript/remoteScript.node.js'; 
+                    files.createWithDirs(remoteScriptPath)
+                    files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(code))}')));
+                    engines.execScriptFile("/sdcard/appSync/nodeRemoteScript/remoteScript.node.js",{path:["/sdcard/appSync/nodeRemoteScript/"]})
+                `;
+                this.remoteExecuteScript(remoteScript);
             }
         },
         // 获取自定义模块远程代码

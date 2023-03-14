@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="https://pro.autojs.org/docs/zh/v9/">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="阅读须知">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2023-02-12T12:20:49.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2023-02-12T12:20:49.000Z">
+  <link rel="alternate" hreflang="en-us" href="https://pro.autojs.org/docs/en/zh/v9/">
+  <link rel="icon" href="https://pro.autojs.org/docs/favicon.ico">
+  <link rel="manifest" href="https://pro.autojs.org/docs/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>阅读须知 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../assets/index.html.c34b367c.js">
+  <link rel="modulepreload" href="../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../assets/index.html.9aaa84a1.js">
+</head>
+
+<body>
+
+
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../docs.html" class="brand"><img class="logo"
+              src="../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v8/v8.html" class="nav-link" aria-label="第一代API文档"><span
+                  class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a aria-current="page" href="v9.html"
+                class="router-link-active router-link-exact-active nav-link active" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://blog.autojs.org/" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方博客" class="nav-link"><!---->官方博客<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="../../en/en.html" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="v9.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading active"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a aria-current="page" href="v9.html"
+                    class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers">
+                    <li class="sidebar-sub-header"><a aria-current="page"
+                        href="https://pro.autojs.org/docs/zh/v9/#第二代api和第一代api的区�?"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="第二代API和第一代API的区别"><!---->第二代API和第一代API的区别<!----></a>
+                      <ul class="sidebar-sub-headers"></ul>
+                    </li>
+                    <li class="sidebar-sub-header"><a aria-current="page"
+                        href="https://pro.autojs.org/docs/zh/v9/#刚接触auto-js-pro时如何选择引擎"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="刚接触Auto.js Pro时如何选择引擎"><!---->刚接触Auto.js Pro时如何选择引擎<!----></a>
+                      <ul class="sidebar-sub-headers"></ul>
+                    </li>
+                    <li class="sidebar-sub-header"><a aria-current="page"
+                        href="https://pro.autojs.org/docs/zh/v9/#快速开�?"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="快速开始"><!---->快速开始<!----></a>
+                      <ul class="sidebar-sub-headers">
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#用node-js引擎运行代码"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="用Node.js引擎运行代码"><!---->用Node.js引擎运行代码<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#使用node-js内置模块"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="使用Node.js内置模块"><!---->使用Node.js内置模块<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#使用pro-9内置模块"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="使用Pro 9内置模块"><!---->使用Pro 9内置模块<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#使用npm安装第三方模�?"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="使用npm安装第三方模块"><!---->使用npm安装第三方模块<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#安装npm全局模块"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="安装npm全局模块"><!---->安装npm全局模块<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#调用java-android-api"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="调用Java/Android API"><!---->调用Java/Android API<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="sidebar-sub-header"><a aria-current="page"
+                        href="https://pro.autojs.org/docs/zh/v9/#线程与线程模�?"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="线程与线程模型"><!---->线程与线程模型<!----></a>
+                      <ul class="sidebar-sub-headers">
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#单线程与多线�?"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="单线程与多线程"><!---->单线程与多线程<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a aria-current="page"
+                            href="https://pro.autojs.org/docs/zh/v9/#ui线程"
+                            class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                            aria-label="UI线程"><!---->UI线程<!----></a>
+                          <ul class="sidebar-sub-headers"></ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="sidebar-sub-header"><a aria-current="page"
+                        href="https://pro.autojs.org/docs/zh/v9/#阅读模块文档的指�?"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="阅读模块文档的指引"><!---->阅读模块文档的指引<!----></a>
+                      <ul class="sidebar-sub-headers"></ul>
+                    </li>
+                    <li class="sidebar-sub-header"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#路线规划"
+                        class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                        aria-label="路线规划"><!---->路线规划<!----></a>
+                      <ul class="sidebar-sub-headers"></ul>
+                    </li>
+                  </ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/migrate-from-api-v1.html"
+                    class="nav-link sidebar-link sidebar-page"
+                    aria-label="如何从第一代API迁移过来"><!---->如何从第一代API迁移过来<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/app.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="app - 应用"><!---->app - 应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/axios.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="axios - http请求"><!---->axios -
+                    http请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/clip_manager.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="clip_manager - 剪贴板"><!---->clip_manager -
+                    剪贴板<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/color.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="color - 颜色"><!---->color - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/datastore.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="datastore - 本地储存"><!---->datastore -
+                    本地储存<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/device.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/dialogs.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="dialogs - 对话框"><!---->dialogs -
+                    对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/engines.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="engines - 脚本引擎"><!---->engines -
+                    脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/floating_window.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="floating_window - 悬浮窗"><!---->floating_window
+                    - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/globals.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="globals - 全局函数与变量"><!---->globals -
+                    全局函数与变量<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/lang.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="lang - 语言"><!---->lang - 语言<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/media.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="media - 多媒体"><!---->media - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/notification.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="notification - 通知"><!---->notification -
+                    通知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/plugins.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/power_manager.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="power_manager - 电池管理"><!---->power_manager -
+                    电池管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/rhino.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="rhino - 犀牛Java交互"><!---->rhino -
+                    犀牛Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/sensors.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="sensors - 传感器"><!---->sensors -
+                    传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/settings.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="settings - 设置"><!---->settings -
+                    设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/shell.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="shell - Shell命令"><!---->shell -
+                    Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/toast.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="toast - Toast"><!---->toast -
+                    Toast<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/ui.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="ui - 用户界面"><!---->ui - 用户界面<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/work_manager.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="work_manager - 定时与任务"><!---->work_manager -
+                    定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="https://pro.autojs.org/docs/zh/v9/generated/modules/zip.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="zip - 压缩与解压"><!---->zip - 压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                  class="title">Node.js文档</span><span class="arrow right"></span></button><!----></section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!--[--><!---->
+        <nav class="breadcrumb disable"></nav>
+        <div class="page-title">
+          <h1><!---->阅读须知</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月22日</span>
+              <meta property="datePublished" content="2022-10-22T13:39:02.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list"><!--[-->
+                <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#第二代api和第一代api的区�?"
+                    class="router-link-active router-link-exact-active toc-link level2">第二代API和第一代API的区别</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v9/#刚接触auto-js-pro时如何选择引擎"
+                    class="router-link-active router-link-exact-active toc-link level2">刚接触Auto.js Pro时如何选择引擎</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#快速开�?"
+                    class="router-link-active router-link-exact-active toc-link level2">快速开始</a></li>
+                <ul class="toc-list"><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#用node-js引擎运行代码"
+                      class="router-link-active router-link-exact-active toc-link level3">用Node.js引擎运行代码</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#使用node-js内置模块"
+                      class="router-link-active router-link-exact-active toc-link level3">使用Node.js内置模块</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#使用pro-9内置模块"
+                      class="router-link-active router-link-exact-active toc-link level3">使用Pro 9内置模块</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#使用npm安装第三方模�?"
+                      class="router-link-active router-link-exact-active toc-link level3">使用npm安装第三方模块</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#安装npm全局模块"
+                      class="router-link-active router-link-exact-active toc-link level3">安装npm全局模块</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page"
+                      href="https://pro.autojs.org/docs/zh/v9/#调用java-android-api"
+                      class="router-link-active router-link-exact-active toc-link level3">调用Java/Android API</a></li>
+                  <!----><!--]-->
+                </ul><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#线程与线程模�?"
+                    class="router-link-active router-link-exact-active toc-link level2">线程与线程模型</a></li>
+                <ul class="toc-list"><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#单线程与多线�?"
+                      class="router-link-active router-link-exact-active toc-link level3">单线程与多线程</a></li>
+                  <!----><!--]--><!--[-->
+                  <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#ui线程"
+                      class="router-link-active router-link-exact-active toc-link level3">UI线程</a></li><!----><!--]-->
+                </ul><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#阅读模块文档的指�?"
+                    class="router-link-active router-link-exact-active toc-link level2">阅读模块文档的指引</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page" href="https://pro.autojs.org/docs/zh/v9/#路线规划"
+                    class="router-link-active router-link-exact-active toc-link level2">路线规划</a></li><!----><!--]-->
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="阅读须知" tabindex="-1"><a class="header-anchor" href="#阅读须知" aria-hidden="true">#</a> 阅读须知</h1>
+          <div class="custom-container warning">
+            <p class="custom-container-title">注意</p>
+            <p>本文档为Pro 9新增的基于Node.js的第二代API的文档（第一代API仍然保留可用）。如果你想查看的是旧的第一代API的文档，请在菜单栏切换。</p>
+          </div>
+          <blockquote>
+            <p>本文档完善中。</p>
+          </blockquote>
+          <p>Auto.js Pro 9是Auto.js
+            Pro的全新版本，除了编辑器、打包等新功能外，最重要的是带来了<strong>基于Node.js的引擎和全新的第二代API</strong>（第一代API仍然保留可用），伴随着庞大的npm生态（接近200万个npm包），并仍然支持和Android/Java交互（也即可在Node.js中使用Android/Java
+            API）。</p>
+          <h2 id="第二代api和第一代api的区别" tabindex="-1"><a class="header-anchor" href="#第二代api和第一代api的区别"
+              aria-hidden="true">#</a> 第二代API和第一代API的区别</h2>
+          <p>Node.js（第二代API）对比Rhino（第一代API）的优势是：</p>
+          <ul>
+            <li>Node.js引擎的JavaScript执行性能是Rhino的100倍以上</li>
+            <li>使用Node.js引擎的代码<strong>加密强度高</strong>，目前不能被还原</li>
+            <li>Node.js支持ES2021以上语言标准，Rhino仅支持ES5和部分ES6特性</li>
+            <li>Node.js引擎本身的Bug基本很少，而Rhino引擎的模块系统、语言实现本身有不少Bug</li>
+            <li>Node.js对应的第二代API设计较好、更加标准</li>
+            <li>可以使用第三方npm包</li>
+            <li>Node.js的网络资料较多</li>
+          </ul>
+          <p>Node.js（第二代API）对比Rhino（第一代API）的劣势是：</p>
+          <ul>
+            <li>Node.js对应的第二代API上手门槛较高，需要对Promise、异步有一定了解，尤其对新手来说</li>
+            <li>第二代API的文档阅读较难，并且目前正在完善中</li>
+            <li>Rhino和第一代API的社区的源码、资料、示例较多</li>
+            <li>第一代API使用上比较方便</li>
+          </ul>
+          <h2 id="刚接触auto-js-pro时如何选择引擎" tabindex="-1"><a class="header-anchor" href="#刚接触auto-js-pro时如何选择引擎"
+              aria-hidden="true">#</a> 刚接触Auto.js Pro时如何选择引擎</h2>
+          <p>如果你是：</p>
+          <ol>
+            <li>没有编程基础的新手，并且不想深入学习编程</li>
+            <li>代码能跑就行，不追求可维护性、可读性</li>
+            <li>不追求最新语言标准，能容忍引擎、API设计本身有不符合标准的地方和bug</li>
+          </ol>
+          <p>那么建议你使用Rhino引擎和第一代API，上手较快。你无需特别配置，代码默认都以该引擎执行。</p>
+          <p>如果你是：</p>
+          <ol>
+            <li>计算机专业出身或者有一定开发经验</li>
+            <li>第一次学习编程，但想学习行业标准和规范，为以后学习深入或学习Android/JavaScript/Web等打基础</li>
+            <li>有一定的代码素养和追求</li>
+            <li>有较高的软件安全、加密需求</li>
+            <li>想用npm包，实现比如连接mysql等需求</li>
+            <li>追求更高的JS运行性能</li>
+            <li>热爱编程，或者热爱探索，热爱学习</li>
+          </ol>
+          <p>那么建议你使用Node.js引擎和第二代API，对Rhino引擎和第一代API了解即可。</p>
+          <div class="custom-container tip">
+            <p class="custom-container-title">提示</p>
+            <p>引擎的选择并非绝对，你可以一边使用Rhino引擎一边使用Node.js引擎，或者在学习一段时间后再看另一个引擎/API。</p>
+          </div>
+          <h2 id="快速开始" tabindex="-1"><a class="header-anchor" href="#快速开始" aria-hidden="true">#</a> 快速开始</h2>
+          <p>本节将介绍如何使用Node.js引擎和第二代API。</p>
+          <h3 id="用node-js引擎运行代码" tabindex="-1"><a class="header-anchor" href="#用node-js引擎运行代码" aria-hidden="true">#</a>
+            用Node.js引擎运行代码</h3>
+          <p>为了向前兼容，Pro 9中的代码仍然默认为旧的Rhino引擎运行，要使用新的Node.js引擎可以用以下任一方式：</p>
+          <ol>
+            <li>
+              文件头带上<code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span></code>，例如：
+            </li>
+          </ol>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 打印nodejs的版本</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Node.js版本: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>process<span class="token punctuation">.</span>version<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <ol start="2">
+            <li>
+              文件以<code><span class="token punctuation">.</span>node<span class="token punctuation">.</span>js</code>或<code><span class="token punctuation">.</span>mjs</code>结尾。<code><span class="token punctuation">.</span>mjs</code>结尾则会同时启用ES
+              Module功能，参见https://nodejs.org/api/esm.html</li>
+          </ol>
+          <h3 id="使用node-js内置模块" tabindex="-1"><a class="header-anchor" href="#使用node-js内置模块" aria-hidden="true">#</a>
+            使用Node.js内置模块</h3>
+          <p>在Node.js中，你可以使用其自带的几十个模块，比如：</p>
+          <ul>
+            <li><strong><code><span class="token property">fs</span></code></strong>: 文件系统，用于读写文件（类似Pro 8中的files模块）</li>
+            <li><strong><code><span class="token property">http</span></code>,
+                <code><span class="token property">https</span></code></strong>: http(s)请求与服务，用于发送http(s)请求或者搭建http服务器
+            </li>
+            <li><strong><code><span class="token property">worker_threads</span></code></strong>: 工作线程，用于并行执行任务（类似于Pro
+              8中的threads模块）</li>
+            <li>...</li>
+          </ul>
+          <p>全部的Node.js内置模块及其文档参见<a href="https://nodejs.org/dist/latest-v16.x/docs/api/" target="_blank"
+              rel="noopener noreferrer">Node.js 16.x文档<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>，</p>
+          <p>以下是一个使用内置的fs模块读取文本文件的例子：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> fs <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;fs&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 使用readFile读取文件，参见https://nodejs.org/dist/latest-v16.x/docs/api/fs.html#fsreadfilepath-options-callback</span>
+fs<span class="token punctuation">.</span><span class="token function">readFile</span><span class="token punctuation">(</span><span class="token string">&#39;/sdcard/脚本/test.txt&#39;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string-property property">&#39;encoding&#39;</span><span class="token operator">:</span> <span class="token string">&#39;utf-8&#39;</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">err<span class="token punctuation">,</span> data</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">&quot;读取文件失败:&quot;</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;读取文件成功:&quot;</span><span class="token punctuation">,</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="使用pro-9内置模块" tabindex="-1"><a class="header-anchor" href="#使用pro-9内置模块" aria-hidden="true">#</a> 使用Pro
+            9内置模块</h3>
+          <p>作为对Node.js内置模块的补充，Pro 9将部分Pro 8的模块迁移到了Pro 9的API中，比如：</p>
+          <ul>
+            <li><strong><code><span class="token property">app</span></code></strong>: 用于启动其他应用、获取其他应用信息，发送广播、邮件等</li>
+            <li><strong><code><span class="token property">ui</span></code></strong>: 用于显示自定义界面、Web界面</li>
+            <li>...</li>
+          </ul>
+          <blockquote><!----> 在Pro
+            9中，所有模块均需要使用<code><span class="token function">require</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>来导入才能使用，而不能像Pro
+            8一样直接使用全局变量。比如不能直接用<code><span class="token property">app</span></code>或<code><span class="token property">$app</span></code>变量，而需要用<code><span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&#39;app&#39;</span><span class="token punctuation">)</span></code>来导入模块。
+          </blockquote>
+          <p>所有模块的列表可在本文档右侧或右上角菜单中查看。</p>
+          <p>每个模块的API可能与Pro
+            8有所不同，大部分API被设计为异步而非同步阻塞，一些全局函数、变量被设计为模块内函数。比如，<code><span class="token function">setClip</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code><span class="token function">getClip</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>在Pro
+            8中是全局函数，在Pro 9中则属于模块]<a href="https://g.pro.autojs.org/docs/v9/modules/clip_manager.html" target="_blank"
+              rel="noopener noreferrer">clip_manager<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>的函数。</p>
+          <h3 id="使用npm安装第三方模块" tabindex="-1"><a class="header-anchor" href="#使用npm安装第三方模块" aria-hidden="true">#</a>
+            使用npm安装第三方模块</h3>
+          <p>在npm上有大量的第三方模块，这些模块绝大部分都能在Pro 9中使用。在使用它们之前需要用npm命令来安装模块。</p>
+          <ol>
+            <li>
+              <p>npm包需要项目才能安装。在Pro 9文件管理中点击右下角菜单，选择项目，在模板中选择Node.js项目。</p>
+            </li>
+            <li>
+              <p>在新建项目页面，填好应用名称、包名（包名需要包含英文&quot;.&quot;，比如com.example），点击确定</p>
+            </li>
+            <li>
+              <p>在项目文件夹中，点击工具栏的项目图标，点击终端</p>
+            </li>
+            <li>
+              <p>输入&quot;npm i --no-bin-links 模块名称&quot;来安装npm包，安装后就可以在项目的代码中使用该模块</p>
+            </li>
+          </ol>
+          <p>以用于生成UUID的uuid模块为例，整个过程如下：</p>
+          <p><img src="../../../../autojspro-apk-1252460104.cos.ap-guangzhou.myqcloud.com/npm-install.gif"
+              alt="npm-install" loading="lazy"></p>
+          <p>之前就可以参考<a href="https://www.npmjs.com/package/uuid" target="_blank"
+              rel="noopener noreferrer">uuid模块的文档<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>在main.js中使用该模块：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> uuid <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;uuid&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;uuid:&quot;</span><span class="token punctuation">,</span> uuid<span class="token punctuation">.</span><span class="token function">v4</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>后续需要安装其他模块，也都在终端中，通过<code><span class="token property">cd</span></code>命令进入相应的项目目录。</p>
+          <p>要搜索模块，请在<a href="https://www.npmjs.com/" target="_blank" rel="noopener noreferrer">npm官网<span><svg
+                  class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+                  x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>中搜索。</p>
+          <blockquote>
+            <p>
+              之所以要用<code><span class="token operator">--</span>no<span class="token operator">-</span>bin<span class="token operator">-</span>links</code>选项，是因为很多npm模块会在安装时链接一些可执行脚本到<code>node_modules<span class="token operator">/</span><span class="token punctuation">.</span>bin</code>目录，但是Android的内部存储分区(sdcard)的文件系统不支持符号链接，因此我们需要使用该选项来禁用它。但是与此同时，我们常常会在npm脚本中用到这些可执行文件，例如安装webpack后运行webpack命令，安装react后运行react-scripts命令，此时只能执行具体路径的js文件来代替，比如用<code>node node_modules<span class="token operator">/</span>webpack<span class="token operator">/</span>bin<span class="token operator">/</span>webpack<span class="token punctuation">.</span>js</code>来代替。另外一个方案是将默认脚本文件夹迁移到app私有目录，这里的文件系统是支持符合链接的，你可以在设置中修改默认脚本文件夹为&quot;~&quot;，但是需要注意，私有目录会在卸载APP后被删除，因此，<!---->
+            </p>
+          </blockquote>
+          <h3 id="安装npm全局模块" tabindex="-1"><a class="header-anchor" href="#安装npm全局模块" aria-hidden="true">#</a> 安装npm全局模块
+          </h3>
+          <p>Pro 9内置的npm也可安装全局模块，比如typescript编译ts文件，webpack-cli打包js文件等。</p>
+          <p>
+            在终端中执行<code>npm i <span class="token operator">-</span>g typescript</code>即可安装typescript模块，之后就可以在终端中执行<code><span class="token property">tsc</span></code>命令来编译ts文件。
+          </p>
+          <blockquote>
+            <p>
+              注意！请勿升级内置的npm版本，否则可能遇到意料之外的问题；另外安装全局模块时不能用<code><span class="token operator">--</span>no<span class="token operator">-</span>bin<span class="token operator">-</span>links</code>参数，否则将无法找到相应的命令。
+            </p>
+          </blockquote>
+          <h3 id="调用java-android-api" tabindex="-1"><a class="header-anchor" href="#调用java-android-api"
+              aria-hidden="true">#</a> 调用Java/Android API</h3>
+          <p>Pro 9提供了全局对象<a href="https://pro.autojs.org/docs/v9/interfaces/globals.AutoJs.html" target="_blank"
+              rel="noopener noreferrer">$autojs<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>，提供一些特殊的API，比如调用Java
+            API。</p>
+          <p>例如：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token comment">// 获取$java对象，用于和Java交互</span>
+<span class="token keyword">const</span> $java <span class="token operator">=</span> $autojs<span class="token punctuation">.</span>java<span class="token punctuation">;</span>
+<span class="token comment">// 加载Java/Android类</span>
+<span class="token keyword">const</span> StringBuilder <span class="token operator">=</span> $java<span class="token punctuation">.</span><span class="token function">findClass</span><span class="token punctuation">(</span><span class="token string">&#39;java.lang.StringBuilder&#39;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 创建这个类的对象</span>
+<span class="token keyword">const</span> sb <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 调用这个类的方法</span>
+sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">&quot;Hello&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>sb<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>除了findClass外，$java提供了调用Java方法时切换线程等API，参见<a
+              href="https://pro.autojs.org/docs/v9/interfaces/globals.Java.html" target="_blank"
+              rel="noopener noreferrer">$java对象的文档<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</p>
+          <p>除了这种比较原始的方式外，Pro 9提供了<code><span class="token property">rhino</span></code>模块，用于提供类似Pro
+            8中rhino引擎类似的和Java交互的方式：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token comment">// 调用install后，可以直接java.*, android.*等来访问Java类</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&#39;rhino&#39;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">install</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> StringBuilder <span class="token operator">=</span> java<span class="token punctuation">.</span>lang<span class="token punctuation">.</span>StringBuilder<span class="token punctuation">;</span>
+<span class="token keyword">const</span> sb <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+sb<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>android<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Base64<span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span><span class="token string">&quot;YXV0b2pz&quot;</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>sb<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <blockquote>
+            <p>暂时还不支持importClass/importPackage等函数；也不支持JavaAdapter。</p>
+          </blockquote>
+          <p>有关Java/Android交互的更多信息，请等待后续单独章节展开。</p>
+          <h2 id="线程与线程模型" tabindex="-1"><a class="header-anchor" href="#线程与线程模型" aria-hidden="true">#</a> 线程与线程模型</h2>
+          <h3 id="单线程与多线程" tabindex="-1"><a class="header-anchor" href="#单线程与多线程" aria-hidden="true">#</a> 单线程与多线程</h3>
+          <p>Node.js使用遵循带有事件循环的单线程模型，在Pro 9中也是如此，因此你不能像Pro 8那样使用threads模块启动新线程。</p>
+          <p>大多数情况你也不必使用线程，一些耗时操作，比如findImage、click等都被封装为异步操作，完全可以并行执行；调用一些Java API时，若这些API是异步操作，也可以指定Java函数执行的线程，比如：
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&#39;rhino&#39;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">install</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&#39;path&#39;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> BitmapFactory <span class="token operator">=</span> android<span class="token punctuation">.</span>graphics<span class="token punctuation">.</span>BitmapFactory<span class="token punctuation">;</span>
+<span class="token comment">// 当前目录下的test.png文件</span>
+<span class="token keyword">const</span> file <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">&quot;./test.png&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 调用 BitmapFactory.decodeFile(file)来解码图片文件为Bitmap</span>
+    <span class="token comment">// 这是一个耗时操作，我们指定在io线程执行</span>
+    <span class="token keyword">const</span> bitmap <span class="token operator">=</span> <span class="token keyword">await</span> BitmapFactory<span class="token punctuation">.</span>decodeFile<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>file<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">&#39;io&#39;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>bitmap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    bitmap<span class="token punctuation">.</span><span class="token function">recycle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>
+            如果以上均不能满足你的需求，你需要纯JavaScript计算逻辑运行于单独的线程，那么需要使用Node.js的<code><span class="token property">worker_threads</span></code>模块，参见<a
+              href="https://nodejs.org/dist/latest-v16.x/docs/api/worker_threads.html" target="_blank"
+              rel="noopener noreferrer">Node.js文档<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new
+                  window</span></span></a>和网上相关资料。worker_thread不像Pro 8中的threads子线程那样可以和主线程共享所有公共、全局变量等，需要额外的通信，这里就不展开了。
+          </p>
+          <blockquote>
+            <p>**<!---->**目前，worker_threads中的子线程无法访问autojs相关的API和模块，比如$autojs, 只能访问Node.js内置的模块和对象。</p>
+          </blockquote>
+          <h3 id="ui线程" tabindex="-1"><a class="header-anchor" href="#ui线程" aria-hidden="true">#</a> UI线程</h3>
+          <p>默认情况下，Node.js引擎运行在非UI线程，但是这样无法操作界面相关的内容；因此Pro
+            9提供了UI线程的选项，通过在文件头用字符串&quot;ui-thread&quot;或&quot;ui&quot;来标识，例如：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs ui&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span>isUiThread<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;ui&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token function">isUiThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>&quot;ui&quot;和&quot;ui-thread&quot;是有区别的：</p>
+          <ul>
+            <li><strong><code><span class="token property">ui</span></code></strong>:
+              用于显示界面（Activity）的情况，比如启动后展示一个Web页面用于用户操作，参见UI模块的文档。</li>
+            <li><strong><code>ui<span class="token operator">-</span>thread</code></strong>:
+              不在启动时显示一个新页面，但是代码运行在UI线程，一般用于无界面的代码中显示和控制悬浮窗，参见悬浮窗模块的文档。</li>
+          </ul>
+          <p>另外，若在非UI线程中，偶尔需要操作UI元素，比如显示和控制対话框，则可以用前述的调用Java
+            API时切换线程的方式来实现。比如<code>view<span class="token punctuation">.</span>setText<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>view<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">&quot;hello&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">&quot;ui&quot;</span><span class="token punctuation">)</span></code>。
+          </p>
+          <h2 id="阅读模块文档的指引" tabindex="-1"><a class="header-anchor" href="#阅读模块文档的指引" aria-hidden="true">#</a> 阅读模块文档的指引
+          </h2>
+          <p>模块的文档是通过代码生成的，阅读文档需要一些技巧，否则可能觉得文档晦涩难懂。</p>
+          <p>以app模块为例，打开<a href="https://pro.autojs.org/docs/v9/modules/app.html" target="_blank"
+              rel="noopener noreferrer">app模块文档<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>后，会看到一个列表：</p>
+          <ul>
+            <li><strong><code>接口</code></strong>: 接口，第一次看文档，直接跳过这部分内容。</li>
+            <li><strong><code>变量</code></strong>:
+              本模块的变量。我们在这个列表中看到<code><span class="token property">packageName</span></code>，代表app模块有一个叫<code><span class="token property">packageName</span></code>的变量。可以用以下方式使用它：
+            </li>
+          </ul>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;app&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>app<span class="token punctuation">.</span>packageName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>
+            点击该变量的文档，可以看到前面有<code>常量</code>标记，表示这是一个常量，不能修改他的值，也即<code>app<span class="token punctuation">.</span>packageName <span class="token operator">=</span> <span class="token string">&quot;xxx&quot;</span></code>会报错；类型是string，字符串。结合变量名可以知道，这是当前app的包名。当然后面会有变量的中文注释，只是目前还没写，得通过变量名去猜测。
+          </p>
+          <ul>
+            <li><strong><code>函数</code></strong>:
+              本模块的函数。我们在这个列表中看到很多函数，比如<code><span class="token property">editFile</span></code>,
+              <code><span class="token property">startActivity</span></code>。这些都是app模块的函数，以<code><span class="token property">startActivity</span></code>为例，点击其文档可以看到：
+            </li>
+          </ul>
+          <div class="language-typescript ext-ts line-numbers-mode">
+            <pre class="language-typescript"><code><span class="token function">startActivity</span><span class="token punctuation">(</span>target<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> IntentOptionsWithRoot<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Promise</span><span class="token operator">&lt;</span><span class="token keyword">void</span><span class="token operator">&gt;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>它有一个参数target，类似是string或IntentOptionsWithRoot。string我们都知道是字符串，也即类似Pro
+            8中的<code>app<span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span><span class="token string">&quot;console&quot;</span><span class="token punctuation">)</span></code>的用法。那么IntentOptionsWithRoot呢？
+          </p>
+          <p>点击<a href="https://pro.autojs.org/docs/v9/interfaces/app.IntentOptionsWithRoot.html" target="_blank"
+              rel="noopener noreferrer">IntentOptionsWithRoot<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new
+                  window</span></span></a>可以看到IntentOptionsWithRoot的文档。先看Properties这一栏，是描述该接口的属性，有<code><span class="token property">root</span></code>这个boolean属性，前面有Optional标签，表示是可选属性；再看前面的继承关系，表示IntentOptionsWithRoot继承于IntentOptions，跳转到<a
+              href="https://pro.autojs.org/docs/v9/interfaces/app.IntentOptions.html" target="_blank"
+              rel="noopener noreferrer">IntentOptions<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new
+                  window</span></span></a>，可以看到它有很多属性，比如string类型的action。其实也可以不跳转过去，勾选右上角的Inherited，可以看到所有继承过来的属性。</p>
+          <p>综合起来，我们可以知道IntentOptionsWithRoot是要我们传入一个对象，这个对象可以有root、action等可选属性，因此我们可以这样写：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token string">&quot;nodejs&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> app <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;app&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+app<span class="token punctuation">.</span><span class="token function">startActivity</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string-property property">&quot;root&quot;</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token string-property property">&quot;action&quot;</span><span class="token operator">:</span> <span class="token string">&quot;android.intent.action.VIEW&quot;</span><span class="token punctuation">,</span>
+    <span class="token string-property property">&quot;data&quot;</span><span class="token operator">:</span> <span class="token string">&quot;https://pro.autojs.org&quot;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="路线规划" tabindex="-1"><a class="header-anchor" href="#路线规划" aria-hidden="true">#</a> 路线规划</h2>
+          <p>关于V9版本的路线规划，请参考https://github.com/hyb1996/Auto.js/issues/526 。</p>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><!----></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><!--[--><!--[--><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span><!--]--><!--]--></div>
+        </footer>
+        <nav class="page-nav"><!----><a href="https://pro.autojs.org/docs/zh/v9/migrate-from-api-v1.html"
+            class="nav-link next" aria-label="如何从第一代API迁移过来">
+            <div class="hint">下一页<span class="arrow right"></span></div>
+            <div class="link">如何从第一代API迁移过来<!----></div>
+          </a></nav><!----><!----><!--]-->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><!----><!--]-->
+  </div>
+  <script type="module" src="../../assets/app.6aa2b576.js" defer></script>
+</body>
+
+</html>

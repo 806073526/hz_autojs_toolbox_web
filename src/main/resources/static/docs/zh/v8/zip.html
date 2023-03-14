@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="https://pro.autojs.org/docs/zh/v8/zip.html">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="zip - 压缩与解压">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2022-10-22T07:36:15.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2022-10-22T07:36:15.000Z">
+  <link rel="alternate" hreflang="en-us" href="https://pro.autojs.org/docs/en/zh/v8/zip.html">
+  <link rel="icon" href="https://pro.autojs.org/docs/favicon.ico">
+  <link rel="manifest" href="https://pro.autojs.org/docs/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>zip - 压缩与解压 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../assets/zip.html.9ec2f019.js">
+  <link rel="modulepreload" href="../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../assets/zip.html.999bd4f0.js">
+</head>
+
+<body>
+
+
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../docs.html" class="brand"><img class="logo"
+              src="../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="v8.html" class="nav-link active" aria-label="第一代API文档"><span
+                  class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v9/v9.html" class="nav-link" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="../../en/en.html" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="zip.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="v8.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">自动化 -
+                        控件操作</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><!--[--><a href="./automator/"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="入门介绍" aria-current="page"><!---->入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/selector.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="选择器"><!---->选择器<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/uiobject.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="控件和控件集合"><!---->控件和控件集合<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="automator与其他函数"><!---->automator与其他函数<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./coordinatesBasedAutomation.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="自动化 - 坐标操作"><!---->自动化 -
+                    坐标操作<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./app.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="app - 应用"><!---->app -
+                    应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./base64.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="base64"><!---->base64<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./colors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="colors - 颜色"><!---->colors - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./canvas.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="canvas - 画布"><!---->canvas - 画布<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./console.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="console - 控制台"><!---->console - 控制台<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./crypto.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="crypto - 加解密与消息摘要"><!---->crypto - 加解密与消息摘要<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./debug.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="debug - 调试工具"><!---->debug - 调试工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./device.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./dialogs.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="dialogs - 对话框"><!---->dialogs - 对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./engines.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="engines - 脚本引擎"><!---->engines - 脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./events.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="events - 事件与监听"><!---->events - 事件与监听<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./floaty.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="floaty - 悬浮窗"><!---->floaty - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./files.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="files - 文件系统"><!---->files - 文件系统<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./globals.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="globals - 全局变量与函数"><!---->globals - 全局变量与函数<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./http.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="http - HTTP网络请求"><!---->http - HTTP网络请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./images.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="images - 图片处理"><!---->images - 图片处理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./keys.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="keys - 按键模拟"><!---->keys
+                    - 按键模拟<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./media.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="media - 多媒体"><!---->media
+                    - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./modules.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="module - 模块"><!---->module - 模块<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./ocr.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="ocr - 文字识别"><!---->ocr -
+                    文字识别<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./plugins.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./powerManager.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="power_manager - 电源管理"><!---->power_manager - 电源管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./sensors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="sensors - 传感器"><!---->sensors - 传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./shell.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="shell - Shell命令"><!---->shell - Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./storages.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="storages - 本地存储"><!---->storages - 本地存储<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./settings.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="settings - 设置"><!---->settings - 设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./threads.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="threads - 多线程"><!---->threads - 多线程<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timers.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="timers - 定时器"><!---->timers - 定时器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timedTasks.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="work_manager - 定时与任务"><!---->work_manager - 定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">ui - 用户界面</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><a href="/docs/zh/v8/ui/ui.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="ui入门介绍"><!---->ui入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/basic.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="基础布局与控件"><!---->基础布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/advanced.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="其他布局与控件"><!---->其他布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="api文档"><!---->api文档<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/customWidget.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="自定义控件"><!---->自定义控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a aria-current="page" href="/docs/zh/v8/ui/webview.html"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="使用Web编写界面"><!---->使用Web编写界面<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./util.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="util - 工具"><!---->util -
+                    工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./webSocket.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="WebSocket"><!---->WebSocket<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./zip.html" class="nav-link sidebar-link sidebar-page active"
+                    aria-label="zip - 压缩与解压"><!---->zip -
+                    压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">进阶</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="scriptingJava.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="和Java交互"><!---->和Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!--[--><!---->
+        <nav class="breadcrumb disable"></nav>
+        <div class="page-title">
+          <h1><!---->zip - 压缩与解压</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月22日</span>
+              <meta property="datePublished" content="2022-10-22T07:36:15.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list"><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zip-zipdir-dir-dest-options"
+                    class="router-link-active router-link-exact-active toc-link level2">$zip.zipDir(dir, dest[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zip-zipfile-file-dest-options"
+                    class="router-link-active router-link-exact-active toc-link level2">$zip.zipFile(file, dest[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zip-zipfiles-filelist-dest-options"
+                    class="router-link-active router-link-exact-active toc-link level2">$zip.zipFiles(fileList, dest[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zip-unzip-zipfile-dest-options"
+                    class="router-link-active router-link-exact-active toc-link level2">$zip.unzip(zipFile, dest[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zip-open-file"
+                    class="router-link-active router-link-exact-active toc-link level2">$zip.open(file)</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-getpath"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.getPath()</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-isvalidzipfile"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.isValidZipFile()</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-setpassword-password"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.setPassword(password)</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-isencrypted"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.isEncrypted()</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-addfile-file-options"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.addFile(file[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-addfiles-filelist-options"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.addFiles(fileList,
+                    options)</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-addfolder-folder-options"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.addFolder(folder[,
+                    options])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-removefile-file"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.removeFile(file)</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-extractfile-file-dest-options-newfilename"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.extractFile(file, dest[,
+                    options, newFileName])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-extractall-dest-options"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.extractAll(dest{,
+                    options})</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-getfileheader-file"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.getFileHeader(file)</a>
+                </li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/zip.html#zipfile-getfileheaders"
+                    class="router-link-active router-link-exact-active toc-link level2">ZipFile.getFileHeaders()</a>
+                </li><!----><!--]-->
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="zip-压缩与解压" tabindex="-1"><a class="header-anchor" href="#zip-压缩与解压" aria-hidden="true">#</a> zip -
+            压缩与解压</h1>
+          <blockquote>
+            <p>Stability: 2 - Stable</p>
+          </blockquote>
+          <p>Zip模块用于处理文件的压缩和解压，并支持加密压缩。</p>
+          <blockquote>
+            <p>zip功能来自<a
+                href="https://javadoc.io/doc/net.lingala.zip4j/zip4j/1.3.2/net/lingala/zip4j/model/ZipParameters.html"
+                target="_blank" rel="noopener noreferrer">zip4j<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>，可阅读相关文档获取更多信息。</p>
+          </blockquote>
+          <h2 id="zip-zipdir-dir-dest-options" tabindex="-1"><a class="header-anchor"
+              href="#zip-zipdir-dir-dest-options" aria-hidden="true">#</a> $zip.zipDir(dir, dest[, options])</h2>
+          <ul>
+            <li><code><span class="token property">dir</span></code> {string} 需要压缩的文件夹路径，如果文件夹下有子文件夹均会一并压缩</li>
+            <li><code><span class="token property">dest</span></code> {string} 压缩后的压缩包存放路径</li>
+            <li><code><span class="token property">options</span></code> {object} 可选参数，选项option包括以下内容，完整的选项参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a>： <ul>
+                <li><code><span class="token property">password</span></code> {string}
+                  加密压缩的密码。如果设置密码但不设置加密方法，则加密方法默认为AES</li>
+                <li><code><span class="token property">compressionMethod</span></code> {string}
+                  压缩方式，<code><span class="token constant">COMP_STORE</span></code>为仅打包不压缩,
+                  <code><span class="token constant">COMP_DEFLATE</span></code>为压缩（默认）</li>
+                <li><code><span class="token property">encryptionMethod</span></code> {string}
+                  加密方法，<code><span class="token constant">ENC_NO_ENCRYPTION</span></code>为不加密(默认)，<code><span class="token constant">ENC_METHOD_STANDARD</span></code>为标准机密,
+                  <code><span class="token constant">ENC_METHOD_AES</span></code>为AES加密</li>
+                <li><code><span class="token property">compressionLevel</span></code> {number}
+                  压缩级别，0~9，0为不压缩，9为最好压缩（速度较慢）。在8.7以前版本，默认为0不压缩；在8.7以后，该值默认为5（正常压缩）</li>
+                <li><code><span class="token property">aesKeyStrength</span></code> {string}
+                  AES加密强度，包括<code><span class="token constant">AES_STRENGTH_128</span></code>，<code><span class="token constant">AES_STRENGTH_192</span></code>，<code><span class="token constant">AES_STRENGTH_256</span></code>
+                </li>
+                <li><code><span class="token property">readHiddenFiles</span></code> {boolean}
+                  压缩文件夹时是否包含隐藏文件。如果为true，则在将文件夹添加到zip时将包含隐藏文件</li>
+                <li><code><span class="token property">includeRootFolder</span></code> {boolean}
+                  设置标志以指示添加文件的父文件夹是否将包含在ZIP中。如果为true，则添加文件的父文件夹将包含在ZIP中。默认true</li>
+                <li><code><span class="token property">rootFolderInZip</span></code> {string}
+                  设置压缩包首目录的文件夹名称，如果没有首目录，则创建这个首目录</li>
+              </ul>
+            </li>
+          </ul>
+          <p>压缩文件夹下所有文件/文件夹，生成到目标路径<code><span class="token property">dest</span></code>。</p>
+          <p>一个简单的压缩文件夹例子。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token comment">// 需压缩文件路径</span>
+<span class="token keyword">let</span> dir <span class="token operator">=</span> <span class="token string">&quot;./zipExample2/&quot;</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩后文件存放路径</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>$files<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 文件夹不存在 创建文件夹 </span>
+    $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token punctuation">}</span>
+ <span class="token comment">// 创建一个文件，自己可多放几个文件或文件夹运行看效果</span>
+ $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>$files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;test.js&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩后文件存放路径</span>
+<span class="token keyword">let</span> zipFile <span class="token operator">=</span> $files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;未加密压缩.zip&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token comment">// 删除同名文件</span>
+$files<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>zipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩</span>
+$zip<span class="token punctuation">.</span><span class="token function">zipDir</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> zipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;压缩完成，压缩包路径：&quot;</span> <span class="token operator">+</span> zipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>加密压缩例子</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token comment">// 需压缩文件路径</span>
+<span class="token keyword">let</span> dir <span class="token operator">=</span> <span class="token string">&quot;./zipExample2/&quot;</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩后文件存放路径</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>$files<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 文件夹不存在 创建文件夹 </span>
+    $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token punctuation">}</span>
+ <span class="token comment">// 创建一个文件，自己可多放几个文件或文件夹运行看效果</span>
+ $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>$files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;test.js&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩包存放路径</span>
+<span class="token keyword">let</span> encryptedZipFile <span class="token operator">=</span> $files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;加密压缩.zip&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+$files<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>encryptedZipFile<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 删除同名文件</span>
+<span class="token comment">// 压缩</span>
+$zip<span class="token punctuation">.</span><span class="token function">zipDir</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> encryptedZipFile<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">password</span><span class="token operator">:</span> <span class="token string">&quot;Auto.js Pro&quot;</span> <span class="token comment">// 压缩密码</span>
+    <span class="token literal-property property">compressionLevel</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token comment">// 压缩级别</span>
+    <span class="token literal-property property">aesKeyStrength</span><span class="token operator">:</span> <span class="token string">&#39;AES_STRENGTH_256&#39;</span><span class="token punctuation">,</span> <span class="token comment">// 加密方法</span>
+    <span class="token literal-property property">readHiddenFiles</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token comment">// 隐藏文件不添加进压缩包</span>
+    <span class="token literal-property property">includeRootFolder</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token comment">//不添加文件夹父目录进压缩包</span>
+    <span class="token literal-property property">rootFolderInZip</span><span class="token operator">:</span> <span class="token string">&quot;测试&quot;</span> <span class="token comment">// 为压缩包添加一个父目录</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;加密压缩完成，压缩包路径：&quot;</span> <span class="token operator">+</span> encryptedZipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zip-zipfile-file-dest-options" tabindex="-1"><a class="header-anchor"
+              href="#zip-zipfile-file-dest-options" aria-hidden="true">#</a> $zip.zipFile(file, dest[, options])</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 需要压缩的单文件路径。</li>
+            <li><code><span class="token property">dest</span></code> {string} 压缩后的压缩包存放路径</li>
+            <li><code><span class="token property">options</span></code> {object} 选项参见参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a></li>
+          </ul>
+          <p>
+            压缩单文件<code><span class="token property">file</span></code>到路径<code><span class="token property">dest</span></code>。
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> path <span class="token operator">=</span> <span class="token string">&quot;./zipExample/test.js&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>$files<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">let</span> zipFilePath <span class="token operator">=</span> <span class="token string">&quot;./zipExample/test.zip&quot;</span><span class="token punctuation">;</span>
+$zip<span class="token punctuation">.</span><span class="token function">zipFile</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> zipFilePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;单文件压缩完成，压缩包路径：&quot;</span> <span class="token operator">+</span> zipFilePath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zip-zipfiles-filelist-dest-options" tabindex="-1"><a class="header-anchor"
+              href="#zip-zipfiles-filelist-dest-options" aria-hidden="true">#</a> $zip.zipFiles(fileList, dest[,
+            options])</h2>
+          <ul>
+            <li><code><span class="token property">fileList</span></code> {string[]} 需压缩的多个文件路径的数组</li>
+            <li><code><span class="token property">dest</span></code> {string} 压缩目标路径</li>
+            <li><code><span class="token property">options</span></code> {object} 选项参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a></li>
+          </ul>
+          <p>
+            压缩多个文件<code><span class="token property">fileList</span></code>到路径<code><span class="token property">dest</span></code>。<code><span class="token property">fileList</span></code>中不能包含文件夹。
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> dir <span class="token operator">=</span> <span class="token string">&quot;./zipExample3/&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>$files<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">let</span> fileList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">&quot;file1.js&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;file2.js&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;file3.js&quot;</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token parameter">p</span> <span class="token operator">=&gt;</span> $files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> p<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+fileList<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">file</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">let</span> zipMultiFile <span class="token operator">=</span> $files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;多文件压缩.zip&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+$files<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>zipMultiFile<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 删除同名文件</span>
+$zip<span class="token punctuation">.</span><span class="token function">zipFiles</span><span class="token punctuation">(</span>fileList<span class="token punctuation">,</span> zipMultiFile<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 压缩</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;多文件压缩完成，压缩包路径：&quot;</span> <span class="token operator">+</span> zipMultiFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zip-unzip-zipfile-dest-options" tabindex="-1"><a class="header-anchor"
+              href="#zip-unzip-zipfile-dest-options" aria-hidden="true">#</a> $zip.unzip(zipFile, dest[, options])</h2>
+          <ul>
+            <li><code><span class="token property">zipFile</span></code> {string} 需解压的压缩包文件路径</li>
+            <li><code><span class="token property">dest</span></code> {string} 解压后的文件夹目录</li>
+            <li><code><span class="token property">options</span></code> {object} 解压选项，可选，参见<a
+                href="#%E8%A7%A3%E5%8E%8B%E9%80%89%E9%A1%B9">解压选项</a></li>
+          </ul>
+          <p>
+            解压zip文件。如果文件夹<code><span class="token property">dest</span></code>不存在则创建该文件夹并将内容解压到里面；如果<code><span class="token property">dest</span></code>已经存在，则在<code><span class="token property">dest</span></code>下面创建一个和<code><span class="token property">zipFile</span></code>文件同名的文件夹，并将内容解压到里面。
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token comment">// 准备一个加密的压缩包</span>
+<span class="token keyword">let</span> dir <span class="token operator">=</span> <span class="token string">&quot;./zipExample2/&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>$files<span class="token punctuation">.</span><span class="token function">exists</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    $files<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">// 压缩后文件存放路径</span>
+<span class="token keyword">let</span> encryptedZipFile <span class="token operator">=</span> $files<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> <span class="token string">&quot;加密压缩.zip&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+$files<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>encryptedZipFile<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 删除同名文件</span>
+<span class="token comment">// 压缩</span>
+$zip<span class="token punctuation">.</span><span class="token function">zipDir</span><span class="token punctuation">(</span>dir<span class="token punctuation">,</span> encryptedZipFile<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">password</span><span class="token operator">:</span> <span class="token string">&quot;Auto.js Pro&quot;</span> <span class="token comment">// 压缩密码</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+$zip<span class="token punctuation">.</span><span class="token function">unzip</span><span class="token punctuation">(</span>encryptedZipFile<span class="token punctuation">,</span> <span class="token string">&#39;./zipExample5&#39;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">password</span><span class="token operator">:</span> <span class="token string">&#39;Auto.js Pro&#39;</span> <span class="token comment">// 解压密码</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;加密zip解压成功，解压路径：&quot;</span> <span class="token operator">+</span> <span class="token string">&quot;./zipExample5/&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zip-open-file" tabindex="-1"><a class="header-anchor" href="#zip-open-file" aria-hidden="true">#</a>
+            $zip.open(file)</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 压缩包文件路径</li>
+            <li>返回 {<a href="#zipfile">ZipFile</a>} ZipFile对象</li>
+          </ul>
+          <p>打开一个zip文件，返回<code><span class="token property">ZipFile</span></code>对象，可对该对象进行进一步的zip操作。</p>
+          <h1 id="zipfile" tabindex="-1"><a class="header-anchor" href="#zipfile" aria-hidden="true">#</a> ZipFile</h1>
+          <p>
+            <code>$zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>返回的对象，用于在压缩包中增删文件、获取文件头信息、解压等。
+          </p>
+          <h2 id="zipfile-getpath" tabindex="-1"><a class="header-anchor" href="#zipfile-getpath"
+              aria-hidden="true">#</a> ZipFile.getPath()</h2>
+          <ul>
+            <li>返回 {string} 返回路径</li>
+          </ul>
+          <p>获取当前压缩包的路径。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> path <span class="token operator">=</span> <span class="token string">&quot;./test.zip&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> zipFile <span class="token operator">=</span> $zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span>zipFile<span class="token punctuation">.</span><span class="token function">getPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 输出路径 &quot;./test.zip&quot;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zipfile-isvalidzipfile" tabindex="-1"><a class="header-anchor" href="#zipfile-isvalidzipfile"
+              aria-hidden="true">#</a> ZipFile.isValidZipFile()</h2>
+          <ul>
+            <li>返回 {boolean} 是否是有效压缩包</li>
+          </ul>
+          <p>获取当前压缩包是否是一个有效的压缩包。</p>
+          <p>如果选择的路径不是一个压缩包或该文件不存在，均返回<code><span class="token boolean">false</span></code>。</p>
+          <h2 id="zipfile-setpassword-password" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-setpassword-password" aria-hidden="true">#</a> ZipFile.setPassword(password)</h2>
+          <ul>
+            <li><code><span class="token property">password</span></code> {string} 设置密码</li>
+          </ul>
+          <p>如果文件是一个加密的压缩包，必须用此函数设置正确的解压密码，才能解压出加密的文件。</p>
+          <p>未设置密码尝试解压加密的压缩包将抛出异常，选择的压缩包文件不存在使用本函数将抛出<code><span class="token property">ZipException</span></code>。</p>
+          <h2 id="zipfile-isencrypted" tabindex="-1"><a class="header-anchor" href="#zipfile-isencrypted"
+              aria-hidden="true">#</a> ZipFile.isEncrypted()</h2>
+          <ul>
+            <li>返回 {boolean} 是否压缩包加密</li>
+          </ul>
+          <p>获取当前压缩包是否是加密压缩包。</p>
+          <h2 id="zipfile-addfile-file-options" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-addfile-file-options" aria-hidden="true">#</a> ZipFile.addFile(file[, options])</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 本地文件路径</li>
+            <li><code><span class="token property">options</span></code> {object} 压缩选项，可选，参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a></li>
+          </ul>
+          <p>在压缩包中添加指定文件。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> zipFile <span class="token operator">=</span> $zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">&quot;./app.apk&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+zipFile<span class="token punctuation">.</span><span class="token function">addFile</span><span class="token punctuation">(</span>file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zipfile-addfiles-filelist-options" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-addfiles-filelist-options" aria-hidden="true">#</a> ZipFile.addFiles(fileList, options)
+          </h2>
+          <ul>
+            <li><code><span class="token property">fileList</span></code> {string[]} 要添加的本地文件路径的数组</li>
+            <li><code><span class="token property">options</span></code> {object} 压缩选项，可选，参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a></li>
+          </ul>
+          <p>在压缩包中添加多个文件。</p>
+          <h2 id="zipfile-addfolder-folder-options" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-addfolder-folder-options" aria-hidden="true">#</a> ZipFile.addFolder(folder[, options])
+          </h2>
+          <ul>
+            <li><code><span class="token property">folder</span></code> {string} 文件夹路径</li>
+            <li><code><span class="token property">options</span></code> {object} 压缩选项，可选，参见<a
+                href="#%E5%8E%8B%E7%BC%A9%E9%80%89%E9%A1%B9">压缩选项</a></li>
+          </ul>
+          <p>在压缩包中添加指定文件夹。</p>
+          <div class="custom-container warning">
+            <p class="custom-container-title">注意</p>
+            <p>注意不要添加压缩包的父目录，否则可能造成循环无限添加！</p>
+          </div>
+          <p>一个备份脚本的简单例子：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> zipFile <span class="token operator">=</span> <span class="token string">&quot;/sdcard/scripts.zip&quot;</span><span class="token punctuation">;</span>
+ <span class="token comment">//指定压缩包文件</span>
+<span class="token keyword">let</span> zip <span class="token operator">=</span> $zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span>zipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;开始备份，取决与你的脚本数量&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 向压缩包添加当前文件夹</span>
+zip<span class="token punctuation">.</span><span class="token function">addFolder</span><span class="token punctuation">(</span><span class="token string">&quot;./&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;备份完成，压缩包路径为：&quot;</span> <span class="token operator">+</span> zipFile<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zipfile-removefile-file" tabindex="-1"><a class="header-anchor" href="#zipfile-removefile-file"
+              aria-hidden="true">#</a> ZipFile.removeFile(file)</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 要删除的文件</li>
+          </ul>
+          <p>删除zip文件内的指定文件。此方法首先找到文件头，然后删除文件；如果文件不存在，则此方法引发异常。</p>
+          <p>如果zip文件是分割后的zip文件，则此方法会抛出异常，原因是zip规范不允许更新拆分的zip档案。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> zipFile <span class="token operator">=</span> $zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">&quot;./app.apk&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+zipFile<span class="token punctuation">.</span><span class="token function">removeFile</span><span class="token punctuation">(</span><span class="token string">&quot;res/drawable/logo.png&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zipfile-extractfile-file-dest-options-newfilename" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-extractfile-file-dest-options-newfilename" aria-hidden="true">#</a>
+            ZipFile.extractFile(file, dest[, options, newFileName])</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 要解压的文件</li>
+            <li><code><span class="token property">dest</span></code> {string} 解压文件的目标路径</li>
+            <li><code><span class="token property">options</span></code> {Object} 解压选项，可选。参见<a
+                href="#%E8%A7%A3%E5%8E%8B%E9%80%89%E9%A1%B9">解压选项</a></li>
+            <li><code><span class="token property">newFileName</span></code> {string} 解压后文件的新名字，可选.</li>
+          </ul>
+          <p>从压缩包文件中提取特定文件到目标路径。如果目标路径无效，则此方法将引发异常。</p>
+          <h2 id="zipfile-extractall-dest-options" tabindex="-1"><a class="header-anchor"
+              href="#zipfile-extractall-dest-options" aria-hidden="true">#</a> ZipFile.extractAll(dest{, options})</h2>
+          <ul>
+            <li><code><span class="token property">dest</span></code> {string} 解压路径</li>
+            <li><code><span class="token property">options</span></code> {Object} 解压选项，可选。参见<a
+                href="#%E8%A7%A3%E5%8E%8B%E9%80%89%E9%A1%B9">解压选项</a></li>
+          </ul>
+          <p>解压所有文件到目标路径<code><span class="token property">dest</span></code>。</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">let</span> zip <span class="token operator">=</span> $zip<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">&quot;./test.zip&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+zip<span class="token punctuation">.</span><span class="token function">addFiles</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">&quot;./test.js&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./test.txt&quot;</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+zip<span class="token punctuation">.</span><span class="token function">extractAll</span><span class="token punctuation">(</span><span class="token string">&quot;./test&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="zipfile-getfileheader-file" tabindex="-1"><a class="header-anchor" href="#zipfile-getfileheader-file"
+              aria-hidden="true">#</a> ZipFile.getFileHeader(file)</h2>
+          <ul>
+            <li><code><span class="token property">file</span></code> {string} 压缩包内指定文件路径</li>
+            <li>返回 {<a
+                href="https://javadoc.io/doc/net.lingala.zip4j/zip4j/1.3.2/net/lingala/zip4j/model/FileHeader.html"
+                target="_blank" rel="noopener noreferrer">FileHeader<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>}</li>
+          </ul>
+          <p>获取压缩包内指定文件的文件头信息。文件头信息包括校验值，是否加密，注释等。</p>
+          <h2 id="zipfile-getfileheaders" tabindex="-1"><a class="header-anchor" href="#zipfile-getfileheaders"
+              aria-hidden="true">#</a> ZipFile.getFileHeaders()</h2>
+          <ul>
+            <li>返回 {Array&lt;<a
+                href="https://javadoc.io/doc/net.lingala.zip4j/zip4j/1.3.2/net/lingala/zip4j/model/FileHeader.html"
+                target="_blank" rel="noopener noreferrer">FileHeader<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>&gt;}</li>
+          </ul>
+          <p>获取压缩包内所有文件的文件头信息。文件头信息包括校验值，是否加密，注释等。</p>
+          <h1 id="压缩选项" tabindex="-1"><a class="header-anchor" href="#压缩选项" aria-hidden="true">#</a> 压缩选项</h1>
+          <p><code><span class="token property">options</span></code> {object} 包括:</p>
+          <ul>
+            <li><code><span class="token property">aesKeyStrength</span></code> {string}
+              AES加密强度，包括<code><span class="token constant">AES_STRENGTH_128</span></code>，<code><span class="token constant">AES_STRENGTH_192</span></code>，<code><span class="token constant">AES_STRENGTH_256</span></code>
+            </li>
+            <li><code><span class="token property">compressionLevel</span></code> {number}
+              压缩级别，0~9，0为不压缩，9为最好压缩（速度较慢）。在8.7以前版本，默认为0不压缩；在8.7以后，该值默认为5（正常压缩）</li>
+            <li><code><span class="token property">compressionMethod</span></code> {string}
+              压缩方式，<code><span class="token constant">COMP_STORE</span></code>为仅打包不压缩,
+              <code><span class="token constant">COMP_DEFLATE</span></code>为压缩（默认）</li>
+            <li><code><span class="token property">defaultFolderPath</span></code> {string} 压缩或添加文件时，指定文件在压缩包的默认文件夹位置
+            </li>
+            <li><code><span class="token property">encryptionMethod</span></code> {string}
+              加密方法，<code><span class="token constant">ENC_NO_ENCRYPTION</span></code>为不加密(默认)，<code><span class="token constant">ENC_METHOD_STANDARD</span></code>为标准机密,
+              <code><span class="token constant">ENC_METHOD_AES</span></code>为AES加密</li>
+            <li><code><span class="token property">fileNameInZip</span></code> {string} 压缩或添加文件时，指定文件在压缩包中的路径、名称</li>
+            <li><code><span class="token property">includeRootFolder</span></code> {boolean}
+              设置标志以指示添加文件的父文件夹是否将包含在ZIP中。如果为true，则添加文件的父文件夹将包含在ZIP中。默认true</li>
+            <li><code><span class="token property">password</span></code> {string} 加密压缩的密码。如果设置密码但不设置加密方法，则加密方法默认为AES
+            </li>
+            <li><code><span class="token property">readHiddenFiles</span></code> {boolean}
+              压缩文件夹时是否包含隐藏文件。如果为true，则在将文件夹添加到zip时将包含隐藏文件</li>
+            <li><code><span class="token property">rootFolderInZip</span></code> {string}
+              设置压缩包首目录的文件夹名称，如果没有首目录，则创建这个首目录</li>
+          </ul>
+          <h1 id="解压选项" tabindex="-1"><a class="header-anchor" href="#解压选项" aria-hidden="true">#</a> 解压选项</h1>
+          <p><code><span class="token property">options</span></code> {object} 包括：</p>
+          <ul>
+            <li><code><span class="token property">ignoreAttribute</span></code> {string[]} 解压文件写入磁盘时，要忽略的文件属性，包括： <ul>
+                <li><code><span class="token property">alls</span></code> 所有属性</li>
+                <li><code><span class="token property">archive</span></code> 压缩包属性</li>
+                <li><code><span class="token property">dateTime</span></code> 时间</li>
+                <li><code><span class="token property">hidden</span></code> 是否隐藏</li>
+                <li><code><span class="token property">readOnly</span></code> 是否只读</li>
+                <li><code><span class="token property">system</span></code> 是否为系统文件</li>
+              </ul>
+            </li>
+          </ul>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><!----></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><!--[--><!--[--><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span><!--]--><!--]--></div>
+        </footer>
+        <nav class="page-nav"><a href="webSocket.html" class="nav-link prev" aria-label="WebSocket">
+            <div class="hint"><span class="arrow left"></span>上一页</div>
+            <div class="link"><!---->WebSocket</div>
+          </a><!----></nav><!----><!----><!--]-->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><!----><!--]-->
+  </div>
+  <script type="module" src="../../assets/app.6aa2b576.js" defer></script>
+</body>
+
+</html>

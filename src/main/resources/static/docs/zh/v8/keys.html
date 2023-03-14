@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)./keys.html -->
+<html lang="zh-CN" data-theme="light" class=" ">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="keys.html">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="keys - 按键模拟">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2022-10-22T07:36:15.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2022-10-22T07:36:15.000Z">
+  <link rel="alternate" hreflang="en-us" href="keys.html">
+  <link rel="icon" href="./docs/favicon.ico">
+  <link rel="manifest" href="./docs/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>keys - 按键模拟 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../assets/app.html.004a89b7.js">
+  <link rel="modulepreload" href="../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../assets/app.html.79d7bc17.js">
+</head>
+
+<body>
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../docs.html" class="brand"><img class="logo"
+              src="../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="v8.html" class="nav-link active" aria-label="第一代API文档"><span
+                  class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v9/v9.html" class="nav-link" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="https://pro.autojs.org/docs/en/" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="./keys.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574=""><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574=""><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="./" class="nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">自动化 -
+                        控件操作</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><!--[--><a href="./automator/"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="入门介绍" aria-current="page"><!---->入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/selector.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="选择器"><!---->选择器<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/uiobject.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="控件和控件集合"><!---->控件和控件集合<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="automator与其他函数"><!---->automator与其他函数<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./coordinatesBasedAutomation.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="自动化 - 坐标操作"><!---->自动化 -
+                    坐标操作<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./app.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="app - 应用"><!---->app -
+                    应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./base64.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="base64"><!---->base64<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./colors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="colors - 颜色"><!---->colors - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./canvas.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="canvas - 画布"><!---->canvas - 画布<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./console.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="console - 控制台"><!---->console - 控制台<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./crypto.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="crypto - 加解密与消息摘要"><!---->crypto - 加解密与消息摘要<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./debug.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="debug - 调试工具"><!---->debug - 调试工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./device.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./dialogs.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="dialogs - 对话框"><!---->dialogs - 对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./engines.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="engines - 脚本引擎"><!---->engines - 脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./events.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="events - 事件与监听"><!---->events - 事件与监听<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./floaty.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="floaty - 悬浮窗"><!---->floaty - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./files.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="files - 文件系统"><!---->files - 文件系统<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./globals.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="globals - 全局变量与函数"><!---->globals - 全局变量与函数<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./http.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="http - HTTP网络请求"><!---->http - HTTP网络请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./images.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="images - 图片处理"><!---->images - 图片处理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./keys.html" class="nav-link sidebar-link sidebar-page active"
+                    aria-label="keys - 按键模拟"><!---->keys
+                    - 按键模拟<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./media.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="media - 多媒体"><!---->media
+                    - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./modules.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="module - 模块"><!---->module - 模块<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./ocr.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="ocr - 文字识别"><!---->ocr -
+                    文字识别<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./plugins.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./powerManager.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="power_manager - 电源管理"><!---->power_manager - 电源管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./sensors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="sensors - 传感器"><!---->sensors - 传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./shell.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="shell - Shell命令"><!---->shell - Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./storages.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="storages - 本地存储"><!---->storages - 本地存储<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./settings.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="settings - 设置"><!---->settings - 设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./threads.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="threads - 多线程"><!---->threads - 多线程<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timers.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="timers - 定时器"><!---->timers - 定时器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timedTasks.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="work_manager - 定时与任务"><!---->work_manager - 定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">ui - 用户界面</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><a href="/docs/zh/v8/ui/ui.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="ui入门介绍"><!---->ui入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/basic.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="基础布局与控件"><!---->基础布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/advanced.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="其他布局与控件"><!---->其他布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="api文档"><!---->api文档<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/customWidget.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="自定义控件"><!---->自定义控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a aria-current="page" href="/docs/zh/v8/ui/webview.html"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="使用Web编写界面"><!---->使用Web编写界面<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./util.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="util - 工具"><!---->util -
+                    工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./webSocket.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="WebSocket"><!---->WebSocket<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./zip.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="zip - 压缩与解压"><!---->zip -
+                    压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">进阶</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="./scriptingJava.html"
+                    class="nav-link sidebar-link sidebar-page" aria-label="和Java交互"><!---->和Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!---->
+        <nav class="breadcrumb">
+          <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+            <li class="" property="itemListElement" typeof="ListItem"><a href="https://pro.autojs.org/docs/" class=""
+                property="item" typeof="WebPage"><span class="icon iconfont icon-home"></span><span
+                  property="name">Auto.js Pro</span></a>
+              <meta property="position" content="1">
+            </li>
+            <li class="" property="itemListElement" typeof="ListItem"><a href="./"
+                class="" property="item" typeof="WebPage"><!----><span property="name">阅读须知</span></a>
+              <meta property="position" content="2">
+            </li>
+            <li class="is-active" property="itemListElement" typeof="ListItem"><a aria-current="page"
+                href="./keys.html" class="router-link-active router-link-exact-active"
+                property="item" typeof="WebPage"><!----><span property="name">keys - 按键模拟</span></a>
+              <meta property="position" content="3">
+            </li>
+          </ol>
+        </nav>
+        <div class="page-title">
+          <h1><!---->keys - 按键模拟</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月22日</span>
+              <meta property="datePublished" content="2022-10-22T07:36:15.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list">
+                <li class="toc-item"><a aria-current="page" href="./keys.html#back"
+                    class="router-link-active router-link-exact-active toc-link level2">back()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#home"
+                    class="router-link-active router-link-exact-active toc-link level2">home()</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#powerdialog"
+                    class="router-link-active router-link-exact-active toc-link level2">powerDialog()</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#notifications"
+                    class="router-link-active router-link-exact-active toc-link level2">notifications()</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#quicksettings"
+                    class="router-link-active router-link-exact-active toc-link level2">quickSettings()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#recents"
+                    class="router-link-active router-link-exact-active toc-link level2">recents()</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#splitscreen"
+                    class="router-link-active router-link-exact-active toc-link level2">splitScreen()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#home-1"
+                    class="router-link-active router-link-exact-active toc-link level2">Home()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#back-1"
+                    class="router-link-active router-link-exact-active toc-link level2">Back()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#power"
+                    class="router-link-active router-link-exact-active toc-link level2">Power()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#menu"
+                    class="router-link-active router-link-exact-active toc-link level2">Menu()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#volumeup"
+                    class="router-link-active router-link-exact-active toc-link level2">VolumeUp()</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#volumedown"
+                    class="router-link-active router-link-exact-active toc-link level2">VolumeDown()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#camera"
+                    class="router-link-active router-link-exact-active toc-link level2">Camera()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#up"
+                    class="router-link-active router-link-exact-active toc-link level2">Up()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#down"
+                    class="router-link-active router-link-exact-active toc-link level2">Down()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#left"
+                    class="router-link-active router-link-exact-active toc-link level2">Left()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#right"
+                    class="router-link-active router-link-exact-active toc-link level2">Right()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#ok"
+                    class="router-link-active router-link-exact-active toc-link level2">OK()</a></li><!---->
+                <li class="toc-item"><a aria-current="page" href="./keys.html#text-text"
+                    class="router-link-active router-link-exact-active toc-link level2">Text(text)</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#keycode-code"
+                    class="router-link-active router-link-exact-active toc-link level2">KeyCode(code)</a></li><!---->
+                <li class="toc-item"><a aria-current="page"
+                    href="./keys.html#%E9%99%84%E5%BD%95-keycode%E5%AF%B9%E7%85%A7%E8%A1%A8"
+                    class="router-link-active router-link-exact-active toc-link level2">附录: KeyCode对照表</a></li><!---->
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="keys-按键模拟" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#keys-%E6%8C%89%E9%94%AE%E6%A8%A1%E6%8B%9F"
+              aria-hidden="true">#</a> keys - 按键模拟</h1>
+          <p>按键模拟部分提供了一些模拟物理按键的全局函数，包括Home、音量键、照相键等，有的函数依赖于无障碍服务，有的函数依赖于root权限。</p>
+          <p>一般来说，以大写字母开头的函数都依赖于root权限。执行此类函数时，如果没有root权限，则函数执行后没有效果，并会在控制台输出一个警告。</p>
+          <h2 id="back" tabindex="-1"><a class="header-anchor" href="./keys.html#back"
+              aria-hidden="true">#</a> back()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>模拟按下返回键。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="home" tabindex="-1"><a class="header-anchor" href="./keys.html#home"
+              aria-hidden="true">#</a> home()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>模拟按下Home键。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="powerdialog" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#powerdialog" aria-hidden="true">#</a> powerDialog()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>弹出电源键菜单。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="notifications" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#notifications" aria-hidden="true">#</a> notifications()
+          </h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>拉出通知栏。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="quicksettings" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#quicksettings" aria-hidden="true">#</a> quickSettings()
+          </h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>显示快速设置(下拉通知栏到底)。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="recents" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#recents" aria-hidden="true">#</a> recents()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>显示最近任务。返回是否执行成功。 此函数依赖于无障碍服务。</p>
+          <h2 id="splitscreen" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#splitscreen" aria-hidden="true">#</a> splitScreen()</h2>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>分屏。返回是否执行成功。 此函数依赖于无障碍服务, 并且需要系统自身功能的支持。</p>
+          <h2 id="home-1" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#home-1" aria-hidden="true">#</a> Home()</h2>
+          <p>模拟按下Home键。 此函数依赖于root权限。</p>
+          <h2 id="back-1" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#back-1" aria-hidden="true">#</a> Back()</h2>
+          <p>模拟按下返回键。 此函数依赖于root权限。</p>
+          <h2 id="power" tabindex="-1"><a class="header-anchor" href="./keys.html#power"
+              aria-hidden="true">#</a> Power()</h2>
+          <p>模拟按下电源键。 此函数依赖于root权限。</p>
+          <h2 id="menu" tabindex="-1"><a class="header-anchor" href="./keys.html#menu"
+              aria-hidden="true">#</a> Menu()</h2>
+          <p>模拟按下菜单键。 此函数依赖于root权限。</p>
+          <h2 id="volumeup" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#volumeup" aria-hidden="true">#</a> VolumeUp()</h2>
+          <p>按下音量上键。 此函数依赖于root权限。</p>
+          <h2 id="volumedown" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#volumedown" aria-hidden="true">#</a> VolumeDown()</h2>
+          <p>按键音量上键。 此函数依赖于root权限。</p>
+          <h2 id="camera" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#camera" aria-hidden="true">#</a> Camera()</h2>
+          <p>模拟按下照相键。</p>
+          <h2 id="up" tabindex="-1"><a class="header-anchor" href="./keys.html#up"
+              aria-hidden="true">#</a> Up()</h2>
+          <p>模拟按下物理按键上。 此函数依赖于root权限。</p>
+          <h2 id="down" tabindex="-1"><a class="header-anchor" href="./keys.html#down"
+              aria-hidden="true">#</a> Down()</h2>
+          <p>模拟按下物理按键下。 此函数依赖于root权限。</p>
+          <h2 id="left" tabindex="-1"><a class="header-anchor" href="./keys.html#left"
+              aria-hidden="true">#</a> Left()</h2>
+          <p>模拟按下物理按键左。 此函数依赖于root权限。</p>
+          <h2 id="right" tabindex="-1"><a class="header-anchor" href="./keys.html#right"
+              aria-hidden="true">#</a> Right()</h2>
+          <p>模拟按下物理按键右。 此函数依赖于root权限。</p>
+          <h2 id="ok" tabindex="-1"><a class="header-anchor" href="./keys.html#ok"
+              aria-hidden="true">#</a> OK()</h2>
+          <p>模拟按下物理按键确定。 此函数依赖于root权限。</p>
+          <h2 id="text-text" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#text-text" aria-hidden="true">#</a> Text(text)</h2>
+          <ul>
+            <li><code><span class="token property">text</span></code> {string} 要输入的文字，只能为英文或英文符号
+              输入文字text。例如<code><span class="token function">Text</span><span class="token punctuation">(</span><span class="token string">"aaa"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code>
+            </li>
+          </ul>
+          <h2 id="keycode-code" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#keycode-code" aria-hidden="true">#</a> KeyCode(code)
+          </h2>
+          <ul>
+            <li><code><span class="token property">code</span></code> {number} | {string} 要按下的按键的数字代码或名称。参见下表。
+              模拟物理按键。例如<code><span class="token function">KeyCode</span><span class="token punctuation">(</span><span class="token number">29</span><span class="token punctuation">)</span></code>和<code><span class="token function">KeyCode</span><span class="token punctuation">(</span><span class="token string">"KEYCODE_A"</span><span class="token punctuation">)</span></code>是按下A键。
+            </li>
+          </ul>
+          <h2 id="附录-keycode对照表" tabindex="-1"><a class="header-anchor"
+              href="./keys.html#%E9%99%84%E5%BD%95-keycode%E5%AF%B9%E7%85%A7%E8%A1%A8"
+              aria-hidden="true">#</a> 附录: KeyCode对照表</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>KeyCode</th>
+                <th>KeyEvent value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>KEYCODE_MENU</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SOFT_RIGHT</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_HOME</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_BACK</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_CALL</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_ENDCALL</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_0</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_1</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_2</td>
+                <td>9</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_3</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_4</td>
+                <td>11</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_5</td>
+                <td>12</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_6</td>
+                <td>13</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_7</td>
+                <td>14</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_8</td>
+                <td>15</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_9</td>
+                <td>16</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_STAR</td>
+                <td>17</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_POUND</td>
+                <td>18</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DPAD_UP</td>
+                <td>19</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DPAD_DOWN</td>
+                <td>20</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DPAD_LEFT</td>
+                <td>21</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DPAD_RIGHT</td>
+                <td>22</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DPAD_CENTER</td>
+                <td>23</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_VOLUME_UP</td>
+                <td>24</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_VOLUME_DOWN</td>
+                <td>25</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_POWER</td>
+                <td>26</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_CAMERA</td>
+                <td>27</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_CLEAR</td>
+                <td>28</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_A</td>
+                <td>29</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_B</td>
+                <td>30</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_C</td>
+                <td>31</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_D</td>
+                <td>32</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_E</td>
+                <td>33</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_F</td>
+                <td>34</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_G</td>
+                <td>35</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_H</td>
+                <td>36</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_I</td>
+                <td>37</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_J</td>
+                <td>38</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_K</td>
+                <td>39</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_L</td>
+                <td>40</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_M</td>
+                <td>41</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_N</td>
+                <td>42</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_O</td>
+                <td>43</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_P</td>
+                <td>44</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_Q</td>
+                <td>45</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_R</td>
+                <td>46</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_S</td>
+                <td>47</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_T</td>
+                <td>48</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_U</td>
+                <td>49</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_V</td>
+                <td>50</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_W</td>
+                <td>51</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_X</td>
+                <td>52</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_Y</td>
+                <td>53</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_Z</td>
+                <td>54</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_COMMA</td>
+                <td>55</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_PERIOD</td>
+                <td>56</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_ALT_LEFT</td>
+                <td>57</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_ALT_RIGHT</td>
+                <td>58</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SHIFT_LEFT</td>
+                <td>59</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SHIFT_RIGHT</td>
+                <td>60</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_TAB</td>
+                <td>61</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SPACE</td>
+                <td>62</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SYM</td>
+                <td>63</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_EXPLORER</td>
+                <td>64</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_ENVELOPE</td>
+                <td>65</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_ENTER</td>
+                <td>66</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_DEL</td>
+                <td>67</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_GRAVE</td>
+                <td>68</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_MINUS</td>
+                <td>69</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_EQUALS</td>
+                <td>70</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_LEFT_BRACKET</td>
+                <td>71</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_RIGHT_BRACKET</td>
+                <td>72</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_BACKSLASH</td>
+                <td>73</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SEMICOLON</td>
+                <td>74</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_APOSTROPHE</td>
+                <td>75</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SLASH</td>
+                <td>76</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_AT</td>
+                <td>77</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_NUM</td>
+                <td>78</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_HEADSETHOOK</td>
+                <td>79</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_FOCUS</td>
+                <td>80</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_PLUS</td>
+                <td>81</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_MENU</td>
+                <td>82</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_NOTIFICATION</td>
+                <td>83</td>
+              </tr>
+              <tr>
+                <td>KEYCODE_SEARCH</td>
+                <td>84</td>
+              </tr>
+              <tr>
+                <td>TAG_LAST_ KEYCODE</td>
+                <td>85</td>
+              </tr>
+            </tbody>
+          </table>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><span class="info">2022/10/22
+              15:36:15</span></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span></div>
+        </footer>
+        <nav class="page-nav"><a href="./images.html" class="nav-link prev"
+            aria-label="images - 图片处理">
+            <div class="hint"><span class="arrow left"></span>上一页</div>
+            <div class="link"><!---->images - 图片处理</div>
+          </a><a href="./media.html" class="nav-link next" aria-label="media - 多媒体">
+            <div class="hint">下一页<span class="arrow right"></span></div>
+            <div class="link">media - 多媒体<!----></div>
+          </a></nav><!----><!---->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><button class="sw-update-popup" tabindex="0">新内容已就绪<span class="icon-wrapper"><svg
+          xmlns="http://www.w3.org/2000/svg" class="icon update-icon" viewBox="0 0 1024 1024" fill="currentColor"
+          aria-label="update icon">
+          <path
+            d="M949.949 146.25v255.826c0 21.981-13.989 35.97-35.97 35.97H658.154c-13.988 0-25.983-7.992-33.973-21.981-5.997-13.989-4-27.977 7.991-39.97l79.942-77.946c-55.954-51.973-121.918-77.955-199.863-77.955-37.975 0-75.95 8.002-113.924 21.99-37.975 15.985-67.948 37.976-91.934 63.957-25.982 23.987-47.973 53.96-63.957 91.934-29.983 73.955-29.983 153.895 0 227.85 15.984 37.976 37.975 67.947 63.957 91.934 23.986 25.982 53.959 47.973 91.934 63.956 37.974 13.989 75.95 21.991 113.924 21.991 45.967 0 87.942-9.998 127.913-29.982 41.976-17.99 75.951-45.967 101.931-83.943 7.993-4 11.994-5.995 13.989-5.995 5.997 0 9.998 1.994 13.988 5.995l77.958 77.946c3.989 4 5.986 7.993 5.986 11.994 0 1.994-1.996 5.995-3.99 11.994-43.973 51.962-93.941 91.934-151.9 117.914-53.958 25.983-115.92 39.972-185.874 39.972-61.961 0-119.921-11.984-169.89-33.973-57.96-25.985-105.923-57.963-139.896-93.943-35.98-33.972-67.958-81.936-93.94-139.897-45.967-101.93-45.967-237.846 0-339.777 25.982-57.96 57.96-105.923 93.94-139.896 33.973-35.98 81.936-67.958 139.896-93.94 49.968-21.99 107.928-33.974 169.89-33.974 55.963 0 109.923 9.988 161.885 29.973 53.97 21.99 101.933 51.963 139.908 89.938l73.954-73.944c9.987-9.998 23.987-13.988 39.971-8.002 13.988 8.002 21.98 19.995 21.98 33.984z">
+          </path>
+        </svg></span></button><!--]-->
+  </div>
+  <script type="module" src="./keys - 按键模拟 _ Auto.js Pro文档_files/app.486b1949.js.下载" defer=""></script>
+
+
+  <div id="message-container"></div>
+</body>
+<div id="photoShowViewer" class="sb_BingCA photoShow" style="transition: all 0.2s ease-out 0s; opacity: 0;">
+  <div class="photoshow-viewer-shadow" style="transition: all 0.2s ease-out 0s;"></div>
+  <div class="photoshow-img-wrapper">
+    <img>
+    <div class="photoshow-view-mode-switch-tip">a</div>
+  </div>
+  <i class="photoshow-img-size"></i>
+</div>
+
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="https://pro.autojs.org/docs/zh/v8/http.html">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="http - HTTP网络请求">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2022-10-22T07:36:15.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2022-10-22T07:36:15.000Z">
+  <link rel="alternate" hreflang="en-us" href="https://pro.autojs.org/docs/en/zh/v8/http.html">
+  <link rel="icon" href="https://pro.autojs.org/docs/favicon.ico">
+  <link rel="manifest" href="https://pro.autojs.org/docs/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>http - HTTP网络请求 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../assets/http.html.f342a6e6.js">
+  <link rel="modulepreload" href="../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../assets/http.html.19fd44b6.js">
+</head>
+
+<body>
+
+
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../docs.html" class="brand"><img class="logo"
+              src="../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="v8.html" class="nav-link active" aria-label="第一代API文档"><span
+                  class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v9/v9.html" class="nav-link" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://blog.autojs.org/" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方博客" class="nav-link"><!---->官方博客<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="../../en/en.html" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="http.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="v8.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">自动化 -
+                        控件操作</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><!--[--><a href="./automator/"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="入门介绍" aria-current="page"><!---->入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/selector.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="选择器"><!---->选择器<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/uiobject.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="控件和控件集合"><!---->控件和控件集合<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                      <li><!--[--><a href="./automator/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="automator与其他函数"><!---->automator与其他函数<!----></a>
+                        <ul class="sidebar-sub-headers"></ul><!--]-->
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./coordinatesBasedAutomation.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="自动化 - 坐标操作"><!---->自动化 -
+                    坐标操作<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./app.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="app - 应用"><!---->app -
+                    应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./base64.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="base64"><!---->base64<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./colors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="colors - 颜色"><!---->colors - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./canvas.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="canvas - 画布"><!---->canvas - 画布<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./console.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="console - 控制台"><!---->console - 控制台<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./crypto.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="crypto - 加解密与消息摘要"><!---->crypto - 加解密与消息摘要<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./debug.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="debug - 调试工具"><!---->debug - 调试工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./device.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./dialogs.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="dialogs - 对话框"><!---->dialogs - 对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./engines.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="engines - 脚本引擎"><!---->engines - 脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./events.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="events - 事件与监听"><!---->events - 事件与监听<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./floaty.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="floaty - 悬浮窗"><!---->floaty - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./files.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="files - 文件系统"><!---->files - 文件系统<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./globals.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="globals - 全局变量与函数"><!---->globals - 全局变量与函数<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./http.html" class="nav-link sidebar-link sidebar-page active"
+                    aria-label="http - HTTP网络请求"><!---->http - HTTP网络请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./images.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="images - 图片处理"><!---->images - 图片处理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./keys.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="keys - 按键模拟"><!---->keys
+                    - 按键模拟<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./media.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="media - 多媒体"><!---->media
+                    - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./modules.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="module - 模块"><!---->module - 模块<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./ocr.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="ocr - 文字识别"><!---->ocr -
+                    文字识别<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./plugins.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./powerManager.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="power_manager - 电源管理"><!---->power_manager - 电源管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./sensors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="sensors - 传感器"><!---->sensors - 传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./shell.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="shell - Shell命令"><!---->shell - Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./storages.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="storages - 本地存储"><!---->storages - 本地存储<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./settings.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="settings - 设置"><!---->settings - 设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./threads.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="threads - 多线程"><!---->threads - 多线程<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timers.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="timers - 定时器"><!---->timers - 定时器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./timedTasks.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="work_manager - 定时与任务"><!---->work_manager - 定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">ui - 用户界面</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><a href="/docs/zh/v8/ui/ui.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="ui入门介绍"><!---->ui入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/basic.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="基础布局与控件"><!---->基础布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/advanced.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="其他布局与控件"><!---->其他布局与控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="api文档"><!---->api文档<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="/docs/zh/v8/ui/customWidget.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="自定义控件"><!---->自定义控件<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a aria-current="page" href="/docs/zh/v8/ui/webview.html"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page"
+                          aria-label="使用Web编写界面"><!---->使用Web编写界面<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="./util.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="util - 工具"><!---->util -
+                    工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./webSocket.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="WebSocket"><!---->WebSocket<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="./zip.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="zip - 压缩与解压"><!---->zip -
+                    压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">进阶</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="scriptingJava.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="和Java交互"><!---->和Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!--[--><!---->
+        <nav class="breadcrumb disable"></nav>
+        <div class="page-title">
+          <h1><!---->http - HTTP网络请求</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月22日</span>
+              <meta property="datePublished" content="2022-10-22T07:36:15.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list"><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#http-get-url-options-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">http.get(url[, options,
+                    callback])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#http-post-url-data-options-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">http.post(url, data[, options,
+                    callback])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#http-postjson-url-data-options-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">http.postJson(url[, data,
+                    options, callback])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#http-postmultipart-url-files-options-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">http.postMultipart(url, files[,
+                    options, callback])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#http-request-url-options-callback"
+                    class="router-link-active router-link-exact-active toc-link level2">http.request(url[, options,
+                    callback])</a></li><!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-statuscode"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.statusCode</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-statusmessage"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.statusMessage</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-headers"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.headers</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-body"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.body</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-request"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.request</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-url"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.url</a></li>
+                <!----><!--]--><!--[-->
+                <li class="toc-item"><a aria-current="page"
+                    href="https://pro.autojs.org/docs/zh/v8/http.html#response-method"
+                    class="router-link-active router-link-exact-active toc-link level2">Response.method</a></li>
+                <!----><!--]-->
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="http-http网络请求" tabindex="-1"><a class="header-anchor" href="#http-http网络请求" aria-hidden="true">#</a>
+            http - HTTP网络请求</h1>
+          <blockquote>
+            <p>Stability: 2 - Stable</p>
+          </blockquote>
+          <p>http模块提供一些进行http请求的函数。</p>
+          <h2 id="http-get-url-options-callback" tabindex="-1"><a class="header-anchor"
+              href="#http-get-url-options-callback" aria-hidden="true">#</a> http.get(url[, options, callback])</h2>
+          <ul>
+            <li><code><span class="token property">url</span></code> {string}
+              请求的URL地址，需要以&quot;http://&quot;或&quot;https://&quot;开头。如果url没有以&quot;http://&quot;开头，则默认为&quot;http://&quot;。
+            </li>
+            <li><code><span class="token property">options</span></code> {Object} 请求选项。参见[http.request()][]。</li>
+            <li><code><span class="token property">callback</span></code> {Function}
+              回调函数，可选，其参数是一个[Response][]对象。如果不加回调函数，则该请求将阻塞、同步地执行。</li>
+          </ul>
+          <p>对地址url进行一次HTTP GET 请求。如果没有回调函数，则在请求完成或失败时返回此次请求的响应(参见[Response][])。</p>
+          <p>最简单GET请求如下:</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> r <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;www.baidu.com&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;code = &quot;</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>statusCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;html = &quot;</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>采用回调形式的GET请求如下：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;www.baidu.com&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">res<span class="token punctuation">,</span> err</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token keyword">if</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span><span class="token punctuation">{</span>
+		console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;code = &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>statusCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;html = &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>如果要增加HTTP头部信息，则在options参数中添加，例如：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> r <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;www.baidu.com&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">headers</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+		<span class="token string-property property">&#39;Accept-Language&#39;</span><span class="token operator">:</span> <span class="token string">&#39;zh-cn,zh;q=0.5&#39;</span><span class="token punctuation">,</span>
+		<span class="token string-property property">&#39;User-Agent&#39;</span><span class="token operator">:</span> <span class="token string">&#39;Mozilla/5.0(Macintosh;IntelMacOSX10_7_0)AppleWebKit/535.11(KHTML,likeGecko)Chrome/17.0.963.56Safari/535.11&#39;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;code = &quot;</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>statusCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;html = &quot;</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>一个请求天气并解析返回的天气JSON结果的例子如下：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> city <span class="token operator">=</span> <span class="token string">&quot;广州&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;http://www.sojson.com/open/api/weather/json.shtml?city=&quot;</span> <span class="token operator">+</span> city<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>statusCode <span class="token operator">!=</span> <span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;请求失败: &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>statusCode <span class="token operator">+</span> <span class="token string">&quot; &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>statusMessage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+	<span class="token keyword">var</span> weather <span class="token operator">=</span> res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">log</span><span class="token punctuation">(</span>weather<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span>util<span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">&quot;温度: %s 湿度: %s 空气质量: %s&quot;</span><span class="token punctuation">,</span> weather<span class="token punctuation">.</span>data<span class="token punctuation">.</span>wendu<span class="token punctuation">,</span>
+		weather<span class="token punctuation">.</span>data<span class="token punctuation">.</span>shidu<span class="token punctuation">,</span> weather<span class="token punctuation">.</span>quality<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="http-post-url-data-options-callback" tabindex="-1"><a class="header-anchor"
+              href="#http-post-url-data-options-callback" aria-hidden="true">#</a> http.post(url, data[, options,
+            callback])</h2>
+          <ul>
+            <li><code><span class="token property">url</span></code> {string}
+              请求的URL地址，需要以&quot;http://&quot;或&quot;https://&quot;开头。如果url没有以&quot;http://&quot;开头，则默认为&quot;http://&quot;。
+            </li>
+            <li><code><span class="token property">data</span></code> {string} | {Object} POST数据。</li>
+            <li><code><span class="token property">options</span></code> {Object} 请求选项。</li>
+            <li><code><span class="token property">callback</span></code> {Function}
+              回调，其参数是一个[Response][]对象。如果不加回调参数，则该请求将阻塞、同步地执行。</li>
+          </ul>
+          <p>对地址url进行一次HTTP POST 请求。如果没有回调函数，则在请求完成或失败时返回此次请求的响应(参见[Response][])。</p>
+          <p>其中POST数据可以是字符串或键值对。具体含义取决于options.contentType的值。默认为&quot;application/x-www-form-urlencoded&quot;(表单提交),
+            这种方式是JQuery的ajax函数的默认方式。</p>
+          <p>一个模拟表单提交登录淘宝的例子如下:</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token string">&quot;https://login.taobao.com/member/login.jhtml&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> username <span class="token operator">=</span> <span class="token string">&quot;你的用户名&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> password <span class="token operator">=</span> <span class="token string">&quot;你的密码&quot;</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">post</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token string-property property">&quot;TPL_username&quot;</span><span class="token operator">:</span> username<span class="token punctuation">,</span>
+	<span class="token string-property property">&quot;TPL_password&quot;</span><span class="token operator">:</span> password
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> html <span class="token operator">=</span> res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>html<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">&quot;页面跳转中&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;登录成功&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;登录失败&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="http-postjson-url-data-options-callback" tabindex="-1"><a class="header-anchor"
+              href="#http-postjson-url-data-options-callback" aria-hidden="true">#</a> http.postJson(url[, data,
+            options, callback])</h2>
+          <ul>
+            <li><code><span class="token property">url</span></code> {string}
+              请求的URL地址，需要以&quot;http://&quot;或&quot;https://&quot;开头。如果url没有以&quot;http://&quot;开头，则默认为&quot;http://&quot;。
+            </li>
+            <li><code><span class="token property">data</span></code> {Object} POST数据。</li>
+            <li><code><span class="token property">options</span></code> {Object} 请求选项。</li>
+            <li><code><span class="token property">callback</span></code> {Function}
+              回调，其参数是一个[Response][]对象。如果不加回调参数，则该请求将阻塞、同步地执行。</li>
+          </ul>
+          <p>以JSON格式向目标Url发起POST请求。如果没有回调函数，则在请求完成或失败时返回此次请求的响应(参见[Response][])。</p>
+          <p>
+            JSON格式指的是，将会调用<code><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>把data对象转换为JSON字符串，并在HTTP头部信息中把&quot;Content-Type&quot;属性置为&quot;application/json&quot;。这种方式是AngularJS的ajax函数的默认方式。
+          </p>
+          <p>一个调用图灵机器人接口的例子如下：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> url <span class="token operator">=</span> <span class="token string">&quot;http://www.tuling123.com/openapi/api&quot;</span><span class="token punctuation">;</span>
+r <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">postJson</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">&quot;65458a5df537443b89b31f1c03202a80&quot;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">info</span><span class="token operator">:</span> <span class="token string">&quot;你好啊&quot;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">userid</span><span class="token operator">:</span> <span class="token string">&quot;1&quot;</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">toastLog</span><span class="token punctuation">(</span>r<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="http-postmultipart-url-files-options-callback" tabindex="-1"><a class="header-anchor"
+              href="#http-postmultipart-url-files-options-callback" aria-hidden="true">#</a> http.postMultipart(url,
+            files[, options, callback])</h2>
+          <ul>
+            <li><code><span class="token property">url</span></code> {string}
+              请求的URL地址，需要以&quot;http://&quot;或&quot;https://&quot;开头。如果url没有以&quot;http://&quot;开头，则默认为&quot;http://&quot;。
+            </li>
+            <li><code><span class="token property">files</span></code> {Object} POST数据。</li>
+            <li><code><span class="token property">options</span></code> {Object} 请求选项。</li>
+            <li><code><span class="token property">callback</span></code> {Function}
+              回调，其参数是一个<code><span class="token property">Response</span></code>对象。如果不加回调参数，则该请求将阻塞、同步地执行。</li>
+          </ul>
+          <p>向目标地址发起类型为multipart/form-data的请求（通常用于文件上传等), 其中files参数是{name1: value1, name2: value2,
+            ...}的键值对，value的格式可以是以下几种情况：</p>
+          <ol>
+            <li><code><span class="token property">string</span></code></li>
+            <li>文件类型，即open()返回的类型</li>
+            <li>[fileName, filePath]</li>
+            <li>[fileName, mimeType, filePath]</li>
+          </ol>
+          <p>其中1属于非文件参数，2、3、4为文件参数。举个例子，最简单的文件上传的请求为：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">postMultipart</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">file</span><span class="token operator">:</span> <span class="token function">open</span><span class="token punctuation">(</span><span class="token string">&quot;/sdcard/1.txt&quot;</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>如果使用格式2，则代码为</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">postMultipart</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">file</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">&quot;1.txt&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;/sdcard/1.txt&quot;</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>如果使用格式3，则代码为</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">postMultipart</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">file</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">&quot;1.txt&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;text/plain&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;/sdcard/1.txt&quot;</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>如果使用格式2的同时要附带非文件参数&quot;appId=test&quot;，则为:</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">postMultipart</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+	<span class="token literal-property property">appId</span><span class="token operator">:</span> <span class="token string">&quot;test&quot;</span><span class="token punctuation">,</span>
+	<span class="token literal-property property">file</span><span class="token operator">:</span> <span class="token function">open</span><span class="token punctuation">(</span><span class="token string">&quot;/sdcard/1.txt&quot;</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">log</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="http-request-url-options-callback" tabindex="-1"><a class="header-anchor"
+              href="#http-request-url-options-callback" aria-hidden="true">#</a> http.request(url[, options, callback])
+          </h2>
+          <ul>
+            <li><code><span class="token property">url</span></code> {string}
+              请求的URL地址，需要以&quot;http://&quot;或&quot;https://&quot;开头。如果url没有以&quot;http://&quot;开头，则默认为&quot;http://&quot;。
+            </li>
+            <li><code><span class="token property">options</span></code> {Object} 请求选项。参见[http.buildRequest()][]。</li>
+            <li><code><span class="token property">callback</span></code> {Function}
+              回调，其参数是一个[Response][]对象。如果不加回调参数，则该请求将阻塞、同步地执行。</li>
+          </ul>
+          <p>对目标地址url发起一次HTTP请求。如果没有回调函数，则在请求完成或失败时返回此次请求的响应(参见[Response][])。</p>
+          <p>选项options可以包含以下属性：</p>
+          <ul>
+            <li><code><span class="token property">headers</span></code> {Object} 键值对形式的HTTP头部信息。有关HTTP头部信息，参见<a
+                href="http://www.runoob.com/http/http-header-fields.html" target="_blank"
+                rel="noopener noreferrer">菜鸟教程：HTTP响应头信息<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</li>
+            <li><code><span class="token property">method</span></code> {string} HTTP请求方法。包括&quot;GET&quot;,
+              &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;PATCH&quot;。</li>
+            <li><code><span class="token property">contentType</span></code> {string}
+              HTTP头部信息中的&quot;Content-Type&quot;, 表示HTTP请求的内容类型。例如&quot;text/plain&quot;,
+              &quot;application/json&quot;。更多信息参见<a href="http://www.runoob.com/http/http-content-type.html"
+                target="_blank" rel="noopener noreferrer">菜鸟教程：HTTP contentType<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</li>
+            <li><code><span class="token property">body</span></code> {string} | {Array} | {Function}
+              HTTP请求的内容。可以是一个字符串，也可以是一个字节数组；或者是一个以<a
+                href="https://github.com/square/okio/blob/master/okio/src/main/java/okio/BufferedSink.java"
+                target="_blank" rel="noopener noreferrer">BufferedSink<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>为参数的函数。</li>
+          </ul>
+          <p>该函数是get, post, postJson等函数的基础函数。因此除非是PUT, DELETE等请求，或者需要更高定制的HTTP请求，否则直接使用get, post, postJson等函数会更加方便。</p>
+          <h1 id="response" tabindex="-1"><a class="header-anchor" href="#response" aria-hidden="true">#</a> Response
+          </h1>
+          <p>HTTP请求的响应。</p>
+          <h2 id="response-statuscode" tabindex="-1"><a class="header-anchor" href="#response-statuscode"
+              aria-hidden="true">#</a> Response.statusCode</h2>
+          <ul>
+            <li>{number}</li>
+          </ul>
+          <p>当前响应的HTTP状态码。例如200(OK), 404(Not Found)等。</p>
+          <p>有关HTTP状态码的信息，参见<a href="http://www.runoob.com/http/http-status-codes.html" target="_blank"
+              rel="noopener noreferrer">菜鸟教程：HTTP状态码<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</p>
+          <h2 id="response-statusmessage" tabindex="-1"><a class="header-anchor" href="#response-statusmessage"
+              aria-hidden="true">#</a> Response.statusMessage</h2>
+          <ul>
+            <li>{string}</li>
+          </ul>
+          <p>当前响应的HTTP状态信息。例如&quot;OK&quot;, &quot;Bad Request&quot;, &quot;Forbidden&quot;。</p>
+          <p>有关HTTP状态码的信息，参见<a href="http://www.runoob.com/http/http-status-codes.html" target="_blank"
+              rel="noopener noreferrer">菜鸟教程：HTTP状态码<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</p>
+          <p>例子：</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code><span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;www.baidu.com&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>statusCode <span class="token operator">&gt;=</span> <span class="token number">200</span> <span class="token operator">&amp;&amp;</span> res<span class="token punctuation">.</span>statusCode <span class="token operator">&lt;</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;页面获取成功!&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>statusCode <span class="token operator">==</span> <span class="token number">404</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;页面没找到哦...&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+	<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">&quot;错误: &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>statusCode <span class="token operator">+</span> <span class="token string">&quot; &quot;</span> <span class="token operator">+</span> res<span class="token punctuation">.</span>statusMessage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="response-headers" tabindex="-1"><a class="header-anchor" href="#response-headers"
+              aria-hidden="true">#</a> Response.headers</h2>
+          <ul>
+            <li>{Object}</li>
+          </ul>
+          <p>当前响应的HTTP头部信息。该对象的键是响应头名称，值是各自的响应头值。 所有响应头名称都是小写的(吗)。</p>
+          <p>有关HTTP头部信息，参见<a href="http://www.runoob.com/http/http-header-fields.html" target="_blank"
+              rel="noopener noreferrer">菜鸟教程：HTTP响应头信息<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</p>
+          <p>例子:</p>
+          <div class="language-javascript ext-js line-numbers-mode">
+            <pre class="language-javascript"><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> res <span class="token operator">=</span> http<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">&quot;www.qq.com&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;HTTP Headers:&quot;</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> headerName <span class="token keyword">in</span> res<span class="token punctuation">.</span>headers<span class="token punctuation">)</span><span class="token punctuation">{</span>
+	console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">&quot;%s: %s&quot;</span><span class="token punctuation">,</span> headerName<span class="token punctuation">,</span> res<span class="token punctuation">.</span>headers<span class="token punctuation">[</span>headerName<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h2 id="response-body" tabindex="-1"><a class="header-anchor" href="#response-body" aria-hidden="true">#</a>
+            Response.body</h2>
+          <ul>
+            <li>{Object}</li>
+          </ul>
+          <p>当前响应的内容。他有以下属性和函数：</p>
+          <ul>
+            <li>bytes() {Array} 以字节数组形式返回响应内容</li>
+            <li>string() {string} 以字符串形式返回响应内容</li>
+            <li>json() {Object} 把响应内容作为JSON格式的数据并调用JSON.parse，返回解析后的对象</li>
+            <li>contentType {string} 当前响应的内容类型</li>
+          </ul>
+          <h2 id="response-request" tabindex="-1"><a class="header-anchor" href="#response-request"
+              aria-hidden="true">#</a> Response.request</h2>
+          <ul>
+            <li>{Request} 当前响应所对应的请求。参见[Request][]。</li>
+          </ul>
+          <h2 id="response-url" tabindex="-1"><a class="header-anchor" href="#response-url" aria-hidden="true">#</a>
+            Response.url</h2>
+          <ul>
+            <li>{number} 当前响应所对应的请求URL。</li>
+          </ul>
+          <h2 id="response-method" tabindex="-1"><a class="header-anchor" href="#response-method"
+              aria-hidden="true">#</a> Response.method</h2>
+          <ul>
+            <li>{string} 当前响应所对应的HTTP请求的方法。例如&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;等。</li>
+          </ul>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><!----></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><!--[--><!--[--><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span><!--]--><!--]--></div>
+        </footer>
+        <nav class="page-nav"><a href="globals.html" class="nav-link prev" aria-label="globals - 全局变量与函数">
+            <div class="hint"><span class="arrow left"></span>上一页</div>
+            <div class="link"><!---->globals - 全局变量与函数</div>
+          </a><a href="media.html" class="nav-link next" aria-label="media - 多媒体">
+            <div class="hint">下一页<span class="arrow right"></span></div>
+            <div class="link">media - 多媒体<!----></div>
+          </a></nav><!----><!----><!--]-->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><!----><!--]-->
+  </div>
+  <script type="module" src="../../assets/app.6aa2b576.js" defer></script>
+</body>
+
+</html>

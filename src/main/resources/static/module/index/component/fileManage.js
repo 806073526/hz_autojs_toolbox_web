@@ -895,6 +895,17 @@ export default {
                 this.downloadFile(row)
             });
         },
+        // 手机端运行文件
+        phoneRunScriptPath(row){
+            window.ZXW_VUE.$confirm('是否确认在手机端运行脚本【' + row.pathName + '】?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let remoteScript = `engines.execScriptFile("${row.pathName}",{path:["${row.parentPathName}"]})`;
+                this.remoteExecuteScript(remoteScript);
+            });
+        },
         // 手机端下载文件
         phoneDownLoadFile(row){
             this.phoneFileLoading = true;
@@ -1483,13 +1494,37 @@ export default {
                 this.refreshPhoneDir();
             },500);
         },
+        // 初始官方示例
+        phoneInitOfficialExample(){
+            this.phoneFileLoading = true;
+            // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedExample",()=>{
+                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                utilsObj.downLoadFile("${getContext()}/AutoJsPro官方示例.zip","/appSync/AutoJsPro官方示例.zip",()=>{
+                    $zip.unzip('/sdcard/appSync/AutoJsPro官方示例.zip', '/sdcard/appSync/');
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"unzipFinishedExample",
+                        "serviceValue":"true"
+                    }
+                    events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    toastLog("初始化AutoJsPro官方示例完成");
+                })`;
+                this.remoteExecuteScript(downLoadGameScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
+                // 刷新手机目录
+                this.refreshPhoneDir();
+            });
+        },
         // 手机端下载脚手架项目
         phoneDownLoadGameScript(){
             this.phoneFileLoading = true;
             // 手机端下载脚手架项目 并且zip解压完成后 web端刷新手机目录
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished",()=>{
                 let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
-                utilsObj.downLoadFile("https://www.zjh336.cn/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{
+                utilsObj.downLoadFile("${getContext()}/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{
                     $zip.unzip('/sdcard/appSync/hz_autojs_game_script.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
                         "deviceUUID":"${this.deviceInfo.deviceUuid}",
