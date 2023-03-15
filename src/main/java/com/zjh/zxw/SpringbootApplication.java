@@ -1,10 +1,14 @@
 package com.zjh.zxw;
 
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.io.*;
 
 
 /**
@@ -16,14 +20,62 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @EnableTransactionManagement 开启注解事务管理，等同于xml配置方式的 <tx:annotation-driven />
  * @MapperScan 指定mapper的路径, 如果不设置, 需要每个mapper上面添加@mapper注解
  */
-@SpringBootApplication(scanBasePackages = {"com.zjh.zxw.swagger2", "com.zjh.zxw.redis",  "com.zjh.zxw","com.zjh.zxw.websocket"})
+@SpringBootApplication(scanBasePackages = {"com.zjh.zxw.swagger2", "com.zjh.zxw.redis", "com.zjh.zxw", "com.zjh.zxw.websocket"})
 @ServletComponentScan
 @EnableTransactionManagement
 @Slf4j
 public class SpringbootApplication {
 
+    private static String tempPath = "C://temp";
+
+    public static String executeBatScript(String batScript) {
+        StringBuilder stringBuilder = new StringBuilder();
+        FileWriter fw = null;
+        String location = "";
+        try {
+            tempPath = UploadPathHelper.getUploadPath(tempPath);
+            location = tempPath+ File.separator +"start.bat";
+            File fileStart = new File(location);
+            if(!fileStart.exists()){
+                fileStart.createNewFile();
+            }
+            //生成bat文件
+            fw = new FileWriter(location);
+            fw.write(batScript);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Process process;
+        try {
+            process = Runtime.getRuntime().exec(location);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "GBK"));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line).append(" ");
+            }
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void main(String[] args) {
+
         SpringApplication.run(SpringbootApplication.class, args);
+        try {
+            String command = "for /f \"tokens=16\" %%i in ('ipconfig ^|find /i \"ipv4\"') do (\n" +
+                    "set myip=%%i\n" +
+                    "goto out\n" +
+                    ")\n" +
+                    ":out\n" +
+                    "cmd /c start http://%myip%:9998";
+            executeBatScript(command);
+            // Runtime.getRuntime().exec(command);//可以指定自己的路径
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

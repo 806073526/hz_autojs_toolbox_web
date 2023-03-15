@@ -7,6 +7,7 @@ import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
 import com.zjh.zxw.domain.dto.FileBase64DTO;
@@ -248,10 +249,7 @@ public class AttachmentInfoController extends BaseController {
     @ApiOperation(value = "获取绝对路径前缀", notes = "获取绝对路径前缀")
     @GetMapping("/getAbsolutePrePath")
     public R<String> getAbsolutePrePath() {
-        File file = new File(uploadPath);
-        if(!file.exists()){
-            uploadPath = "C:\\zxwAjUpload\\";
-        }
+        uploadPath = UploadPathHelper.getUploadPath(uploadPath);
         return success(uploadPath + "autoJsTools" + File.separator);
     }
 

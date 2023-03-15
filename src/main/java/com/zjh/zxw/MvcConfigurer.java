@@ -7,6 +7,7 @@
  */
 package com.zjh.zxw;
 
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -37,10 +38,7 @@ public class MvcConfigurer extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        File file = new File(uploadPath);
-        if(!file.exists()){
-            uploadPath = "C:\\zxwAjUpload\\";
-        }
+        uploadPath = UploadPathHelper.getUploadPath(uploadPath);
         //静态资源访问路径配置
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
         //本地资源访问路径配置

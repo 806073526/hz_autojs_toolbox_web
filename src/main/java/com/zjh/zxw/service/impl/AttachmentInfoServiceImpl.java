@@ -6,6 +6,7 @@ import com.zjh.zxw.common.util.UnZipUtils;
 import com.zjh.zxw.common.util.ZipApacheUtils;
 import com.zjh.zxw.common.util.ZipUtils;
 import com.zjh.zxw.common.util.exception.BusinessException;
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
@@ -51,10 +52,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     private String uploadPath;
 
     private String getRootPath() {
-        File file = new File(uploadPath);
-        if(!file.exists()){
-            uploadPath = "C:\\zxwAjUpload\\";
-        }
+        uploadPath = UploadPathHelper.getUploadPath(uploadPath);
         return uploadPath + "autoJsTools" + File.separator;
     }
 
