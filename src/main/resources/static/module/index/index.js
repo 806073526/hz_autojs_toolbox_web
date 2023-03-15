@@ -118,7 +118,9 @@ window.ZXW_VUE = new Vue({
                                         message: "访问密码不正确",
                                         duration: '1000'
                                     });
-                                    window.location.reload();
+                                    setTimeout(()=>{
+                                        window.location.reload();
+                                    },500);
                                 }
                             }
                         }
