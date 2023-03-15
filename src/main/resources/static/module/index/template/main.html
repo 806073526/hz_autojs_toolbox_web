@@ -1,5 +1,8 @@
 <div class="container">
-    <el-form ref="commodityInfo" class="commodity mt-10 width100" label-width="100px">
+    <div v-if="pageAccessLimit" style="display:flex;justify-content: center;align-items: center;font-size: 50px;height: 50vh;">
+        当前没有访问权限,请输入页面访问密码！！！
+    </div>
+    <el-form ref="commodityInfo" v-if="!pageAccessLimit" class="commodity mt-10 width100" label-width="100px">
         <!-- 设备信息组件 -->
         <device-info ref="deviceInfo" @deviceSelectRowCallback="deviceSelectRowCallback"/>
         <el-tabs tab-position="left" style="height: auto;margin-top:5px;" v-model="activeTab">

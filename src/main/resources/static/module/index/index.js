@@ -31,6 +31,8 @@ window.ZXW_VUE = new Vue({
     },
     template: template,
     data: {
+        inputPageAccessPassword:'',
+        pageAccessLimit: false,
         monacoEditorComplete: false,
         activeTab:'imgHandler',
         otherProperty: {// 其他属性对象 同步app端
@@ -71,6 +73,64 @@ window.ZXW_VUE = new Vue({
         }
     },
     mounted() {
+        this.pageAccessLimit = true;
+        // 加载是否需要访问密码
+        let _that = this;
+        $.ajax({
+            url: getContext() + "/device/checkPageAccessLimit",
+            type: "get",
+            dataType: "json",
+            async:false,
+            data: {},
+            success: function (data) {
+                if (data) {
+                    if (data.isSuccess) {
+                        _that.pageAccessLimit = data.data;
+                    }
+                }
+            },
+            error: function (msg) {
+            }
+        });
+
+        // 需要访问密码
+        if(this.pageAccessLimit){
+            // 弹出密码输入界面 密码正确后修改标记
+            this.$prompt('请输入页面访问密码', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then(({value}) => {
+                $.ajax({
+                    url: getContext() + "/device/validatePageAccessPassword",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "inputVal": value
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                // 密码正确
+                                if (data.data) {
+                                    _that.pageAccessLimit = false;
+                                } else {
+                                    window.ZXW_VUE.$notify.error({
+                                        message: "访问密码不正确",
+                                        duration: '1000'
+                                    });
+                                    window.location.reload();
+                                }
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            }).catch(() => {
+                window.location.reload();
+            });
+        }
+
         require.config({ paths: { 'vs': '/plugins/monaco-editor/min/vs' }});
         require(['vs/editor/editor.main'],()=>{ this.monacoEditorComplete = true });
         this.timeSyncOtherProperty();

@@ -3,6 +3,7 @@ package com.zjh.zxw.controller;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
@@ -11,7 +12,9 @@ import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +40,24 @@ import static com.zjh.zxw.base.R.SERVICE_ERROR;
 @Api(value = "DeviceController", tags = "设备控制")
 public class DeviceController extends BaseController {
 
+    @Value("${com.zjh.pageAccessPassword}")
+    private String pageAccessPassword;
+
+
+    @ApiOperation(value = "检查页面访问限制", notes = "检查页面访问限制")
+    @GetMapping("/checkPageAccessLimit")
+    public R<Boolean> checkPageAccessLimit(){
+        return success(StringUtils.isNotBlank(pageAccessPassword));
+    }
+
+
+    @ApiOperation(value = "校验页面访问密码", notes = "校验页面访问密码")
+    @GetMapping("/validatePageAccessPassword")
+    public R<Boolean> validatePageAccessPassword(@RequestParam("inputVal") String inputVal){
+        System.out.println("inputVal:"+inputVal);
+        System.out.println("pageAccessPassword："+pageAccessPassword);
+        return success(StrHelper.getObjectValue(pageAccessPassword).equals(inputVal));
+    }
 
     /**
      * 获取在线设备
