@@ -43,6 +43,14 @@ export default {
             let arr = Object.values(this.remoteScript);
             return arr.filter(item => item.type === 'device');
         },
+        remoteScriptKeys(){
+          let arr = Object.values(this.remoteScript);
+          return arr.filter(item=> item.type === 'keys')
+        },
+        remoteScriptOperate(){
+            let arr = Object.values(this.remoteScript);
+            return arr.filter(item=> item.type === 'operate')
+        },
         remoteScriptOther(){
             let arr = Object.values(this.remoteScript);
             return arr.filter(item => item.type === 'other');
@@ -154,6 +162,138 @@ export default {
                 getClip: {type: 'other', name: '读取剪切板', code: 'toastLog(getClip());'},
                 randomMinMax: {type: 'other', name: '随机数指定范围', code: 'toastLog(random(1,10));'},
                 random: {type: 'other', name: '随机数浮点', code: 'toastLog(random());'},
+                observeNotification:{type: 'other', name: '开启通知监听', code: `
+                    events.obverseNotification();
+                    events.onNotification(function(notification){
+                        log("通知时间为" + new Date(n.when));
+                        log("应用包名: " + notification.getPackageName());
+                        log("通知文本: " + notification.getText());
+                        log("通知优先级: " + notification.priority);
+                        log("通知目录: " + notification.category);
+                        log("通知时间: " + new Date(notification.when));
+                        log("通知数: " + notification.number);
+                        log("通知摘要: " + notification.tickerText);
+                        // 点击通知 notification.click();
+                        // 删除通知 notification.delete();
+                    });
+                    `
+                },
+                observeToast:{type: 'other', name: '开启Toast监听', code: `
+                   events.observeToast();
+                   events.onToast(function(toast){
+                      log("Toast内容: " + toast.getText() + " 包名: " + toast.getPackageName());
+                   });
+                   `
+                },
+
+                back: {type: 'keys', name: '返回上一层', code: 'back();'},
+                home: {type: 'keys', name: '返回主页', code: 'home();'},
+                powerDialog: {type: 'keys', name: '电源', code: 'powerDialog();'},
+                notifications: {type: 'keys', name: '通知栏拉出', code: 'notifications();'},
+                quickSettings: {type: 'keys', name: '通知栏拉到底', code: 'back();'},
+                recents: {type: 'keys', name: '最近任务', code: 'recents();'},
+                observeKey: {type: 'keys', name: '启用按键监听', code: 'events.observeKey();'},
+                onKeyDown: {type: 'keys', name: '监听按键按下', code: `
+                    //启用按键监听
+                    events.observeKey();
+                    //监听音量上键按下
+                    events.onKeyDown("volume_up", function(event){
+                        toast("音量上键被按下了");
+                    });
+                    //监听菜单键按下
+                    events.onKeyDown("menu", function(event){
+                        toast("菜单键被按下了");
+                    });`
+                },
+                onKeyUp: {type: 'keys', name: '监听按键弹起', code: `
+                    //启用按键监听
+                    events.observeKey();
+                    //监听音量上键按下
+                    events.onKeyUp("volume_up", function(event){
+                        toast("音量上键弹起");
+                    });
+                    //监听菜单键按下
+                    events.onKeyUp("menu", function(event){
+                        toast("Home键弹起");
+                    });`
+                },
+                onceKeyDown: {type: 'keys', name: '监听按键按下一次', code: `
+                    //启用按键监听
+                    events.observeKey();
+                    //监听音量上键按下
+                    events.onceKeyDown("volume_up", function(event){
+                        toast("音量上键被按下了一次");
+                    });
+                    //监听菜单键按下
+                    events.onceKeyDown("menu", function(event){
+                        toast("菜单键被按下了一次");
+                    });`
+                },
+                onceKeyUp: {type: 'keys', name: '监听按键弹起一次', code: `
+                    //启用按键监听
+                    events.observeKey();
+                    //监听音量上键按下
+                    events.onceKeyUp("volume_up", function(event){
+                        toast("音量上键弹起一次");
+                    });
+                    //监听菜单键按下
+                    events.onceKeyUp("menu", function(event){
+                        toast("Home键弹起一次");
+                    });`
+                },
+                removeAllKeyDownListeners: {type: 'keys', name: '删除全部按键按下事件', code: `
+                    //启用按键监听
+                    events.observeKey();
+                    //删除音量全部按下事件
+                    events.removeAllKeyDownListeners("volume_up");
+                    //删除菜单全部按下事件
+                    events.removeAllKeyDownListeners("menu");`
+                },
+                setKeyInterceptionEnabled:{type: 'keys', name: '设置按键屏蔽是否启用', code: `
+                    // 会使系统的音量、Home、返回等键不再具有调节音量、回到主页、返回的作用，但此时仍然能通过按键事件监听按键
+                    // 屏蔽全部按键 events.setKeyInterceptionEnabled(true)
+                    events.setKeyInterceptionEnabled("volume_up", true);
+                    events.observeKey();
+                    events.onKeyDown("volume_up", ()=>{
+                        log("音量上键被按下");
+                    });`
+                },
+                observeTouch:{type: 'keys', name: '启用屏幕触摸监听(需要root)', code: `
+                    // 会使系统的音量、Home、返回等键不再具有调节音量、回到主页、返回的作用，但此时仍然能通过按键事件监听按键
+                    // 屏蔽全部按键 events.setKeyInterceptionEnabled(true)
+                    events.observeTouch()
+                    events.setTouchEventTimeout("100");
+                    events.getTouchEventTimeout()
+                    events.onTouch(function(p){
+                        //触摸事件发生时, 打印出触摸的点的坐标
+                         log(p.x + ", " + p.y);
+                    });
+                    events.removeAllTouchListeners();
+                    `
+                },
+
+                click: {type: 'operate', name: '点击坐标', code: 'click(0,0);'},
+                longClick: {type: 'operate', name: '长按坐标', code: 'longClick(0,0);'},
+                press: {type: 'operate', name: '按住坐标', code: 'press(0,0,100);'},
+                swipe: {type: 'operate', name: '滑动', code: 'swipe(0,0,10,10,100);'},
+                gesture: {type: 'operate', name: '手势', code: `
+                    // 为模拟一个从(0, 0)到(500, 500)到(500, 100)的手势操作，时长为1秒。
+                    gesture(1000, [0, 0], [500, 500], [500, 100])
+                `},
+                gestures: {type: 'operate', name: '多个手势', code: `
+                   // 同时模拟多个手势。每个手势的参数为[delay, duration, 坐标], delay为延迟多久(毫秒)才执行该手势；duration为手势执行时长；坐标为手势经过的点的坐标。其中delay参数可以省略，默认为0。
+                    gestures([0, 500, [800, 300], [500, 1000]],
+                        [0, 500, [300, 1500], [500, 1000]]);
+                `},
+                clickText: {type: 'operate', name: '点击文本', code: 'click("扫一扫",0);'},
+                longClickText: {type: 'operate', name: '长按文本', code: 'longClick("运行",0);'},
+                scrollUp: {type: 'operate', name: '上滑或左滑', code: 'scrollUp(0);'},
+                scrollDown: {type: 'operate', name: '下滑或右滑', code: 'scrollDown(0);'},
+                setText: {type: 'operate', name: '设置文本', code: 'setText("测试");'},
+                input: {type: 'operate', name: '输入文本', code: 'input("测试");'},
+                takeScreenshot:  {type: 'operate', name: '无障碍权限截图', code: 'let capture = $automator.takeScreenshot();\n' +
+                        '$images.save(capture, "sdcard/capture.png")'},
+
             }
         }
     },
@@ -326,6 +466,7 @@ export default {
                     this.remoteExecuteScript(code);
                 }
                 let scriptText = this.scriptEditor.getValue();
+                code = code.replace(/ /g,'');
                 this.scriptEditor.setValue(scriptText+=code+"\n");
                 // this.remoteHandler.param4.scriptText += code +"\n";
             }

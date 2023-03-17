@@ -80,6 +80,20 @@
         </el-form-item>
     </el-row>
     <el-row style="margin-top: 10px">
+        <el-form-item label="Keys模块" class="width100">
+            <el-button v-for="(btn,index) in remoteScriptKeys" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                {{btn.name}}
+            </el-button>
+        </el-form-item>
+    </el-row>
+    <el-row style="margin-top: 10px">
+        <el-form-item label="Operate模块" class="width100">
+            <el-button v-for="(btn,index) in remoteScriptOperate" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                {{btn.name}}
+            </el-button>
+        </el-form-item>
+    </el-row>
+    <el-row style="margin-top: 10px">
         <el-form-item label="Other模块" class="width100">
             <el-button v-for="(btn,index) in remoteScriptOther" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
                 {{btn.name}}
