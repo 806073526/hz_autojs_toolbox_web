@@ -6,9 +6,8 @@ public  class UploadPathHelper {
     public static String getUploadPath(String uploadPath){
         File file = new File(uploadPath);
         if(!file.exists()){
-            try {
-                file.mkdirs();
-            } catch (Exception e){
+            boolean createSuccess = file.mkdirs();
+            if(!createSuccess){
                 uploadPath = "C:\\zxwAjUpload\\";
                 file = new File(uploadPath);
                 file.mkdirs();
