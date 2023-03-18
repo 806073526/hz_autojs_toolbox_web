@@ -51,6 +51,10 @@ export default {
             let arr = Object.values(this.remoteScript);
             return arr.filter(item=> item.type === 'operate')
         },
+        remoteScriptTask(){
+            let arr = Object.values(this.remoteScript);
+            return arr.filter(item=> item.type === 'task')
+        },
         remoteScriptOther(){
             let arr = Object.values(this.remoteScript);
             return arr.filter(item => item.type === 'other');
@@ -162,8 +166,8 @@ export default {
                 getClip: {type: 'other', name: '读取剪切板', code: 'toastLog(getClip());'},
                 randomMinMax: {type: 'other', name: '随机数指定范围', code: 'toastLog(random(1,10));'},
                 random: {type: 'other', name: '随机数浮点', code: 'toastLog(random());'},
-                observeNotification:{type: 'other', name: '开启通知监听', code: `
-                    events.obverseNotification();
+                observeNotification:{type: 'other', name: '开启通知监听', code:
+                   `events.obverseNotification();
                     events.onNotification(function(notification){
                         log("通知时间为" + new Date(n.when));
                         log("应用包名: " + notification.getPackageName());
@@ -175,11 +179,10 @@ export default {
                         log("通知摘要: " + notification.tickerText);
                         // 点击通知 notification.click();
                         // 删除通知 notification.delete();
-                    });
-                    `
+                    });`
                 },
-                observeToast:{type: 'other', name: '开启Toast监听', code: `
-                   events.observeToast();
+                observeToast:{type: 'other', name: '开启Toast监听', code:
+                  `events.observeToast();
                    events.onToast(function(toast){
                       log("Toast内容: " + toast.getText() + " 包名: " + toast.getPackageName());
                    });
@@ -193,8 +196,8 @@ export default {
                 quickSettings: {type: 'keys', name: '通知栏拉到底', code: 'back();'},
                 recents: {type: 'keys', name: '最近任务', code: 'recents();'},
                 observeKey: {type: 'keys', name: '启用按键监听', code: 'events.observeKey();'},
-                onKeyDown: {type: 'keys', name: '监听按键按下', code: `
-                    //启用按键监听
+                onKeyDown: {type: 'keys', name: '监听按键按下', code:
+                    `//启用按键监听
                     events.observeKey();
                     //监听音量上键按下
                     events.onKeyDown("volume_up", function(event){
@@ -205,8 +208,8 @@ export default {
                         toast("菜单键被按下了");
                     });`
                 },
-                onKeyUp: {type: 'keys', name: '监听按键弹起', code: `
-                    //启用按键监听
+                onKeyUp: {type: 'keys', name: '监听按键弹起', code:
+                   `//启用按键监听
                     events.observeKey();
                     //监听音量上键按下
                     events.onKeyUp("volume_up", function(event){
@@ -217,8 +220,8 @@ export default {
                         toast("Home键弹起");
                     });`
                 },
-                onceKeyDown: {type: 'keys', name: '监听按键按下一次', code: `
-                    //启用按键监听
+                onceKeyDown: {type: 'keys', name: '监听按键按下一次', code:
+                    ` //启用按键监听
                     events.observeKey();
                     //监听音量上键按下
                     events.onceKeyDown("volume_up", function(event){
@@ -229,8 +232,8 @@ export default {
                         toast("菜单键被按下了一次");
                     });`
                 },
-                onceKeyUp: {type: 'keys', name: '监听按键弹起一次', code: `
-                    //启用按键监听
+                onceKeyUp: {type: 'keys', name: '监听按键弹起一次', code:
+                   `//启用按键监听
                     events.observeKey();
                     //监听音量上键按下
                     events.onceKeyUp("volume_up", function(event){
@@ -241,16 +244,16 @@ export default {
                         toast("Home键弹起一次");
                     });`
                 },
-                removeAllKeyDownListeners: {type: 'keys', name: '删除全部按键按下事件', code: `
-                    //启用按键监听
+                removeAllKeyDownListeners: {type: 'keys', name: '删除全部按键按下事件', code:
+                   `//启用按键监听
                     events.observeKey();
                     //删除音量全部按下事件
                     events.removeAllKeyDownListeners("volume_up");
                     //删除菜单全部按下事件
                     events.removeAllKeyDownListeners("menu");`
                 },
-                setKeyInterceptionEnabled:{type: 'keys', name: '设置按键屏蔽是否启用', code: `
-                    // 会使系统的音量、Home、返回等键不再具有调节音量、回到主页、返回的作用，但此时仍然能通过按键事件监听按键
+                setKeyInterceptionEnabled:{type: 'keys', name: '设置按键屏蔽是否启用', code:
+                  `// 会使系统的音量、Home、返回等键不再具有调节音量、回到主页、返回的作用，但此时仍然能通过按键事件监听按键
                     // 屏蔽全部按键 events.setKeyInterceptionEnabled(true)
                     events.setKeyInterceptionEnabled("volume_up", true);
                     events.observeKey();
@@ -258,33 +261,30 @@ export default {
                         log("音量上键被按下");
                     });`
                 },
-                observeTouch:{type: 'keys', name: '启用屏幕触摸监听(需要root)', code: `
-                    // 会使系统的音量、Home、返回等键不再具有调节音量、回到主页、返回的作用，但此时仍然能通过按键事件监听按键
-                    // 屏蔽全部按键 events.setKeyInterceptionEnabled(true)
-                    events.observeTouch()
+                observeTouch:{type: 'keys', name: '启用屏幕触摸监听(需要root)', code:
+                    `events.observeTouch()
                     events.setTouchEventTimeout("100");
                     events.getTouchEventTimeout()
                     events.onTouch(function(p){
                         //触摸事件发生时, 打印出触摸的点的坐标
                          log(p.x + ", " + p.y);
                     });
-                    events.removeAllTouchListeners();
-                    `
+                    events.removeAllTouchListeners();`
                 },
 
                 click: {type: 'operate', name: '点击坐标', code: 'click(0,0);'},
                 longClick: {type: 'operate', name: '长按坐标', code: 'longClick(0,0);'},
                 press: {type: 'operate', name: '按住坐标', code: 'press(0,0,100);'},
                 swipe: {type: 'operate', name: '滑动', code: 'swipe(0,0,10,10,100);'},
-                gesture: {type: 'operate', name: '手势', code: `
-                    // 为模拟一个从(0, 0)到(500, 500)到(500, 100)的手势操作，时长为1秒。
-                    gesture(1000, [0, 0], [500, 500], [500, 100])
-                `},
-                gestures: {type: 'operate', name: '多个手势', code: `
-                   // 同时模拟多个手势。每个手势的参数为[delay, duration, 坐标], delay为延迟多久(毫秒)才执行该手势；duration为手势执行时长；坐标为手势经过的点的坐标。其中delay参数可以省略，默认为0。
+                gesture: {type: 'operate', name: '手势', code:
+                   `// 为模拟一个从(0, 0)到(500, 500)到(500, 100)的手势操作，时长为1秒。
+                    gesture(1000, [0, 0], [500, 500], [500, 100])`
+                },
+                gestures: {type: 'operate', name: '多个手势', code:
+                  `// 同时模拟多个手势。每个手势的参数为[delay, duration, 坐标], delay为延迟多久(毫秒)才执行该手势；duration为手势执行时长；坐标为手势经过的点的坐标。其中delay参数可以省略，默认为0。
                     gestures([0, 500, [800, 300], [500, 1000]],
-                        [0, 500, [300, 1500], [500, 1000]]);
-                `},
+                        [0, 500, [300, 1500], [500, 1000]]);`
+                },
                 clickText: {type: 'operate', name: '点击文本', code: 'click("扫一扫",0);'},
                 longClickText: {type: 'operate', name: '长按文本', code: 'longClick("运行",0);'},
                 scrollUp: {type: 'operate', name: '上滑或左滑', code: 'scrollUp(0);'},
@@ -294,6 +294,99 @@ export default {
                 takeScreenshot:  {type: 'operate', name: '无障碍权限截图', code: 'let capture = $automator.takeScreenshot();\n' +
                         '$images.save(capture, "sdcard/capture.png")'},
 
+                removeTimedTask: {type: 'task', name: '通过id删除按时间运行的定时任务', code:
+                  `$work_manager.removeTimedTask(0);`
+                },
+                removeIntentTask: {type: 'task', name: '通过id删除按事件运行的定时任务', code:
+                  `$work_manager.removeIntentTask(0);`
+                },
+                getTimedTask: {type: 'task', name: '通过id获取按时间运行的定时任务', code:
+                 `$work_manager.getTimedTask(0)`
+                },
+                getIntentTask: {type: 'task', name: '通过id获取按事件运行的定时任务', code:
+                 `$work_manager.getIntentTask(0);`},
+                queryTimedTasks: {type: 'task', name: '通过脚本路径查找按时间运行的定时任务', code:
+                 `let tasks = $work_manager.queryTimedTasks({
+                    path: "/sdcard/appSync/main.js",
+                  });
+                  let tasks2 = $work_manager.queryTimedTasks();`
+                },
+                queryIntentTasks: {type: 'task', name: '通过脚本路径或监听广播查找按广播运行的定时任务', code:
+                  `let tasks = $work_manager.queryIntentTasks({
+                    path: "/sdcard/appSync/main.js",
+                  });
+                  let tasks2 = $work_manager.queryIntentTasks();`
+                },
+                addDailyTask: {type: 'task', name: '每日运行一次的定时任务', code:
+                    `// path {string} 需要运行的脚本的绝对路径
+                    // time {number} | {string} | {Date} 此定时任务每天运行的时间，支持时间戳、字符串和Date对象
+                    // delay {number} 任务开始前的延迟，单位毫秒，默认为0；如果延时较长，则此参数并不可靠，建议勿用此参数控制大于30s的延迟
+                    // loopTimes {number} 任务循环次数，默认为1
+                    // interval {number} 任务循环间隔，单位毫秒，默认为0；如果间隔较长，则此参数并不可靠，建议勿用此参数控制大于30s的间隔
+                    console.log($work_manager.addDailyTask({
+                        path: "/sdcard/appSync/main.js",
+                        time: new Date(0, 0, 0, 13, 14, 0),
+                        delay: 0,
+                        loopTimes: 1,
+                        interval: 0,
+                   }));`
+                },
+                addWeeklyTask: {type: 'task', name: '每周运行的定时任务', code:
+                   `// path {string} 需要运行的脚本的绝对路径
+                    // time {number} | {string} | {Date} 此定时任务每天运行的时间，支持时间戳、字符串和Date对象
+                    // daysOfWeek {string[]} 每周几运行，参数包括：['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] 或 ['一', '二', '三', '四', '五', '六', '日']
+                    // delay {number} 任务开始前的延迟，单位毫秒，默认为0；如果延时较长，则此参数并不可靠，建议勿用此参数控制大于30s的延迟
+                    // loopTimes {number} 任务循环次数，默认为1
+                    // interval {number} 任务循环间隔，单位毫秒，默认为0；如果间隔较长，则此参数并不可靠，建议勿用此参数控制大于30s的间隔
+                    log($work_manager.addWeeklyTask({
+                        path: "/sdcard/appSync/main.js",
+                        // 时间戳为Mon Jun 21 2021 13:14:00 GMT+0800 (中国标准时间)，事实上只有13:14:00的参数起作用
+                        time: 1624252440000,
+                        daysOfWeek: ['一', '二'],
+                        delay: 0,
+                        loopTimes: 5,
+                        interval: 10
+                    }));`
+                },
+                addDisposableTask: {type: 'task', name: '一次性的定时任务', code:
+                   `// path {string} 需要运行的脚本的绝对路径
+                    // time {number} | {string} | {Date} 此定时任务开始运行的时间，支持时间戳、字符串和Date对象（9.3以上版本可以用这个字段代替date）
+                    // date {number} | {string} | {Date} 同time，由于一个失误，原本这个字段应该是time（9.2以之前版本需要用这个字段指定时间）
+                    // delay {number} 任务开始前的延迟，单位毫秒，默认为0；如果延时较长，则此参数并不可靠，建议勿用此参数控制大于30s的延迟
+                    // loopTimes {number} 任务循环次数，默认为1
+                    // interval {number} 任务循环间隔，单位毫秒，默认为0；如果间隔较长，则此参数并不可靠，建议勿用此参数控制大于30s的间隔
+                    log($work_manager.addDisposableTask({
+                        path: "/sdcard/appSync/main.js",
+                        date: new Date(2021, 5, 21, 13, 14, 0),
+                    }));`},
+                addIntentTask: {type: 'task', name: '广播定时任务', code:
+                    `// path {string} 需要运行的脚本的绝对路径
+                    // action {string} 需要监听的事件的广播的Action名称
+                    // delay {number} 任务开始前的延迟，单位毫秒，默认为0；如果延时较长，则此参数并不可靠，建议勿用此参数控制大于30s的延迟
+                    // loopTimes {number} 任务循环次数，默认为1
+                    // interval {number} 任务循环间隔，单位毫秒，默认为0；如果间隔较长，则此参数并不可靠，建议勿用此参数控制大于30s的间隔
+                    // 安卓意图列表 http://localhost:9998/Intent.txt
+                    log($work_manager.addIntentTask({
+                        path: "/sdcard/appSync/main.js",
+                        action: Intent.ACTION_BATTERY_CHANGED,
+                    }));`
+                },
+                TimedTask: {type:'task' ,name: '定时任务对象', code:
+                `// TimedTask.id
+                // 此定时任务的唯一id，用于查找定时任务。
+                // TimedTask.scriptPath
+                // 此定时任务的所执行脚本的路径。
+                // TimedTask.millis
+                // 此定时任务的执行时间的时间戳，单位为毫秒。
+                // TimedTask.delay
+                // 此定时任务所设置的延迟，
+                // TimedTask.interval
+                // 此定时任务循环的间隔。
+                //TimedTask.loopTimes
+                // 此定时任务循环的次数。
+                // TimedTask.action
+                //此定时任务的触发事件（只有广播定时任务才有该参数）`
+                }
             }
         }
     },

@@ -94,6 +94,13 @@
         </el-form-item>
     </el-row>
     <el-row style="margin-top: 10px">
+        <el-form-item label="Task模块" class="width100">
+            <el-button v-for="(btn,index) in remoteScriptTask" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                {{btn.name}}
+            </el-button>
+        </el-form-item>
+    </el-row>
+    <el-row style="margin-top: 10px">
         <el-form-item label="Other模块" class="width100">
             <el-button v-for="(btn,index) in remoteScriptOther" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
                 {{btn.name}}
