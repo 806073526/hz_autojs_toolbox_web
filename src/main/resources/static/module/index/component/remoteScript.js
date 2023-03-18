@@ -169,7 +169,6 @@ export default {
                 observeNotification:{type: 'other', name: '开启通知监听', code:
                    `events.obverseNotification();
                     events.onNotification(function(notification){
-                        log("通知时间为" + new Date(n.when));
                         log("应用包名: " + notification.getPackageName());
                         log("通知文本: " + notification.getText());
                         log("通知优先级: " + notification.priority);
