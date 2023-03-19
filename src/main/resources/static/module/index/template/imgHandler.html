@@ -185,8 +185,9 @@
                     <span>
                         开启快速裁剪：
                     </span>
-                    <el-switch v-model="remoteHandler.param1.isOpenFastClip" @change="openFastClipChange"
-                    />
+                    <el-tooltip class="item" effect="dark" content="请注意,快速裁剪是点击两次鼠标,左上角和右下角" placement="top-start">
+                         <el-switch v-model="remoteHandler.param1.isOpenFastClip" @change="openFastClipChange"/>
+                    </el-tooltip>
                 </div>
                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                     <span>

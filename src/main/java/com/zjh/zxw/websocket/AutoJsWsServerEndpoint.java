@@ -22,6 +22,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,8 +109,22 @@ public class AutoJsWsServerEndpoint {
     public static List<AutoJsSession> getOnlineDevice() {
         List<AutoJsSession> autoJsSessionList = sessionMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
         List<AutoJsSession> otherList = new ArrayList<AutoJsSession>();
+
+        List<String> needRemoveList = new ArrayList<String>();
         if (CollectionUtils.isNotEmpty(autoJsSessionList)) {
             for (AutoJsSession autoJsSession : autoJsSessionList) {
+
+                LocalDateTime lastHeartTime = autoJsSession.getLastHeartTime();
+                if(Objects.nonNull(lastHeartTime)){
+                    Duration duration = Duration.between(lastHeartTime,LocalDateTime.now());
+                    long minutes = NumberHelper.getOrDef(duration.toMinutes(),0L);
+                    // 超过5分钟
+                    if(minutes>5){
+                        // 移除
+                        needRemoveList.add(autoJsSession.getDeviceUuid());
+                        continue;
+                    }
+                }
                 AutoJsSession obj = AutoJsSession.builder()
                         .deviceUuid(autoJsSession.getDeviceUuid())
                         .connectTime(autoJsSession.getConnectTime())
@@ -118,6 +133,11 @@ public class AutoJsWsServerEndpoint {
                         .otherPropertyJson(autoJsSession.getOtherPropertyJson())
                         .lastHeartTime(autoJsSession.getLastHeartTime()).build();
                 otherList.add(obj);
+            }
+            if(CollectionUtils.isNotEmpty(needRemoveList)){
+                for (String s : needRemoveList) {
+                    sessionMap.remove(s);
+                }
             }
         }
         return otherList;

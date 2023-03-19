@@ -558,7 +558,7 @@ export default {
                     this.remoteExecuteScript(code);
                 }
                 let scriptText = this.scriptEditor.getValue();
-                code = code.replace(/ /g,'');
+                code = code.replace(/^\s+|\s+$/g,"");
                 this.scriptEditor.setValue(scriptText+=code+"\n");
                 // this.remoteHandler.param4.scriptText += code +"\n";
             }
