@@ -1,4 +1,4 @@
-import {getContext, zeroFill, initFileEditor} from "./../../../utils/utils.js";
+import {getContext, zeroFill,getEditorType, initFileEditor} from "./../../../utils/utils.js";
 let template='<div></div>';
 $.ajax({
     url: "/module/index/template/remoteLog.html",
@@ -152,9 +152,17 @@ export default {
                             if (data.isSuccess) {
                                 _that.onlineLogContent = decodeURI(atob(data.data));
                                 _that.logEditor.setValue(_that.onlineLogContent);
+                                if(getEditorType() === 'ace'){
+                                    _that.logEditor.clearSelection();
+                                }
                                 if(_that.autoScroll){
                                     _that.$nextTick(() =>{
-                                        _that.logEditor.revealLine(_that.logEditor.getModel().getLineCount());
+                                        if(getEditorType() === 'ace'){
+                                            const numRows = _that.logEditor.session.getLength();
+                                            _that.logEditor.scrollToRow(numRows - 1);
+                                        } else {
+                                            _that.logEditor.revealLine(_that.logEditor.getModel().getLineCount());
+                                        }
                                     });
                                 }
                             }

@@ -54,8 +54,6 @@ public class DeviceController extends BaseController {
     @ApiOperation(value = "校验页面访问密码", notes = "校验页面访问密码")
     @GetMapping("/validatePageAccessPassword")
     public R<Boolean> validatePageAccessPassword(@RequestParam("inputVal") String inputVal){
-        System.out.println("inputVal:"+inputVal);
-        System.out.println("pageAccessPassword："+pageAccessPassword);
         return success(StrHelper.getObjectValue(pageAccessPassword).equals(inputVal));
     }
 
