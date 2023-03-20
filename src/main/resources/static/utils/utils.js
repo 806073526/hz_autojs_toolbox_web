@@ -252,7 +252,7 @@ export const initFileEditor = (_that, editorKey, containerId, getEditorCompleteF
             });
 
             editor.setValue(fileContent);
-
+            editor.clearSelection();
             document.getElementById(containerId).oncontextmenu = (e)=>{
                     e.preventDefault();
                     editor.beautify();
