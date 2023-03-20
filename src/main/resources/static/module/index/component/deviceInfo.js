@@ -19,6 +19,8 @@ export default {
         return {
             deviceList: [],// 设备列表
             deviceLoading: true,
+            editorType:'vscode',
+            editorTypeNeedRefresh:false,
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
@@ -34,8 +36,47 @@ export default {
     },
     mounted() {
         this.getOnlineDevice();
+
+        // 获取编辑器类型未刷新标记
+        let editorTypeChangeNoRefresh = window.localStorage.getItem('editorTypeChangeNoRefresh');
+        if(editorTypeChangeNoRefresh){
+            window.localStorage.removeItem('editorTypeChangeNoRefresh');
+            // 获取编辑器类型变化值
+            let editorTypeChangeValue = window.localStorage.getItem('editorTypeChangeValue');
+            // 获取编辑器类型
+            let editorType = window.localStorage.getItem('editorType');
+            // 重置当前编辑器类型
+            this.editorType = editorTypeChangeValue ? editorTypeChangeValue : editorType;
+            // 设置到缓存中
+            window.localStorage.setItem('editorType',this.editorType);
+            // 清除变化值
+            window.localStorage.removeItem('editorTypeChangeValue');
+        } else {
+            // 获取编辑器类型
+            this.editorType = window.localStorage.getItem('editorType') || 'vscode';
+        }
     },
     methods: {
+        // 编辑器类型change
+        editorTypeChange(){
+            // 设置编辑器类型变化值
+            window.localStorage.setItem('editorTypeChangeValue',this.editorType);
+            // 设置编辑器类型未刷新标记
+            window.localStorage.setItem('editorTypeChangeNoRefresh','true');
+
+            let cacheEditorType = window.localStorage.getItem('editorType');
+            // 设置需要刷新标记
+            this.editorTypeNeedRefresh = cacheEditorType !== this.editorType;
+        },
+        refreshPage(){
+            window.ZXW_VUE.$confirm('编辑器类型已修改,刷新后才能生效,是否确认刷新页面?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                window.location.reload();
+            });
+        },
         // 选中行
         selectRowChange(row) {
             // 初始化设备

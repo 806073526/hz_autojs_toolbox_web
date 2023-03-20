@@ -132,9 +132,12 @@ window.ZXW_VUE = new Vue({
                 window.location.reload();
             });
         }
-
+        // 初始化monacoEditor编辑器
         require.config({ paths: { 'vs': '/plugins/monaco-editor/min/vs' }});
         require(['vs/editor/editor.main'],()=>{ this.monacoEditorComplete = true });
+
+        // 初始化ace编辑器
+        window.aceRange = ace.require('ace/range').Range;
         this.timeSyncOtherProperty();
         // 每3秒同步一次其他属性
         setInterval(() => {

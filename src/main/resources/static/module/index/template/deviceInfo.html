@@ -78,7 +78,7 @@
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="调试模式:" label-width="100px" class="width20">
+            <el-form-item label="调试模式:" label-width="100px" class="width15">
                 <div class="d-flex j-center a-center">
                     <el-switch v-model="deviceInfo.debugModel" @change="syncWidthHeightToApp" style="margin-right: 5px;"/>
                     <el-input type="number" v-model="deviceInfo.debugSleep" placeholder="请设置调试延时" class="flex-1"
@@ -86,10 +86,22 @@
                     </el-input>
                 </div>
             </el-form-item>
-           <!-- <el-form-item label="标准坐标转换:" label-width="120px" class="width10">
-                <el-switch v-model="deviceInfo.standardConvert" @change="syncWidthHeightToApp"/>
-            </el-form-item>-->
-            <div class="width20 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
+           <el-form-item label="编辑器类型:" label-width="120px" class="width15">
+               <el-tooltip class="item" effect="dark"  content="请注意,修改编辑类型后,必须要刷新页面才能生效!" placement="top-start">
+                   <div class="d-flex j-center a-center" style="height: 40px;white-space: nowrap;">
+                       <el-radio-group v-model="editorType" @change="editorTypeChange">
+                               <el-radio label="vscode">
+                                   vscode
+                               </el-radio>
+                               <el-radio label="ace">
+                                   ace
+                               </el-radio>
+                       </el-radio-group>
+                       <i v-if="editorTypeNeedRefresh" class="el-icon-refresh-right" @click.stop="refreshPage" style="margin-left: 5px"/>
+                   </div>
+               </el-tooltip>
+            </el-form-item>
+            <div class="width10 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
                 <el-button @click.stop="syncWidthHeightToApp">
                     同步到APP
                 </el-button>

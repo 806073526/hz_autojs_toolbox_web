@@ -1,4 +1,4 @@
-import {getContext,initFileEditor} from "../../../utils/utils.js";
+import {getContext,getEditorType,initFileEditor} from "../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -465,7 +465,10 @@ export default {
         // 清空脚本
         clearScript() {
             // this.remoteHandler.param4.scriptText = '';
-            this.scriptEditor.setValue('')
+            this.scriptEditor.setValue('');
+            if(getEditorType() === 'ace'){
+                this.scriptEditor.clearSelection();
+            }
         },
         // 保存到草稿
         saveToDraft(){
@@ -483,6 +486,9 @@ export default {
                 return false;
             }
             this.scriptEditor.setValue( window.localStorage.getItem("remoteScriptText_"+this.remoteHandler.param4.scriptName));
+            if(getEditorType() === 'ace'){
+                this.scriptEditor.clearSelection();
+            }
             window.ZXW_VUE.$notify.success({message: '读取草稿成功', duration: '1000'});
         },
         // 存为文件
@@ -542,6 +548,9 @@ export default {
                 dataType:"TEXT", //返回值的类型
                 success: function (res) {
                     _that.scriptEditor.setValue(String(res));
+                    if(getEditorType() === 'ace'){
+                        _that.scriptEditor.clearSelection();
+                    }
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
@@ -560,6 +569,9 @@ export default {
                 let scriptText = this.scriptEditor.getValue();
                 code = code.replace(/^\s+|\s+$/g,"");
                 this.scriptEditor.setValue(scriptText+=code+"\n");
+                if(getEditorType() === 'ace'){
+                    this.scriptEditor.clearSelection();
+                }
                 // this.remoteHandler.param4.scriptText += code +"\n";
             }
         },
@@ -594,6 +606,9 @@ export default {
                     //_that.remoteHandler.param4.scriptText += String(res) + "\n";
                     let scriptText = _that.scriptEditor.getValue();
                     _that.scriptEditor.setValue(scriptText+=String(res)+"\n");
+                    if(getEditorType() === 'ace'){
+                        _that.scriptEditor.clearSelection();
+                    }
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
