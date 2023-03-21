@@ -1978,6 +1978,43 @@ export default {
                 }
                 this.phoneFileLoading = false;
             });
+        },
+        // 手机端华仔autoJs工具箱热更新
+        phoneAutoJsToolHotUpdate(){
+            window.ZXW_VUE.$confirm('是否确认远程更新华仔AutoJs工具箱APP端?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let remoteScript = `
+                // 获取项目路径
+                let projectPath = files.cwd();
+                // 设置本地临时更新路径
+                let tempUpdatePath = "/sdcard/appSync/tempUpdateTools/";
+                // 创建临时更新js目录
+                files.createWithDirs(tempUpdatePath)
+                // 获取热更新版本
+                let getResult = http.get("https://gitee.com/zjh336/hz_autojs_toolbox/raw/master/hotUpdateVerson.txt");
+                // 可自定义 主要为了app端区分版本
+                let hotUpdateVersion = getResult && getResult.statusCode == 200 ? getResult.body.string() : "热更新";
+                // 下载工具箱js代码 也可以选择将修改后的js代码 替换到web端上传路径下
+                let url = "http://121.4.241.250:9998/uploadPath/autoJsTools/hz_autojs_tools.zip"
+                // 请求压缩包
+                let r = http.get(url);
+                if (r.statusCode == 200) {
+                    // 下载压缩包到本地临时更新路径
+                    var content = r.body.bytes();
+                    files.writeBytes(tempUpdatePath + "hz_autojs_tools.zip", content);
+                    // 解压下载文件到 项目路径
+                    $zip.unzip(tempUpdatePath + "hz_autojs_tools.zip", projectPath);
+                    commonStorage.put("hotUpdateVersion", hotUpdateVersion)
+                    toastLog("热更新成功,请重启APP后生效！");
+                } else {
+                    toastLog(url + "下载失败！！！");
+                }`;
+                // 执行热更新逻辑
+                this.remoteExecuteScript(remoteScript);
+            });
         }
     }
 }
