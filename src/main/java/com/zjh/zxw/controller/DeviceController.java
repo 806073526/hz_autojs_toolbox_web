@@ -159,6 +159,23 @@ public class DeviceController extends BaseController {
         }
     }
 
+    /**
+     * 发送指令到多个客户端
+     */
+    @ApiOperation(value = "发送指令到多个客户端", notes = "发送指令到多个客户端")
+    @PostMapping("/sendMessageToMultipleClient")
+    public R<Boolean> sendMessageToMultipleClient(@RequestBody AjMessageDTO messageDTO) {
+        try {
+            AutoJsWsServerEndpoint.sendMessageToMultipleClient(messageDTO);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("发送指令失败！请联系管理员");
+        }
+    }
+
 
 
 }

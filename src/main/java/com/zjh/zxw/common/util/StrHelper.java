@@ -6,9 +6,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 字符串帮助类
@@ -145,6 +143,22 @@ public class StrHelper {
             }
         }
         return allStringList;
+    }
+
+    /**
+     * 字符串分割成ArrayList
+     * @param source  源字符串
+     * @param split  分隔符
+     * @return
+     */
+    public static List<String>  str2ArrayListBySplit(String source,String split) {
+        if(org.apache.commons.lang3.StringUtils.isBlank(source)) {
+            return Collections.emptyList();
+        }
+        if(org.apache.commons.lang3.StringUtils.isBlank(split)) {
+            split = StrPool.COMMA;
+        }
+        return Arrays.asList(org.apache.commons.lang3.StringUtils.split(source,split));
     }
 
 }

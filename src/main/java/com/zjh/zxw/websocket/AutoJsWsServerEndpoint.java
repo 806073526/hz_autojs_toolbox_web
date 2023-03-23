@@ -2,6 +2,7 @@ package com.zjh.zxw.websocket;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.socket.aio.IoAction;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.common.util.DateUtils;
@@ -152,6 +153,19 @@ public class AutoJsWsServerEndpoint {
         AutoJsSession curAutoJsSession = sessionMap.get(deviceUUID);
         if (Objects.nonNull(curAutoJsSession)) {
             curAutoJsSession.sendText(JSONUtil.toJsonStr(messageDTO));
+        }
+    }
+
+    public static void sendMessageToMultipleClient(AjMessageDTO messageDTO) throws IOException {
+        messageDTO.setMessageDateTime(LocalDateTime.now());
+        String deviceUUID = messageDTO.getDeviceUuid();
+
+        List<String> deviceUUIDList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(deviceUUID,","));
+        for (String deviceUUIDSingle : deviceUUIDList) {
+            AutoJsSession curAutoJsSession = sessionMap.get(deviceUUIDSingle);
+            if (Objects.nonNull(curAutoJsSession)) {
+                curAutoJsSession.sendText(JSONUtil.toJsonStr(messageDTO));
+            }
         }
     }
 
