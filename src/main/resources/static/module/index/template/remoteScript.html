@@ -108,6 +108,13 @@
         </el-form-item>
     </el-row>
     <el-row style="margin-top: 10px">
+        <el-form-item label="内置模块" class="width100">
+            <el-button v-for="(btn,index) in remoteScriptInternal" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                {{btn.name}}
+            </el-button>
+        </el-form-item>
+    </el-row>
+    <el-row style="margin-top: 10px">
         <el-form-item label="自定义模块" class="width100">
             <el-button v-for="(btn,index) in customScript" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getCustomRemoteScript(btn.scriptName)">
                 {{btn.moduleName}}

@@ -55,6 +55,10 @@ export default {
             let arr = Object.values(this.remoteScript);
             return arr.filter(item=> item.type === 'task')
         },
+        remoteScriptInternal(){
+            let arr = Object.values(this.remoteScript);
+            return arr.filter(item=> item.type === 'internal')
+        },
         remoteScriptOther(){
             let arr = Object.values(this.remoteScript);
             return arr.filter(item => item.type === 'other');
@@ -66,7 +70,7 @@ export default {
                 param4: {
                     scriptName:'remoteScript.js',
                     scriptText: '',
-                    scriptImmediatelyExec: true,
+                    scriptImmediatelyExec: false,
                     isNodeScript: false
                 }
             },
@@ -385,7 +389,36 @@ export default {
                 // 此定时任务循环的次数。
                 // TimedTask.action
                 //此定时任务的触发事件（只有广播定时任务才有该参数）`
+                },
+
+                remoteHotUpdateApp: {type: 'internal', name: '远程热更新APP', code:
+                        `
+                // 获取项目路径 默认为工具箱APP的路径 如果要更新其他APP 请修改
+                let projectPath = files.cwd();
+                // 设置本地临时更新路径
+                let tempUpdatePath = "/sdcard/appSync/tempUpdateTools/";
+                // 创建临时更新js目录
+                files.createWithDirs(tempUpdatePath)
+                // 可自定义 主要为了app端区分版本 请修改
+                let hotUpdateVersion = "热更新";
+                // 可替换为本地目录下载目录  注意zip压缩包,请在文件目录下全选文件压缩  
+                let url = "http://121.4.241.250:9998/uploadPath/autoJsTools/hz_autojs_tools.zip"
+                // 请求压缩包
+                let r = http.get(url);
+                if (r.statusCode == 200) {
+                    // 下载压缩包到本地临时更新路径
+                    var content = r.body.bytes();
+                    files.writeBytes(tempUpdatePath + "hz_autojs_tools.zip", content);
+                    toastLog(tempUpdatePath + "hz_autojs_tools.zip" + "下载成功！！！");
+                    // 解压下载文件到 项目路径  为防止误操作 请放开注释后再执行
+                    // $zip.unzip(tempUpdatePath + "hz_autojs_tools.zip", projectPath);
+                    // commonStorage.put("hotUpdateVersion", hotUpdateVersion)
+                    // toastLog("热更新成功,请重启APP后生效！");
+                } else {
+                    toastLog(url + "下载失败！！！");
                 }
+                `
+                },
             }
         }
     },
