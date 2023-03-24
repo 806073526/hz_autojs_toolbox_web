@@ -6,6 +6,10 @@
         <!-- 设备信息组件 -->
         <device-info ref="deviceInfo" @deviceSelectRowCallback="deviceSelectRowCallback"/>
         <el-tabs tab-position="left" style="height: auto;margin-top:5px;" v-model="activeTab">
+            <el-tab-pane label="公共文件" name="commonFile">
+                <!-- 公共文件组件  -->
+                <common-file :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="commonFile" />
+            </el-tab-pane>
             <el-tab-pane label="图像处理" name="imgHandler">
                 <!-- 图像处理组件 -->
                 <img-handler :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="imgHandler" />

@@ -60,7 +60,7 @@ export default {
             autoSyncWebSyncPath:true,
             autoSyncPhoneSyncPath:true,
             phoneFileTableRandomKey:Math.random(),
-            breadcrumbList: [{label: '根目录', value: ''}], // 面包屑
+            breadcrumbList: [{label: '根目录', value: 'undefined'}], // 面包屑
             phoneBreadcrumbList: [{label: '根目录', value: '/sdcard/'}],
             fileLoading: false,// 加载文件loading
             phoneFileLoading: false,// 手机端加载文件loading

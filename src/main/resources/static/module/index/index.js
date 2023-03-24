@@ -9,6 +9,7 @@ $.ajax({
 });
 import {getContext} from "./../../utils/utils.js";
 import DeviceInfo from "./component/deviceInfo.js";
+import CommonFile from "./component/commonFile.js";
 import ImgHandler from "./component/imgHandler.js";
 import LayoutAnalysis from "./component/layoutAnalysis.js"
 import RemoteScript from "./component/remoteScript.js"
@@ -21,6 +22,7 @@ window.ZXW_VUE = new Vue({
     el: "#app",
     components: {
         DeviceInfo: DeviceInfo,
+        CommonFile: CommonFile,
         ImgHandler: ImgHandler,
         LayoutAnalysis: LayoutAnalysis,
         RemoteScript: RemoteScript,
@@ -34,7 +36,7 @@ window.ZXW_VUE = new Vue({
         inputPageAccessPassword:'',
         pageAccessLimit: false,
         monacoEditorComplete: false,
-        activeTab:'imgHandler',
+        activeTab:'commonFile',
         otherProperty: {// 其他属性对象 同步app端
             orientation: 1,  // 屏幕方向
             debugModel: true,// 调试模式

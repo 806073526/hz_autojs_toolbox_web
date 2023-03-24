@@ -21,6 +21,7 @@ export default {
             deviceLoading: true,
             editorType:'vscode',
             editorTypeNeedRefresh:false,
+            expandDevice:true,
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
@@ -57,6 +58,9 @@ export default {
         }
     },
     methods: {
+        expandDeviceFun(){
+            this.expandDevice = !this.expandDevice;
+        },
         // 编辑器类型change
         editorTypeChange(){
             // 设置编辑器类型变化值
