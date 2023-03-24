@@ -1,0 +1,22 @@
+<div @drop.prevent="onDrop" @dragover.prevent="onDragover" @dragenter.prevent>
+    <p class="basicInfo" style="position: relative;">
+        定时任务
+    </p>
+    <div style="padding-left: 20px;margin-top: 0!important;">
+        <el-row style="padding-left: 0!important;">
+            <div class="d-flex j-sb a-center width100">
+                <div class="d-flex a-center">
+                    <el-button size="mini" type="primary" @click="createTask">创建</el-button>
+                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="queryTasks">查询</el-button>
+                </div>
+            </div>
+        </el-row>
+        <el-row style="padding-left: 0!important;">
+            <div class="fileTableList" v-loading="fileLoading">
+                <el-scrollbar class="right-scrollbar-wrap">
+
+                </el-scrollbar>
+            </div>
+        </el-row>
+    </div>
+</div>

@@ -38,6 +38,9 @@
                 <!-- 页面匹配组件 -->
                 <page-matching :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="pageMatching" />
             </el-tab-pane>
+            <el-tab-pane label="定时任务" name="taskManage">
+                建设中！！！！
+            </el-tab-pane>
         </el-tabs>
         <el-button v-show="fileDialogIsMin" type="danger" @click.stop.native="phoneMaxFileEditorDialog" style="position: fixed;right: 10px;bottom: 10px;z-index: 999999;">还原文件编辑器</el-button>
         <i class="el-icon-caret-top" style="cursor:pointer; font-size: 40px;position: fixed;left: 10px;bottom: 8px;z-index: 999999;" @click.stop="bodyScrollTop"></i>
