@@ -53,7 +53,7 @@ export default {
             checkAllFile: false,// 全选文件
             previewList: [],// 单个上传
             uploadFileList: [],// 需要上传的文件列表
-            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js',
+            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js,.apk',
             curFileData: {},// 选中的文件数据
             copyFileList: [],// 复制文件列表
             moveFileList: [],// 移动文件列表
