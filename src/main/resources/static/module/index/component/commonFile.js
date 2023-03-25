@@ -481,8 +481,8 @@ export default {
             } else {
                 if(['png','jpg','jpeg'].includes(row.fileType)){
                     window.open(getContext() + "/" + row.previewUrl)
-                } else if(['zip','rar'].includes(row.fileType)){
-                    window.ZXW_VUE.$message.warning('暂不支持编辑压缩文件,请解压后查看');
+                } else if(['zip','rar','apk'].includes(row.fileType)){
+                    window.ZXW_VUE.$message.warning('暂不支持编辑此类文件');
                     return false;
                 } else {
                     this.fileEditVisible = true;
