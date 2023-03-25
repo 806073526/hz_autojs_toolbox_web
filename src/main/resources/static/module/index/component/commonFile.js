@@ -700,6 +700,37 @@ export default {
             }).catch(() => {
             });
         },
+        // 删除单个文件
+        removeFile(row){
+            let fileNames =  (row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType);
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/deleteFile",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "filePath":row.pathName
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+                                // 重新加载文件列表
+                                _that.queryFileList(toPath);
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
+        },
         // 创建文件夹
         createFolder() {
             window.ZXW_VUE.$prompt('请输入文件夹名称', '提示', {
