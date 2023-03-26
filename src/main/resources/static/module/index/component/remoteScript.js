@@ -171,7 +171,7 @@ export default {
                 randomMinMax: {type: 'other', name: '随机数指定范围', code: 'toastLog(random(1,10));'},
                 random: {type: 'other', name: '随机数浮点', code: 'toastLog(random());'},
                 observeNotification:{type: 'other', name: '开启通知监听', code:
-                   `events.obverseNotification();
+                   `events.observeNotification();
                     events.onNotification(function(notification){
                         log("应用包名: " + notification.getPackageName());
                         log("通知文本: " + notification.getText());

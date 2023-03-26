@@ -46,6 +46,10 @@ export default {
                 valueUpdateAfterAutoPreview: false,
                 operateRecord: ''
             },
+            textContent:'',// 文本信息传输
+            textIndex:null, // 文本传输序号
+            textType:'text',// 文本传输类型
+            previewActiveName:'previewParam',
             deviceMousePosition: { // 设备鼠标坐标
                 x: 0,
                 y: 0
@@ -111,6 +115,87 @@ export default {
                     callback()
                 }
             })
+        },
+        // 发送文本
+        sendTextContent(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            let remoteScript = "";
+            let param = this.textIndex !== null ? (this.textIndex + ',"' + this.textContent + '"') : '"'+this.textContent +'"';
+            // 覆盖
+            if(this.textType === 'text'){
+                remoteScript = 'setText('+param+')';
+            // 输入
+            } else {
+                remoteScript = 'input('+param+')';
+            }
+            this.remoteExecuteScript(remoteScript);
+        },
+        // 远程脚本查询
+        queryRemoteScript(){
+
+        },
+        // 关闭远程脚本
+        closeRemoteScript(){
+
+        },
+        // 定时任务查询
+        queryTimerTask(){
+
+        },
+        // 关闭定时任务
+        closeTimerTask(){
+
+        },
+        // 消息通知查询
+        queryNoticeMessage(){
+
+        },
+        // 开启通知消息监听
+        openNoticeMessageListener(){
+            let remoteExecuteScript = `
+            let matching包名 = "";
+            let matching文本 = "";
+            let autoClick = false;
+            let receiveEmail = "";
+            let title = "";
+            let message = "";
+            let executeScript = "";
+            events.removeAllListeners('notification');
+            events.observeNotification();
+            events.onNotification(function(notification) {
+                let messageObj = {
+                    "应用包名": notification.getPackageName(),
+                    "通知文本": notification.getText(),
+                    "通知优先级": notification.priority,
+                    "通知目录": notification.category,
+                    "通知时间": new Date(notification.when),
+                    "通知数": notification.number,
+                    "通知摘要": notification.tickerText
+                }
+            
+                if ((!matching包名 || messageObj["应用包名"].indexOf(matching包名) !== -1) && (!matching文本 || messageObj["通知文本"].indexOf(matching文本) !== -1)) {
+                    if (autoClick) {
+                        notification.click();
+                    }
+                    sleep(1000);
+                    // 发送邮件消息
+                    if (receiveEmail) {
+                        utilsObj.request("/attachmentInfo/sendEmailMessage?receiveEmail=" + receiveEmail + "&title=" + title + "&message=" + message, "GET", null, () => {
+                            toastLog("发送成功")
+                        });
+                    }
+                    // 记录通知
+                    utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + message, "GET", null, () => {
+                        if (executeScript) {
+                            //\t执行代码
+                            eval(executeScript);
+                        }
+                    });
+                }
+            });
+`;
         },
         // 自动预览设备
         autoDevicePreview() {

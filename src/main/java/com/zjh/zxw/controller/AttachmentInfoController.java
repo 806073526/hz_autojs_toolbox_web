@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.StrHelper;
+import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
@@ -30,10 +32,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -72,6 +75,36 @@ public class AttachmentInfoController extends BaseController {
 
     // 在线日志map key为deviceUUID
     private final static ConcurrentHashMap<String, String> onlineLogMap = new ConcurrentHashMap<String,String>();
+
+    // 消息通知map key为deviceUUID
+    private final static ConcurrentHashMap<String,List<String>> noticeMessageMap = new ConcurrentHashMap<String,List<String>>();
+
+    @ApiOperation(value = "查询手机端通知消息记录", notes = "查询手机端通知消息记录")
+    @GetMapping("/queryNoticeMessageByKey")
+    public R<List<String>> queryNoticeMessageByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        List<String> noticeMessageList = noticeMessageMap.get(deviceUUID);
+        return success(noticeMessageList);
+    }
+
+    @ApiOperation(value = "写入手机端通知消息", notes = "写入手机端通知消息")
+    @GetMapping("/writeNoticeMessage")
+    public R<Boolean> writeNoticeMessage(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID,@ApiParam("message") @RequestParam(value = "message") String message){
+        List<String> noticeMessageList = noticeMessageMap.getOrDefault(deviceUUID,new ArrayList<String>());
+        noticeMessageList.add(message);
+        noticeMessageMap.put(deviceUUID,noticeMessageList);
+        return success(true);
+    }
+
+    @ApiOperation(value = "发送邮件消息", notes = "发送邮件消息")
+    @GetMapping("/sendEmailMessage")
+    public R<Boolean> sendEmailMessage(@ApiParam("receiveEmail") @RequestParam(value = "receiveEmail") String receiveEmail,@ApiParam("title") @RequestParam(value = "title") String title,@ApiParam("message") @RequestParam(value = "message") String message){
+       String messageStr = new String(Base64.getDecoder().decode(message.getBytes()));
+       messageStr = StrHelper.decode(messageStr);
+        EmailSender.sendAutoJsEmail(receiveEmail,title,messageStr);
+       return success(true);
+    }
+
+
 
     @ApiOperation(value = "清理app消息业务key", notes = "清理app消息业务key")
     @GetMapping("/clearAppMsgServiceKey")

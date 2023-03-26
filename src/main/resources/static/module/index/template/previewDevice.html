@@ -2,51 +2,89 @@
     <p class="basicInfo">
         预览设备
     </p>
+    <el-tabs v-model="previewActiveName" style="padding-left: 20px;margin-top: 0!important;">
+        <el-tab-pane label="预览参数" name="previewParam">
+            <el-row style="padding-left: 0!important;">
+                <div class="width100 d-flex a-center">
+                    <el-form-item label="预览质量:" prop="imgQuality" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.imgQuality" placeholder=""
+                                  oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="100"
+                                  @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="缩放倍数:" prop="scale" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.imgScale" placeholder=""
+                                  oninput="if(value.length>10)value=value.slice(0,10)" min="0" step="0.1"
+                                  max="1" @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="预览高度:" prop="scale" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.previewHeight" placeholder=""
+                                  min="0" max="5000" @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="预览阈值:" prop="scale" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.imgThreshold" placeholder=""
+                                  oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="255"
+                                  @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                </div>
+            </el-row>
+            <el-row style="padding-left: 0!important;">
+                <div class="width100 d-flex a-center">
+                    <el-form-item label="APP刷新:" prop="appSpace" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.appSpace" placeholder=""
+                                  oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
+                                  max="5000" @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="浏览器刷新:" prop="clientSpace" class="width25">
+                        <el-input type="number" v-model="devicePreviewParam.clientSpace" placeholder=""
+                                  oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
+                                  max="5000" @change="autoDevicePreview" class="width100">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="操作记录:" prop="clientSpace" class="width50">
+                        <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder=""
+                                  class="width100">
+                        </el-input>
+                    </el-form-item>
+                </div>
+            </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="消息监听" name="noticeMessage">
+            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+        </el-tab-pane>
+        <el-tab-pane label="脚本管理" name="scriptManage">
+            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+        </el-tab-pane>
+        <el-tab-pane label="定时任务" name="timerTask">
+            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+        </el-tab-pane>
+    </el-tabs>
     <el-row>
         <div class="width100 d-flex a-center">
-            <el-form-item label="预览质量:" prop="imgQuality" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.imgQuality" placeholder=""
-                          oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="100"
-                          @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="缩放倍数:" prop="scale" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.imgScale" placeholder=""
-                          oninput="if(value.length>10)value=value.slice(0,10)" min="0" step="0.1"
-                          max="1" @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="预览高度:" prop="scale" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.previewHeight" placeholder=""
-                          min="0" max="5000" @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="预览阈值:" prop="scale" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.imgThreshold" placeholder=""
-                          oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="255"
-                          @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-        </div>
-    </el-row>
-    <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="APP刷新:" prop="appSpace" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.appSpace" placeholder=""
-                          oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
-                          max="5000" @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="浏览器刷新:" prop="clientSpace" class="width25">
-                <el-input type="number" v-model="devicePreviewParam.clientSpace" placeholder=""
-                          oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
-                          max="5000" @change="autoDevicePreview" class="width100">
-                </el-input>
-            </el-form-item>
-            <el-form-item label="操作记录:" prop="clientSpace" class="width50">
-                <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder=""
+            <el-form-item label="文本传输内容:" prop="textContent" class="width50">
+                <el-input type="textarea" v-model="textContent" placeholder=""
                           class="width100">
                 </el-input>
+            </el-form-item>
+            <el-form-item label="文本框序号:" prop="textIndex" class="width25">
+                <el-input type="number" v-model="textIndex" placeholder=""
+                          oninput="if(value.length>10)value=value.slice(0,10)" step="1"
+                          max="5000" class="width100">
+                </el-input>
+            </el-form-item>
+            <el-form-item label="传输类型:" prop="textType" class="width25">
+                <el-radio-group v-model="textType">
+                    <el-radio label="text">
+                        覆盖
+                    </el-radio>
+                    <el-radio label="input">
+                        追加
+                    </el-radio>
+                </el-radio-group>
             </el-form-item>
         </div>
     </el-row>
@@ -57,6 +95,9 @@
                     x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}
                 </div>
                 <div style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
+                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="sendTextContent">
+                        发送文本
+                    </el-button>
                     <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
                         主页
                     </el-button>
