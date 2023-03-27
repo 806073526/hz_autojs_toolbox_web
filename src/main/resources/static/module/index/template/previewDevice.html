@@ -53,8 +53,90 @@
                 </div>
             </el-row>
         </el-tab-pane>
-        <el-tab-pane label="消息监听" name="noticeMessage">
-            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+        <el-tab-pane label="通知监听" name="noticeMessage">
+            <el-row style="padding-left: 0!important;margin-top:10px;">
+                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                    <div>通知监听规则名称</div>
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; ">
+                        <el-input placeholder="通知规则名称" class="flex-1"/>
+                    </div>
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="building">
+                        存为草稿
+                    </el-button>
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="building">
+                        从草稿读取
+                    </el-button>
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="building">
+                        存为文件
+                    </el-button>
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="building">
+                        从文件读取
+                    </el-button>
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; ">
+                        <span>是否开启通知监听：</span>
+                        <el-switch v-model="openNoticeMessageListenerFlag"/>
+                    </div>
+                </div>
+                <div class="width100 d-flex a-center">
+                    <el-table :data="noticeListenerRules"  border ref="noticeListenerRulesTable"
+                              highlight-current-row style="width: 100%">
+                        <el-table-column prop="matchingPackageName" align="left" label="匹配包名">
+                            <template slot-scope="{ row, $index}">
+                                <el-input type="text" v-model="row.matchingPackageName" placeholder="请输入匹配包名" class="width100">
+                                </el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="matchingText" label="匹配文本" align="left">
+                        </el-table-column>
+                        <el-table-column prop="autoClick" label="自动点击" align="left">
+                        </el-table-column>
+                        <el-table-column prop="receiveEmail" label="邮件地址" align="left">
+                        </el-table-column>
+                        <el-table-column prop="executeScript" label="执行代码" align="left">
+                        </el-table-column>
+                        <el-table-column width="100">
+                            <template slot="header">
+                                <div class="d-flex a-center">
+                                    操作
+                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="tableAddRow('noticeListenerRules',-1)"/>
+                                </div>
+                            </template>
+                            <template slot-scope="{ row, $index }">
+                                <div class="d-flex j-start a-center">
+                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('noticeListenerRules',$index)"/>
+                                    <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('noticeListenerRules',$index)"/>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </el-row>
+            <el-row style="padding-left: 0!important;;margin-top:10px;">
+                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                    <div>历史通知</div>
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="building">
+                        查询通知
+                    </el-button>
+                </div>
+                <el-table :data="historyNoticeMessageList"  border ref="historyNoticeMessageListTable"
+                          highlight-current-row style="width: 100%">
+                    <el-table-column prop="应用包名" align="left" label="应用包名">
+                    </el-table-column>
+                    <el-table-column prop="通知文本" label="通知文本" align="left">
+                    </el-table-column>
+                    <el-table-column prop="通知优先级" label="通知优先级" align="left">
+                    </el-table-column>
+                    <el-table-column prop="通知目录" label="通知目录" align="left">
+                    </el-table-column>
+                    <el-table-column prop="通知时间" label="通知时间" align="left">
+                    </el-table-column>
+                </el-table>
+            </el-row>
         </el-tab-pane>
         <el-tab-pane label="脚本管理" name="scriptManage">
             <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
@@ -63,7 +145,7 @@
             <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
         </el-tab-pane>
     </el-tabs>
-    <el-row>
+    <el-row style="margin-top:10px;">
         <div class="width100 d-flex a-center">
             <el-form-item label="文本传输内容:" prop="textContent" class="width50">
                 <el-input type="textarea" v-model="textContent" placeholder=""

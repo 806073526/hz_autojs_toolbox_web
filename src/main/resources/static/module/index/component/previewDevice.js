@@ -1,10 +1,11 @@
 import {getContext} from "./../../../utils/utils.js";
-let template='<div></div>';
+
+let template = '<div></div>';
 $.ajax({
     url: "/module/index/template/previewDevice.html",
-    type:'get',
-    async:false,
-    success:function(res){
+    type: 'get',
+    async: false,
+    success: function (res) {
         template = String(res);
     }
 });
@@ -46,10 +47,22 @@ export default {
                 valueUpdateAfterAutoPreview: false,
                 operateRecord: ''
             },
-            textContent:'',// 文本信息传输
-            textIndex:null, // 文本传输序号
-            textType:'text',// 文本传输类型
-            previewActiveName:'previewParam',
+            textContent: '',// 文本信息传输
+            textIndex: null, // 文本传输序号
+            textType: 'text',// 文本传输类型
+            previewActiveName: 'previewParam',
+            openNoticeMessageListenerFlag: false,
+            noticeListenerRules: [],// 通知监听规则
+            historyNoticeMessageList:[],// 历史通知消息列表
+            tableDefaultRowMap: {// 默认行数据
+                noticeListenerRules: {
+                    matchingPackageName: "",
+                    matchingText: "",
+                    autoClick: false,
+                    receiveEmail: "",
+                    executeScript: ""
+                }
+            },
             deviceMousePosition: { // 设备鼠标坐标
                 x: 0,
                 y: 0
@@ -116,52 +129,73 @@ export default {
                 }
             })
         },
+        // 表格添加行
+        tableAddRow(tableName, index) {
+            let defaultObj = this.tableDefaultRowMap[tableName];
+            let tableArr = this[tableName];
+            if (index === -1) {
+                tableArr.push(JSON.parse(JSON.stringify(defaultObj)));
+            } else {
+                tableArr.splice(index + 1, 0, JSON.parse(JSON.stringify(defaultObj)));
+            }
+        },
+        // 表格删除行
+        tableDeleteRow(tableName,index){
+            let tableArr = this[tableName];
+            window.ZXW_VUE.$confirm('是否确认删除?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                tableArr.splice(index, 1);
+                window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+            });
+        },
+        // 建设中
+        building(){
+            window.ZXW_VUE.$notify.success({message: '建设中', duration: '1000'});
+        },
         // 发送文本
-        sendTextContent(){
+        sendTextContent() {
             if (!this.validSelectDevice()) {
                 return;
             }
             let remoteScript = "";
-            let param = this.textIndex !== null ? (this.textIndex + ',"' + this.textContent + '"') : '"'+this.textContent +'"';
+            let param = this.textIndex !== null ? (this.textIndex + ',"' + this.textContent + '"') : '"' + this.textContent + '"';
             // 覆盖
-            if(this.textType === 'text'){
-                remoteScript = 'setText('+param+')';
-            // 输入
+            if (this.textType === 'text') {
+                remoteScript = 'setText(' + param + ')';
+                // 输入
             } else {
-                remoteScript = 'input('+param+')';
+                remoteScript = 'input(' + param + ')';
             }
             this.remoteExecuteScript(remoteScript);
         },
         // 远程脚本查询
-        queryRemoteScript(){
+        queryRemoteScript() {
 
         },
         // 关闭远程脚本
-        closeRemoteScript(){
+        closeRemoteScript() {
 
         },
         // 定时任务查询
-        queryTimerTask(){
+        queryTimerTask() {
 
         },
         // 关闭定时任务
-        closeTimerTask(){
+        closeTimerTask() {
 
         },
         // 消息通知查询
-        queryNoticeMessage(){
+        queryNoticeMessage() {
 
         },
         // 开启通知消息监听
-        openNoticeMessageListener(){
+        openNoticeMessageListener() {
             let remoteExecuteScript = `
-            let matching包名 = "";
-            let matching文本 = "";
-            let autoClick = false;
-            let receiveEmail = "";
-            let title = "";
-            let message = "";
-            let executeScript = "";
+            let deviceUUID = '${this.deviceInfo.deviceUuid}'
+            let matchingRules = [];
             events.removeAllListeners('notification');
             events.observeNotification();
             events.onNotification(function(notification) {
@@ -174,28 +208,30 @@ export default {
                     "通知数": notification.number,
                     "通知摘要": notification.tickerText
                 }
-            
-                if ((!matching包名 || messageObj["应用包名"].indexOf(matching包名) !== -1) && (!matching文本 || messageObj["通知文本"].indexOf(matching文本) !== -1)) {
-                    if (autoClick) {
-                        notification.click();
-                    }
-                    sleep(1000);
-                    // 发送邮件消息
-                    if (receiveEmail) {
-                        utilsObj.request("/attachmentInfo/sendEmailMessage?receiveEmail=" + receiveEmail + "&title=" + title + "&message=" + message, "GET", null, () => {
-                            toastLog("发送成功")
+                matchingRules.forEach(item=>{
+                    if ((!item.matchingPackageName || messageObj["应用包名"].indexOf(item.matchingPackageName) !== -1) && (!item.matchingText || messageObj["通知文本"].indexOf(item.matchingText) !== -1)) {
+                        if (item.autoClick) {
+                            notification.click();
+                        }
+                        sleep(1000);
+                        // 发送邮件消息
+                        if (item.receiveEmail) {
+                            utilsObj.request("/attachmentInfo/sendEmailMessage?receiveEmail=" + item.receiveEmail + "&title=" + item.title + "&message=" + item.message, "GET", null, () => {
+                                toastLog("发送成功")
+                            });
+                        }
+                        // 记录通知
+                        utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + item.message, "GET", null, () => {
+                            // 如果有代码则执行
+                            if (item.executeScript) {
+                                //执行代码
+                                eval(item.executeScript);
+                            }
                         });
                     }
-                    // 记录通知
-                    utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + message, "GET", null, () => {
-                        if (executeScript) {
-                            //\t执行代码
-                            eval(executeScript);
-                        }
-                    });
-                }
+                })
             });
-`;
+        `;
         },
         // 自动预览设备
         autoDevicePreview() {

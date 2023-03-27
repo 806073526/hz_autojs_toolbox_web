@@ -403,15 +403,18 @@ export default {
                 let hotUpdateVersion = "热更新";
                 // 可替换为本地目录下载目录  注意zip压缩包,请在文件目录下全选文件压缩  
                 let url = "http://121.4.241.250:9998/uploadPath/autoJsTools/webCommonPath/hz_autojs_toolbox.zip"
+                toastLog(url+"开始下载");
                 // 请求压缩包
                 let r = http.get(url);
                 if (r.statusCode == 200) {
+                    let zipPath = tempUpdatePath + "hz_autojs_toolbox.zip";
+                    files.remove(zipPath)
                     // 下载压缩包到本地临时更新路径
                     var content = r.body.bytes();
-                    files.writeBytes(tempUpdatePath + "hz_autojs_toolbox.zip", content);
-                    toastLog(tempUpdatePath + "hz_autojs_toolbox.zip" + "下载成功！！！");
+                    files.writeBytes(zipPath, content);
+                    toastLog(zipPath + "下载成功！！！");
                     // 解压下载文件到 项目路径  为防止误操作 请放开注释后再执行
-                    // $zip.unzip(tempUpdatePath + "hz_autojs_toolbox.zip", projectPath);
+                    // $zip.unzip(zipPath, projectPath);
                     // commonStorage.put("hotUpdateVersion", hotUpdateVersion)
                     // toastLog("热更新成功,请重启APP后生效！");
                 } else {
