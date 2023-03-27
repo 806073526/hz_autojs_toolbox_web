@@ -53,6 +53,7 @@ export default {
             previewActiveName: 'previewParam',
             openNoticeMessageListenerFlag: false,
             noticeListenerRules: [],// 通知监听规则
+            noticeListenerName:'noticeListenerRules.json',// 通知监听名称
             historyNoticeMessageList:[],// 历史通知消息列表
             tableDefaultRowMap: {// 默认行数据
                 noticeListenerRules: {
@@ -73,6 +74,12 @@ export default {
                 }
             }
         }
+    },
+    computed:{
+      allowOpenNoticeListener(){ // 允许开启通知监听
+          let notCompleted =this.noticeListenerRules.find(item=> JSON.stringify(item) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"]));
+          return !notCompleted;
+      }
     },
     methods: {
         // 开始预览设备
@@ -142,6 +149,12 @@ export default {
         // 表格删除行
         tableDeleteRow(tableName,index){
             let tableArr = this[tableName];
+            // 空行
+            if(tableArr[index] && JSON.stringify(tableArr[index]) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"])){
+                tableArr.splice(index, 1);
+                window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+                return false;
+            }
             window.ZXW_VUE.$confirm('是否确认删除?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -149,6 +162,102 @@ export default {
             }).then(() => {
                 tableArr.splice(index, 1);
                 window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+            });
+        },
+        // 保存到草稿
+        saveToDraft(){
+            if(!this.noticeListenerName){
+                window.ZXW_VUE.$message.warning('请设置规则名称');
+                return false;
+            }
+            let notCompleted =this.noticeListenerRules.find(item=> JSON.stringify(item) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"]));
+            if(notCompleted){
+                window.ZXW_VUE.$message.warning('请将规则填写完整');
+                return false;
+            }
+            window.localStorage.setItem("noticeListenerRules_"+this.noticeListenerName,JSON.stringify(this.noticeListenerRules));
+            window.ZXW_VUE.$notify.success({message: '保存草稿成功', duration: '1000'});
+        },
+        // 从草稿读取
+        readForDraft(){
+            if(!this.noticeListenerName){
+                window.ZXW_VUE.$message.warning('请设置规则名称');
+                return false;
+            }
+            let noticeListenerRulesJson = window.localStorage.getItem("noticeListenerRules_"+this.noticeListenerName);
+            this.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
+            window.ZXW_VUE.$notify.success({message: '读取草稿成功', duration: '1000'});
+        },
+        // 存为文件
+        saveToFile(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            if(!this.noticeListenerName){
+                window.ZXW_VUE.$message.warning('请设置规则名称');
+                return;
+            }
+            let notCompleted =this.noticeListenerRules.find(item=> JSON.stringify(item) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"]));
+            if(notCompleted){
+                window.ZXW_VUE.$message.warning('请将规则填写完整');
+                return false;
+            }
+            window.ZXW_VUE.$confirm('是否确认将当通知监听规则存为' + this.noticeListenerName + '?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let noticeListenerRulesJson = JSON.stringify(this.noticeListenerRules);
+                let scriptFile = new File([noticeListenerRulesJson], this.noticeListenerName, {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.deviceInfo.deviceUuid+"/");
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
+        },
+        // 从文件读取
+        readForFile(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            if(!this.noticeListenerName){
+                window.ZXW_VUE.$message.warning('请设置规则名称');
+                return;
+            }
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.noticeListenerName,
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    let noticeListenerRulesJson = String(res);
+                    this.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
+                    window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
+                },
+                error: function (msg) {
+                    console.log(msg);
+                    window.ZXW_VUE.$notify.error({message: _that.noticeListenerName+'文件不存在', duration: '1000'});
+                }
             });
         },
         // 建设中
@@ -189,49 +298,125 @@ export default {
         },
         // 消息通知查询
         queryNoticeMessage() {
-
-        },
-        // 开启通知消息监听
-        openNoticeMessageListener() {
-            let remoteExecuteScript = `
-            let deviceUUID = '${this.deviceInfo.deviceUuid}'
-            let matchingRules = [];
-            events.removeAllListeners('notification');
-            events.observeNotification();
-            events.onNotification(function(notification) {
-                let messageObj = {
-                    "应用包名": notification.getPackageName(),
-                    "通知文本": notification.getText(),
-                    "通知优先级": notification.priority,
-                    "通知目录": notification.category,
-                    "通知时间": new Date(notification.when),
-                    "通知数": notification.number,
-                    "通知摘要": notification.tickerText
-                }
-                matchingRules.forEach(item=>{
-                    if ((!item.matchingPackageName || messageObj["应用包名"].indexOf(item.matchingPackageName) !== -1) && (!item.matchingText || messageObj["通知文本"].indexOf(item.matchingText) !== -1)) {
-                        if (item.autoClick) {
-                            notification.click();
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryNoticeMessageByKey",
+                type: "GET",
+                dataType: "json",
+                // contentType: "application/json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            console.log(data.data);
+                            _that.historyNoticeMessageList = [];
+                            let arr = data.data || [];
+                            arr.forEach(item=>{
+                                // 获取json
+                                let json = decodeURIComponent(atob(item));
+                                // 解析对象
+                                let obj = json ? JSON.parse(json) : {};
+                                // 添加到数组
+                                _that.historyNoticeMessageList.push(obj);
+                            })
                         }
-                        sleep(1000);
-                        // 发送邮件消息
-                        if (item.receiveEmail) {
-                            utilsObj.request("/attachmentInfo/sendEmailMessage?receiveEmail=" + item.receiveEmail + "&title=" + item.title + "&message=" + item.message, "GET", null, () => {
-                                toastLog("发送成功")
-                            });
-                        }
-                        // 记录通知
-                        utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + item.message, "GET", null, () => {
-                            // 如果有代码则执行
-                            if (item.executeScript) {
-                                //执行代码
-                                eval(item.executeScript);
-                            }
-                        });
                     }
-                })
+                    setTimeout(() => {
+                    }, 200)
+                },
+                error: function (msg) {
+                }
             });
-        `;
+        },
+        clearNoticeMessage(){
+            window.ZXW_VUE.$confirm('是否确认清理全部历史通知?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/clearNoticeMessageByKey",
+                    type: "GET",
+                    dataType: "json",
+                    // contentType: "application/json",
+                    data: {
+                        "deviceUUID": this.deviceInfo.deviceUuid
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                _that.queryNoticeMessage();
+                                window.ZXW_VUE.$notify.success({message: '清理成功', duration: '1000'});
+                            }
+                        }
+                        setTimeout(() => {
+                        }, 200)
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
+        },
+        // 通知消息监听开关
+        openNoticeMessageListenerChange(){
+            let remoteExecuteScript = '';
+            if(this.openNoticeMessageListenerFlag){
+                remoteExecuteScript = `
+                    let deviceUUID = '${this.deviceInfo.deviceUuid}'
+                    let rules = decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(this.noticeListenerRules)))}'));
+                    let matchingRules = rules ? JSON.parse(rules) : [];
+                    events.removeAllListeners('notification');
+                    events.observeNotification();
+                    events.onNotification(function(notification) {
+                        let messageObj = {
+                            "应用包名": notification.getPackageName() || "",
+                            "通知文本": notification.getText() || "",
+                            "通知优先级": notification.priority || 0,
+                            "通知目录": notification.category || "",
+                            "通知时间": new Date(notification.when),
+                            "通知数": notification.number || 0,
+                            "通知摘要": notification.tickerText || ""
+                        }
+                        try{
+                            matchingRules.forEach(item=>{
+                                item.matchingPackageName = item.matchingPackageName ? item.matchingPackageName : "";
+                                item.matchingText = item.matchingText ? item.matchingText : "";
+                                if ((!item.matchingPackageName || messageObj["应用包名"].indexOf(item.matchingPackageName) !== -1) && (!item.matchingText || messageObj["通知文本"].indexOf(item.matchingText) !== -1)) {
+                                    if (item.autoClick) {
+                                        notification.click();
+                                    }
+                                    let message = JSON.stringify(messageObj)
+                                    item.message = $base64.encode(encodeURI(message))
+                                    item.title = "手机端通知消息";
+                                    sleep(1000);
+                                    // 发送邮件消息
+                                    if (item.receiveEmail) {
+                                        utilsObj.request("/attachmentInfo/sendEmailMessage?receiveEmail=" + item.receiveEmail + "&title=" + item.title + "&message=" + item.message, "GET", null, () => {
+                                            // console.log("邮件推送成功")
+                                        });
+                                    }
+                                    // 记录通知
+                                    utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + item.message, "GET", null, () => {
+                                        // 如果有代码则执行
+                                        if (item.executeScript) {
+                                            //执行代码
+                                            eval(item.executeScript);
+                                        }
+                                    });
+                                }
+                            });
+                        }catch(e){
+                            console.error(e)
+                        }
+                    });
+                `;
+            } else {
+                remoteExecuteScript =  `events.removeAllListeners('notification');`;
+            }
+            this.remoteExecuteScript(remoteExecuteScript);
         },
         // 自动预览设备
         autoDevicePreview() {

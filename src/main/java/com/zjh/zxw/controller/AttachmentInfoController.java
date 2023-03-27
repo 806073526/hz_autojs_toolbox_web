@@ -86,6 +86,14 @@ public class AttachmentInfoController extends BaseController {
         return success(noticeMessageList);
     }
 
+    @ApiOperation(value = "查询手机端通知消息记录", notes = "查询手机端通知消息记录")
+    @GetMapping("/clearNoticeMessageByKey")
+    public R<Boolean> clearNoticeMessageByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        noticeMessageMap.put(deviceUUID,new ArrayList<>());
+        return success(true);
+    }
+
+
     @ApiOperation(value = "写入手机端通知消息", notes = "写入手机端通知消息")
     @GetMapping("/writeNoticeMessage")
     public R<Boolean> writeNoticeMessage(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID,@ApiParam("message") @RequestParam(value = "message") String message){
