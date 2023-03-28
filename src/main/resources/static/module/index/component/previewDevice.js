@@ -169,6 +169,9 @@ export default {
         },
         // 查询脚本
         queryScript(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
             this.scriptLoading = true;
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"queryScript",()=>{
                 // 获取手机端脚本
