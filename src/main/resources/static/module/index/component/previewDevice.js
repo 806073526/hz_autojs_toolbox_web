@@ -245,17 +245,29 @@ export default {
                 cancelButtonText: '取消',
                 type: 'info'
             }).then(() => {
-                let remoteScript = `let allEngines = engines.all();
-                allEngines.forEach(item=>{
-                    if(String(item.getSource()) === "${row.source}"){
-                        item.forceStop();
-                    }
-                })
-                `;
-                this.remoteExecuteScript(remoteScript);
-                setTimeout(()=>{
+                // 执行停止脚本操作
+                handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"stopScript",()=>{
+                   let remoteScript = `let allEngines = engines.all();
+                    allEngines.forEach(item=>{
+                        if(String(item.getSource()) === "${row.source}"){
+                            item.forceStop();
+                        }
+                    })
+                    sleep(500);
+                    utilsObj.request("/attachmentInfo/clearScriptByKey?deviceUUID=" + '${this.deviceInfo.deviceUuid}', "GET", null, () => {
+                        let finishMsgObj = {
+                            "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                            "serviceKey":"stopScript",
+                            "serviceValue":"true"
+                         }
+                         events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    });
+                    `;
+                    this.remoteExecuteScript(remoteScript);
+                },()=>{
+                    // 执行重新加载操作
                     this.queryScript();
-                },500);
+                });
             });
         },
         // 保存到草稿

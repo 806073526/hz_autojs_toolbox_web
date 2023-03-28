@@ -89,6 +89,13 @@ public class AttachmentInfoController extends BaseController {
         return success(scriptJSON);
     }
 
+    @ApiOperation(value = "清除手机端脚本记录", notes = "清除手机端脚本记录")
+    @GetMapping("/clearScriptByKey")
+    public R<Boolean> clearScriptByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        scriptMap.put(deviceUUID,"");
+        return success(true);
+    }
+
     /**
      * deviceUUID
      * scriptJSON
