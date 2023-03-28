@@ -54,7 +54,7 @@
             </el-row>
         </el-tab-pane>
         <el-tab-pane label="通知监听" name="noticeMessage">
-            <el-row style="padding-left: 0!important;margin-top:10px;">
+            <el-row style="padding-left: 0!important;">
                 <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
                     <div>通知监听规则名称</div>
                     <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; width: 200px; ">
@@ -156,7 +156,35 @@
             </el-row>
         </el-tab-pane>
         <el-tab-pane label="脚本管理" name="scriptManage">
-            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+            <el-row style="padding-left: 0!important;">
+                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="queryScript">
+                        查询脚本
+                    </el-button>
+                </div>
+                <el-table :data="scriptArr" v-loading="scriptLoading" border ref="scriptArrTable"
+                          highlight-current-row style="width: 100%">
+                    <el-table-column prop="id" align="left" label="脚本id" width="200">
+                    </el-table-column>
+                    <el-table-column prop="source" label="脚本路径" align="left">
+                    </el-table-column>
+                    <el-table-column prop="cwd" label="脚本目录" align="left">
+                    </el-table-column>
+                    <el-table-column width="100">
+                        <template slot="header">
+                            <div class="d-flex a-center">
+                                操作
+                            </div>
+                        </template>
+                        <template slot-scope="{ row, $index }">
+                            <div class="d-flex j-start a-center">
+                                <el-link :underline="false" type="primary" @click="stopScript(row)">停止脚本</el-link>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-row>
         </el-tab-pane>
         <el-tab-pane label="定时任务" name="timerTask">
             <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>

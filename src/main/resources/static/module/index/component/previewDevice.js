@@ -1,4 +1,4 @@
-import {getContext} from "./../../../utils/utils.js";
+import {getContext,handlerAppByCacheChange} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -55,6 +55,9 @@ export default {
             noticeListenerRules: [],// 通知监听规则
             noticeListenerName:'noticeListenerRules.json',// 通知监听名称
             historyNoticeMessageList:[],// 历史通知消息列表
+            historyNoticeLoading:false,
+            scriptArr:[],// 脚本数组
+            scriptLoading:false,
             tableDefaultRowMap: {// 默认行数据
                 noticeListenerRules: {
                     matchingPackageName: "",
@@ -162,6 +165,97 @@ export default {
             }).then(() => {
                 tableArr.splice(index, 1);
                 window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+            });
+        },
+        // 查询脚本
+        queryScript(){
+            this.scriptLoading = true;
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"queryScript",()=>{
+                // 获取手机端脚本
+                let remoteScript = `let allEngines = engines.all();
+                 let enginesArr = [];
+                 // 排除本身数组
+                 let noContainsArr = ['/data/user/0/com.zjh336.cn.tools/files/project/main.js','/data/user/0/com.zjh336.cn.tools/files/project/runScript.js']
+                 allEngines.forEach(item=>{
+                    let source = String(item.getSource());
+                    if(!noContainsArr.includes(source)){
+                        enginesArr.push({
+                            "source":String(item.getSource()),
+                            "cwd":item.cwd(),
+                            "id":item.id
+                        });
+                    }
+                 })
+                 let scriptJSON = JSON.stringify(enginesArr);
+                 // 编码参数
+                 scriptJSON = $base64.encode(encodeURI(scriptJSON));
+                 let requestBody = {
+                    "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                    "scriptJSON":scriptJSON
+                 };
+                 // 记录通知
+                 utilsObj.request("/attachmentInfo/writeScript", "POST", JSON.stringify(requestBody), () => {
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"queryScript",
+                        "serviceValue":"true"
+                     }
+                     events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                 });
+                `;
+                this.remoteExecuteScript(remoteScript);
+            },()=>{
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryScriptByKey",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "deviceUUID": this.deviceInfo.deviceUuid
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                               // 原始数据
+                               let scriptJSON = data.data;
+                               if(scriptJSON){
+                                   // 解码数据
+                                   let json = decodeURIComponent(atob(scriptJSON));
+                                   // 解析对象
+                                   _that.scriptArr = json ? JSON.parse(json) : [];
+                               } else{
+                                   _that.scriptArr = [];
+                               }
+                            }
+                        }
+                        setTimeout(() => {
+                            _that.scriptLoading = false;
+                        }, 200)
+                    },
+                    error: function (msg) {
+                        _that.scriptLoading = true;
+                    }
+                });
+            });
+        },
+        // 停止脚本
+        stopScript(row){
+            window.ZXW_VUE.$confirm('是否确认远程停止脚本【'+row.source+'】?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                let remoteScript = `let allEngines = engines.all();
+                allEngines.forEach(item=>{
+                    if(String(item.getSource()) === "${row.source}"){
+                        item.forceStop();
+                    }
+                })
+                `;
+                this.remoteExecuteScript(remoteScript);
+                setTimeout(()=>{
+                    this.queryScript();
+                },500);
             });
         },
         // 保存到草稿

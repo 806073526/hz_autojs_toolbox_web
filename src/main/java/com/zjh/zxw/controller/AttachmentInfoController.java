@@ -79,6 +79,31 @@ public class AttachmentInfoController extends BaseController {
     // 消息通知map key为deviceUUID
     private final static ConcurrentHashMap<String,List<String>> noticeMessageMap = new ConcurrentHashMap<String,List<String>>();
 
+    // 脚本记录map key为deviceUUID
+    private final static ConcurrentHashMap<String,String> scriptMap = new ConcurrentHashMap<String,String>();
+
+    @ApiOperation(value = "查询手机端脚本记录", notes = "查询手机端脚本记录")
+    @GetMapping("/queryScriptByKey")
+    public R<String> queryScriptByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        String scriptJSON = scriptMap.get(deviceUUID);
+        return success(scriptJSON);
+    }
+
+    /**
+     * deviceUUID
+     * scriptJSON
+     * @param mapParam
+     * @return
+     */
+    @ApiOperation(value = "写入手机端脚本记录", notes = "写入手机端脚本记录")
+    @PostMapping("/writeScript")
+    public R<Boolean> writeScript(@RequestBody Map<String,String> mapParam){
+        String deviceUUID = mapParam.get("deviceUUID");
+        String scriptJSON = mapParam.get("scriptJSON");
+        scriptMap.put(deviceUUID,scriptJSON);
+        return success(true);
+    }
+
     @ApiOperation(value = "查询手机端通知消息记录", notes = "查询手机端通知消息记录")
     @GetMapping("/queryNoticeMessageByKey")
     public R<List<String>> queryNoticeMessageByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
