@@ -360,7 +360,7 @@ export default {
                 dataType:"TEXT", //返回值的类型
                 success: function (res) {
                     let noticeListenerRulesJson = String(res);
-                    this.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
+                    _that.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
                     window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'});
                 },
                 error: function (msg) {
