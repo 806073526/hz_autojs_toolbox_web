@@ -493,7 +493,7 @@ export default {
                             matchingRules.forEach(item=>{
                                 item.matchingPackageName = item.matchingPackageName ? item.matchingPackageName : "";
                                 item.matchingText = item.matchingText ? item.matchingText : "";
-                                if ((!item.matchingPackageName || messageObj["应用包名"].indexOf(item.matchingPackageName) !== -1) && (!item.matchingText || messageObj["通知文本"].indexOf(item.matchingText) !== -1)) {
+                                if ((!item.matchingPackageName || messageObj["应用包名"].indexOf(item.matchingPackageName) !== -1) && (!item.matchingText || (messageObj["通知文本"].indexOf(item.matchingText) !== -1 || messageObj["通知摘要"].indexOf(item.matchingText) !== -1))) {
                                     if (item.autoClick) {
                                         notification.click();
                                     }
