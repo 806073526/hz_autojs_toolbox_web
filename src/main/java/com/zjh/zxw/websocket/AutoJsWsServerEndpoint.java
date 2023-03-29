@@ -11,6 +11,7 @@ import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.domain.dto.EmailConfig;
+import com.zjh.zxw.dozer.DozerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -51,6 +52,8 @@ public class AutoJsWsServerEndpoint {
     // app消息map
     // key deviceUUID_serviceKey   value:具体值
     private static ConcurrentHashMap<String, String> appMessageMap = new ConcurrentHashMap<String,String>();
+
+    private static DozerUtils dozerUtils;
 
 
     /**
@@ -98,8 +101,10 @@ public class AutoJsWsServerEndpoint {
             return null;
         }
         AutoJsSession session = sessionMap.get(deviceUUID);
-        session.setSession(null);
-        return session;
+        // 获取复制参数
+        AutoJsSession copySession = dozerUtils.map(session,AutoJsSession.class);
+        copySession.setSession(null);
+        return copySession;
     }
 
     /**
