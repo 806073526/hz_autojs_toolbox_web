@@ -82,6 +82,40 @@ public class AttachmentInfoController extends BaseController {
     // 脚本记录map key为deviceUUID
     private final static ConcurrentHashMap<String,String> scriptMap = new ConcurrentHashMap<String,String>();
 
+    // 定时任务记录map key为deviceUUID
+    private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
+
+    @ApiOperation(value = "查询手机端定时任务记录", notes = "查询手机端定时任务记录")
+    @GetMapping("/queryTimerTaskByKey")
+    public R<String> queryTimerTaskByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        String timerTaskJSON = timerTaskMap.get(deviceUUID);
+        return success(timerTaskJSON);
+    }
+
+    @ApiOperation(value = "清除手机端定时任务记录", notes = "清除手机端定时任务记录")
+    @GetMapping("/clearTimerTaskByKey")
+    public R<Boolean> clearTimerTaskByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        timerTaskMap.put(deviceUUID,"");
+        return success(true);
+    }
+
+    /**
+     * deviceUUID
+     * timerTaskJSON
+     * @param mapParam
+     * @return
+     */
+    @ApiOperation(value = "写入手机端定时任务记录", notes = "写入手机端定时任务记录")
+    @PostMapping("/writeTimerTask")
+    public R<Boolean> writeTimerTask(@RequestBody Map<String,String> mapParam){
+        String deviceUUID = mapParam.get("deviceUUID");
+        String timerTaskJSON = mapParam.get("timerTaskJSON");
+        timerTaskMap.put(deviceUUID,timerTaskJSON);
+        return success(true);
+    }
+
+
+
     @ApiOperation(value = "查询手机端脚本记录", notes = "查询手机端脚本记录")
     @GetMapping("/queryScriptByKey")
     public R<String> queryScriptByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){

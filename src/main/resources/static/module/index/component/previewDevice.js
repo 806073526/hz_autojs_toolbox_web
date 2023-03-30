@@ -1,4 +1,4 @@
-import {getContext,handlerAppByCacheChange} from "./../../../utils/utils.js";
+import {getContext,handlerAppByCacheChange,sortByKey} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -58,6 +58,8 @@ export default {
             historyNoticeLoading:false,
             scriptArr:[],// 脚本数组
             scriptLoading:false,
+            timerTaskArr:[],
+            timerTaskLoading:false,
             tableDefaultRowMap: {// 默认行数据
                 noticeListenerRules: {
                     matchingPackageName: "",
@@ -167,6 +169,142 @@ export default {
                 window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
             });
         },
+        // 查询定时任务
+        queryTimerTask(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            this.timerTaskLoading = true;
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"queryTimerTask",()=>{
+                // 获取手机端脚本
+                let remoteScript = `
+                // 定时任务数组
+                let tasksArr = [];
+                let intentTasks = $work_manager.queryIntentTasks();
+                if (intentTasks) {
+                    intentTasks.forEach((item) => {
+                        let task = {
+                            id: item.id,
+                            taskType: '广播',
+                            scriptPath: item.scriptPath,
+                            timerParamJson: JSON.stringify({
+                                action: item.action,
+                                category: item.category,
+                                dataType: item.dataType,
+                                local: item.local,
+                                flags: item.flags
+                            })
+                        }
+                        tasksArr.push(task);
+                    })
+                }
+                let timedTasks = $work_manager.queryTimedTasks();
+                if (timedTasks) {
+                    timedTasks.forEach((item) => {
+                        let task = {
+                            id: item.id,
+                            taskType: '时间',
+                            scriptPath: item.scriptPath,
+                            timerParamJson: JSON.stringify({
+                                millis: item.millis,
+                                date: new Date(item.millis),
+                                scheduled: item.scheduled,
+                                delay: item.delay,
+                                interval: item.interval,
+                                loopTimes: item.loopTimes,
+                                timeFlag: item.timeFlag
+                            })
+                        }
+                        tasksArr.push(task);
+                    })
+                }
+                 let timerTaskJSON = JSON.stringify(tasksArr);
+                 // 编码参数
+                 timerTaskJSON = $base64.encode(encodeURI(timerTaskJSON));
+                 let requestBody = {
+                    "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                    "timerTaskJSON":timerTaskJSON
+                 };
+                 // 记录通知
+                 utilsObj.request("/attachmentInfo/writeTimerTask", "POST", JSON.stringify(requestBody), () => {
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"queryTimerTask",
+                        "serviceValue":"true"
+                     }
+                     events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                 });
+                `;
+                this.remoteExecuteScript(remoteScript);
+            },()=>{
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryTimerTaskByKey",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "deviceUUID": this.deviceInfo.deviceUuid
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                // 原始数据
+                                let timerTaskJSON = data.data;
+                                if(timerTaskJSON){
+                                    // 解码数据
+                                    let json = decodeURIComponent(atob(timerTaskJSON));
+                                    // 解析对象
+                                    let arr = json ? JSON.parse(json) : [];                                   // 解析对象
+                                    _that.timerTaskArr = sortByKey(arr,'id',true);
+                                } else{
+                                    _that.timerTaskArr = [];
+                                }
+                            }
+                        }
+                        setTimeout(() => {
+                            _that.timerTaskLoading = false;
+                        }, 200)
+                    },
+                    error: function (msg) {
+                        _that.timerTaskLoading = true;
+                    }
+                });
+            });
+        },
+        // 停止定时任务
+        stopTimerTask(row){
+            window.ZXW_VUE.$confirm('是否确认远程停止定时任务【'+row.id+'】?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                // 执行停止定时任务操作
+                handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"stopTimerTask",()=>{
+                    let remoteScript = `
+                    let taskType = '${row.taskType}';
+                    let id = ${row.id};
+                    if(taskType === '广播'){
+                        $work_manager.removeIntentTask(id);
+                    } else {
+                        $work_manager.removeTimedTask(id);
+                    }
+                    sleep(500);
+                    utilsObj.request("/attachmentInfo/clearTimerTaskByKey?deviceUUID=" + '${this.deviceInfo.deviceUuid}', "GET", null, () => {
+                        let finishMsgObj = {
+                            "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                            "serviceKey":"stopTimerTask",
+                            "serviceValue":"true"
+                         }
+                         events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    });
+                    `;
+                    this.remoteExecuteScript(remoteScript);
+                },()=>{
+                    // 执行重新加载操作
+                    this.queryTimerTask();
+                });
+            });
+        },
         // 查询脚本
         queryScript(){
             if (!this.validSelectDevice()) {
@@ -224,8 +362,8 @@ export default {
                                if(scriptJSON){
                                    // 解码数据
                                    let json = decodeURIComponent(atob(scriptJSON));
-                                   // 解析对象
-                                   _that.scriptArr = json ? JSON.parse(json) : [];
+                                   let arr = json ? JSON.parse(json) : [];                                   // 解析对象
+                                   _that.scriptArr = sortByKey(arr,'id',true);
                                } else{
                                    _that.scriptArr = [];
                                }
@@ -395,10 +533,6 @@ export default {
         },
         // 关闭远程脚本
         closeRemoteScript() {
-
-        },
-        // 定时任务查询
-        queryTimerTask() {
 
         },
         // 关闭定时任务

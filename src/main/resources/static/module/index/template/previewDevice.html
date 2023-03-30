@@ -189,7 +189,52 @@
             </el-row>
         </el-tab-pane>
         <el-tab-pane label="定时任务" name="timerTask">
-            <div class="d-flex j-center a-center" style="height: 100px">建设中！！！</div>
+            <el-row style="padding-left: 0!important;">
+                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                               @click.stop.prevent="queryTimerTask">
+                        查询定时任务
+                    </el-button>
+                </div>
+                <el-table :data="timerTaskArr" v-loading="timerTaskLoading" border ref="scriptArrTable"
+                          highlight-current-row style="width: 100%">
+                    <el-table-column prop="id" align="left" label="任务id" width="100px">
+                    </el-table-column>
+                    <el-table-column prop="taskType" label="任务类型" align="left"  width="150px">
+                    </el-table-column>
+                    <el-table-column prop="scriptPath" label="脚本路径" align="left" width="300px">
+                    </el-table-column>
+                    <el-table-column prop="timerParamJson" label="任务参数" align="left">
+                    </el-table-column>
+                    <el-table-column width="100px">
+                        <template slot="header">
+                            <div class="d-flex a-center">
+                                操作
+                            </div>
+                        </template>
+                        <template slot-scope="{ row, $index }">
+                            <div class="d-flex j-start a-center">
+                                <el-link :underline="false" type="primary" @click="stopTimerTask(row)">停止任务</el-link>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-row>
+            <!--
+
+
+
+            任务参数
+                延迟毫秒
+                间隔毫秒
+                循环次数
+            action
+            category
+            dataType
+            local
+
+            操作
+            -->
         </el-tab-pane>
     </el-tabs>
     <el-row style="margin-top:10px;">
