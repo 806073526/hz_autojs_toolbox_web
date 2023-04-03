@@ -196,7 +196,7 @@ export default {
                 home: {type: 'keys', name: '返回主页', code: 'home();'},
                 powerDialog: {type: 'keys', name: '电源', code: 'powerDialog();'},
                 notifications: {type: 'keys', name: '通知栏拉出', code: 'notifications();'},
-                quickSettings: {type: 'keys', name: '通知栏拉到底', code: 'back();'},
+                quickSettings: {type: 'keys', name: '通知栏拉到底', code: 'quickSettings();'},
                 recents: {type: 'keys', name: '最近任务', code: 'recents();'},
                 observeKey: {type: 'keys', name: '启用按键监听', code: 'events.observeKey();'},
                 onKeyDown: {type: 'keys', name: '监听按键按下', code:
