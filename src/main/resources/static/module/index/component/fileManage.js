@@ -1518,6 +1518,30 @@ export default {
                 this.refreshPhoneDir();
             });
         },
+		// 初始化官方商店示例
+		phoneInitOfficalShopExample(){
+			 this.phoneFileLoading = true;
+            // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedShopExample",()=>{
+                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                utilsObj.downLoadFile("${getContext()}/AutoJsPro商店示例脚本.zip","/appSync/AutoJsPro商店示例脚本.zip",()=>{
+                    $zip.unzip('/sdcard/appSync/AutoJsPro商店示例脚本.zip', '/sdcard/appSync/');
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"unzipFinishedShopExample",
+                        "serviceValue":"true"
+                    }
+                    events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    toastLog("初始化AutoJsPro商店示例脚本完成");
+                })`;
+                this.remoteExecuteScript(downLoadGameScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
+                // 刷新手机目录
+                this.refreshPhoneDir();
+            });
+		},
         // 手机端下载脚手架项目
         phoneDownLoadGameScript(){
             this.phoneFileLoading = true;
