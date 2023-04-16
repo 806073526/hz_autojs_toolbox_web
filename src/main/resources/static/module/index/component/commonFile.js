@@ -1,4 +1,4 @@
-import {getContext, getEditorType, initFileEditor, queryCacheData, handlerByFileChange, handlerAppByCacheChange} from "./../../../utils/utils.js";
+import {getContext,urlParam, getEditorType, initFileEditor, queryCacheData, handlerByFileChange, handlerAppByCacheChange} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -59,6 +59,10 @@ export default {
             moveFileList: [],// 移动文件列表
             absolutePrePath: '',// 绝对路径前缀
             fileList: [], // 文件列表
+            noPermissionPath:['uploadPath/autoJsTools/webCommonPath/发行版本',
+                'uploadPath/autoJsTools/webCommonPath/公共脚本',
+                'uploadPath/autoJsTools/webCommonPath/hz_autojs_toolbox.zip'
+                ]
         }
     },
     mounted() {
@@ -114,6 +118,21 @@ export default {
         // 上传进度数组
         uploadPercentageArr(){
             return this.uploadFileList.map(item=>item.percentage);
+        },
+        // 允许保存文件
+        allowSaveFile(){
+            let flag = true;
+            let allowOperateFile = urlParam("allowOperateFile");
+            if(allowOperateFile){
+                return true;
+            }
+            let comparePath = 'uploadPath/autoJsTools' + this.fileSavePath + this.fileEditorName;
+            this.noPermissionPath.forEach(path=>{
+                if(comparePath.startsWith(path)){
+                    flag = false;
+                }
+            });
+            return flag;
         }
     },
     watch:{
@@ -134,6 +153,52 @@ export default {
         }
     },
     methods: {
+        // 允许批量操作文件
+        allowBatchOperateFile(){
+            let flag = true;
+            let allowOperateFile = urlParam("allowOperateFile");
+            if(allowOperateFile){
+                return true;
+            }
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            let comparePath = 'uploadPath/autoJsTools/'+toPath;
+            this.noPermissionPath.forEach(path=>{
+                if(comparePath.startsWith(path)){
+                    flag = false;
+                }
+            });
+            return flag;
+        },
+        // 允许复选框勾选文件
+        allowCheckFile(item){
+            let flag = true;
+            let allowOperateFile = urlParam("allowOperateFile");
+            if(allowOperateFile){
+                return true;
+            }
+            let fileName = (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
+            this.noPermissionPath.forEach(path=>{
+                let comparePath = path.substring(path.lastIndexOf('/')+1,path.length);
+                if(comparePath === fileName){
+                    flag = false;
+                }
+            });
+            return flag;
+        },
+        // 允许操作文件 操作按钮显示
+        allowOperateFile(item){
+            let flag = true;
+            let allowOperateFile = urlParam("allowOperateFile");
+            if(allowOperateFile){
+                return true;
+            }
+            this.noPermissionPath.forEach(path=>{
+                if(item.previewUrl && item.previewUrl.startsWith(path)){
+                    flag = false;
+                }
+            });
+            return flag;
+        },
         // 初始化方法
         init() {
             if(!this.isInit){
@@ -488,6 +553,7 @@ export default {
                     this.fileEditVisible = true;
                     this.fileEditorName = row.fileName + '.' + row.fileType;
                     this.fileSavePath = row.previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
+                    console.log(this.fileSavePath);
                     let _that = this;
                     $.ajax({
                         url: getContext() + "/" +row.previewUrl +"?t="+(new Date().getTime()),
@@ -634,6 +700,8 @@ export default {
             this.queryFileList(item.value);
             // 重新加载面包屑
             this.breadcrumbList = this.breadcrumbList.slice(0, index + 1);
+
+            console.log(this.breadcrumbList);
             this.$set(this.breadcrumbList, 0, {label: '根目录', value: this.webCommonPath});
 
         },

@@ -36,8 +36,8 @@
                 </el-tooltip>
                 <div class="operate d-flex a-center j-center">
                     <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('copy')">复制</el-link>
-                    <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('move')">移动</el-link>
-                    <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('remove')">删除</el-link>
+                    <el-link v-if="allowBatchOperateFile && checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('move')">移动</el-link>
+                    <el-link v-if="allowBatchOperateFile && checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('remove')">删除</el-link>
                     <el-link v-if="copyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('paste')">粘贴到</el-link>
                     <el-link v-if="moveFileList.length>0" :underline="false" :disabled="!allowMoveFileList.length>0" type="info" style="margin-left: 5px;" @click="operateFun('moveTo')">移动到</el-link>
                     <el-link v-if="copyFileList.length>0 || moveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('cancel')">取消</el-link>
@@ -68,7 +68,7 @@
                     </div>
                     <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
                         <div class="d-flex a-center fileName">
-                            <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
+                            <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native :disabled="!allowCheckFile(item)"/>
                             <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
                                 <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                             </div>
@@ -81,10 +81,10 @@
                         </div>
                         <div class="operate d-flex a-center j-center">
                             <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>
-                            <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
-                            <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
-                            <el-link :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
-                            <el-link :underline="false" type="info" style="margin-left: 5px;" @click="removeFile(item)">删除</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
+                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
+                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;" @click="removeFile(item)">删除</el-link>
                         </div>
                     </div>
                 </el-scrollbar>
@@ -95,7 +95,7 @@
         <div id="fileEditor" style="height: 85vh;width: 100%;">
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary"  @click.stop.native="saveFileEditorContent">
+          <el-button type="primary" v-if="allowSaveFile"  @click.stop.native="saveFileEditorContent">
             保存
           </el-button>
           <el-button type="info" @click.stop.native="closeFileEditorDialog">
