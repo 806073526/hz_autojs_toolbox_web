@@ -110,7 +110,7 @@ export default {
                         let logContent = utilsObj.getOnlineLog();
                         // url编码base64加密
                         let result = $base64.encode(encodeURI(logContent));
-                        http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateLogMap', {
+                        http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateLogMap', {
                             headers: {
                                 "deviceUUID": commonStorage.get('deviceUUID')
                             },

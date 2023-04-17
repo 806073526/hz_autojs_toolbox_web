@@ -1664,7 +1664,7 @@ export default {
                 let appSyncFileList = getFileByPath(targetPath);
                 // url编码base64加密
                 let result = $base64.encode(encodeURI(JSON.stringify(appSyncFileList)));
-                http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateFileDirectoryMap', {
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileDirectoryMap', {
                     headers: {
                         "deviceUUID": commonStorage.get('deviceUUID')
                     },
@@ -1867,7 +1867,7 @@ export default {
                    let text = files.read('${targetPath}');
                    result = $base64.encode(encodeURI(text));
                 }
-                http.request(commonStorage.get("服务端IP") + ':9998/attachmentInfo/updateFileMap', {
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
                     headers: {
                         "deviceUUID": commonStorage.get('deviceUUID')
                     },
