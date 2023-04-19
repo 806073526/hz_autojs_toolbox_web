@@ -351,6 +351,9 @@ export default {
                     drawBox.removeEventListener('mousedown', _this.drawMouseDown);
                     drawBox.addEventListener('mousedown', _this.drawMouseDown, true);
 
+                    drawBox.removeEventListener('mouseup', _this.drawMouseUp);
+                    drawBox.addEventListener('mouseup', _this.drawMouseUp, true);
+
                     drawBox.removeEventListener('click', _this.imgMouseClick);
                     drawBox.addEventListener('click', _this.imgMouseClick);
 
@@ -431,6 +434,61 @@ export default {
                     // 关闭快速裁图
                     this.remoteHandler.param1.isOpenFastClip = false;
                 }, 500)
+            }
+        },
+        // 绘画鼠标弹起
+        drawMouseUp(e){
+            if (!this.remoteHandler.param1.isOpenFastClip) {
+                return;
+            }
+            // 已开启拖选模式
+            if (window.drawFlag) {
+                let drawArear = document.getElementById('drawArear'); // 获取画布元素
+                let areaInfo = drawArear.getBoundingClientRect();
+                // 鼠标弹起的点作为矩形框的终点
+                let tempEndPoint = {x: e.clientX - areaInfo.x, y: e.clientY - areaInfo.y};
+                if(window.beginPoint){
+                    //  如果 起点坐标和终点坐标有区别 则以弹起位置为终点坐标
+                    if(window.beginPoint.x !== tempEndPoint.x && window.beginPoint.y !== tempEndPoint.y){
+                        // 关闭绘画标记
+                        window.drawFlag = false;
+                        // 清空绘画框
+                        let drawReact = document.getElementById('drawReact'); // 获取矩形框元素
+                        drawReact.style.visibility = 'hidden';
+                        drawReact.style.width = '0px'; // 宽
+                        drawReact.style.height = '0px'; // 高
+                        drawReact.style.left = '0px';
+                        drawReact.style.top = '0px';
+
+                        setTimeout(() => {
+                            // 获取坐标列表
+                            let positionList = (this.remoteHandler.param1.positionList || "").trim();
+                            let tempArr = (positionList || '').split('\n') || [];
+                            if (tempArr.length < 1) {
+                                return;
+                            }
+                            // 获取终点实际坐标
+                            let endPointArr = (tempArr[tempArr.length - 1] || '').split(',') || [];
+                            if (endPointArr && endPointArr.length <= 3) {
+                                this.remoteHandler.param1.x2 = endPointArr[0];
+                                this.remoteHandler.param1.y2 = endPointArr[1];
+                            }
+                            // 相比起点坐标x的变化
+                            let xVal = tempEndPoint.x - window.beginPoint.x;
+                            // 相比起点坐标y的变化
+                            let yVal = tempEndPoint.y - window.beginPoint.y;
+
+                            this.remoteHandler.param1.x1 = Number(this.remoteHandler.param1.x2) - Number(xVal);
+                            this.remoteHandler.param1.y1 = Number(this.remoteHandler.param1.y2) - Number(yVal);
+
+                            // 生成图片
+                            this.sendImgAction('remoteClipGrayscaleAndThresholdToServer');
+                            // 关闭快速裁图
+                            this.remoteHandler.param1.isOpenFastClip = false;
+                        }, 500)
+                    }
+                }
+
             }
         },
         // 绘画鼠标移动
