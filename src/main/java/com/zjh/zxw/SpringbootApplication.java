@@ -26,7 +26,11 @@ import java.io.*;
 @Slf4j
 public class SpringbootApplication {
 
-    private static String tempPath = "C://temp";
+    private static String tempPath = isWindowsSystem() ? "C:"+File.separator+"temp" : File.separator + "temp";
+    public static boolean isWindowsSystem(){
+        String osName = System.getProperty("os.name");
+        return osName.startsWith("Windows");
+    }
 
     public static String executeBatScript(String batScript) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -34,7 +38,7 @@ public class SpringbootApplication {
         String location = "";
         try {
             tempPath = UploadPathHelper.getUploadPath(tempPath);
-            location = tempPath+ File.separator +"start.bat";
+            location = tempPath+ File.separator + (isWindowsSystem() ? "start.bat" : "start.sh");
             File fileStart = new File(location);
             if(!fileStart.exists()){
                 fileStart.createNewFile();
@@ -62,7 +66,6 @@ public class SpringbootApplication {
     }
 
     public static void main(String[] args) {
-
         SpringApplication.run(SpringbootApplication.class, args);
         try {
             String command = "for /f \"tokens=16\" %%i in ('ipconfig ^|find /i \"ipv4\"') do (\n" +
@@ -71,11 +74,12 @@ public class SpringbootApplication {
                     ")\n" +
                     ":out\n" +
                     "cmd /c start http://%myip%:9998";
-            executeBatScript(command);
+            if(isWindowsSystem()){
+                executeBatScript(command);
+            }
             // Runtime.getRuntime().exec(command);//可以指定自己的路径
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-
 }

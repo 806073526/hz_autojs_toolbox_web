@@ -300,6 +300,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean createFolder(String folderName) {
+        folderName = folderName.replaceAll("\\\\",File.separator);
         String folderPath = this.getRootPath() + folderName;
         folderPath = this.getTargetFilePathNoExit(folderPath,true);
         FileUtil.createFolder(folderPath);

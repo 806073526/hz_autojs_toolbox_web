@@ -283,6 +283,7 @@ public class AttachmentInfoController extends BaseController {
     public R<String> uploadFileSingle(@RequestParam("file") MultipartFile file,@RequestParam("pathName")String pathName) {
         String url = "";
         try {
+            pathName = pathName.replaceAll("\\\\",File.separator);
             url = attachmentInfoService.uploadFileToAutoJs(file,pathName + File.separator + file.getOriginalFilename());
             return success(url);
         } catch (BusinessException e) {

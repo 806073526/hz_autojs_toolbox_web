@@ -751,7 +751,7 @@ export default {
                 let pathName = row.pathName;
                 let index = pathName.indexOf(this.deviceInfo.deviceUuid);
                 pathName = pathName.substring(index, pathName.length);
-                let array = pathName.split("\\");
+                let array = pathName.indexOf("\\") !==-1 ? pathName.split("\\") : pathName.split("/");
 
                 // 面包屑数组
                 let breadcrumbArr = [];
