@@ -460,6 +460,25 @@ export default {
                         drawReact.style.left = '0px';
                         drawReact.style.top = '0px';
 
+
+                        let box = document.querySelector('#previewImg');
+                        let xCoefficient = 1;
+                        let yCoefficient = 1;
+
+                        // x乘法系数
+                        let xMul = ((this.remoteHandler.param1.cache_x2 || 0) - (this.remoteHandler.param1.cache_x1 || 0)) / box.width;
+                        // y乘法系数
+                        let yMul = ((this.remoteHandler.param1.cache_y2 || 0) - (this.remoteHandler.param1.cache_y1 || 0)) / box.height;
+                        // 竖屏
+                        if (this.positionShowType === 'standard' && this.screenDirection === "竖屏") {
+                            xCoefficient = xCoefficient * (this.deviceInfo.screenWidth || this.deviceInfo.standardWidth) / this.deviceInfo.standardWidth;
+                            yCoefficient = yCoefficient * (this.deviceInfo.screenHeight || this.deviceInfo.standardHeight) / this.deviceInfo.standardHeight;
+                            // 横屏
+                        } else if (this.positionShowType === 'standard' && this.screenDirection === "横屏") {
+                            xCoefficient = xCoefficient * (this.deviceInfo.screenHeight || this.deviceInfo.standardHeight) / this.deviceInfo.standardHeight;
+                            yCoefficient = yCoefficient * (this.deviceInfo.screenWidth || this.deviceInfo.standardWidth) / this.deviceInfo.standardWidth;
+                        }
+
                         setTimeout(() => {
                             // 获取坐标列表
                             let positionList = (this.remoteHandler.param1.positionList || "").trim();
@@ -477,6 +496,9 @@ export default {
                             let xVal = tempEndPoint.x - window.beginPoint.x;
                             // 相比起点坐标y的变化
                             let yVal = tempEndPoint.y - window.beginPoint.y;
+
+                            xVal = Number((xVal * xMul) / xCoefficient).toFixed(0);
+                            yVal = Number((yVal * yMul) / yCoefficient).toFixed(0);
 
                             this.remoteHandler.param1.x1 = Number(this.remoteHandler.param1.x2) - Number(xVal);
                             this.remoteHandler.param1.y1 = Number(this.remoteHandler.param1.y2) - Number(yVal);
