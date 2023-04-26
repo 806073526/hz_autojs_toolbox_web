@@ -278,11 +278,26 @@ export default {
 
             let fileNoChangeCount = 0;//连续未变化次数
             let startFlag = false; //开始处理标志
+
+            let fileNoChangeCountImg = 0; // 图片连续未变化次数
+            let startFlagImg = false; // 图片开始处理标志
+
+            // 节点
             let relativeFilePath = this.deviceInfo.deviceUuid + "/rootNode.json";
+            // 图片
+            let relativeFilePathImg = this.deviceInfo.deviceUuid + "/nodePreviewImg.jpg";
+
             // 原始文件信息
             let sourceFileInfo = this.getFileInfoByPath(relativeFilePath);
             let sourceFileSize = sourceFileInfo ? sourceFileInfo.fileSize : 0;
             let sourceLastUpdateTime = sourceFileInfo ? sourceFileInfo.lastUpdateTime : '';
+
+            // 图片原始文件信息
+            let sourceFileInfoImg = this.getFileInfoByPath(relativeFilePathImg);
+            let sourceFileSizeImg = sourceFileInfoImg ? sourceFileInfoImg.fileSize : 0;
+            let sourceLastUpdateTimeImg = sourceFileInfoImg ? sourceFileInfoImg.lastUpdateTime : '';
+
+
             // 每隔200毫秒执行一次查询
             let refreshTimer = setInterval(()=>{
                 // 当前文件信息
@@ -290,10 +305,20 @@ export default {
                 let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
                 let curLastUpdateTime = curFileInfo ? curFileInfo.lastUpdateTime : '';
 
+                // 图片当前文件信息
+                let curFileInfoImg = this.getFileInfoByPath(relativeFilePathImg);
+                let curFileSizeImg = curFileInfoImg ? curFileInfoImg.fileSize : 0;
+                let curLastUpdateTimeImg = curFileInfoImg ? curFileInfoImg.lastUpdateTime : '';
+
                 if(sourceFileSize !== curFileSize || sourceLastUpdateTime !== curLastUpdateTime){
                     // 内容有变化时开始记录
                     startFlag = true;
                 }
+                if(sourceFileSizeImg !== curFileSizeImg || sourceLastUpdateTimeImg !== curLastUpdateTimeImg){
+                    // 内容有变化时开始记录
+                    startFlagImg = true;
+                }
+
                 // 有一次变化后 文件大小和时间连续没有变化
                 if(sourceFileSize === curFileSize && sourceLastUpdateTime === curLastUpdateTime && startFlag){
                     // 文件未变化计数加一
@@ -303,8 +328,19 @@ export default {
                     sourceLastUpdateTime = curLastUpdateTime;
                     fileNoChangeCount = 0;// 重置次数
                 }
-                // 200*3 0.6秒钟未变化 认为图片上传完成
-                if(fileNoChangeCount >= 3){
+
+                // 图片有一次变化后 文件大小和时间连续没有变化
+                if(sourceFileSizeImg === curFileSizeImg && sourceLastUpdateTimeImg === curLastUpdateTimeImg && startFlagImg){
+                    // 文件未变化计数加一
+                    fileNoChangeCountImg++;
+                } else {
+                    sourceFileSizeImg = curFileSizeImg;
+                    sourceLastUpdateTimeImg = curLastUpdateTimeImg;
+                    fileNoChangeCountImg = 0;// 重置次数
+                }
+
+                // 200*3 0.6秒钟未变化 认为节点和图片 都上传完成
+                if(fileNoChangeCount >= 3 && fileNoChangeCountImg>=3){
                     // 执行加载图片
                     this.loadNodeJson();
                     setTimeout(()=>{
