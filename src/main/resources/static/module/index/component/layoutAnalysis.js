@@ -298,8 +298,16 @@ export default {
             let sourceLastUpdateTimeImg = sourceFileInfoImg ? sourceFileInfoImg.lastUpdateTime : '';
 
 
+            let reConnectCount = 0;
             // 每隔200毫秒执行一次查询
             let refreshTimer = setInterval(()=>{
+                if(reConnectCount > 60){
+                    reConnectCount = 0;
+                    this.layoutLoading = false;
+                    window.ZXW_VUE.$message.warning('一键布局分析超时,请重试或者采用分步操作(远程布局分析-上传布局分析并解析)！');
+                    clearInterval(refreshTimer);
+                }
+
                 // 当前文件信息
                 let curFileInfo = this.getFileInfoByPath(relativeFilePath);
                 let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
@@ -354,6 +362,8 @@ export default {
                     clearInterval(refreshTimer);
                     refreshTimer = null;
                 }
+                // 累计次数
+                reConnectCount+=1;
             },200);
 
         },
