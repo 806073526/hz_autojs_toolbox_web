@@ -775,6 +775,8 @@ export default {
                     return false;
                 } else {
                     this.fileEditVisible = true;
+                    window.removeEventListener('keydown',this.editorDialogSaveListener);
+                    window.addEventListener('keydown',this.editorDialogSaveListener,false);
                     this.fileEditorName = row.fileName + '.' + row.fileType;
                     this.fileSavePath = row.previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
                     let _that = this;
@@ -826,8 +828,62 @@ export default {
                     return false;
                 } else {
                     this.phoneFileLoading = true;
+                    window.removeEventListener('keydown',this.phoneEditorDialogSaveListener);
+                    window.addEventListener('keydown',this.phoneEditorDialogSaveListener,false);
                     this.updatePhoneFileCache(row);
                 }
+            }
+        },
+        // web端文件编辑器弹窗保存监听
+        editorDialogSaveListener(e){
+            if(e.ctrlKey && e.keyCode === 83 && this.fileEditVisible){
+                e.stopPropagation();
+                e.preventDefault();
+                if(!this.fileEditorName){
+                    return;
+                }
+                let scriptFile = new File([this.scriptEditor.getValue()], this.fileEditorName, {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.fileSavePath);
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                return false;
+            }
+        },
+        // 手机端文件编辑器弹窗保存监听
+        phoneEditorDialogSaveListener(e){
+            if(e.ctrlKey && e.keyCode === 83 && this.phoneFileEditVisible){
+                e.stopPropagation();
+                e.preventDefault();
+                // 获取当前点击的文件对象
+                let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                if(!fileObj){
+                    return;
+                }
+                let remoteScript = `let writableTextFile = files.write('${fileObj.fileSavePath}',decodeURI($base64.decode('${btoa(encodeURI(fileObj.fileContent))}')));`;
+                this.remoteExecuteScript(remoteScript);
+                // 更新原始缓存值
+                fileObj.sourceFileContent = fileObj.fileContent;
+                return false;
             }
         },
         // 压缩文件
