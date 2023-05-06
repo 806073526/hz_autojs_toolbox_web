@@ -239,10 +239,19 @@
           <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent">
             保存
           </el-button>
+          <el-button type="warning"  @click.stop.native="phoneRunScriptByDialog">
+            运行当前
+          </el-button>
+          <el-button type="warning"  @click.stop.native="phoneStopAllScript">
+            停止全部
+          </el-button>
           <el-button type="info" @click.stop.native="phoneMinFileEditorDialog">
             最小化
           </el-button>
         </span>
+        <el-tooltip style="left: 85px;position: absolute;bottom: 0px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【运行当前 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
+           <span>快捷键说明</span>
+        </el-tooltip>
     </el-dialog>
     <el-dialog :visible.sync="phoneImagePreviewVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
         <div style="height: 85vh;width: 100%;display: inline-flex;justify-content: center;align-items: center;">

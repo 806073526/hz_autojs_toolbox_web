@@ -871,9 +871,13 @@ export default {
         },
         // 手机端文件编辑器弹窗保存监听
         phoneEditorDialogSaveListener(e){
-            if(e.ctrlKey && e.keyCode === 83 && this.phoneFileEditVisible){
-                e.stopPropagation();
-                e.preventDefault();
+            if(!this.phoneFileEditVisible){
+                return;
+            }
+            e.stopPropagation();
+            e.preventDefault();
+            // 保存 ctrl+s
+            if(e.ctrlKey && e.keyCode === 83){
                 // 获取当前点击的文件对象
                 let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                 if(!fileObj){
@@ -884,6 +888,24 @@ export default {
                 // 更新原始缓存值
                 fileObj.sourceFileContent = fileObj.fileContent;
                 return false;
+            // 最小化 ctrl+3
+            }else if(e.ctrlKey && (e.keyCode === 51 || e.keyCode === 99)){
+                this.phoneMinFileEditorDialog();
+            // 运行当前 ctrl+1
+            }else if(e.ctrlKey && (e.keyCode === 49 || e.keyCode === 97)){
+                this.phoneRunScriptByDialog();
+            // 停止全部 ctrl+2
+            }else if(e.ctrlKey && (e.keyCode === 50 || e.keyCode === 98)){
+                this.phoneStopAllScript();
+            // 切换tab ctrl + 0
+            }else if(e.ctrlKey && (e.keyCode === 48 || e.keyCode === 96)){
+                let length = this.phoneFileCacheArr.length;
+                if(this.phoneFileSelectIndex ===  length - 1){
+                    this.phoneFileSelectIndex = 0
+                } else {
+                    this.phoneFileSelectIndex = this.phoneFileSelectIndex+1;
+                }
+                this.phoneFileEditorArrClick(this.phoneFileSelectIndex);
             }
         },
         // 压缩文件
@@ -950,6 +972,20 @@ export default {
                 this.phoneFileLoading = false;
                 this.downloadFile(row)
             });
+        },
+        // 手机端运行选中脚本 弹窗
+        phoneRunScriptByDialog(){
+            let savePath = this.phoneFileSavePath;
+            if(!savePath){
+                return;
+            }
+            let parentSavePath = savePath.substring(0,this.phoneFileSavePath.lastIndexOf('/'));
+            let remoteScript = `engines.execScriptFile("${savePath}",{path:["${parentSavePath}"]})`;
+            this.remoteExecuteScript(remoteScript);
+        },
+        // 手机端停止全部脚本
+        phoneStopAllScript(){
+            this.phoneRemoteStopScript();
         },
         // 手机端运行文件
         phoneRunScriptPath(row){

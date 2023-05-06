@@ -145,6 +145,20 @@ window.ZXW_VUE = new Vue({
         setInterval(() => {
             this.timeSyncOtherProperty()
         }, 3 * 1000)
+
+
+
+        window.addEventListener('keydown',(e)=>{
+            if(!this.fileDialogIsMin){
+                return false;
+            }
+            if(e.ctrlKey && (e.keyCode === 52 || e.keyCode === 100)){
+                e.stopPropagation();
+                e.preventDefault();
+                this.phoneMaxFileEditorDialog();
+                return false;
+            }
+        },false);
     },
     provide() {
         return {
