@@ -647,7 +647,7 @@ public class AttachmentInfoController extends BaseController {
      * 初始化打包模板
      */
     @ApiOperation(value = "初始化打包模板", notes = "初始化打包模板")
-    @GetMapping("/初始化打包模板")
+    @GetMapping("/initPackageTemplate")
     public R<Boolean> initPackageTemplate(
             @RequestParam("webProjectRootPath") String webProjectRootPath,
             @RequestParam("webProjectName") String webProjectName
