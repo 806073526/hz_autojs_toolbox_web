@@ -61,7 +61,11 @@ export default {
             fileList: [], // 文件列表
             noPermissionPath:['uploadPath/autoJsTools/webCommonPath/发行版本',
                 'uploadPath/autoJsTools/webCommonPath/公共脚本',
-                'uploadPath/autoJsTools/webCommonPath/hz_autojs_toolbox.zip'
+                'uploadPath/autoJsTools/webCommonPath/hz_autojs_toolbox.zip',
+                'uploadPath/autoJsTools/webCommonPath/apkPackage',
+                'uploadPath/autoJsTools/webCommonPath/apkPackage/apkFrameWork',
+                'uploadPath/autoJsTools/webCommonPath/apkPackage/apkTemplate',
+                'uploadPath/autoJsTools/webCommonPath/apkPackage/apkTool',
                 ]
         }
     },
@@ -169,6 +173,10 @@ export default {
         }
     },
     methods: {
+        // 初始化打包插件
+        initPackPlugins(){
+            window.open("https://sp.zjh336.cn/product/5.html","_blank");
+        },
         // 允许复选框勾选文件
         allowCheckFile(item){
             let flag = true;

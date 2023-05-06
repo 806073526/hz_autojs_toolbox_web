@@ -9,6 +9,7 @@ import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.exception.BusinessException;
+import com.zjh.zxw.common.util.runTimeExecUtils;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
@@ -640,4 +641,179 @@ public class AttachmentInfoController extends BaseController {
             }
         }
     }
+
+
+    /**
+     * 初始化打包模板
+     */
+    @ApiOperation(value = "初始化打包模板", notes = "初始化打包模板")
+    @GetMapping("/初始化打包模板")
+    public R<Boolean> initPackageTemplate(
+            @RequestParam("webProjectRootPath") String webProjectRootPath,
+            @RequestParam("webProjectName") String webProjectName
+            ) {
+        try {
+           // 获取插件资源目录
+           String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
+
+           // 检测打包插件是否存在
+            File checkFile = new File(apkSourcePath);
+            if(!checkFile.exists()){
+                return fail("未找到打包插件,请先初始化！");
+            }
+
+           // 模板资源目录
+           String sourcePath = apkSourcePath + File.separator + "apkTemplate" + File.separator + "template";
+           // 目标资源目录
+           String targetPath  = webProjectRootPath;
+           // 先删除模板文件
+           attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
+           // 再删除目标文件目录
+           attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName);
+           // 从打包插件模板资源目录拷贝到目标文件目录
+           Boolean copySuccess = attachmentInfoService.copyFile(sourcePath + ".zip",  targetPath);
+           // 复制成功
+           if(copySuccess){
+               // 解压文件
+               attachmentInfoService.unServerFileZip(targetPath + File.separator +  "template.zip", targetPath);
+               // 重命名文件
+               attachmentInfoService.reNameFile(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName);
+               // 删除压缩文件
+               attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
+           } else {
+               return success(false);
+           }
+           return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("初始化打包模板异常！请联系管理员");
+        }
+    }
+
+    // TODO 根据配置信息 动态替换打包模板内容
+    /**
+     * 项目资源文件
+     * 项目插件
+     * 项目配置json
+     * lib依赖
+     * 启动图、桌面图
+     * xml配置文件
+     */
+
+
+    /**
+     * 生成自定义签名
+     */
+    @ApiOperation(value = "生成自定义签名", notes = "生成自定义签名")
+    @GetMapping("/generateSign")
+    public R<String> generateSign(
+            @RequestParam(value = "javaHome",required = false) String javaHome,
+            @RequestParam(value = "keyStoreAlias") String keyStoreAlias,
+            @RequestParam(value = "keyStoreValidity",required = false) String keyStoreValidity,
+            @RequestParam(value = "keyStoreDName",required = false) String keyStoreDName,
+            @RequestParam(value = "keyStoreALog",required = false) String keyStoreALog,
+            @RequestParam(value = "keyStoreFilePath",required = false) String keyStoreFilePath,
+            @RequestParam(value = "keyStorePwd",required = false) String keyStorePwd,
+            @RequestParam(value = "keyStoreAliasPwd",required = false) String keyStoreAliasPwd) {
+        try {
+            if(StringUtils.isBlank(javaHome)){
+                javaHome = "JAVA_HOME";
+            }
+            if(StringUtils.isBlank(keyStoreFilePath)){
+                keyStoreFilePath = "zjh336.keystore";
+            }
+            if(StringUtils.isBlank(keyStoreValidity)){
+                keyStoreValidity = "36500";
+            }
+            if(StringUtils.isBlank(keyStoreDName)){
+                keyStoreDName = "CN=,OU=,O=,L=,S=,C=";
+            }
+            if(StringUtils.isBlank(keyStoreALog)){
+                keyStoreALog= "RSA";
+            }
+            if(StringUtils.isBlank(keyStorePwd)){
+                keyStorePwd = "zjh336";
+            }
+            if(StringUtils.isBlank(keyStoreAliasPwd)){
+                keyStoreAliasPwd = "zjh336";
+            }
+            if(StringUtils.isBlank(keyStoreAlias)){
+                keyStoreAlias = "zjh336";
+            }
+            // 获取插件资源目录
+            String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
+
+            // 检测打包插件是否存在
+            File checkFile = new File(apkSourcePath);
+            if(!checkFile.exists()){
+                return fail("未找到打包插件,请先初始化！");
+            }
+
+            String packageCommand =
+                    apkSourcePath.substring(0,2)+"\n"+
+                            "cd "+apkSourcePath + File.separator + "apkTool\n" +
+                            "generateKey.bat "+ javaHome +" "+ keyStoreAlias + " " + keyStoreValidity + " " + keyStoreALog + " \"" + keyStoreDName + "\" " + keyStoreAliasPwd + " " + keyStoreFilePath + " " +  keyStoreAliasPwd;
+            return success(runTimeExecUtils.executeBatScript(packageCommand));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("生成签名异常！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 打包项目
+     */
+    @ApiOperation(value = "打包项目", notes = "打包项目")
+    @GetMapping("/packageProject")
+    public R<String> packageProject(
+                                    @RequestParam(value = "javaHome",required = false) String javaHome,
+                                    @RequestParam("webProjectRootPath") String webProjectRootPath,
+                                    @RequestParam("webProjectName") String webProjectName,
+                                    @RequestParam(value = "keyStoreFilePath",required = false) String keyStoreFilePath,
+                                    @RequestParam(value = "keyStoreAlias",required = false) String keyStoreAlias,
+                                    @RequestParam(value = "kyeStorePwd",required = false) String kyeStorePwd,
+                                    @RequestParam(value = "kyeStoreAliasPwd",required = false) String kyeStoreAliasPwd) {
+        try {
+            if(StringUtils.isBlank(javaHome)){
+                javaHome = "JAVA_HOME";
+            }
+            if(StringUtils.isBlank(keyStoreFilePath)){
+                keyStoreFilePath = "zjh336.keystore";
+            }
+            if(StringUtils.isBlank(keyStoreAlias)){
+                keyStoreAlias = "zjh336";
+            }
+            if(StringUtils.isBlank(kyeStorePwd)){
+                kyeStorePwd = "zjh336";
+            }
+            if(StringUtils.isBlank(kyeStoreAliasPwd)){
+                kyeStoreAliasPwd = "zjh336";
+            }
+            // 获取插件资源目录
+            String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
+
+            // 检测打包插件是否存在
+            File checkFile = new File(apkSourcePath);
+            if(!checkFile.exists()){
+                return fail("未找到打包插件,请先初始化！");
+            }
+
+            String packageCommand =
+                    apkSourcePath.substring(0,2)+"\n"+
+                    "cd "+apkSourcePath + File.separator + "apkTool\n" +
+                    "package.bat "+ javaHome + " " + apkSourcePath + " "+ webProjectRootPath + " " + webProjectName + " " + keyStoreFilePath + " " + keyStoreAlias + " " + kyeStorePwd + " " +  kyeStoreAliasPwd;
+            return success(runTimeExecUtils.executeBatScript(packageCommand));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("打包项目异常！请联系管理员");
+        }
+    }
+
 }
