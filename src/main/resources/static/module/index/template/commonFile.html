@@ -9,7 +9,9 @@
                 <div class="d-flex a-center">
                     <el-button size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
                     <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="createFolder">新建文件夹</el-button>
+                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="settingJre">JAVA环境变量</el-button>
                     <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="initPackPlugins">初始化打包插件</el-button>
+                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="openCustomSignDialog">自定义签名</el-button>
                 </div>
                 <input ref="commonInput" style="display: none;" type="file" name="file" :multiple="true" :accept="accept" @change="handleChange">
             </div>
@@ -101,6 +103,85 @@
           </el-button>
           <el-button type="info" @click.stop.native="closeFileEditorDialog">
             关闭
+          </el-button>
+        </span>
+    </el-dialog>
+    <el-dialog  :visible.sync="customSignDialog" title="自定义签名" center :close-on-click-modal="false" width="70vw" height="40vh">
+        <div style="height: 100%;width: 100%;">
+            <el-form :model="keyStore" ref="keyStore" :rules="customSignRules" v-loading="generateSignLoading">
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="密钥对别名:" prop="keyStoreAlias" class="width50">
+                            <el-input v-model="keyStore.keyStoreAlias" placeholder="请输入密钥对别名,例如zjh336"
+                                      class="width90" />
+                        </el-form-item>
+                        <el-form-item label="密钥对有效期:" prop="keyStoreValidity" class="width50">
+                            <el-input v-model="keyStore.keyStoreValidity" placeholder="请输入密钥对有效期(单位天),例如36500"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="CN名称与姓氏:" prop="keyStoreDNameCN" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameCN" placeholder="请输入CN内容"
+                                      class="width90" />
+                        </el-form-item>
+                        <el-form-item label="OU组织单位名称:" prop="keyStoreDNameOU" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameOU" placeholder="请输入OU内容"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="O组织名称:" prop="keyStoreDNameO" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameO" placeholder="请输入O内容"
+                                      class="width90" />
+                        </el-form-item>
+                        <el-form-item label="L城市或区域名称:" prop="keyStoreDNameL" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameL" placeholder="请输入L内容"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="S省市自治区名称:" prop="keyStoreDNameS" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameS" placeholder="请输入S内容"
+                                      class="width90" />
+                        </el-form-item>
+                        <el-form-item label="C国家或地区代码:" prop="keyStoreDNameC" class="width50">
+                            <el-input v-model="keyStore.keyStoreDNameC" placeholder="请输入C内容"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="密钥对密码:" prop="keyStoreAliasPwd" class="width50">
+                            <el-input v-model="keyStore.keyStoreAliasPwd" placeholder="请输入密钥对密码,例如zjh336"
+                                      class="width90" />
+                        </el-form-item>
+                        <el-form-item label="密钥库密码:" prop="keyStorePwd" class="width50">
+                            <el-input v-model="keyStore.keyStorePwd" placeholder="请输入密钥库密码,例如zjh336"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+                <el-row>
+                    <div class="width100 d-flex a-center">
+                        <el-form-item label="证书文件路径:" prop="keyStoreFile" class="width50">
+                            <el-input v-model="keyStore.keyStoreFile" placeholder="请输证书文件路径,例如zjh336.keystore"
+                                      class="width90" />
+                        </el-form-item>
+                    </div>
+                </el-row>
+            </el-form>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click.stop.native="saveCustomSign">
+            生成签名
           </el-button>
         </span>
     </el-dialog>

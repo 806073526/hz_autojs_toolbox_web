@@ -714,15 +714,15 @@ public class AttachmentInfoController extends BaseController {
             @RequestParam(value = "keyStoreValidity",required = false) String keyStoreValidity,
             @RequestParam(value = "keyStoreDName",required = false) String keyStoreDName,
             @RequestParam(value = "keyStoreALog",required = false) String keyStoreALog,
-            @RequestParam(value = "keyStoreFilePath",required = false) String keyStoreFilePath,
+            @RequestParam(value = "keyStoreFile",required = false) String keyStoreFile,
             @RequestParam(value = "keyStorePwd",required = false) String keyStorePwd,
             @RequestParam(value = "keyStoreAliasPwd",required = false) String keyStoreAliasPwd) {
         try {
             if(StringUtils.isBlank(javaHome)){
                 javaHome = "JAVA_HOME";
             }
-            if(StringUtils.isBlank(keyStoreFilePath)){
-                keyStoreFilePath = "zjh336.keystore";
+            if(StringUtils.isBlank(keyStoreFile)){
+                keyStoreFile = "zjh336.keystore";
             }
             if(StringUtils.isBlank(keyStoreValidity)){
                 keyStoreValidity = "36500";
@@ -754,7 +754,7 @@ public class AttachmentInfoController extends BaseController {
             String packageCommand =
                     apkSourcePath.substring(0,2)+"\n"+
                             "cd "+apkSourcePath + File.separator + "apkTool\n" +
-                            "generateKey.bat "+ javaHome +" "+ keyStoreAlias + " " + keyStoreValidity + " " + keyStoreALog + " \"" + keyStoreDName + "\" " + keyStoreAliasPwd + " " + keyStoreFilePath + " " +  keyStoreAliasPwd;
+                            "generateKey.bat "+ javaHome +" "+ keyStoreAlias + " " + keyStoreValidity + " " + keyStoreALog + " \"" + keyStoreDName + "\" " + keyStoreAliasPwd + " " + keyStoreFile + " " +  keyStoreAliasPwd;
             return success(runTimeExecUtils.executeBatScript(packageCommand));
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());

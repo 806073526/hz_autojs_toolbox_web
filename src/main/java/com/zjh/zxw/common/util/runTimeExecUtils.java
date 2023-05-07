@@ -3,6 +3,7 @@ package com.zjh.zxw.common.util;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 public class runTimeExecUtils {
 
@@ -24,10 +25,12 @@ public class runTimeExecUtils {
             if(!fileStart.exists()){
                 fileStart.createNewFile();
             }
+            FileOutputStream outputStream = new FileOutputStream(location);
+            Writer writer = new OutputStreamWriter(outputStream, Charset.forName("Cp1252"));
             //生成bat文件
-            fw = new FileWriter(location);
-            fw.write(batScript);
-            fw.close();
+            // fw = new FileWriter(location);
+            writer.write(batScript);
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

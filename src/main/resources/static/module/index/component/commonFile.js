@@ -37,6 +37,7 @@ export default {
     data() {
         return {
             isInit:false,
+            customSignDialog:false,
             webCommonPath:'webCommonPath',
             fileEditVisible:false, // 文件编辑器可见
             fileEditorName:'',// 文件编辑器名称
@@ -59,6 +60,45 @@ export default {
             moveFileList: [],// 移动文件列表
             absolutePrePath: '',// 绝对路径前缀
             fileList: [], // 文件列表
+            generateSignLoading:false, // 生成签名loading
+            keyStore:{
+                keyStoreAlias:'test',
+                keyStoreValidity:'36500',
+                keyStoreDName:'',
+                keyStoreDNameCN:'',
+                keyStoreDNameOU:'',
+                keyStoreDNameO:'',
+                keyStoreDNameL:'',
+                keyStoreDNameS:'',
+                keyStoreDNameC:'',
+                keyStoreAliasPwd:'test123',
+                keyStorePwd:'test123',
+                keyStoreFile:'test.keystore'
+            },
+            customSignRules: {
+                // 校验规则
+                keyStoreAlias: [{ required: true, message: '请填写密钥对别名', trigger: 'blur' }],
+                keyStoreValidity: [{ required: true, message: '请填写密钥对有效期', trigger: 'blur' }],
+                keyStoreAliasPwd: [{ required: true, message: '请填写密钥对密码', trigger: 'blur' , validator: (rules, value, cb) => {
+                        if (!value) {
+                            return cb(new Error('请填写密钥对密码!'))
+                        }
+                        if (value.length < 6) {
+                            return cb(new Error('请填写至少6位数!'))
+                        }
+                        return cb()
+                    }}],
+                keyStorePwd: [{ required: true, message: '请填写密钥库密码', trigger: 'blur' , validator: (rules, value, cb) => {
+                        if (!value) {
+                            return cb(new Error('请填写密钥库密码!'))
+                        }
+                        if (value.length < 6) {
+                            return cb(new Error('请填写至少6位数!'))
+                        }
+                        return cb()
+                    }}],
+                keyStoreFile: [{ required: true, message: '请填写证书文件路径', trigger: 'blur' }]
+            },
             noPermissionPath:['uploadPath/autoJsTools/webCommonPath/发行版本',
                 'uploadPath/autoJsTools/webCommonPath/公共脚本',
                 'uploadPath/autoJsTools/webCommonPath/hz_autojs_toolbox.zip',
@@ -176,6 +216,179 @@ export default {
         // 初始化打包插件
         initPackPlugins(){
             window.open("https://sp.zjh336.cn/product/5.html","_blank");
+        },
+        // 获取JavaHome
+        getJavaHome(){
+            let JAVA_HOME = '';
+            let _that = this;
+            $.ajax({
+                url: getContext() + '/uploadPath/autoJsTools/' + this.webCommonPath + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + 'JAVA_HOME.json',
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    JAVA_HOME = String(res)
+                },
+                error: function (msg) {
+                }
+            });
+            return JAVA_HOME;
+        },
+        // 设置JAVA_HOME
+        settingJre(){
+            // 设置JavaHome
+            let setJavaHome = (JAVA_HOME,callback)=>{
+                let scriptFile = new File([JAVA_HOME], "JAVA_HOME.json", {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.webCommonPath + '/' + 'apkPackage' + '/' + 'apkTool' + '/');
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '设置完成', duration: '1000'});
+                            }
+                        }
+                        if(callback){
+                            callback();
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            };
+            // 检验打包插件
+            this.checkWebPackPlugins(()=>{
+                // 获取值
+                let JAVA_HOME = this.getJavaHome();
+                window.ZXW_VUE.$prompt('请设置JAVA环境变量,为空则默认读取JAVA_HOME(例如:E:\\华仔AutoJs工具箱Web端V2.4.0免费版\\jre)', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputValue: JAVA_HOME
+                }).then(({value}) => {
+                    setJavaHome(value,()=>{
+                        // 加载文件列表
+                        this.queryFileList(this.breadcrumbList[this.breadcrumbList.length - 1].value);
+                    });
+                }).catch(() => {
+                });
+            });
+
+        },
+        // 校验打包插件
+        checkWebPackPlugins(callback){
+            this.breadcrumbList = [
+                {label: '根目录', value: this.webCommonPath},
+                {label: 'apkPackage', value: this.webCommonPath + '/' + 'apkPackage'},
+                {label: 'apkTool', value: this.webCommonPath + '/' + 'apkPackage' + '/' + 'apkTool'},
+            ];
+            // 加载文件列表
+            this.queryFileList(this.breadcrumbList[this.breadcrumbList.length - 1].value,()=>{
+                // 没有文件 则提示
+                if(!this.fileList || !this.fileList.length){
+                    window.ZXW_VUE.$message.warning('未找到打包插件,请先进行初始化！');
+                    return;
+                }
+                if(callback){
+                    callback();
+                }
+            });
+        },
+        // 自定义签名弹窗
+        openCustomSignDialog(){
+            this.checkWebPackPlugins(()=>{
+                this.customSignDialog = true;
+            });
+        },
+        // 保存自定义签名
+        saveCustomSign(){
+            // 生成json参数
+            let saveParamFun = (callback)=>{
+                // 转换参数
+                this.keyStore.keyStoreDName = `CN=${this.keyStore.keyStoreDNameCN}OU=${this.keyStore.keyStoreDNameOU}O=${this.keyStore.keyStoreDNameO}L=${this.keyStore.keyStoreDNameL}S=${this.keyStore.keyStoreDNameS}C=${this.keyStore.keyStoreDNameC}`;
+                let signJson =  JSON.stringify(this.keyStore,"", "\t");
+                let scriptFile = new File([signJson], this.keyStore.keyStoreAlias + ".json", {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.webCommonPath + '/' + 'apkPackage' + '/' + 'apkTool' + '/');
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if(callback){
+                                callback();
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                        _that.generateSignLoading = false;
+                    }
+                });
+            };
+            // 生成签名
+            let generateSignKey = ()=>{
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/generateSign",
+                    type: 'get',
+                    data: {
+                        "javaHome":this.getJavaHome(),
+                        "keyStoreAlias":this.keyStore.keyStoreAlias,
+                        "keyStoreValidity":this.keyStore.keyStoreValidity,
+                        "keyStoreDName":this.keyStore.keyStoreDName,
+                        "keyStoreALog":"RSA",
+                        "keyStorePwd":this.keyStore.keyStorePwd,
+                        "keyStoreAliasPwd":this.keyStore.keyStoreAliasPwd,
+                        "keyStoreFile":this.keyStore.keyStoreFile
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '生成完成！', duration: '1000'});
+                                _that.customSignDialog = false;
+                                // 加载文件列表
+                                _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                            }
+                        }
+                        _that.generateSignLoading = false;
+                    },
+                    error: function (msg) {
+                        _that.generateSignLoading = false;
+                    }
+                });
+            };
+            // 校验数据
+            this.$refs['keyStore'].validate((valid) => {
+                if (valid) {
+                    this.$confirm('是否确认生成自定义签名?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        this.generateSignLoading = true;
+                        // 先保存参数 再生成签名
+                        saveParamFun(generateSignKey());
+                    })
+                }
+            });
         },
         // 允许复选框勾选文件
         allowCheckFile(item){
@@ -332,7 +545,7 @@ export default {
             });
         },
         // 查询文件列表
-        queryFileList(relativeFilePath) {
+        queryFileList(relativeFilePath,callback) {
             this.fileLoading = true;
             let _that = this;
             $.ajax({
@@ -353,6 +566,9 @@ export default {
                             });
                             _that.fileList = data.data;
                         }
+                    }
+                    if(callback){
+                        callback();
                     }
                     setTimeout(() => {
                         _that.fileLoading = false
