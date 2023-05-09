@@ -1481,6 +1481,7 @@ export default {
                             window.ZXW_VUE.$notify.success({message: '初始化完成', duration: '1000'});
                         } else {
                             _that.packageProjectStepLoading = false;
+                            window.ZXW_VUE.$message.warning(data.msg);
                         }
                     } else {
                         _that.packageProjectStepLoading = false;
