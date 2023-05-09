@@ -140,6 +140,7 @@
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
+                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
                         <!--<el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
                     </div>
                 </div>
@@ -260,6 +261,163 @@
         <span slot="footer" class="dialog-footer">
           <el-button type="info" @click.stop.native="phoneCloseImagePreviewDialog">
             关闭
+          </el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog  :visible.sync="packageProjectDialog" title="打包项目" center :close-on-click-modal="false" width="80vw" height="40vh">
+        <el-steps :active="packageProjectActive" finish-status="success" style="margin-top: 10px;margin-bottom: 5px;">
+            <el-step title="项目配置"></el-step>
+            <el-step title="初始化打包模板"></el-step>
+            <el-step title="上传项目资源"></el-step>
+            <el-step title="打包资源处理"></el-step>
+            <el-step title="项目打包"></el-step>
+            <el-step title="下载打包结果"></el-step>
+        </el-steps>
+        <el-scrollbar v-loading="packageProjectStepLoading" style="height: 70vh;width: 100%;">
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===0">
+                <el-form :model="packageProject" ref="packageProjectFirst" :rules="packageProjectRules">
+                    <p class="basicInfo">
+                        应用
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="应用名称:" prop="appName" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.appName" placeholder="请输入应用名称"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="应用包名:" prop="packageName" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.packageName" placeholder="请输入应用包名"
+                                          class="width100" />
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="版本名称:" prop="versionName" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.versionName" placeholder="请输入版本名称"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="版本号:" prop="versionCode" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.versionCode" placeholder="请输入版本号"
+                                          class="width100" />
+                            </el-form-item>
+                        </div>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="应用图标:" prop="appIcon" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径"
+                                          class="width100" />
+                            </el-form-item>
+                            <span style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.appIcon)">预览</span>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        特性
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="NodeJs:" prop="openNodeJs" class="width25" label-width="100px">
+                                <el-switch v-model="packageProject.openNodeJs" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="开机自启动:" prop="autoOpen" class="width25" label-width="100px">
+                                <el-switch v-model="packageProject.autoOpen" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="CPU架构:" prop="abis" class="width50" label-width="100px">
+                                <el-checkbox-group v-model="packageProject.abis">
+                                    <el-checkbox label="arm64-v8a">
+                                        arm64-v8a
+                                    </el-checkbox>
+                                    <el-checkbox label="armeabi-v7a">
+                                        armeabi-v7a
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="插件:" prop="plugins" class="width100" label-width="100px">
+                                <el-checkbox-group v-model="packageProject.plugins">
+                                    <el-checkbox label="org.autojs.autojspro.plugin.mlkit.ocr">
+                                        mlkit-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="org.autojs.autojspro.ocr.v2">
+                                        paddle-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.tomato.ocr">
+                                        tomato-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.ocr32">
+                                        hraps32-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.ocr">
+                                        hraps-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="cn.lzx284.p7zip">
+                                        p7zip
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.pytorch">
+                                        pytorch
+                                    </el-checkbox>
+                                    <el-checkbox label="org.autojs.plugin.ffmpeg">
+                                        ffmpeg
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        运行配置
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="隐藏日志:" prop="hideLogs" class="width50" label-width="100px">
+                                <el-switch v-model="packageProject.hideLogs" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="启动界面文本:" prop="splashText" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.splashText" placeholder="请输入启动界面文本"
+                                          class="width100" />
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="启动界面图标:" prop="splashIcon" class="width50" label-width="100px">
+                                <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径"
+                                          class="width100" />
+                            </el-form-item>
+                            <span style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.splashIcon)">预览</span>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        签名
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="自定义签名:" prop="customSignAlias" class="width100" label-width="100px">
+                                <el-radio-group v-model="packageProject.customSignAlias">
+                                    <el-radio :label="item" v-for="(item,index) in keyStoreArr" :key="index">
+                                        {{item}}
+                                    </el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                </el-form>
+            </div>
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===1">
+                <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
+                    <span><i v-show="alreadyInitPackageTemplate" class="el-icon-success"></i><i v-show="!alreadyInitPackageTemplate" class="el-icon-warning"></i>打包模板{{alreadyInitPackageTemplate ? '已' : '未'}}初始化</span>
+                    <span @click.stop="initPackageTemplate" style="cursor: pointer"><i class="el-icon-thumb"></i>点击{{alreadyInitPackageTemplate ? '重新' : ''}}初始化</span>
+                </div>
+            </div>
+        </el-scrollbar>x
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" v-show="packageProjectActive>0" @click.stop.native="preSteps">
+            上一步
+          </el-button>
+          <el-button type="primary" v-show="packageProjectActive<5"  @click.stop.native="nextSteps">
+            下一步
           </el-button>
         </span>
     </el-dialog>

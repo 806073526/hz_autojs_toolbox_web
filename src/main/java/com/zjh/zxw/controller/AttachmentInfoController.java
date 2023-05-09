@@ -659,7 +659,7 @@ public class AttachmentInfoController extends BaseController {
            // 检测打包插件是否存在
             File checkFile = new File(apkSourcePath);
             if(!checkFile.exists()){
-                return fail("未找到打包插件,请先初始化！");
+                return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
 
            // 模板资源目录
@@ -748,7 +748,7 @@ public class AttachmentInfoController extends BaseController {
             // 检测打包插件是否存在
             File checkFile = new File(apkSourcePath);
             if(!checkFile.exists()){
-                return fail("未找到打包插件,请先初始化！");
+                return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
 
             String packageCommand =
@@ -800,7 +800,7 @@ public class AttachmentInfoController extends BaseController {
             // 检测打包插件是否存在
             File checkFile = new File(apkSourcePath);
             if(!checkFile.exists()){
-                return fail("未找到打包插件,请先初始化！");
+                return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
 
             String packageCommand =

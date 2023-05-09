@@ -9,6 +9,190 @@ $.ajax({
         template = String(res);
     }
 });
+let defaultProjectJSON = {
+    "abis": [
+        "arm64-v8a",
+        "armeabi-v7a"
+    ],
+    "assets": [],
+    "build": {
+        "build_id": "604CCB7A-25",
+        "build_number": 25,
+        "build_time": 1678719855559,
+        "release": true
+    },
+    "encryptLevel": 0,
+    "features": {
+        "activityIntentTasks": false,
+        "builtInOCR": "with-models",
+        "nodejs": "enabled"
+    },
+    "icon": "images/ic_app_logo.png",
+    "launchConfig": {
+        "displaySplash": true,
+        "hideLogs": false,
+        "splashIcon": "images/ic_splash.png",
+        "splashText": "欢迎关注华仔部落！",
+        "stableMode": false
+    },
+    "main": "main.js",
+    "name": "华仔AutoJs工具箱",
+    "optimization": {
+        "obfuscateComponents": false,
+        "removeAccessibilityService": false,
+        "removeOpenCv": false,
+        "unusedResources": false
+    },
+    "packageName": "com.zjh336.cn.tools",
+    "permissionConfig": {
+        "manifestPermissions": [
+            "android.permission.ACCESS_WIFI_STATE",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "com.android.launcher.permission.INSTALL_SHORTCUT",
+            "com.android.launcher.permission.UNINSTALL_SHORTCUT",
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.SYSTEM_ALERT_WINDOW",
+            "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+            "android.permission.RECEIVE_BOOT_COMPLETED",
+            "android.permission.FOREGROUND_SERVICE",
+            "android.permission.FORCE_STOP_PACKAGES",
+            "android.permission.PACKAGE_USAGE_STATS",
+            "android.permission.WRITE_SECURE_SETTINGS",
+            "android.permission.WRITE_SETTINGS",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.RECORD_AUDIO",
+            "com.android.alarm.permission.SET_ALARM",
+            "android.permission.ACCESS_CHECKIN_PROPERTIES",
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_LOCATION_EXTRA_COMMANDS",
+            "android.permission.ACCESS_SURFACE_FLINGER",
+            "android.permission.ACCOUNT_MANAGER",
+            "android.permission.AUTHENTICATE_ACCOUNTS",
+            "android.permission.BATTERY_STATS",
+            "android.permission.BIND_APPWIDGET",
+            "android.permission.BIND_DEVICE_ADMIN",
+            "android.permission.BIND_INPUT_METHOD",
+            "android.permission.BIND_REMOTEVIEWS",
+            "android.permission.BIND_WALLPAPER",
+            "android.permission.BLUETOOTH",
+            "android.permission.BLUETOOTH_ADMIN",
+            "android.permission.BRICK",
+            "android.permission.BROADCAST_PACKAGE_REMOVED",
+            "android.permission.BROADCAST_SMS",
+            "android.permission.BROADCAST_STICKY",
+            "android.permission.BROADCAST_WAP_PUSH",
+            "android.permission.CALL_PHONE",
+            "android.permission.CALL_PRIVILEGED",
+            "android.permission.CAMERA",
+            "android.permission.CHANGE_COMPONENT_ENABLED_STATE",
+            "android.permission.CHANGE_CONFIGURATION",
+            "android.permission.CHANGE_NETWORK_STATE",
+            "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+            "android.permission.CHANGE_WIFI_STATE",
+            "android.permission.CLEAR_APP_CACHE",
+            "android.permission.CLEAR_APP_USER_DATA",
+            "android.permission.CONTROL_LOCATION_UPDATES",
+            "android.permission.DELETE_CACHE_FILES",
+            "android.permission.DELETE_PACKAGES",
+            "android.permission.DEVICE_POWER",
+            "android.permission.DIAGNOSTIC",
+            "android.permission.DISABLE_KEYGUARD",
+            "android.permission.DUMP",
+            "android.permission.EXPAND_STATUS_BAR",
+            "android.permission.FACTORY_TEST",
+            "android.permission.FLASHLIGHT",
+            "android.permission.FORCE_BACK",
+            "android.permission.GET_ACCOUNTS",
+            "android.permission.GET_PACKAGE_SIZE",
+            "android.permission.GET_TASKS",
+            "android.permission.GLOBAL_SEARCH",
+            "android.permission.HARDWARE_TEST",
+            "android.permission.INJECT_EVENTS",
+            "android.permission.INSTALL_LOCATION_PROVIDER",
+            "android.permission.INSTALL_PACKAGES",
+            "android.permission.INTERNAL_SYSTEM_WINDOW",
+            "android.permission.KILL_BACKGROUND_PROCESSES",
+            "android.permission.MANAGE_ACCOUNTS",
+            "android.permission.MANAGE_APP_TOKENS",
+            "android.permission.MASTER_CLEAR",
+            "android.permission.MODIFY_AUDIO_SETTINGS",
+            "android.permission.MODIFY_PHONE_STATE",
+            "android.permission.MOUNT_FORMAT_FILESYSTEMS",
+            "android.permission.MOUNT_UNMOUNT_FILESYSTEMS",
+            "android.permission.NFC",
+            "android.permission.PERSISTENT_ACTIVITY",
+            "android.permission.PROCESS_OUTGOING_CALLS",
+            "android.permission.READ_CALENDAR",
+            "android.permission.READ_CONTACTS",
+            "android.permission.READ_FRAME_BUFFER",
+            "android.permission.READ_INPUT_STATE",
+            "android.permission.READ_LOGS",
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.READ_SMS",
+            "android.permission.RECEIVE_WAP_PUSH",
+            "android.permission.REORDER_TASKS",
+            "android.permission.RESTART_PACKAGES",
+            "android.permission.SEND_SMS",
+            "android.permission.SET_ACTIVITY_WATCHER",
+            "android.permission.SET_ALWAYS_FINISH",
+            "android.permission.SET_ANIMATION_SCALE",
+            "android.permission.SET_DEBUG_APP",
+            "android.permission.SET_ORIENTATION",
+            "android.permission.SET_PREFERRED_APPLICATIONS",
+            "android.permission.SET_PROCESS_LIMIT",
+            "android.permission.SET_TIME",
+            "android.permission.SET_TIME_ZONE",
+            "android.permission.SET_WALLPAPER",
+            "android.permission.SET_WALLPAPER_HINTS",
+            "android.permission.SIGNAL_PERSISTENT_PROCESSES",
+            "android.permission.STATUS_BAR",
+            "android.permission.SUBSCRIBED_FEEDS_READ",
+            "android.permission.SUBSCRIBED_FEEDS_WRITE",
+            "android.permission.UPDATE_DEVICE_STATS",
+            "android.permission.USE_CREDENTIALS",
+            "android.permission.USE_SIP",
+            "android.permission.VIBRATE",
+            "android.permission.WAKE_LOCK",
+            "android.permission.WRITE_APN_SETTINGS",
+            "android.permission.WRITE_CALENDAR",
+            "android.permission.WRITE_CONTACTS",
+            "android.permission.WRITE_GSERVICES",
+            "android.permission.WRITE_SMS",
+            "android.permission.WRITE_SYNC_SETTINGS",
+            "com.android.browser.permission.READ_HISTORY_BOOKMARKS",
+            "com.android.browser.permission.WRITE_HISTORY_BOOKMARKS",
+            "android.permission.REQUEST_INSTALL_PACKAGES",
+            "moe.shizuku.manager.permission.API_V23",
+            "android.permission.QUERY_ALL_PACKAGES",
+            "android.permission.REQUEST_DELETE_PACKAGES"
+        ],
+        "requestListOnStartup": [
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+        ]
+    },
+    "plugins": {
+        "org.autojs.autojspro.plugin.mlkit.ocr": "1.1",
+        "org.autojs.autojspro.ocr.v2":"1.3",
+        "com.tomato.ocr":"1.0",
+        "com.hraps.ocr32":"1.0",
+        "com.hraps.ocr":"2.0.0",
+        "cn.lzx284.p7zip":"1.2.1",
+        "com.hraps.pytorch":"1.0",
+        "org.autojs.plugin.ffmpeg":"1.1"
+    },
+    "scripts": {},
+    "signingConfig": {
+        "alias": "zjh336",
+        "keystore": "",
+        "uuid": ""
+    },
+    "useFeatures": [],
+    "versionCode": 1000,
+    "versionName": "1.0.0"
+};
 
 export default {
     template: template,
@@ -76,7 +260,37 @@ export default {
             phoneMoveFileList: [],// 手机端移动文件列表
             absolutePrePath: '',// 绝对路径前缀
             fileList: [], // 文件列表
-            phoneFileList:[] // 手机文件列表
+            phoneFileList:[], // 手机文件列表
+            packageProjectActive:0,
+            packageProjectDialog: false,
+            projectJsonObj:{ // 缓存project对象
+            },
+            packageProjectStepLoading: false,
+            keyStoreArr:[],// 自定义签名数组
+            packageProject:{
+                appName:'',//
+                packageName:'',//
+                versionName:'',
+                versionCode:'',
+                appIcon:'',
+                openNodeJs:false,
+                autoOpen:false,
+                plugins:[],
+                abis:['armeabi-v7a','arm64-v8a'],
+                hideLogs:false,
+                splashText:'',
+                splashIcon:'',
+                customSignAlias:''
+            },
+            packageProjectRules:{
+                appName: [{ required: true, message: '请填写应用名称', trigger: 'blur' }],
+                packageName: [{ required: true, message: '请填写应用包名', trigger: 'blur' }],
+                versionName: [{ required: true, message: '请填写版本名称', trigger: 'blur' }],
+                versionCode: [{ required: true, message: '请填写版本号', trigger: 'blur' }],
+                abis:[{ required: true, message: '请选择CPU架构', trigger: 'change' }],
+                customSignAlias: [{ required: true, message: '请选择签名', trigger: 'change' }]
+            },
+            alreadyInitPackageTemplate:false,// 是否已经初始化完成打包模板
         }
     },
     mounted() {
@@ -170,6 +384,13 @@ export default {
                         this.queryFileList(toPath);
                     },200);
                 }
+            }
+        },
+        packageProjectActive(val){
+            // 第二步  初始化打包模板
+            if(val === 1){
+                // 检查是否已经初始化完成打包模板
+                this.alreadyInitPackageTemplate = this.checkWebPackageTemplate(this.packageProject.appName);
             }
         }
     },
@@ -874,8 +1095,6 @@ export default {
             if(!this.phoneFileEditVisible){
                 return;
             }
-            e.stopPropagation();
-            e.preventDefault();
             // 保存 ctrl+s
             if(e.ctrlKey && e.keyCode === 83){
                 // 获取当前点击的文件对象
@@ -887,18 +1106,28 @@ export default {
                 this.remoteExecuteScript(remoteScript);
                 // 更新原始缓存值
                 fileObj.sourceFileContent = fileObj.fileContent;
+                e.stopPropagation();
+                e.preventDefault();
                 return false;
             // 最小化 ctrl+3
             }else if(e.ctrlKey && (e.keyCode === 51 || e.keyCode === 99)){
+                e.stopPropagation();
+                e.preventDefault();
                 this.phoneMinFileEditorDialog();
             // 运行当前 ctrl+1
             }else if(e.ctrlKey && (e.keyCode === 49 || e.keyCode === 97)){
+                e.stopPropagation();
+                e.preventDefault();
                 this.phoneRunScriptByDialog();
             // 停止全部 ctrl+2
             }else if(e.ctrlKey && (e.keyCode === 50 || e.keyCode === 98)){
+                e.stopPropagation();
+                e.preventDefault();
                 this.phoneStopAllScript();
             // 切换tab ctrl + 0
             }else if(e.ctrlKey && (e.keyCode === 48 || e.keyCode === 96)){
+                e.stopPropagation();
+                e.preventDefault();
                 let length = this.phoneFileCacheArr.length;
                 if(this.phoneFileSelectIndex ===  length - 1){
                     this.phoneFileSelectIndex = 0
@@ -907,6 +1136,360 @@ export default {
                 }
                 this.phoneFileEditorArrClick(this.phoneFileSelectIndex);
             }
+        },
+        // 打包项目
+        phonePackageProject(){
+            let projectFileArr = this.phoneFileList.filter(item=>item.fileType==='json' && item.fileName === 'project');
+            if(!projectFileArr || projectFileArr.length===0){
+                window.ZXW_VUE.$confirm('未检测到project.json,是否需要在当前目录生成文件?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    // 将json写入本地文件
+                    let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+                    let targetPath = toPath + "/project.json";
+                    let remoteScript = `let writableTextFile = files.write('${targetPath}',decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(defaultProjectJSON,"","\t")))}')));`;
+                    this.remoteExecuteScript(remoteScript);
+                    // 刷新手机目录
+                    this.refreshPhoneDir();
+                });
+                return;
+            }
+            // 读取当前目录project.json文件
+            this.getPhoneProjectJson((projectJson)=>{
+                if(!projectJson){
+                    window.ZXW_VUE.$message.warning('未检测到project.json');
+                } else {
+                    this.projectJsonObj = JSON.parse(projectJson);
+                    // 打开弹窗
+                    this.packageProjectDialog = true;
+                    // 初始化配置
+                    this.initProjectJsonFun();
+                    // 加载自定义签名数组
+                    this.loadCustomSignDict();
+                }
+            })
+        },
+        // 下一步
+        nextSteps(){
+            // 第一步
+            if(this.packageProjectActive === 0){
+                // 校验配置表单
+                this.$refs["packageProjectFirst"].validate((valid) => {
+                    if (valid) {
+                        // 校验通过调用保存配置方法
+                        this.saveProjectJsonFun();
+                        this.packageProjectActive++;
+                    } else {
+                        window.ZXW_VUE.$message.warning('请将信息补充完整！');
+                    }
+                });
+            // 第二步
+            } else if(this.packageProjectActive === 1){
+                if(this.alreadyInitPackageTemplate){
+                    this.packageProjectActive++;
+                } else {
+                    window.ZXW_VUE.$message.warning('请先初始化打包模板！');
+                }
+            }
+        },
+        // 上一步
+        preSteps(){
+            this.packageProjectActive--;
+        },
+        // TODO 加载自定义签名字典
+        loadCustomSignDict(){
+            let _that = this;
+            this.keyStoreArr = [];
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool'
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                           if(data.data){
+                               // 全部的证书数组
+                               _that.keyStoreArr = data.data.filter(item=>item.fileType === "keystore").map(item=> item.fileName);
+                           }
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+
+        },
+        // 根据路径加载icon图
+        previewIconByPath(iconPath){
+            if(!iconPath){
+                return;
+            }
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let targetPath = toPath + "/" + iconPath;
+            // 关键key
+            let dirPathKey = this.deviceInfo.deviceUuid + '_' + targetPath;
+            // 更新手机端目录缓存
+            let updatePhoneDirCacheFun = () => {
+                // 远程执行脚本内容
+                let remoteScript = `let result = '';
+                let bytes = files.readBytes('${targetPath}');
+                let image = images.read('${targetPath}');
+                result = images.toBase64(image, "png", 100);
+                image.recycle();
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                    headers: {
+                        "deviceUUID": commonStorage.get('deviceUUID')
+                    },
+                    method: 'POST',
+                    contentType: 'application/json',
+                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + '${targetPath}', 'fileJson': result })
+                }, (e) => { });`;
+                this.remoteExecuteScript(remoteScript);
+            };
+            // 查询缓存数据方法
+            queryCacheData(() => {
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/clearFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                    },
+                    error: function (msg) {
+                    }
+                });
+                // 清除完成后执行
+                updatePhoneDirCacheFun();
+            }, () => {
+                let cacheData = null;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                cacheData = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                return cacheData;
+            }, 200, 30,(cacheResultData)=>{
+                let fileContent = '';
+                this.phoneFileEditorName = '';
+                this.phoneImageBase64 = '';
+                this.phoneImagePreviewVisible = true;
+                this.phoneFileEditorName = iconPath;
+                this.phoneImageBase64 = 'data:image/png;base64,' + cacheResultData;
+                this.phoneFileLoading = false;
+            });
+        },
+        // 保存初始化配置参数
+        saveProjectJsonFun(){
+            // 获取临时缓存变量
+            let saveProjectJsonObj = JSON.parse(JSON.stringify(this.projectJsonObj));
+            saveProjectJsonObj.name = this.packageProject.appName;
+            saveProjectJsonObj.packageName = this.packageProject.packageName;
+            saveProjectJsonObj.versionName = this.packageProject.versionName;
+            saveProjectJsonObj.versionCode = this.packageProject.versionCode;
+            // NodeJs环境判断
+            if(!saveProjectJsonObj.features){
+                saveProjectJsonObj.features = {};
+            }
+            saveProjectJsonObj.features.nodejs = this.packageProject.openNodeJs ? "enabled" : "disabled";
+            let pluginsMap = {
+                "org.autojs.autojspro.plugin.mlkit.ocr": "1.1",
+                "org.autojs.autojspro.ocr.v2":"1.3",
+                "com.tomato.ocr":"1.0",
+                "com.hraps.ocr32":"1.0",
+                "com.hraps.ocr":"2.0.0",
+                "cn.lzx284.p7zip":"1.2.1",
+                "com.hraps.pytorch":"1.0",
+                "org.autojs.plugin.ffmpeg":"1.1"
+            };
+            let plugins = saveProjectJsonObj.plugins || {};
+            this.packageProject.plugins.forEach(key=>{
+                plugins[key] = pluginsMap[key];
+            });
+            saveProjectJsonObj.plugins = plugins;
+
+            if(!saveProjectJsonObj.launchConfig){
+                saveProjectJsonObj.launchConfig = {};
+            }
+            saveProjectJsonObj.launchConfig.hideLogs = this.packageProject.hideLogs;
+            saveProjectJsonObj.launchConfig.splashText = this.packageProject.splashText;
+            saveProjectJsonObj.launchConfig.splashIcon = this.packageProject.splashIcon;
+
+            if(!saveProjectJsonObj.signingConfig){
+                saveProjectJsonObj.signingConfig = {};
+            }
+            saveProjectJsonObj.signingConfig.alias = this.packageProject.customSignAlias;
+            // 将json写入本地文件
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let targetPath = toPath + "/project.json";
+            let remoteScript = `let writableTextFile = files.write('${targetPath}',decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(saveProjectJsonObj,"","\t")))}')));`;
+            this.remoteExecuteScript(remoteScript);
+        },
+        // 初始化配置参数
+        initProjectJsonFun(){
+            // 初始化配置参数
+            this.packageProject.appName = this.projectJsonObj.name;
+            this.packageProject.packageName = this.projectJsonObj.packageName;
+            this.packageProject.versionName = this.projectJsonObj.versionName;
+            this.packageProject.versionCode = this.projectJsonObj.versionCode;
+            // NodeJs环境判断
+            let features = this.projectJsonObj.features;
+            this.packageProject.openNodeJs = features && features.nodejs === "enabled";
+
+            // 插件列表读取
+            let pluginsKeys = Object.keys(this.projectJsonObj.plugins || []);
+            this.packageProject.plugins = pluginsKeys;
+
+
+            this.packageProject.hideLogs = this.projectJsonObj.launchConfig.hideLogs;
+            this.packageProject.splashText = this.projectJsonObj.launchConfig.splashText;
+            this.packageProject.splashIcon = this.projectJsonObj.launchConfig.splashIcon;
+
+            let signingConfig = this.projectJsonObj.signingConfig;
+            // 自定义签名处理
+            this.packageProject.customSignAlias = signingConfig ? signingConfig.alias : "";
+        },
+        // 获取手机端项目json
+        getPhoneProjectJson(callback){
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let targetPath = toPath + "/project.json";
+            // 关键key
+            let dirPathKey = this.deviceInfo.deviceUuid + '_' + targetPath;
+            // 更新手机端目录缓存
+            let updatePhoneDirCacheFun = () => {
+                // 远程执行脚本内容
+                let remoteScript = `let result = '';
+                let text = files.read('${targetPath}');
+                result = $base64.encode(encodeURI(text));
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                    headers: {
+                        "deviceUUID": commonStorage.get('deviceUUID')
+                    },
+                    method: 'POST',
+                    contentType: 'application/json',
+                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + '${targetPath}', 'fileJson': result })
+                }, (e) => { });`;
+                this.remoteExecuteScript(remoteScript);
+            };
+            // 查询缓存数据方法
+            queryCacheData(() => {
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/clearFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                    },
+                    error: function (msg) {
+                    }
+                });
+                // 清除完成后执行
+                updatePhoneDirCacheFun();
+            }, () => {
+                let cacheData = null;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                cacheData = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                return cacheData;
+            }, 200, 30,(cacheResultData)=>{
+                let fileContent = cacheResultData ? decodeURI(atob(cacheResultData)) : '';
+                if(callback){
+                    callback(fileContent);
+                }
+            });
+        },
+        // 检测web端打包模板
+        checkWebPackageTemplate(projectName){
+            let exits = false;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + projectName
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data && data.data.length){
+                                exits = true;
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return exits;
+        },
+        // 初始化打包模板
+        initPackageTemplate(){
+            let _that = this;
+            this.packageProjectStepLoading = true;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/initPackageTemplate",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
+                    "webProjectName": this.packageProject.appName
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            _that.alreadyInitPackageTemplate = data.data;
+                            _that.packageProjectStepLoading = false;
+                            window.ZXW_VUE.$notify.success({message: '初始化完成', duration: '1000'});
+                        } else {
+                            _that.packageProjectStepLoading = false;
+                        }
+                    } else {
+                        _that.packageProjectStepLoading = false;
+                    }
+                },
+                error: function (msg) {
+                    _that.packageProjectStepLoading = false;
+                }
+            });
         },
         // 压缩文件
         zipFile(row){
