@@ -265,6 +265,7 @@ export default {
             packageProjectActive:0,
             packageProjectDialog: false,
             projectJsonObj:{ // 缓存project对象
+
             },
             packageProjectStepLoading: false,
             keyStoreArr:[],// 自定义签名数组
