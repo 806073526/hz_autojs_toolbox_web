@@ -673,6 +673,14 @@ public class AttachmentInfoController extends BaseController {
 
            // 模板资源目录
            String sourcePath = apkSourcePath + File.separator + "apkTemplate" + File.separator + "template";
+
+           File templateFie = new File(sourcePath);
+           // 模板资源目录不存在时 进行解压操作
+           if(!templateFie.exists()){
+               // 解压文件
+               attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
+           }
+
            // 目标资源目录
            String targetPath  = webProjectRootPath;
            // 先删除模板文件
@@ -702,7 +710,7 @@ public class AttachmentInfoController extends BaseController {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return fail("初始化打包模板异常！请联系管理员");
+            return fail("处理打包项目资源异常！请联系管理员");
         }
     }
 
@@ -737,6 +745,13 @@ public class AttachmentInfoController extends BaseController {
             File checkFile = new File(apkSourcePath);
             if(!checkFile.exists()){
                 return fail("未找到打包插件,请先在公共文件模块初始化！");
+            }
+
+            File templateFie = new File(packageTemplateSourcePath);
+            // 模板资源目录不存在时 进行解压操作
+            if(!templateFie.exists()){
+                // 解压文件
+                attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
             }
 
             // 解压项目资源到 打包模板的assets目录
@@ -878,7 +893,7 @@ public class AttachmentInfoController extends BaseController {
 
             // apktool.yml 设置版本名称 版本号  apkFileName名称必须保持一致 否则版本号修改无效
             // 未知问题 通过yml文件修改的版本号 版本名称 回编译后一直无效 经验证 直接将版本号写入xml中可以实现
-            // 暂不删除 apktool.yml的修改
+            /*
             InputStream inputStream = new FileInputStream(new File(packageTemplateSourcePath + File.separator + "apktool.yml"));
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -894,7 +909,7 @@ public class AttachmentInfoController extends BaseController {
             // 输出到打包模板中去
             OutputStream outputStream = new FileOutputStream(new File(packageTemplatePath + File.separator + "apktool.yml"));
             yaml.dump(apkToolMap, new OutputStreamWriter(outputStream));
-            outputStream.close();
+            outputStream.close();*/
 
             // xml配置的解析、替换、写入
             // AndroidManifest.xml文件读取
