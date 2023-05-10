@@ -4,6 +4,7 @@ import com.zjh.zxw.common.util.spring.UploadPathHelper;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class runTimeExecUtils {
 
@@ -26,10 +27,10 @@ public class runTimeExecUtils {
                 fileStart.createNewFile();
             }
             FileOutputStream outputStream = new FileOutputStream(location);
-            Writer writer = new OutputStreamWriter(outputStream, Charset.forName("Cp1252"));
+            Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             //生成bat文件
             // fw = new FileWriter(location);
-            writer.write(batScript);
+            writer.write("chcp 65001\r\n" + batScript);
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,7 +38,7 @@ public class runTimeExecUtils {
         Process process;
         try {
             process = Runtime.getRuntime().exec(location);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "GBK"));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuilder.append(line).append(" ");

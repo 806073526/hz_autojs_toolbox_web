@@ -367,7 +367,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         }catch (Exception e){
             if(e.getMessage().contains("only DEFLATED entries can have EXT descriptor")){
                 log.info("解压失败，尝试另外的解压方法");
-                ZipApacheUtils.unZip(sourcePathName);
+                ZipApacheUtils.unZipToPath(sourcePathName,targetPathName);
             }
         }
 

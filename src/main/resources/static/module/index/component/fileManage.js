@@ -37,6 +37,7 @@ let defaultProjectJSON = {
     },
     "main": "main.js",
     "name": "华仔AutoJs工具箱",
+    "autoOpen":false,
     "optimization": {
         "obfuscateComponents": false,
         "removeAccessibilityService": false,
@@ -291,6 +292,10 @@ export default {
                 customSignAlias: [{ required: true, message: '请选择签名', trigger: 'change' }]
             },
             alreadyInitPackageTemplate:false,// 是否已经初始化完成打包模板
+            alreadyUploadProjectRes:false,// 是否已经上传项目资源
+            alreadyHandlerPackageRes:false,// 是否已处理打包资源
+            alreadyCompletePackageProject:false,// 是否已完成打包项目
+            packageProjectMessage:'',// 打包日志信息
         }
     },
     mounted() {
@@ -390,7 +395,19 @@ export default {
             // 第二步  初始化打包模板
             if(val === 1){
                 // 检查是否已经初始化完成打包模板
-                this.alreadyInitPackageTemplate = this.checkWebPackageTemplate(this.packageProject.appName);
+                this.alreadyInitPackageTemplate = this.checkWebPackageTemplate();
+            // 第三步  上传项目资源
+            } else if(val === 2){
+                // 检测项目资源是否已上传完成
+                this.alreadyUploadProjectRes = this.checkProjectRes()
+            // 第四步  打包资源处理
+            } else if(val === 3){
+                // 检测打包资源是否已处理完成
+                this.alreadyHandlerPackageRes = this.checkPackageResHandlerStatus();
+            // 第五步  打包项目
+            } else if(val === 4){
+                // 检测是否已完成打包
+                this.alreadyCompletePackageProject = this.checkPackageProject();
             }
         }
     },
@@ -1164,6 +1181,10 @@ export default {
                     this.projectJsonObj = JSON.parse(projectJson);
                     // 打开弹窗
                     this.packageProjectDialog = true;
+                    // 关闭loading
+                    this.packageProjectStepLoading = false;
+                    // 重置步骤
+                    this.packageProjectActive = 0;
                     // 初始化配置
                     this.initProjectJsonFun();
                     // 加载自定义签名数组
@@ -1192,13 +1213,27 @@ export default {
                 } else {
                     window.ZXW_VUE.$message.warning('请先初始化打包模板！');
                 }
+            // 第三步
+            } else if(this.packageProjectActive === 2){
+                if(this.alreadyUploadProjectRes){
+                    this.packageProjectActive++;
+                } else {
+                    window.ZXW_VUE.$message.warning('请先上传项目资源！');
+                }
+            // 第四步
+            } else if(this.packageProjectActive === 3){
+                if(this.alreadyHandlerPackageRes){
+                    this.packageProjectActive++;
+                } else {
+                    window.ZXW_VUE.$message.warning('请先处理打包资源！');
+                }
             }
         },
         // 上一步
         preSteps(){
             this.packageProjectActive--;
         },
-        // TODO 加载自定义签名字典
+        // 加载自定义签名字典
         loadCustomSignDict(){
             let _that = this;
             this.keyStoreArr = [];
@@ -1307,11 +1342,16 @@ export default {
             saveProjectJsonObj.packageName = this.packageProject.packageName;
             saveProjectJsonObj.versionName = this.packageProject.versionName;
             saveProjectJsonObj.versionCode = this.packageProject.versionCode;
+            saveProjectJsonObj.icon = this.packageProject.appIcon;
             // NodeJs环境判断
             if(!saveProjectJsonObj.features){
                 saveProjectJsonObj.features = {};
             }
             saveProjectJsonObj.features.nodejs = this.packageProject.openNodeJs ? "enabled" : "disabled";
+
+            // 开机自启动
+            saveProjectJsonObj.autoOpen = this.packageProject.autoOpen;
+
             let pluginsMap = {
                 "org.autojs.autojspro.plugin.mlkit.ocr": "1.1",
                 "org.autojs.autojspro.ocr.v2":"1.3",
@@ -1327,6 +1367,8 @@ export default {
                 plugins[key] = pluginsMap[key];
             });
             saveProjectJsonObj.plugins = plugins;
+
+            saveProjectJsonObj.abis = this.packageProject.abis || [];
 
             if(!saveProjectJsonObj.launchConfig){
                 saveProjectJsonObj.launchConfig = {};
@@ -1352,6 +1394,10 @@ export default {
             this.packageProject.packageName = this.projectJsonObj.packageName;
             this.packageProject.versionName = this.projectJsonObj.versionName;
             this.packageProject.versionCode = this.projectJsonObj.versionCode;
+            this.packageProject.appIcon = this.projectJsonObj.icon;
+                // 开机自启动
+            this.packageProject.autoOpen = this.projectJsonObj.autoOpen;
+
             // NodeJs环境判断
             let features = this.projectJsonObj.features;
             this.packageProject.openNodeJs = features && features.nodejs === "enabled";
@@ -1360,6 +1406,7 @@ export default {
             let pluginsKeys = Object.keys(this.projectJsonObj.plugins || []);
             this.packageProject.plugins = pluginsKeys;
 
+            this.packageProject.abis = this.projectJsonObj.abis || [];
 
             this.packageProject.hideLogs = this.projectJsonObj.launchConfig.hideLogs;
             this.packageProject.splashText = this.projectJsonObj.launchConfig.splashText;
@@ -1437,7 +1484,7 @@ export default {
             });
         },
         // 检测web端打包模板
-        checkWebPackageTemplate(projectName){
+        checkWebPackageTemplate(){
             let exits = false;
             $.ajax({
                 url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
@@ -1445,7 +1492,7 @@ export default {
                 dataType: "json",
                 async: false,
                 data: {
-                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + projectName
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName
                 },
                 success: function (data) {
                     if (data) {
@@ -1491,6 +1538,252 @@ export default {
                     _that.packageProjectStepLoading = false;
                 }
             });
+        },
+        // 检测web端项目资源
+        checkProjectRes(){
+            let exits = false;
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/"
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                let dataArr = data.data.filter(item=> item.pathName.indexOf(_that.packageProject.appName + "_projectRes.zip") !== -1);
+                                exits = dataArr.length > 0;
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return exits;
+        },
+        // 上传项目资源
+        uploadProjectRes(){
+            this.packageProjectStepLoading = true;
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            toPath = toPath.replace(/\/$/, "");
+            let phoneZipPath =  toPath.substring(0,toPath.lastIndexOf("/")+1) + this.packageProject.appName + '.zip';
+            let relativeFilePath = this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" +this.packageProject.appName + "_projectRes.zip";
+            // 文件内容变化后处理函数
+            handlerByFileChange(relativeFilePath,()=>{
+                let remoteScript = `
+                files.remove('${phoneZipPath}')
+                $zip.zipDir('${toPath}', '${phoneZipPath}')
+                utilsObj.uploadFileToServer('${phoneZipPath}','${relativeFilePath}',()=>{});
+                `;
+                // 删除本地压缩文件-压缩目标文件夹-上传web端
+                this.remoteExecuteScript(remoteScript);
+            },()=>{
+                this.packageProjectStepLoading = false;
+                this.alreadyUploadProjectRes = true;
+            });
+        },
+        // 检测打包资源处理状态
+        checkPackageResHandlerStatus(){
+            let exits = false;
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                let dataArr = data.data.filter(item=> item.pathName.indexOf("packageResAlreadyHandler") !== -1);
+                                exits = dataArr.length > 0;
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return exits;
+        },
+        // 处理打包资源
+        handlerPackageRes(){
+            this.packageProjectStepLoading = true;
+            // 调用接口
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/handlerPackageProjectRes",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
+                    "webProjectName": this.packageProject.appName,
+                    "appName":this.packageProject.appName,
+                    "packageName":this.packageProject.packageName,
+                    "versionName":this.packageProject.versionName,
+                    "versionCode":this.packageProject.versionCode,
+                    "appIcon":this.packageProject.appIcon,
+                    "openNodeJs":this.packageProject.openNodeJs,
+                    "autoOpen":this.packageProject.autoOpen,
+                    "plugins":this.packageProject.plugins.join(','),
+                    "abis":this.packageProject.abis.join(','),
+                    "hideLogs":this.packageProject.hideLogs,
+                    "splashText":this.packageProject.splashText,
+                    "splashIcon":this.packageProject.splashIcon,
+                    "customSignAlias":this.packageProject.customSignAlias
+                }),
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                _that.alreadyHandlerPackageRes = true;
+                            }
+                        }
+                    }
+                    _that.packageProjectStepLoading = false;
+                },
+                error: function (msg) {
+                    _that.packageProjectStepLoading = false;
+                }
+            });
+
+        },
+        // 检测打包项目
+        checkPackageProject(){
+            let exits = false;
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/"
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                let dataArr = data.data.filter(item=> item.pathName.indexOf(_that.packageProject.appName + ".apk") !== -1);
+                                exits = dataArr.length > 0;
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return exits;
+        },
+        // 获取JavaHome
+        getJavaHome(){
+            let JAVA_HOME = '';
+            let _that = this;
+            $.ajax({
+                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + 'JAVA_HOME.json',
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    JAVA_HOME = String(res)
+                },
+                error: function (msg) {
+                }
+            });
+            return JAVA_HOME;
+        },
+        // 获取证书信息
+        getKeyStoreObjBySelect(){
+            let keyStoreObj = {};
+            let _that = this;
+            $.ajax({
+                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + this.packageProject.customSignAlias + '.json',
+                type: 'get',
+                async: false,
+                dataType:"TEXT", //返回值的类型
+                success: function (res) {
+                    let string = String(res);
+                    if(string){
+                        keyStoreObj = JSON.parse(string);
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return keyStoreObj;
+        },
+        // 处理打包项目
+        handlerPackageProject(){
+            let _that = this;
+            this.packageProjectStepLoading = true;
+            // 获取javaHome
+            let javaHome = this.getJavaHome();
+            // 获取选择证书
+            let keyStoreObj = this.getKeyStoreObjBySelect();
+            if(!keyStoreObj || !Object.keys(keyStoreObj).length){
+                window.ZXW_VUE.$message.warning('未找到签名配置,请先到公共文件生成签名');
+                this.packageProjectStepLoading = false;
+                return;
+            }
+            $.ajax({
+                url: getContext() + "/attachmentInfo/packageProject",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "javaHome":javaHome,
+                    "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
+                    "webProjectName": this.packageProject.appName,
+                    "keyStoreFile": keyStoreObj ? keyStoreObj["keyStoreFile"] : "",
+                    "keyStoreAlias":keyStoreObj ? keyStoreObj["keyStoreAlias"] : "",
+                    "keyStorePwd":keyStoreObj ? keyStoreObj["keyStorePwd"] : "",
+                    "keyStoreAliasPwd":keyStoreObj ? keyStoreObj["keyStoreAliasPwd"] : ""
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let message = data.data;
+                            console.log(message);
+                            _that.alreadyCompletePackageProject = _that.checkPackageProject();
+                            _that.packageProjectStepLoading = false;
+                            window.ZXW_VUE.$notify.success({message: '打包完成', duration: '1000'});
+                        } else {
+                            _that.packageProjectStepLoading = false;
+                            window.ZXW_VUE.$message.warning(data.msg);
+                        }
+                    } else {
+                        _that.packageProjectStepLoading = false;
+                    }
+                },
+                error: function (msg) {
+                    _that.packageProjectStepLoading = false;
+                }
+            });
+        },
+        // 下载打包后的文件
+        downloadPackageProject(){
+            if(!this.alreadyCompletePackageProject){
+                window.ZXW_VUE.$message.warning('请先打包项目！');
+                return;
+            }
+            // 创建a标签，通过a标签实现下载
+            const dom = document.createElement("a");
+            dom.href = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
+            console.log(dom.href);
+            dom.id = "upload-file-dom";
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            // 触发点击事件
+            dom.click();
+            document.getElementById("upload-file-dom")?.remove();
         },
         // 压缩文件
         zipFile(row){
