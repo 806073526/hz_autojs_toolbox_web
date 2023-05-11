@@ -89,7 +89,7 @@ public class AttachmentInfoController extends BaseController {
     private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
 
     @ApiOperation(value = "检查当前设备机器码授权状态", notes = "检查当前设备机器码授权状态")
-    @PostMapping("/checkSelfMachineCodeAuthorize")
+    @GetMapping("/checkSelfMachineCodeAuthorize")
     public Boolean checkSelfMachineCodeAuthorize() throws IOException {
         return validateMachineCodeCommon(PackageProjectUtils.getMachineCode());
     }
