@@ -366,6 +366,8 @@ export default {
                                 _that.customSignDialog = false;
                                 // 加载文件列表
                                 _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                            } else {
+                                window.ZXW_VUE.$message.warning(data.msg);
                             }
                         }
                         _that.generateSignLoading = false;
