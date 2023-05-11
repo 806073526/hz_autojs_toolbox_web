@@ -1796,12 +1796,12 @@ export default {
             }
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             toPath = toPath.substring(0,toPath.length - 1);
-            let localFileUrl = toPath.substring(0,toPath.indexOf('/')+1) + this.packageProject.appName + ".apk";
+            let localFileUrl = this.packageProject.appName + ".apk";
             let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
 
-            let message = "安装包下载路径为："+localFileUrl+",请查看!";
+            let message = "安装包下载路径为：/sdcard/"+localFileUrl+",请查看!";
             // 创建目录代码 如果不是/ 则需要创建目录
-            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl.replace("/sdcard",'')+"',()=>{});";
+            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{});";
             this.remoteExecuteScript(script);
             window.ZXW_VUE.$message.info({
                 message: message,
