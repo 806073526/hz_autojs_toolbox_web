@@ -37,6 +37,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +90,6 @@ public class AttachmentInfoController extends BaseController {
     // 定时任务记录map key为deviceUUID
     private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
 
-
     @ApiOperation(value = "根据参数校验机器码是否已授权", notes = "根据参数校验机器码是否已授权")
     @PostMapping("/validateMachineCode")
     public Boolean validateMachineCode(@RequestParam(value = "machineCode") String machineCode) throws IOException {
@@ -97,6 +98,19 @@ public class AttachmentInfoController extends BaseController {
         }
         return validateMachineCodeCommon(machineCode);
     }
+
+    @ApiOperation(value = "根据参数校验机器码是否已授权提供前端调用", notes = "根据参数校验机器码是否已授权提供前端调用")
+    @PostMapping("/validateMachineCodeWithSelf")
+    public Boolean validateMachineCodeWithSelf(@RequestParam(value = "machineCode") String machineCode) throws IOException {
+        Boolean flag = false;
+        try {
+            flag =  PackageProjectUtils.checkMachineCodeValid(machineCode);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return flag;
+    }
+
 
     /**
      * 验证机器码授权状态
