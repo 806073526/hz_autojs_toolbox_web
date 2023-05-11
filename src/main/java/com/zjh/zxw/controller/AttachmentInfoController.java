@@ -118,6 +118,7 @@ public class AttachmentInfoController extends BaseController {
             while ((line = reader.readLine()) != null) {
                 machineCodeBuilder.append(line);
             }
+            reader.close();
             resultString = machineCodeBuilder.toString();
         }catch (Exception e){
             log.error(e.getMessage());
