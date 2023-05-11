@@ -86,6 +86,15 @@
             </exclusions>
             <version>2.9.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.zjh</groupId>
+            <artifactId>third-module</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/third-module.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-models</artifactId>
@@ -305,6 +314,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
                 <executions>
                     <execution>
