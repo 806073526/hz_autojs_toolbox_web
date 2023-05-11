@@ -4,13 +4,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.zjh.PackageProjectUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
-import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.exception.BusinessException;
-import com.zjh.zxw.common.util.runTimeExecUtils;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.*;
 import com.zjh.zxw.service.AttachmentInfoService;
@@ -29,8 +28,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 import sun.misc.BASE64Decoder;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,11 +37,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -94,6 +87,29 @@ public class AttachmentInfoController extends BaseController {
 
     // 定时任务记录map key为deviceUUID
     private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
+
+    @ApiOperation(value = "校验机器码", notes = "校验机器码")
+    @PostMapping("/validateMachineCode")
+    public Boolean validateMachineCode(@RequestParam(value = "machineCode") String machineCode) throws IOException {
+        if(StringUtils.isBlank(machineCode)){
+            return false;
+        }
+        BufferedReader reader = new BufferedReader(new FileReader(UploadPathHelper.getUploadPath("C:\\"+File.separator + "machineCode.txt")));
+        StringBuilder machineCodeBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            machineCodeBuilder.append(line);
+        }
+        List<String> machineCodeList = StrHelper.str2ArrayListBySplit(machineCodeBuilder.toString(),",");
+        return machineCodeList.contains(machineCode);
+    }
+
+    @ApiOperation(value = "获取机器码", notes = "获取机器码")
+    @GetMapping("/getMachineCode")
+    public R<String> getMachineCode(){
+        return success(PackageProjectUtils.getMachineCode());
+    }
+
 
     @ApiOperation(value = "查询手机端定时任务记录", notes = "查询手机端定时任务记录")
     @GetMapping("/queryTimerTaskByKey")
@@ -1049,12 +1065,13 @@ public class AttachmentInfoController extends BaseController {
             if(!checkFile.exists()){
                 return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
+            // 执行生成签名命令 返回结果
+            String result = PackageProjectUtils.executeGenerateSign(javaHome,apkSourcePath,keyStoreAlias,keyStoreValidity,keyStoreDName,keyStoreALog,keyStoreFile,keyStorePwd,keyStoreAliasPwd);
 
-            String packageCommand =
-                    apkSourcePath.substring(0,2)+"\r\n"+
-                            "cd "+apkSourcePath + File.separator + "apkTool\r\n" +
-                            "generateKey.bat "+ javaHome +" "+ keyStoreAlias + " " + keyStoreValidity + " " + keyStoreALog + " \"" + keyStoreDName + "\" " + keyStoreAliasPwd + " " + keyStoreFile + " " +  keyStoreAliasPwd;
-            return success(runTimeExecUtils.executeBatScript(packageCommand));
+            if(StrHelper.getObjectValue(result).contains("当前设备未授权")){
+                return fail(result);
+            }
+            return success(result);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
@@ -1101,12 +1118,12 @@ public class AttachmentInfoController extends BaseController {
             if(!checkFile.exists()){
                 return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
-
-            String packageCommand =
-                    apkSourcePath.substring(0,2)+"\r\n"+
-                    "cd "+apkSourcePath + File.separator + "apkTool\r\n" +
-                    "package.bat "+ javaHome + " " + apkSourcePath + " "+ webProjectRootPath + " " + webProjectName + " " + keyStoreFile + " " + keyStoreAlias + " " + keyStorePwd + " " +  keyStoreAliasPwd;
-            return success(runTimeExecUtils.executeBatScript(packageCommand));
+            // 执行打包命令 返回结果
+            String result = PackageProjectUtils.executePackageProjectCommand(javaHome,apkSourcePath,webProjectRootPath,webProjectName,keyStoreFile,keyStoreAlias,keyStorePwd,keyStoreAliasPwd);
+            if(StrHelper.getObjectValue(result).contains("当前设备未授权")){
+                return fail(result);
+            }
+            return success(result);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
