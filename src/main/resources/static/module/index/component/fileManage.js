@@ -1795,7 +1795,8 @@ export default {
                 return;
             }
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
-            let localFileUrl = toPath.substring(0,toPath.lastIndexOf("/")+1) + this.packageProject.appName + ".apk";
+            toPath = toPath.substring(0,toPath.length - 1);
+            let localFileUrl = toPath.substring(0,toPath.indexOf('/')+1) + this.packageProject.appName + ".apk";
             let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
 
             let message = "安装包下载路径为："+localFileUrl+",请查看!";
