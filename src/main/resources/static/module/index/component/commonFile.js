@@ -215,7 +215,49 @@ export default {
     methods: {
         // 初始化打包插件
         initPackPlugins(){
-            window.open("https://sp.zjh336.cn/product/5.html","_blank");
+            this.breadcrumbList = [
+                {label: '根目录', value: this.webCommonPath}
+            ];
+            // 加载文件列表
+            this.queryFileList(this.breadcrumbList[this.breadcrumbList.length - 1].value,()=>{
+                let packageDirectoryArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && item.isDirectory);
+                let packageFileArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && !item.isDirectory);
+                // 打包插件已解压
+                if(packageDirectoryArr && packageDirectoryArr.length){
+                    window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成！', duration: '1000'});
+                    return;
+                }
+                // 打包插件已上传 未解压
+                if(packageDirectoryArr && packageFileArr.length){
+                    let pathName = this.absolutePrePath + this.webCommonPath + "/apkPackage.zip";
+                    let _that = this;
+                    $.ajax({
+                        url: getContext() + "/attachmentInfo/unServerFileZip",
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            "sourcePathName": pathName,
+                            "targetPathName": this.absolutePrePath + this.webCommonPath + "/apkPackage"
+                        },
+                        success: function (data) {
+                            if (data) {
+                                if (data.isSuccess) {
+                                    window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成', duration: '1000'});
+                                    // 重新加载文件列表
+                                    _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                                }
+                            }
+                        },
+                        error: function (msg) {
+                        }
+                    });
+                    return;
+                }
+                window.ZXW_VUE.$message.warning('未检测到打包插件,请先上传打包插件！');
+                setTimeout(()=>{
+                    window.open("https://sp.zjh336.cn/product/5.html","_blank");
+                },1000);
+            });
         },
         // 获取JavaHome
         getJavaHome(){
@@ -436,7 +478,8 @@ export default {
         },
         // 取消上传
         cancelUpload(i) {
-            this.uploadFileList.splice(i, 1)
+            this.uploadFileList.splice(i, 1);
+            window.newxhr.abort();
         },
         // 文件上传按钮点击
         uploadFileClick(){
@@ -534,6 +577,7 @@ export default {
                         const percent = (e.loaded / e.total) * 100 | 0;
                         _that.uploadProgress(percent, uid)
                     };
+                    window.newxhr = newxhr;
                     return newxhr
                 },
                 success: function (data) {

@@ -429,7 +429,8 @@ export default {
         },
         // 取消上传
         cancelUpload(i) {
-            this.uploadFileList.splice(i, 1)
+            this.uploadFileList.splice(i, 1);
+            window.newxhr.abort();
         },
         // 文件上传按钮点击
         uploadFileClick(){
@@ -527,6 +528,7 @@ export default {
                         const percent = (e.loaded / e.total) * 100 | 0;
                         _that.uploadProgress(percent, uid)
                     };
+                    window.newxhr = newxhr;
                     return newxhr
                 },
                 success: function (data) {

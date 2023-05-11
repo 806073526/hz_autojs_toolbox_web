@@ -99,7 +99,7 @@
                                     <span class="mr-16 text-fileName mt-0">{{ item.fileName }}</span>
                                 </div>
                             </div>
-                            <span class="iconfont" @click.stop.native="cancelUpload(index)">取消</span>
+                            <span class="iconfont" @click.stop="cancelUpload(index)" style="cursor: pointer;">取消</span>
                             <el-progress :percentage="item.percentage" :stroke-width="3" />
                         </div>
                         <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
