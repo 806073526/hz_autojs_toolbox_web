@@ -228,18 +228,14 @@ export default {
             let authorize = false;
             $.ajax({
                 url: "http://121.4.241.250:9998" + "/attachmentInfo/validateMachineCode",
-                type: 'get',
+                type: 'POST',
                 data: {
                     "machineCode":this.getSelfMachineCode()
                 },
                 async:false,
                 dataType: "json",
                 success: function (data) {
-                    if (data) {
-                        if (data.isSuccess) {
-                            authorize = data.data;
-                        }
-                    }
+                    authorize = data;
                 },
                 error: function (msg) {
                 }
