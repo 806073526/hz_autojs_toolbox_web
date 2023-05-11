@@ -227,9 +227,10 @@ export default {
         checkSelfMachineAuthorize(){
             let authorize = false;
             $.ajax({
-                url: getContext() + "/attachmentInfo/checkSelfMachineCodeAuthorize",
+                url: "http://121.4.241.250:9998" + "/attachmentInfo/validateMachineCode",
                 type: 'get',
                 data: {
+                    "machineCode":this.getSelfMachineCode()
                 },
                 async:false,
                 dataType: "json",

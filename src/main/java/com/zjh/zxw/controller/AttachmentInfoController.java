@@ -88,11 +88,6 @@ public class AttachmentInfoController extends BaseController {
     // 定时任务记录map key为deviceUUID
     private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
 
-    @ApiOperation(value = "检查当前设备机器码授权状态", notes = "检查当前设备机器码授权状态")
-    @GetMapping("/checkSelfMachineCodeAuthorize")
-    public R<Boolean> checkSelfMachineCodeAuthorize() throws IOException {
-        return success(validateMachineCodeCommon(PackageProjectUtils.getMachineCode()));
-    }
 
     @ApiOperation(value = "根据参数校验机器码是否已授权", notes = "根据参数校验机器码是否已授权")
     @PostMapping("/validateMachineCode")
