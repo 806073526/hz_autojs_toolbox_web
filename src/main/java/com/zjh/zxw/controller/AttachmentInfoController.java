@@ -94,13 +94,19 @@ public class AttachmentInfoController extends BaseController {
         if(StringUtils.isBlank(machineCode)){
             return false;
         }
-        BufferedReader reader = new BufferedReader(new FileReader(UploadPathHelper.getUploadPath("C:\\"+File.separator + "machineCode.txt")));
-        StringBuilder machineCodeBuilder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            machineCodeBuilder.append(line);
+        String resultString = "";
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(UploadPathHelper.getUploadPath("C:\\"+File.separator + "machineCode.txt")));
+            StringBuilder machineCodeBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                machineCodeBuilder.append(line);
+            }
+            resultString = machineCodeBuilder.toString();
+        }catch (Exception e){
+            log.error(e.getMessage());
         }
-        List<String> machineCodeList = StrHelper.str2ArrayListBySplit(machineCodeBuilder.toString(),",");
+        List<String> machineCodeList = StrHelper.str2ArrayListBySplit(resultString.toString(),",");
         return machineCodeList.contains(machineCode);
     }
 
