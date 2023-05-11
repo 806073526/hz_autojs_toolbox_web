@@ -1788,6 +1788,25 @@ export default {
             dom.click();
             document.getElementById("upload-file-dom")?.remove();
         },
+        // 下载项目到手机
+        downloadPackageProjectToPhone(){
+            if(!this.alreadyCompletePackageProject){
+                window.ZXW_VUE.$message.warning('请先打包项目！');
+                return;
+            }
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let localFileUrl = toPath.substring(0,toPath.lastIndexOf("/")+1) + this.packageProject.appName + ".apk";
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
+
+            let message = "安装包下载路径为："+localFileUrl+",请查看!";
+            // 创建目录代码 如果不是/ 则需要创建目录
+            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl.replace("/sdcard",'')+"',()=>{});";
+            this.remoteExecuteScript(script);
+            window.ZXW_VUE.$message.info({
+                message: message,
+                duration: '2000'
+            });
+        },
         // 压缩文件
         zipFile(row){
             let path = this.navigatePath.replace('根目录','');

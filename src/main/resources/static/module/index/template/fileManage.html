@@ -427,7 +427,8 @@
                     <span style="color:#67c23a;"><i v-show="alreadyCompletePackageProject" class="el-icon-success"></i><i v-show="!alreadyCompletePackageProject" class="el-icon-warning"></i>{{alreadyCompletePackageProject ? '已' : '未'}}完成打包项目</span>
                     <div style="margin-top: 5px;">
                         <el-button style="font-size: 25px;" type="text" @click.stop="handlerPackageProject"  icon="el-icon-thumb">{{ alreadyCompletePackageProject ? "点击重新打包" : "点击打包"}}</el-button>
-                        <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProject" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载安装包</el-button>
+                        <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProject" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到本地</el-button>
+                        <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProjectToPhone" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到手机</el-button>
                     </div>
                 </div>
             </div>
