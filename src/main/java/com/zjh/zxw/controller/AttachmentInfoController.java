@@ -88,12 +88,27 @@ public class AttachmentInfoController extends BaseController {
     // 定时任务记录map key为deviceUUID
     private final static ConcurrentHashMap<String,String> timerTaskMap = new ConcurrentHashMap<String,String>();
 
-    @ApiOperation(value = "校验机器码", notes = "校验机器码")
+    @ApiOperation(value = "检查当前设备机器码授权状态", notes = "检查当前设备机器码授权状态")
+    @PostMapping("/checkSelfMachineCodeAuthorize")
+    public Boolean checkSelfMachineCodeAuthorize() throws IOException {
+        return validateMachineCodeCommon(PackageProjectUtils.getMachineCode());
+    }
+
+    @ApiOperation(value = "根据参数校验机器码是否已授权", notes = "根据参数校验机器码是否已授权")
     @PostMapping("/validateMachineCode")
     public Boolean validateMachineCode(@RequestParam(value = "machineCode") String machineCode) throws IOException {
         if(StringUtils.isBlank(machineCode)){
             return false;
         }
+        return validateMachineCodeCommon(machineCode);
+    }
+
+    /**
+     * 验证机器码授权状态
+     * @param machineCode
+     * @return
+     */
+    private boolean validateMachineCodeCommon(String machineCode){
         String resultString = "";
         try {
             String targetPath = "C:"+File.separator + "machine" + File.separator;
@@ -115,6 +130,7 @@ public class AttachmentInfoController extends BaseController {
         List<String> machineCodeList = StrHelper.str2ArrayListBySplit(resultString.toString(),",");
         return machineCodeList.contains(machineCode);
     }
+
 
     @ApiOperation(value = "获取机器码", notes = "获取机器码")
     @GetMapping("/getMachineCode")

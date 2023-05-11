@@ -22,6 +22,7 @@ export default {
             editorType:'vscode',
             editorTypeNeedRefresh:false,
             expandDevice:true,
+            authorizeStatus: false,
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
@@ -56,6 +57,8 @@ export default {
             // 获取编辑器类型
             this.editorType = window.localStorage.getItem('editorType') || 'vscode';
         }
+        // 检查设备授权状态
+        this.authorizeStatus = this.checkSelfMachineAuthorize();
     },
     methods: {
         expandDeviceFun(){
@@ -220,5 +223,70 @@ export default {
                 "events.broadcast.emit('refreshUI');";
             this.remoteExecuteScript(script);
         },
+        // 检查当前设备机器码授权状态
+        checkSelfMachineAuthorize(){
+            let authorize = false;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/checkSelfMachineCodeAuthorize",
+                type: 'get',
+                data: {
+                },
+                async:false,
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            authorize = data.data;
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return authorize;
+        },
+        // 获取当前机器码
+        getSelfMachineCode(){
+            let machineCode = '';
+            $.ajax({
+                url: getContext() + "/attachmentInfo/getMachineCode",
+                type: 'get',
+                data: {
+                },
+                async:false,
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            machineCode = data.data
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return machineCode;
+        },
+        // 设备授权方法
+        authorizedFun(){
+            let message =  "<div>您的机器码是【"+ this.getSelfMachineCode()+"】</div>";
+            if(!this.authorizeStatus){
+                message += "<div>请点击确定,联系QQ806073526,进行机器码授权</div>";
+            }
+            this.$msgbox({
+                title: '提示',
+                dangerouslyUseHTMLString: true,
+                customClass:"messageClass",
+                message: message,
+                showCancelButton: true,
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then(action => {
+                if(action && !this.authorizeStatus){
+                    window.open("tencent://message/?uin=806073526&Site=Talklee.Com&Menu=yes","_blank");
+                }
+            });
+
+        }
     }
 }
