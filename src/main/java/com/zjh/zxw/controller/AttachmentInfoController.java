@@ -96,7 +96,13 @@ public class AttachmentInfoController extends BaseController {
         }
         String resultString = "";
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(UploadPathHelper.getUploadPath("C:\\"+File.separator + "machineCode.txt")));
+            String targetPath = "C:"+File.separator + "machine" + File.separator;
+            String filePath = UploadPathHelper.getUploadPath(targetPath);
+            File machineFile = new File(filePath + "machineCode.txt");
+            if(!machineFile.exists()){
+                machineFile.createNewFile();
+            }
+            BufferedReader reader = new BufferedReader(new FileReader(filePath + "machineCode.txt"));
             StringBuilder machineCodeBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
