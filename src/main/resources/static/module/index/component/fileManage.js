@@ -37,7 +37,7 @@ let defaultProjectJSON = {
     "icon": "images/ic_app_logo.png",
     "launchConfig": {
         "displaySplash": true,
-        "hideLogs": false,
+        "hideLogs": true,
         "splashIcon": "images/ic_splash.png",
         "splashText": "欢迎关注华仔部落！",
         "stableMode": false
@@ -286,7 +286,7 @@ export default {
                 autoOpen:false,
                 plugins:[],
                 abis:['armeabi-v7a','arm64-v8a'],
-                hideLogs:false,
+                hideLogs:true,
                 splashText:'',
                 splashIcon:'',
                 customSignStorePath:''
@@ -1471,9 +1471,11 @@ export default {
 
             this.packageProject.abis = this.projectJsonObj.abis || [];
 
-            this.packageProject.hideLogs = this.projectJsonObj.launchConfig.hideLogs;
-            this.packageProject.splashText = this.projectJsonObj.launchConfig.splashText;
-            this.packageProject.splashIcon = this.projectJsonObj.launchConfig.splashIcon;
+            let launchConfig = this.projectJsonObj.launchConfig ? this.projectJsonObj.launchConfig : {};
+
+            this.packageProject.hideLogs = launchConfig.hideLogs || true;
+            this.packageProject.splashText = launchConfig.splashText || "";
+            this.packageProject.splashIcon = launchConfig.splashIcon || "";
 
             let signingConfig = this.projectJsonObj.signingConfig;
             // 自定义签名处理
