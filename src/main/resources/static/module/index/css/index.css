@@ -91,6 +91,10 @@ textarea:hover::-webkit-scrollbar-track {
     width: 450px;
     text-align: center;
 }
+.messageTipsClass{
+    width: 500px;
+    text-align: left;
+}
 
 .el-form-item {
     margin-bottom: 15px;

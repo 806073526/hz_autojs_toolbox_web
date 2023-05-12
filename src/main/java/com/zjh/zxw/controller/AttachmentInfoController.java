@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tools.zip.ZipFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
@@ -40,10 +41,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -807,7 +810,27 @@ public class AttachmentInfoController extends BaseController {
                 // 解压文件
                 attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
             }
-
+            // 资源包名称
+            String resName = webProjectName;
+            try {
+                ZipFile zipFile = new ZipFile(projectResPath, "gbk"); //解决中文乱码问题
+                Enumeration<?> entries = zipFile.getEntries();
+                while (entries.hasMoreElements()) {
+                    ZipEntry entry = (ZipEntry) entries.nextElement();
+                    if (StringUtils.isNotBlank(entry.getName())) {
+                        resName = StrHelper.getObjectValue(entry.getName());
+                        int index = resName.indexOf("/");
+                        if(index == -1){
+                            continue;
+                        }
+                        resName = resName.substring(0,index);
+                        break;
+                    }
+                }
+                zipFile.close();
+            } catch (Exception e){
+                log.error(e.getMessage());
+            }
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
             // 读取文件列表
@@ -815,7 +838,8 @@ public class AttachmentInfoController extends BaseController {
             File[] files = assetsFile.exists() ? assetsFile.listFiles() : new File[0];
             if(Objects.nonNull(files) && files.length>0){
                 // 查找以项目名称开头的文件
-                List<File> targetFiles = Arrays.stream(files).filter(file -> Objects.nonNull(file) && StrHelper.getObjectValue(file.getName()).startsWith(webProjectName)).collect(Collectors.toList());
+                String finalResName = resName;
+                List<File> targetFiles = Arrays.stream(files).filter(file -> Objects.nonNull(file) && StrHelper.getObjectValue(file.getName()).startsWith(finalResName)).collect(Collectors.toList());
                 if(CollectionUtils.isNotEmpty(targetFiles)){
                     // 先删除文件
                     attachmentInfoService.deleteFile(targetFiles.get(0).getParent() + File.separator + "project");
@@ -828,6 +852,13 @@ public class AttachmentInfoController extends BaseController {
             String plugins = packageProjectDTO.getPlugins();
             // 读取已选插件列表
             List<String> pluginsList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(plugins,","));
+
+            // 目标插件根路径
+            String targetPluginRootPath = packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + "plugins";
+
+            // 先删除插件
+            attachmentInfoService.deleteFile(targetPluginRootPath);
+
             // 遍历插件 复制插件到目标目录
             for (String plugin : pluginsList) {
                 if(StringUtils.isBlank(plugin)){
@@ -835,8 +866,7 @@ public class AttachmentInfoController extends BaseController {
                 }
                 // 模板插件路径
                 String pluginPath = packageTemplateSourcePath + File.separator + "assets" + File.separator + "project" + File.separator + "plugins" + File.separator + plugin + ".apk";
-                // 目标插件根路径
-                String targetPluginRootPath = packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + "plugins";
+
                 // 复制文件
                 attachmentInfoService.copyFile(pluginPath,targetPluginRootPath);
             }
@@ -887,7 +917,7 @@ public class AttachmentInfoController extends BaseController {
             // 桌面图标的复制  res/mipmap/ic_launcher.png
 
             // 读取桌面图标
-            String appIcon = packageProjectDTO.getAppIcon();
+            String appIcon = StrHelper.getObjectValue(packageProjectDTO.getAppIcon());
 
             // 原始图标路径
             String appIconSourcePath = "";
@@ -896,15 +926,25 @@ public class AttachmentInfoController extends BaseController {
 
             // 是否需要重命名
             boolean appIconNeedReName = false;
+
+            String appIconImgFileType = "png";
+            if(appIcon.endsWith("jpg")){
+                appIconImgFileType = "jpg";
+            } else if(appIcon.endsWith("jpeg")){
+                appIconImgFileType = "jpeg";
+            }
+
             // 如果为空 拼接默认的图标
             if(StringUtils.isBlank(appIcon)){
-                appIconSourcePath = packageTemplateSourcePath + File.separator + "res" + File.separator + "mipmap" + File.separator + "ic_launcher.png";
+                appIconSourcePath = packageTemplateSourcePath + File.separator + "res" + File.separator + "mipmap" + File.separator + "ic_launcher." + appIconImgFileType;
             // 如果不为空 拼接设置图标
             } else {
                 appIconNeedReName = true;
                 appIconSourcePath = packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + appIcon;
             }
             // 先删除目标文件
+            attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpeg");
+            attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpg");
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.png");
             // 再复制当目标目录
             attachmentInfoService.copyFile(appIconSourcePath,appIconTargetRootPath);
@@ -912,12 +952,12 @@ public class AttachmentInfoController extends BaseController {
             if(appIconNeedReName){
                 String imgFileName = appIcon.substring(appIcon.lastIndexOf("/") + 1);
                 // 重命名图片
-                attachmentInfoService.reNameFile(appIconTargetRootPath + File.separator + imgFileName, appIconTargetRootPath +File.separator + "ic_launcher.png");
+                attachmentInfoService.reNameFile(appIconTargetRootPath + File.separator + imgFileName, appIconTargetRootPath +File.separator + "ic_launcher." + appIconImgFileType);
             }
 
 
             // 启动图的复制 res/drawable-mdpi/splash_icon.png
-            String splashIcon = packageProjectDTO.getSplashIcon();
+            String splashIcon = StrHelper.getObjectValue(packageProjectDTO.getSplashIcon());
 
             // 原始图标路径
             String splashIconSourcePath = "";
@@ -926,23 +966,32 @@ public class AttachmentInfoController extends BaseController {
 
             // 是否需要重命名
             boolean splashNeedReName = false;
+
+            String splashImgFileType = "png";
+            if(splashIcon.endsWith("jpg")){
+                splashImgFileType = "jpg";
+            } else if(splashIcon.endsWith("jpeg")){
+                splashImgFileType = "jpeg";
+            }
             // 如果为空 拼接默认的图标
             if(StringUtils.isBlank(splashIcon)){
-                splashIconSourcePath = packageTemplateSourcePath + File.separator + "res" + File.separator + "drawable-mdpi" + File.separator + "splash_icon.png";
+                splashIconSourcePath = packageTemplateSourcePath + File.separator + "res" + File.separator + "drawable-mdpi" + File.separator + "splash_icon." + splashImgFileType;
                 // 如果不为空 拼接设置图标
             } else {
                 splashNeedReName = true;
                 splashIconSourcePath = packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + splashIcon;
             }
             // 先删除目标文件
+            attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpg");
+            attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpeg");
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.png");
             // 再复制当目标目录
             attachmentInfoService.copyFile(splashIconSourcePath,splashIconTargetRootPath);
 
             if(splashNeedReName){
-                String imgFileName = splashIcon.substring(appIcon.lastIndexOf("/") + 1);
+                String imgFileName = splashIcon.substring(splashIcon.lastIndexOf("/") + 1);
                 // 重命名图片
-                attachmentInfoService.reNameFile(splashIconTargetRootPath + File.separator + imgFileName, splashIconTargetRootPath +File.separator + "splash_icon.png");
+                attachmentInfoService.reNameFile(splashIconTargetRootPath + File.separator + imgFileName, splashIconTargetRootPath +File.separator + "splash_icon." + splashImgFileType);
             }
 
             // apktool.yml 设置版本名称 版本号  apkFileName名称必须保持一致 否则版本号修改无效
@@ -1156,6 +1205,14 @@ public class AttachmentInfoController extends BaseController {
             if(!checkFile.exists()){
                 return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
+            // 打包模板路径
+            String packageTemplatePath = webProjectRootPath + File.separator + webProjectName;
+            // 先删除build文件
+            attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "build");
+            // 删除apk文件
+            attachmentInfoService.deleteFile(packageTemplatePath + ".apk");
+            // 删除apk.idsig文件
+            attachmentInfoService.deleteFile(packageTemplatePath + ".apk.idsig");
             // 执行打包命令 返回结果
             String result = PackageProjectUtils.executePackageProjectCommand(javaHome,apkSourcePath,webProjectRootPath,webProjectName,keyStoreFile,keyStoreAlias,keyStorePwd,keyStoreAliasPwd);
             if(StrHelper.getObjectValue(result).contains("当前设备未授权")){

@@ -1,4 +1,11 @@
-import {getContext, getEditorType, initFileEditor, queryCacheData, handlerByFileChange, handlerAppByCacheChange} from "./../../../utils/utils.js";
+import {
+    getContext,
+    getEditorType,
+    handlerAppByCacheChange,
+    handlerByFileChange,
+    initFileEditor,
+    queryCacheData
+} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -282,7 +289,7 @@ export default {
                 hideLogs:false,
                 splashText:'',
                 splashIcon:'',
-                customSignAlias:''
+                customSignStorePath:''
             },
             packageProjectRules:{
                 appName: [{ required: true, message: '请填写应用名称', trigger: 'blur' }],
@@ -290,7 +297,34 @@ export default {
                 versionName: [{ required: true, message: '请填写版本名称', trigger: 'blur' }],
                 versionCode: [{ required: true, message: '请填写版本号', trigger: 'blur' }],
                 abis:[{ required: true, message: '请选择CPU架构', trigger: 'change' }],
-                customSignAlias: [{ required: true, message: '请选择签名', trigger: 'change' }]
+                appIcon:[{ required: true, trigger: 'change' , validator: (rules, value, cb) => {
+                        if(!value){
+                            return cb()
+                        }
+                        if (value.endsWith("png") || value.endsWith("jpg") || value.endsWith("jpeg")) {
+                            return cb()
+                        }
+                        return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
+                    }}],
+                splashIcon:[{ required: true, trigger: 'change' , validator: (rules, value, cb) => {
+                        if(!value){
+                            return cb()
+                        }
+                        if (value.endsWith("png") || value.endsWith("jpg") || value.endsWith("jpeg")) {
+                            return cb()
+                        }
+                        return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
+                    }}],
+                customSignStorePath: [{ required: true, trigger: 'change' , validator: (rules, value, cb) => {
+                        if(!this.keyStoreArr || !this.keyStoreArr.length){
+                            return cb(new Error('请先在公共文件模块，生成自定义签名!'))
+                        }
+                        let arr = this.keyStoreArr.filter(item=>item === value);
+                        if (!arr || !arr.length) {
+                            return cb(new Error('请选择自定义签名!'))
+                        }
+                        return cb()
+                    }}]
             },
             alreadyInitPackageTemplate:false,// 是否已经初始化完成打包模板
             alreadyUploadProjectRes:false,// 是否已经上传项目资源
@@ -1168,8 +1202,11 @@ export default {
                 }).then(() => {
                     // 将json写入本地文件
                     let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+                    let jsonObj = JSON.parse(JSON.stringify(defaultProjectJSON));
+                    // 默认项目名称
+                    jsonObj.name = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label || "";
                     let targetPath = toPath + "/project.json";
-                    let remoteScript = `let writableTextFile = files.write('${targetPath}',decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(defaultProjectJSON,"","\t")))}')));`;
+                    let remoteScript = `let writableTextFile = files.write('${targetPath}',decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(jsonObj,"","\t")))}')));`;
                     this.remoteExecuteScript(remoteScript);
                     // 刷新手机目录
                     this.refreshPhoneDir();
@@ -1252,7 +1289,7 @@ export default {
                         if (data.isSuccess) {
                            if(data.data){
                                // 全部的证书数组
-                               _that.keyStoreArr = data.data.filter(item=>item.fileType === "keystore").map(item=> item.fileName);
+                               _that.keyStoreArr = data.data.filter(item=>item.fileType === "keystore").map(item=> item.fileName + "." + item.fileType);
                            }
                         }
                     }
@@ -1337,15 +1374,38 @@ export default {
                 this.phoneFileLoading = false;
             });
         },
+        // 打包须知
+        phonePackageProjectTips(){
+            let tipsHtml = `
+            <div>
+                1、打包功能需要购买打包插件后才能使用,请点击顶部打包插件下载查看。<br/>
+                2、打包功能需要依赖打包插件,请先初始化插件,具体见公共文件模块。<br/>
+                3、打包功能需要机器码授权后才能使用,请购买插件后联系管理员。<br/>
+                4、打包功能需要JAVA环境支持,请在公共文件模块设置。<br/>
+                5、打包功能需要依赖自定义签名,请在公共文件模块设置。<br/>
+                6、打包功能暂不支持直接使用安卓资源的项目。<br/>
+                7、打包过程中,若在第一步更改了项目配置或者修改了项目文件,如果需要再次打包,建议每步骤都执行一遍,保证资源更新。<br/>
+                8、打包过程中,设置了自定义应用图标和启动界面图标,如果打包报错,可以重新传一个图片后再次尝试。<br/>
+                9、如有其他问题请在QQ群：806074622中反馈。</div>
+            `;
+            this.$msgbox({
+                title: '打包须知',
+                dangerouslyUseHTMLString: true,
+                customClass:"messageTipsClass",
+                message: tipsHtml,
+                confirmButtonText: '确定'
+            }).then(action => {
+            });
+        },
         // 保存初始化配置参数
         saveProjectJsonFun(){
             // 获取临时缓存变量
             let saveProjectJsonObj = JSON.parse(JSON.stringify(this.projectJsonObj));
-            saveProjectJsonObj.name = this.packageProject.appName;
-            saveProjectJsonObj.packageName = this.packageProject.packageName;
-            saveProjectJsonObj.versionName = this.packageProject.versionName;
-            saveProjectJsonObj.versionCode = this.packageProject.versionCode;
-            saveProjectJsonObj.icon = this.packageProject.appIcon;
+            saveProjectJsonObj.name = (this.packageProject.appName||"").trim();
+            saveProjectJsonObj.packageName = (this.packageProject.packageName||"").trim();
+            saveProjectJsonObj.versionName = (this.packageProject.versionName||"").trim();
+            saveProjectJsonObj.versionCode = (this.packageProject.versionCode||"").trim();
+            saveProjectJsonObj.icon = (this.packageProject.appIcon||"").trim();
             // NodeJs环境判断
             if(!saveProjectJsonObj.features){
                 saveProjectJsonObj.features = {};
@@ -1383,7 +1443,7 @@ export default {
             if(!saveProjectJsonObj.signingConfig){
                 saveProjectJsonObj.signingConfig = {};
             }
-            saveProjectJsonObj.signingConfig.alias = this.packageProject.customSignAlias;
+            saveProjectJsonObj.signingConfig.keystore = this.packageProject.customSignStorePath;
             // 将json写入本地文件
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             let targetPath = toPath + "/project.json";
@@ -1417,7 +1477,7 @@ export default {
 
             let signingConfig = this.projectJsonObj.signingConfig;
             // 自定义签名处理
-            this.packageProject.customSignAlias = signingConfig ? signingConfig.alias : "";
+            this.packageProject.customSignStorePath = signingConfig ? signingConfig.keystore : "";
         },
         // 获取手机端项目json
         getPhoneProjectJson(callback){
@@ -1642,7 +1702,7 @@ export default {
                     "hideLogs":this.packageProject.hideLogs,
                     "splashText":this.packageProject.splashText,
                     "splashIcon":this.packageProject.splashIcon,
-                    "customSignAlias":this.packageProject.customSignAlias
+                    "customSignAlias":""
                 }),
                 success: function (data) {
                     if (data) {
@@ -1708,8 +1768,10 @@ export default {
         getKeyStoreObjBySelect(){
             let keyStoreObj = {};
             let _that = this;
+            let keyStoreFilePath = this.packageProject.customSignStorePath;
+            keyStoreFilePath = keyStoreFilePath.replace(".keystore","");
             $.ajax({
-                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + this.packageProject.customSignAlias + '.json',
+                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + keyStoreFilePath + '.json',
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型
@@ -1757,7 +1819,11 @@ export default {
                             console.log(message);
                             _that.alreadyCompletePackageProject = _that.checkPackageProject();
                             _that.packageProjectStepLoading = false;
-                            window.ZXW_VUE.$notify.success({message: '打包完成', duration: '1000'});
+                            if(_that.alreadyCompletePackageProject){
+                                window.ZXW_VUE.$notify.success({message: '打包成功', duration: '1000'});
+                            } else {
+                                window.ZXW_VUE.$message.error({message: message, duration: '3000'});
+                            }
                         } else {
                             _that.packageProjectStepLoading = false;
                             window.ZXW_VUE.$message.warning(data.msg);
@@ -1801,7 +1867,7 @@ export default {
 
             let message = "安装包下载路径为：/sdcard/"+localFileUrl+",请查看!";
             // 创建目录代码 如果不是/ 则需要创建目录
-            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{});";
+            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{app.viewFile('/sdcard/"+localFileUrl+"');});";
             this.remoteExecuteScript(script);
             window.ZXW_VUE.$message.info({
                 message: message,

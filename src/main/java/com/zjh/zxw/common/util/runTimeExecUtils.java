@@ -1,6 +1,7 @@
 package com.zjh.zxw.common.util;
 
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -9,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 public class runTimeExecUtils {
 
     private static String tempPath = isWindowsSystem() ? "C:"+File.separator+"temp" : File.separator + "temp";
-
     public static boolean isWindowsSystem(){
         String osName = System.getProperty("os.name");
         return osName.startsWith("Windows");

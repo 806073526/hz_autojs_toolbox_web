@@ -79,7 +79,7 @@ export default {
                 // 校验规则
                 keyStoreAlias: [{ required: true, message: '请填写密钥对别名', trigger: 'blur' }],
                 keyStoreValidity: [{ required: true, message: '请填写密钥对有效期', trigger: 'blur' }],
-                keyStoreAliasPwd: [{ required: true, message: '请填写密钥对密码', trigger: 'blur' , validator: (rules, value, cb) => {
+                keyStoreAliasPwd: [{ required: true, trigger: 'blur' , validator: (rules, value, cb) => {
                         if (!value) {
                             return cb(new Error('请填写密钥对密码!'))
                         }
@@ -88,7 +88,7 @@ export default {
                         }
                         return cb()
                     }}],
-                keyStorePwd: [{ required: true, message: '请填写密钥库密码', trigger: 'blur' , validator: (rules, value, cb) => {
+                keyStorePwd: [{ required: true, trigger: 'blur' , validator: (rules, value, cb) => {
                         if (!value) {
                             return cb(new Error('请填写密钥库密码!'))
                         }
@@ -222,13 +222,13 @@ export default {
             this.queryFileList(this.breadcrumbList[this.breadcrumbList.length - 1].value,()=>{
                 let packageDirectoryArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && item.isDirectory);
                 let packageFileArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && !item.isDirectory);
-                // 打包插件已解压
-                if(packageDirectoryArr && packageDirectoryArr.length){
+                // 不存在打包插件zip 且 打包插件已解压  直接提示已完成
+                if((!packageFileArr || ! packageFileArr.length) && (packageDirectoryArr && packageDirectoryArr.length)){
                     window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成！', duration: '1000'});
                     return;
                 }
-                // 打包插件已上传 未解压
-                if(packageDirectoryArr && packageFileArr.length){
+                // 已存在打包插件zip 且 打包插件未解压 则进行解压
+                if((packageFileArr && packageFileArr.length) && (!packageDirectoryArr || !packageDirectoryArr.length)){
                     let pathName = this.absolutePrePath + this.webCommonPath + "/apkPackage.zip";
                     let _that = this;
                     $.ajax({
@@ -245,6 +245,54 @@ export default {
                                     window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成', duration: '1000'});
                                     // 重新加载文件列表
                                     _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                                }
+                            }
+                        },
+                        error: function (msg) {
+                        }
+                    });
+                    return;
+                }
+
+                // 已存在打包插件zip 且 打包插件已解压 则提示是否需要重新初始化打包插件
+                if((packageFileArr && packageFileArr.length) && (packageDirectoryArr && packageDirectoryArr.length)){
+                    let pathName = this.absolutePrePath + this.webCommonPath + "/apkPackage.zip";
+                    let _that = this;
+                    let unServerFileZipFun = ()=>{
+                        // 再重新解压
+                        $.ajax({
+                            url: getContext() + "/attachmentInfo/unServerFileZip",
+                            type: "get",
+                            dataType: "json",
+                            data: {
+                                "sourcePathName": pathName,
+                                "targetPathName": _that.absolutePrePath + _that.webCommonPath + "/apkPackage"
+                            },
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成', duration: '1000'});
+                                        // 重新加载文件列表
+                                        _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                                    }
+                                }
+                            },
+                            error: function (msg) {
+                            }
+                        });
+                    };
+                    // 先删除
+                    $.ajax({
+                        url: getContext() + "/attachmentInfo/deleteFile",
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "filePath":this.absolutePrePath + this.webCommonPath + "/apkPackage"
+                        },
+                        success: function (data) {
+                            if (data) {
+                                if (data.isSuccess) {
+                                    unServerFileZipFun();
                                 }
                             }
                         },
@@ -358,7 +406,10 @@ export default {
                 // 转换参数
                 this.keyStore.keyStoreDName = `CN=${this.keyStore.keyStoreDNameCN}OU=${this.keyStore.keyStoreDNameOU}O=${this.keyStore.keyStoreDNameO}L=${this.keyStore.keyStoreDNameL}S=${this.keyStore.keyStoreDNameS}C=${this.keyStore.keyStoreDNameC}`;
                 let signJson =  JSON.stringify(this.keyStore,"", "\t");
-                let scriptFile = new File([signJson], this.keyStore.keyStoreAlias + ".json", {
+
+                let keyStoreFilePath = this.keyStore.keyStoreFile;
+                keyStoreFilePath = keyStoreFilePath.replace(".keystore","");
+                let scriptFile = new File([signJson], keyStoreFilePath + ".json", {
                     type: "text/plain",
                 });
                 const param = new FormData();
@@ -422,7 +473,7 @@ export default {
             // 校验数据
             this.$refs['keyStore'].validate((valid) => {
                 if (valid) {
-                    this.$confirm('是否确认生成自定义签名?', '提示', {
+                    this.$confirm('是否确认生成自定义签名(证书文件路径相同的会覆盖)?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
