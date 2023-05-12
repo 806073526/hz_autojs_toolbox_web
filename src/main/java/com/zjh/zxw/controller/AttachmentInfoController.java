@@ -76,7 +76,6 @@ public class AttachmentInfoController extends BaseController {
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
 
-
     // 文件目录 key为deviceUUID value为当前设备的日志目录结构json
     private final static ConcurrentHashMap<String, String> fileDirectoryMap = new ConcurrentHashMap<String,String>();
 
@@ -101,7 +100,12 @@ public class AttachmentInfoController extends BaseController {
         if(StringUtils.isBlank(machineCode)){
             return false;
         }
-        return validateMachineCodeCommon(machineCode);
+        try{
+            return PackageProjectUtils.validateMachineCodeCommonByFile(machineCode);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     @ApiOperation(value = "根据参数校验机器码是否已授权提供前端调用", notes = "根据参数校验机器码是否已授权提供前端调用")
@@ -116,41 +120,23 @@ public class AttachmentInfoController extends BaseController {
         return flag;
     }
 
-
-    /**
-     * 验证机器码授权状态
-     * @param machineCode
-     * @return
-     */
-    private boolean validateMachineCodeCommon(String machineCode){
-        String resultString = "";
-        try {
-            String targetPath = "C:"+File.separator + "machine" + File.separator;
-            String filePath = UploadPathHelper.getUploadPath(targetPath);
-            File machineFile = new File(filePath + "machineCode.txt");
-            if(!machineFile.exists()){
-                machineFile.createNewFile();
-            }
-            BufferedReader reader = new BufferedReader(new FileReader(filePath + "machineCode.txt"));
-            StringBuilder machineCodeBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                machineCodeBuilder.append(line);
-            }
-            reader.close();
-            resultString = machineCodeBuilder.toString();
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
-        List<String> machineCodeList = StrHelper.str2ArrayListBySplit(resultString.toString(),",");
-        return machineCodeList.contains(machineCode);
-    }
-
-
     @ApiOperation(value = "获取机器码", notes = "获取机器码")
     @GetMapping("/getMachineCode")
     public R<String> getMachineCode(){
-        return success(PackageProjectUtils.getMachineCode());
+        String curMachineCode = "";
+        try{
+            curMachineCode = PackageProjectUtils.getMachineCode();
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return success(curMachineCode);
+    }
+
+    @ApiOperation(value = "刷新机器码", notes = "刷新机器码")
+    @GetMapping("/refreshMachineCode")
+    public R<Boolean> refreshMachineCode(){
+        PackageProjectUtils.clearCurMachineCode();
+        return success(true);
     }
 
 
