@@ -42,6 +42,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -843,6 +845,7 @@ public class AttachmentInfoController extends BaseController {
                 if(CollectionUtils.isNotEmpty(targetFiles)){
                     // 先删除文件
                     attachmentInfoService.deleteFile(targetFiles.get(0).getParent() + File.separator + "project");
+                    Thread.sleep(100);
                     // 重命名文件为project
                     attachmentInfoService.reNameFile(targetFiles.get(0).getAbsolutePath(), targetFiles.get(0).getParent() + File.separator + "project");
                 }
@@ -858,6 +861,16 @@ public class AttachmentInfoController extends BaseController {
 
             // 先删除插件
             attachmentInfoService.deleteFile(targetPluginRootPath);
+
+            // 等待插件删除完成
+            int count = 0;
+            while (Files.exists(Paths.get(targetPluginRootPath))) {
+                Thread.sleep(100);
+                count++;
+                if(count>20){
+                    break;
+                }
+            }
 
             // 遍历插件 复制插件到目标目录
             for (String plugin : pluginsList) {
@@ -885,10 +898,21 @@ public class AttachmentInfoController extends BaseController {
             List<String> excludesLibList = new ArrayList<String>();
             // 未开启 则 排除nodejs的 libnode.so依赖
             if(!openNodeJs){
-                excludesLibList.add("libnode");
+                excludesLibList.add("libnode.so");
             }
             // 先删除
             attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "lib");
+
+            // 等待依赖删除完成
+            int libCount = 0;
+            while (Files.exists(Paths.get(packageTemplatePath + File.separator + "lib"))) {
+                Thread.sleep(100);
+                libCount++;
+                if(libCount>20){
+                    break;
+                }
+            }
+
             // 遍历架构
             for (String abisName : abisList) {
                 // 读取模板资源文件 当前CPU架构的 依赖列表
@@ -946,10 +970,14 @@ public class AttachmentInfoController extends BaseController {
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpeg");
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpg");
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.png");
+            // 等待删除完成
+            Thread.sleep(100);
             // 再复制当目标目录
             attachmentInfoService.copyFile(appIconSourcePath,appIconTargetRootPath);
 
             if(appIconNeedReName){
+                // 等待复制完成
+                Thread.sleep(200);
                 String imgFileName = appIcon.substring(appIcon.lastIndexOf("/") + 1);
                 // 重命名图片
                 attachmentInfoService.reNameFile(appIconTargetRootPath + File.separator + imgFileName, appIconTargetRootPath +File.separator + "ic_launcher." + appIconImgFileType);
@@ -985,10 +1013,14 @@ public class AttachmentInfoController extends BaseController {
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpg");
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpeg");
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.png");
+            // 等待删除完成
+            Thread.sleep(100);
             // 再复制当目标目录
             attachmentInfoService.copyFile(splashIconSourcePath,splashIconTargetRootPath);
 
             if(splashNeedReName){
+                // 等待复制完成
+                Thread.sleep(200);
                 String imgFileName = splashIcon.substring(splashIcon.lastIndexOf("/") + 1);
                 // 重命名图片
                 attachmentInfoService.reNameFile(splashIconTargetRootPath + File.separator + imgFileName, splashIconTargetRootPath +File.separator + "splash_icon." + splashImgFileType);

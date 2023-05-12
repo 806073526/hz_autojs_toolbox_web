@@ -1385,7 +1385,7 @@ export default {
                 5、打包功能需要依赖自定义签名,请在公共文件模块设置。<br/>
                 6、打包功能暂不支持直接使用安卓资源的项目。<br/>
                 7、打包过程中,若在第一步更改了项目配置或者修改了项目文件,如果需要再次打包,建议每步骤都执行一遍,保证资源更新。<br/>
-                8、打包过程中,设置了自定义应用图标和启动界面图标,如果打包报错,可以重新传一个图片后再次尝试。<br/>
+                8、打包过程中,设置了自定义应用图标和启动界面图标,如果打包报错,可以重新传一个图片后再次尝试,或者修改其后缀名为jpg或者png。<br/>
                 9、如有其他问题请在QQ群：806074622中反馈。</div>
             `;
             this.$msgbox({
@@ -1404,7 +1404,7 @@ export default {
             saveProjectJsonObj.name = (this.packageProject.appName||"").trim();
             saveProjectJsonObj.packageName = (this.packageProject.packageName||"").trim();
             saveProjectJsonObj.versionName = (this.packageProject.versionName||"").trim();
-            saveProjectJsonObj.versionCode = (this.packageProject.versionCode||"").trim();
+            saveProjectJsonObj.versionCode = String(this.packageProject.versionCode||"").trim();
             saveProjectJsonObj.icon = (this.packageProject.appIcon||"").trim();
             // NodeJs环境判断
             if(!saveProjectJsonObj.features){
@@ -1456,7 +1456,7 @@ export default {
             this.packageProject.appName = this.projectJsonObj.name;
             this.packageProject.packageName = this.projectJsonObj.packageName;
             this.packageProject.versionName = this.projectJsonObj.versionName;
-            this.packageProject.versionCode = this.projectJsonObj.versionCode;
+            this.packageProject.versionCode = String(this.projectJsonObj.versionCode);
             this.packageProject.appIcon = this.projectJsonObj.icon;
                 // 开机自启动
             this.packageProject.autoOpen = this.projectJsonObj.autoOpen;
