@@ -105,6 +105,7 @@ export default {
                 'uploadPath/autoJsTools/webCommonPath/apkPackage',
                 'uploadPath/autoJsTools/webCommonPath/apkPackage/apkFrameWork',
                 'uploadPath/autoJsTools/webCommonPath/apkPackage/apkTemplate',
+                'uploadPath/autoJsTools/webCommonPath/apkPackage/apkTemplate/template.zip',
                 'uploadPath/autoJsTools/webCommonPath/apkPackage/apkTool',
                 ]
         }
