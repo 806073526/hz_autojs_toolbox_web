@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.socket.aio.IoAction;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.zjh.PackageProjectUtils;
 import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
@@ -192,7 +193,7 @@ public class AutoJsWsServerEndpoint {
         // 未包含的设备id
         if(!curConnectMap.containsKey(deviceUuid) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
             // 推送上线消息
-            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","设备uuid："+deviceUuid+"<br>设备宽度："+deviceWidth+"<br>设备高度："+deviceHeight+"<br>连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT)+"<br>服务端IP："+ InetAddress.getLocalHost().getHostAddress() +"<br>客户端IP："+IP);
+            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","服务端机器码:"+ PackageProjectUtils.getMachineCode() + "<br>设备uuid："+deviceUuid+"<br>设备宽度："+deviceWidth+"<br>设备高度："+deviceHeight+"<br>连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT)+"<br>服务端IP："+ InetAddress.getLocalHost().getHostAddress() +"<br>客户端IP："+IP);
             // 记录
             curConnectMap.put(deviceUuid,LocalDateTime.now());
         }
