@@ -2546,7 +2546,7 @@ export default {
         },
         // 手机端初始化同步目录
         phoneInitSyncDir(){
-            let remoteScript = `files.createWithDirs("/sdcard/appSync/");toastLog("初始化同步目录完成");`;
+            let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");toastLog("初始化同步目录完成");`;
             this.remoteExecuteScript(remoteScript);
             this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
             setTimeout(()=>{
@@ -2559,7 +2559,7 @@ export default {
             this.phoneFileLoading = true;
             // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedExample",()=>{
-                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/AutoJsPro官方示例.zip","/appSync/AutoJsPro官方示例.zip",()=>{
                     $zip.unzip('/sdcard/appSync/AutoJsPro官方示例.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
@@ -2583,7 +2583,7 @@ export default {
 			 this.phoneFileLoading = true;
             // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedShopExample",()=>{
-                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/AutoJsPro商店示例脚本.zip","/appSync/AutoJsPro商店示例脚本.zip",()=>{
                     $zip.unzip('/sdcard/appSync/AutoJsPro商店示例脚本.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
@@ -2607,7 +2607,7 @@ export default {
             this.phoneFileLoading = true;
             // 手机端下载脚手架项目 并且zip解压完成后 web端刷新手机目录
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished",()=>{
-                let downLoadGameScript = `files.createWithDirs("/sdcard/appSync/");
+                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{
                     $zip.unzip('/sdcard/appSync/hz_autojs_game_script.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
