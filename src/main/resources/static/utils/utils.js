@@ -251,6 +251,16 @@ export const initFileEditor = (_that, editorKey, containerId, getEditorCompleteF
                 }
             });
 
+            editor.session.on('changeScrollTop', function (e) {
+                if (editorScrollChangeCallBack) {
+                    let obj = {
+                        scrollLeft:editor.session.getScrollLeft(),
+                        scrollTop:e
+                    };
+                    editorScrollChangeCallBack(obj, editor.getValue());
+                }
+            });
+
             editor.setValue(fileContent);
             editor.clearSelection();
             document.getElementById(containerId).oncontextmenu = (e)=>{

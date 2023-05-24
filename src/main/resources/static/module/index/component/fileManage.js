@@ -2828,7 +2828,7 @@ export default {
             // 滚动到记录位置
             if(getEditorType() === 'ace'){
                 this.phoneScriptEditor.clearSelection();
-                this.phoneScriptEditor.renderer.scrollBarV.setScrollHeight(cacheScroll.scrollTop);
+                this.phoneScriptEditor.session.setScrollTop(cacheScroll.scrollTop);
             } else {
                 // 滚动到记录位置
                 this.phoneScriptEditor.setScrollPosition(cacheScroll,1);
@@ -2883,7 +2883,7 @@ export default {
                     this.phoneScriptEditor.setValue(fileObj.fileContent || '');
                     if(getEditorType() === 'ace'){
                         this.phoneScriptEditor.clearSelection();
-                        this.phoneScriptEditor.renderer.scrollBarV.setScrollHeight(cacheScroll.scrollTop);
+                        this.phoneScriptEditor.session.setScrollTop(cacheScroll.scrollTop);
                     } else {
                         // 滚动到记录位置
                         this.phoneScriptEditor.setScrollPosition(cacheScroll, 1);
@@ -3008,7 +3008,7 @@ export default {
                                 // 滚动到记录位置
                                 if(getEditorType() === 'ace'){
                                     this.phoneScriptEditor.clearSelection();
-                                    this.phoneScriptEditor.renderer.scrollBarV.setScrollHeight(fileObj.scroll.scrollTop);
+                                    this.phoneScriptEditor.session.setScrollTop(fileObj.scroll.scrollTop);
                                 } else {
                                     this.phoneScriptEditor.setScrollPosition(fileObj.scroll,1);
                                 }
@@ -3033,22 +3033,15 @@ export default {
                         },(e)=>{
                             let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                             if(fileObj){
-                                if(getEditorType() === 'ace'){
-                                    this.phoneFileCacheArr[this.phoneFileSelectIndex].scroll = {
-                                        scrollLeft: 0,
-                                        scrollTop: this.phoneScriptEditor.getScrollHeight()
-                                    };
-                                } else {
-                                    this.phoneFileCacheArr[this.phoneFileSelectIndex].scroll = {
-                                        scrollLeft: e.scrollLeft,
-                                        scrollTop: e.scrollTop
-                                    };
-                                }
+                                this.phoneFileCacheArr[this.phoneFileSelectIndex].scroll = {
+                                    scrollLeft: e.scrollLeft,
+                                    scrollTop: e.scrollTop
+                                };
                             }
                         });
                         if(this.phoneScriptEditor){
                             if(getEditorType() === 'ace'){
-                                this.phoneScriptEditor.renderer.scrollBarV.setScrollHeight(0);
+                                this.phoneScriptEditor.session.setScrollTop(0);
                             }else {
                                 // 滚动到记录位置
                                 this.phoneScriptEditor.setScrollPosition({scrollLeft: 0,scrollTop: 0},1);
