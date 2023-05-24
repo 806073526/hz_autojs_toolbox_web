@@ -1943,7 +1943,8 @@ export default {
         },
         // 手机端运行选中脚本 弹窗
         phoneRunScriptByDialog(){
-            let savePath = this.phoneFileSavePath;
+            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            let savePath = fileObj.fileSavePath;
             if(!savePath){
                 return;
             }
