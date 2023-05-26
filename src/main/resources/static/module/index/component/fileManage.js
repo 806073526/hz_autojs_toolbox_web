@@ -2627,6 +2627,30 @@ export default {
                 this.refreshPhoneDir();
             });
         },
+        // 初始化图色示例项目
+        phoneDownLoadImageExampleScript(){
+            this.phoneFileLoading = true;
+            // 手机端下载图色示例项目 并且zip解压完成后 web端刷新手机目录
+            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished_example",()=>{
+                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
+                utilsObj.downLoadFile("${getContext()}/hz_autojs_example_project.zip","/appSync/hz_autojs_example_project.zip",()=>{
+                    $zip.unzip('/sdcard/appSync/hz_autojs_example_project.zip', '/sdcard/appSync/');
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"unzipFinished_example",
+                        "serviceValue":"true"
+                    }
+                    events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    toastLog("初始化图色示例项目完成");
+                })`;
+                this.remoteExecuteScript(downLoadGameScript);
+            },()=>{
+                this.phoneFileLoading = false;
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
+                // 刷新手机目录
+                this.refreshPhoneDir();
+            });
+        },
         // 手机端初始化运行文件
         phoneInitFile(){
             let initRemoteScript = 'engines.execScriptFile("/sdcard/appSync/hz_autojs_game_script/main.js",{path:["/sdcard/appSync/hz_autojs_game_script"]})';

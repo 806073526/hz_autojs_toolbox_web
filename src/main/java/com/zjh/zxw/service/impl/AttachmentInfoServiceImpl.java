@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -300,7 +301,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
 
     @Override
     public Boolean createFolder(String folderName) {
-        folderName = folderName.replaceAll("\\\\",File.separator);
+        folderName = folderName.replaceAll("\\\\", Matcher.quoteReplacement(File.separator));
         String folderPath = this.getRootPath() + folderName;
         folderPath = this.getTargetFilePathNoExit(folderPath,true);
         FileUtil.createFolder(folderPath);

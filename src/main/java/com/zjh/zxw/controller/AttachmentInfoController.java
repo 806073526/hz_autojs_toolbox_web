@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -338,7 +339,7 @@ public class AttachmentInfoController extends BaseController {
     public R<String> uploadFileSingle(@RequestParam("file") MultipartFile file,@RequestParam("pathName")String pathName) {
         String url = "";
         try {
-            pathName = pathName.replaceAll("\\\\",File.separator);
+            pathName = pathName.replaceAll("\\\\", Matcher.quoteReplacement(File.separator));
             url = attachmentInfoService.uploadFileToAutoJs(file,pathName + File.separator + file.getOriginalFilename());
             return success(url);
         } catch (BusinessException e) {
