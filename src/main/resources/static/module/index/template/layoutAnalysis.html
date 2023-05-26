@@ -286,7 +286,10 @@
                             boundsInParent:
                         </div>
                         <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.boundsInParent }}
+                            {{ '['+remoteHandler.param5.selectNode.boundsInParent.left+','+
+                            remoteHandler.param5.selectNode.boundsInParent.top+',' +
+                            remoteHandler.param5.selectNode.boundsInParent.right + ',' +
+                            remoteHandler.param5.selectNode.boundsInParent.bottom + ']' }}
                         </div>
                     </el-row>
                     <el-row class="nodeDetailRow">
