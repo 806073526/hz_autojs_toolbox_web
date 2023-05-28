@@ -59,6 +59,7 @@ export default {
                     bigScale: 1,
                     smallScale: 1,
                     localImageName: 'allScreen.png',
+                    pathName:'',
                     context:'',// 文字内容
                     scriptPreview: '',
                     previewImg: '',

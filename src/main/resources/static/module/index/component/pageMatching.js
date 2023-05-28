@@ -565,6 +565,10 @@ eval(pageExecuteScript);
                             let widthHeightObj = paramObj[widthHeight];
                             // 设置参数
                             paramObj[widthHeight] = widthHeightObj || (paramJson ? JSON.parse(paramJson) : {});
+                            // 处理图片
+                            let pathName = paramObj[widthHeight].pathName || "";
+                            pathName = pathName.replace(this.sourcePathName,this.targetPathName);
+                            paramObj[widthHeight].pathName = pathName;
                             // 重新赋值
                             serviceOperateParam[paramKey] = paramObj;
                         })
