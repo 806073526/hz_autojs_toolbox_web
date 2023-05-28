@@ -14,7 +14,7 @@ export const getContext = () => {
 
 export const getEditorType = ()=> {
     // 获取编辑器类型
-    return window.localStorage.getItem("editorType") || 'vscode';
+    return window.localStorage.getItem("editorType") || 'ace';
 };
 
 /**

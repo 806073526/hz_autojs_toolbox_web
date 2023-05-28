@@ -214,7 +214,7 @@ utilsObj.executeServiceOperate = (pageName, operateSymbol, functionName, success
     commonStorage.put("notNeedConvert", serviceOperateParam.notNeedConvert ? true : false)
 
     // 解构参数
-    let { position, context, threshold, maxVal, pathName, imgThreshold, color, colorOther, colorThreshold, matchingCount, transparentMask, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg } = serviceOperateParam
+    let { position, context, threshold, maxVal, pathName, imgThreshold, color, colorOther, colorThreshold, matchingCount, transparentMask, bigScale, smallScale, featuresThreshold, isOpenGray, isOpenThreshold, canvasMsg, openSplit } = serviceOperateParam
 
     let x1 = position[0];
     let y1 = position[1];
@@ -245,7 +245,7 @@ utilsObj.executeServiceOperate = (pageName, operateSymbol, functionName, success
             break;
         // 区域文字识别获取坐标
         case "regionalAnalysisChartPosition2":
-            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold);
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, openSplit);
             break;
         // 区域文字识别点击
         case "regionalClickText2":

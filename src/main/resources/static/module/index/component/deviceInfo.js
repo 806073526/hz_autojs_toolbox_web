@@ -19,7 +19,7 @@ export default {
         return {
             deviceList: [],// 设备列表
             deviceLoading: true,
-            editorType:'vscode',
+            editorType:'ace',
             editorTypeNeedRefresh:false,
             expandDevice:true,
             authorizeStatus: false,
@@ -55,7 +55,7 @@ export default {
             window.localStorage.removeItem('editorTypeChangeValue');
         } else {
             // 获取编辑器类型
-            this.editorType = window.localStorage.getItem('editorType') || 'vscode';
+            this.editorType = window.localStorage.getItem('editorType') || 'ace';
         }
         // 检查设备授权状态
         this.authorizeStatus = this.checkSelfMachineAuthorize();
