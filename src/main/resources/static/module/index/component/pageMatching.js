@@ -243,6 +243,10 @@ utilsObj.executeServiceOperate = (pageName, operateSymbol, functionName, success
         case "regionalAnalysisChart2":
             result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold, canvasMsg);
             break;
+        // 区域文字识别返回对象数组
+        case "regionalAnalysisChart3":
+            result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, isOpenGray, isOpenThreshold, canvasMsg);
+            break;    
         // 区域文字识别获取坐标
         case "regionalAnalysisChartPosition2":
             result = utilsObj[functionName](img, x1, y1, x2, y2, threshold, maxVal, matchingContent, isOpenGray, isOpenThreshold, openSplit);
