@@ -901,7 +901,7 @@ eval(pageExecuteScript);
             }
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.pageSettingParam.pageSettingParamName,
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.pageSettingParam.pageSettingParamName + "?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型

@@ -492,7 +492,7 @@ export default {
             }
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.noticeListenerName,
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.noticeListenerName + "?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型
