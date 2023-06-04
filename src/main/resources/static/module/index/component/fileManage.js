@@ -1426,6 +1426,13 @@ export default {
                 "org.autojs.plugin.ffmpeg":"1.1"
             };
             let plugins = saveProjectJsonObj.plugins || {};
+            Object.keys(plugins).forEach(key=>{
+                if(this.packageProject.plugins.includes(key)){
+                    plugins[key] = pluginsMap[key];
+                } else{
+                     delete plugins [key];
+                }
+            });
             this.packageProject.plugins.forEach(key=>{
                 plugins[key] = pluginsMap[key];
             });
@@ -1473,7 +1480,7 @@ export default {
 
             let launchConfig = this.projectJsonObj.launchConfig ? this.projectJsonObj.launchConfig : {};
 
-            this.packageProject.hideLogs = launchConfig.hideLogs || true;
+            this.packageProject.hideLogs = launchConfig.hideLogs !=null ? launchConfig.hideLogs : true;
             this.packageProject.splashText = launchConfig.splashText || "";
             this.packageProject.splashIcon = launchConfig.splashIcon || "";
 
