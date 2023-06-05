@@ -309,7 +309,7 @@
                                 <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径"
                                           class="width100" />
                             </el-form-item>
-                            <span style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.appIcon)">预览</span>
+                            <span v-loading="appIconLoading" style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.appIcon,'appIcon')">预览</span>
                         </div>
                     </el-row>
                     <p class="basicInfo">
@@ -387,7 +387,7 @@
                                 <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径"
                                           class="width100" />
                             </el-form-item>
-                            <span style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.splashIcon)">预览</span>
+                            <span v-loading="splashIconLoading" style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.splashIcon,'splashIcon')">预览</span>
                         </div>
                     </el-row>
                     <p class="basicInfo">

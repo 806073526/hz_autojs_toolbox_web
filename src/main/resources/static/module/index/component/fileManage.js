@@ -291,6 +291,8 @@ export default {
                 splashIcon:'',
                 customSignStorePath:''
             },
+            appIconLoading:false,
+            splashIconLoading:false,
             packageProjectRules:{
                 appName: [{ required: true, message: '请填写应用名称', trigger: 'blur' }],
                 packageName: [{ required: true, message: '请填写应用包名', trigger: 'blur' }],
@@ -302,18 +304,36 @@ export default {
                             return cb()
                         }
                         if (value.endsWith("png") || value.endsWith("jpg") || value.endsWith("jpeg")) {
-                            return cb()
+                            this.appIconLoading = true;
+                            this.checkIconByPath(value,(checkResult)=>{
+                                this.appIconLoading = false;
+                                if(!checkResult){
+                                    return cb(new Error('图片未找到,请重试！'))
+                                } else {
+                                    return cb()
+                                }
+                            })
+                        } else {
+                            return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
                         }
-                        return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
                     }}],
                 splashIcon:[{ required: true, trigger: 'change' , validator: (rules, value, cb) => {
                         if(!value){
                             return cb()
                         }
                         if (value.endsWith("png") || value.endsWith("jpg") || value.endsWith("jpeg")) {
-                            return cb()
+                            this.splashIconLoading = true;
+                            this.checkIconByPath(value,(checkResult)=>{
+                                this.splashIconLoading = false;
+                                if(!checkResult){
+                                    return cb(new Error('图片未找到,请重试！'))
+                                } else {
+                                    return cb()
+                                }
+                            })
+                        } else{
+                            return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
                         }
-                        return cb(new Error('只能使用png、jpg、jpeg格式图片!'))
                     }}],
                 customSignStorePath: [{ required: true, trigger: 'change' , validator: (rules, value, cb) => {
                         if(!this.keyStoreArr || !this.keyStoreArr.length){
@@ -1299,10 +1319,89 @@ export default {
             });
 
         },
+        // 根据路径检查icon图
+        checkIconByPath(iconPath,callback){
+            if(!iconPath){
+                if(callback){
+                    callback()
+                }
+                return;
+            }
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            let targetPath = toPath + "/" + iconPath;
+            // 关键key
+            let dirPathKey = this.deviceInfo.deviceUuid + '_' + targetPath;
+            // 更新手机端目录缓存
+            let updatePhoneDirCacheFun = () => {
+                // 远程执行脚本内容
+                let remoteScript = `let result = '';
+                let bytes = files.readBytes('${targetPath}');
+                let image = images.read('${targetPath}');
+                result = images.toBase64(image, "png", 1);
+                image.recycle();
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                    headers: {
+                        "deviceUUID": commonStorage.get('deviceUUID')
+                    },
+                    method: 'POST',
+                    contentType: 'application/json',
+                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + '${targetPath}', 'fileJson': result })
+                }, (e) => { });`;
+                this.remoteExecuteScript(remoteScript);
+            };
+            // 查询缓存数据方法
+            queryCacheData(() => {
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/clearFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                    },
+                    error: function (msg) {
+                    }
+                });
+                // 清除完成后执行
+                updatePhoneDirCacheFun();
+            }, () => {
+                let cacheData = null;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                cacheData = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                return cacheData;
+            }, 200, 10,(cacheResultData)=>{
+                if(callback){
+                    callback(cacheResultData)
+                }
+            });
+        },
         // 根据路径加载icon图
-        previewIconByPath(iconPath){
+        previewIconByPath(iconPath,type){
             if(!iconPath){
                 return;
+            }
+            if(type === 'appIcon'){
+                this.appIconLoading = true;
+            } else if(type === 'splashIcon'){
+                this.splashIconLoading = true;
             }
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             let targetPath = toPath + "/" + iconPath;
@@ -1364,14 +1463,23 @@ export default {
                     }
                 });
                 return cacheData;
-            }, 200, 30,(cacheResultData)=>{
-                let fileContent = '';
-                this.phoneFileEditorName = '';
-                this.phoneImageBase64 = '';
-                this.phoneImagePreviewVisible = true;
-                this.phoneFileEditorName = iconPath;
-                this.phoneImageBase64 = 'data:image/png;base64,' + cacheResultData;
-                this.phoneFileLoading = false;
+            }, 200, 20,(cacheResultData)=>{
+                if(type === 'appIcon'){
+                    this.appIconLoading = false;
+                } else if(type === 'splashIcon'){
+                    this.splashIconLoading = false;
+                }
+                if(cacheResultData){
+                    let fileContent = '';
+                    this.phoneFileEditorName = '';
+                    this.phoneImageBase64 = '';
+                    this.phoneImagePreviewVisible = true;
+                    this.phoneFileEditorName = iconPath;
+                    this.phoneImageBase64 = 'data:image/png;base64,' + cacheResultData;
+                    this.phoneFileLoading = false;
+                } else {
+                    window.ZXW_VUE.$message.error({message: "未找到图片", duration: '1000'});
+                }
             });
         },
         // 打包须知
