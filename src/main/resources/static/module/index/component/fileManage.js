@@ -2063,7 +2063,7 @@ export default {
             if(!savePath){
                 return;
             }
-            let parentSavePath = savePath.substring(0,this.phoneFileSavePath.lastIndexOf('/'));
+            let parentSavePath = savePath.substring(0,savePath.lastIndexOf('/'));
             let remoteScript = `engines.execScriptFile("${savePath}",{path:["${parentSavePath}"]})`;
             this.remoteExecuteScript(remoteScript);
         },
