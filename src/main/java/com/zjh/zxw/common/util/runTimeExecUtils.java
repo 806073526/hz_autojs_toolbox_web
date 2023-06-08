@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 public class runTimeExecUtils {
 
-    private static String tempPath = isWindowsSystem() ? "C:"+File.separator+"temp" : File.separator + "temp";
+    /*private static String tempPath = isWindowsSystem() ? "C:"+File.separator+"temp" : File.separator + "temp";
     public static boolean isWindowsSystem(){
         String osName = System.getProperty("os.name");
         return osName.startsWith("Windows");
@@ -51,11 +51,11 @@ public class runTimeExecUtils {
     }
 
 
-    /**
+    *//**
      * 执行bat命令
      * @param batCommand
      * @return
-     */
+     *//*
     public static String execBatCommand(String batCommand){
         StringBuilder stringBuilder = new StringBuilder();
         Process process;
@@ -71,5 +71,5 @@ public class runTimeExecUtils {
             e.printStackTrace();
             return null;
         }
-    }
+    }*/
 }

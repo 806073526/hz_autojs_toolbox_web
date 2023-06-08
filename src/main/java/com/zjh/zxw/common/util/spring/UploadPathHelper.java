@@ -9,12 +9,18 @@ public  class UploadPathHelper {
         return osName.startsWith("Windows");
     }
 
+    public static boolean isMacSystem(){
+        String osName = System.getProperty("os.name");
+        return osName.contains("mac");
+    }
+
+
     public static String getUploadPath(String uploadPath){
         File file = new File(uploadPath);
         if(!file.exists()){
             boolean createSuccess = file.mkdirs();
             if(!createSuccess){
-                uploadPath = isWindowsSystem() ?  "C:"+File.separator+"zxwAjUpload"+File.separator : File.separator + "zxwAjUpload" + File.separator;
+                uploadPath = isWindowsSystem() ?  "C:"+File.separator+"zxwAjUpload"+File.separator : (isMacSystem() ? "." + File.separator + "zxwAjUpload" + File.separator : File.separator + "zxwAjUpload" + File.separator);
                 file = new File(uploadPath);
                 file.mkdirs();
             }

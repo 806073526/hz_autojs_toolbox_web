@@ -118,12 +118,15 @@
 .fileNameArr{
     display: flex;
     border: 1px solid #cfbfbf;
-    height: 25px;
+    height: 40px;
     justify-content: flex-start;
     align-items: center;
     border-radius: 2px;
     margin-bottom: 2px;
     padding: 4px 0;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
 }
 .fileNameArr .fileNameItem{
     border: 1px solid #d9c5c1;
