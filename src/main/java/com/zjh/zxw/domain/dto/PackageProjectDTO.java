@@ -75,6 +75,12 @@ public class PackageProjectDTO implements Serializable {
     private Boolean openNodeJs;
 
     /**
+     * 项目配置-开启图色模块支持
+     */
+    @ApiModelProperty(value = "项目配置-开启图色模块支持")
+    private Boolean openImageModule;
+
+    /**
      * 项目配置-开机自启动
      */
     @ApiModelProperty(value = "项目配置-开机自启动")

@@ -843,6 +843,11 @@ public class AttachmentInfoController extends BaseController {
             // 读取已选插件列表
             List<String> pluginsList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(plugins,","));
 
+            // 需要删除V8内置模块标记
+            Boolean needRemoveNodeV8Module = false;
+            // 需要删除ocr模块标记
+            Boolean needRemoveOcrModule = false;
+
             // 目标插件根路径
             String targetPluginRootPath = packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + "plugins";
 
@@ -881,12 +886,33 @@ public class AttachmentInfoController extends BaseController {
             // 获取是否开启nodejs开关 是否需要libnode.so的依赖
             boolean openNodeJs = Objects.nonNull(packageProjectDTO.getOpenNodeJs()) ? packageProjectDTO.getOpenNodeJs() : false;
 
+            // 未开启nodejs模块则需要删除
+            needRemoveNodeV8Module = !openNodeJs;
+
+            // 获取是否开启图色模块 开关
+            boolean openImageModule = Objects.nonNull(packageProjectDTO.getOpenImageModule()) ? packageProjectDTO.getOpenImageModule() : false;
+
             // 需要排除的依赖集合
             List<String> excludesLibList = new ArrayList<String>();
-            // 未开启 则 排除nodejs的 libnode.so依赖
+            // 未开启 则 排除nodejs的 libnode.so、libv8.so依赖
             if(!openNodeJs){
                 excludesLibList.add("libnode.so");
+                excludesLibList.add("libv8.so");
             }
+            // 未开启 则排除图色模块
+            if(!openImageModule){
+                excludesLibList.add("libautojspro_cvext.so");
+                excludesLibList.add("libopencv_java4.so");
+            }
+
+            // 未包含 官方的ocr模块 则排除 对应依赖so
+            if(!pluginsList.contains("org.autojs.autojspro.plugin.mlkit.ocr") || !pluginsList.contains("org.autojs.autojspro.ocr.v2")){
+                excludesLibList.add("libocrautojspro.so");
+                excludesLibList.add("libpaddle_light_api_shared.so");
+                // 不包含官方ocr模块则需要删除
+                needRemoveOcrModule = true;
+            }
+
             // 先删除
             attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "lib");
 
@@ -923,6 +949,17 @@ public class AttachmentInfoController extends BaseController {
                         attachmentInfoService.copyFile(libSoPath,targetLibSoRootPath);
                     }
                 }
+            }
+            // 移除nodejs V8内置模块
+            if(needRemoveNodeV8Module){
+                attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "v8" + File.separator + "built_in_modules");
+                attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "v8" + File.separator + "v8java.js");
+                attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "v8" + File.separator + "v8autojs.js");
+            }
+
+            // 移除ocr内置模型
+            if(needRemoveOcrModule){
+                attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "ocr");
             }
 
             // 桌面图标的复制  res/mipmap/ic_launcher.png

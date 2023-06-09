@@ -283,6 +283,7 @@ export default {
                 versionCode:'',
                 appIcon:'',
                 openNodeJs:false,
+                openImageModule:true,
                 autoOpen:false,
                 plugins:[],
                 abis:['armeabi-v7a','arm64-v8a'],
@@ -1520,6 +1521,12 @@ export default {
             }
             saveProjectJsonObj.features.nodejs = this.packageProject.openNodeJs ? "enabled" : "disabled";
 
+            // 图色模块判断
+            if(!saveProjectJsonObj.optimization) {
+                saveProjectJsonObj.optimization = {}
+            }
+            saveProjectJsonObj.optimization.removeOpenCv = !this.packageProject.openImageModule;
+
             // 开机自启动
             saveProjectJsonObj.autoOpen = this.packageProject.autoOpen;
 
@@ -1579,6 +1586,13 @@ export default {
             // NodeJs环境判断
             let features = this.projectJsonObj.features;
             this.packageProject.openNodeJs = features && features.nodejs === "enabled";
+
+            // 图色模块判断
+            let optimization = this.projectJsonObj.optimization;
+            this.packageProject.openImageModule = true;
+            if(optimization){
+                this.packageProject.openImageModule = !optimization.removeOpenCv;
+            }
 
             // 插件列表读取
             let pluginsKeys = Object.keys(this.projectJsonObj.plugins || []);
@@ -1813,6 +1827,7 @@ export default {
                     "versionCode":this.packageProject.versionCode,
                     "appIcon":this.packageProject.appIcon,
                     "openNodeJs":this.packageProject.openNodeJs,
+                    "openImageModule":this.packageProject.openImageModule,
                     "autoOpen":this.packageProject.autoOpen,
                     "plugins":this.packageProject.plugins.join(','),
                     "abis":this.packageProject.abis.join(','),
