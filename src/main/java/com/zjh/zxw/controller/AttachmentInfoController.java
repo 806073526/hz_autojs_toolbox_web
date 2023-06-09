@@ -1165,7 +1165,6 @@ public class AttachmentInfoController extends BaseController {
             }
             // 获取插件资源目录
             String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
-
             // 检测打包插件是否存在
             File checkFile = new File(apkSourcePath);
             if(!checkFile.exists()){
@@ -1183,28 +1182,6 @@ public class AttachmentInfoController extends BaseController {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return fail("生成签名异常！请联系管理员");
-        }
-    }
-
-
-    /**
-     * 打包项目
-     */
-    @ApiOperation(value = "测试命令", notes = "测试命令")
-    @GetMapping("/testCommand")
-    public R<String> testCommand() {
-        try {
-            // 执行命令 返回结果
-            String result = PackageProjectUtils.executeCommand("ls");
-            if(StrHelper.getObjectValue(result).contains("当前设备未授权")){
-                return fail(result);
-            }
-            return success(result);
-        } catch (BusinessException e) {
-            return fail(SERVICE_ERROR, e.getMessage());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return fail("打包项目异常！请联系管理员");
         }
     }
 
