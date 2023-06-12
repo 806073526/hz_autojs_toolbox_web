@@ -42,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -505,6 +506,67 @@ public class AttachmentInfoController extends BaseController {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return fail("重命名文件异常！请联系管理员");
+        }
+    }
+
+    /**
+     * 设置打包目录权限(linux)
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "设置打包目录权限(linux)", notes = "设置打包目录权限(linux)")
+    @GetMapping("/authorizePackagePath")
+    public R<String> authorizePackagePath() {
+        try {
+            if(!UploadPathHelper.isWindowsSystem()){
+                return success(chmodPackagePath());
+            }
+            return success("无需授权");
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("设置打包目录权限(linux)！请联系管理员");
+        }
+    }
+
+    /**
+     * 设置文件目录权限
+     * @return
+     */
+    public String chmodPackagePath() {
+        // 插件资源路径
+        String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
+        // 验证打包模板是否存在
+        File checkTemplateFile = new File(apkSourcePath);
+        if(!checkTemplateFile.exists()){
+            return apkSourcePath +"不存在";
+        }
+        StringBuilder stringBuilderSuccessMsg = new StringBuilder();
+        StringBuilder stringBuilderErrorMsg = new StringBuilder();
+        FileWriter fw = null;
+        String location = "chmod -R 777 "+apkSourcePath;
+        Process process;
+        try {
+            process = Runtime.getRuntime().exec(location);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilderSuccessMsg.append(line).append(" ");
+            }
+            BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), "GBK"));
+            String errorLine;
+            while ((errorLine = errorBufferedReader.readLine()) != null) {
+                stringBuilderErrorMsg.append(errorLine).append(" ");
+            }
+            if(StringUtils.isNotBlank(stringBuilderErrorMsg.toString())){
+                return stringBuilderErrorMsg.toString();
+            }
+            return stringBuilderSuccessMsg.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage(),e);
+            return e.getMessage();
         }
     }
 

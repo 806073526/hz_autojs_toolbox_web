@@ -222,8 +222,29 @@ export default {
             this.queryFileList(this.breadcrumbList[this.breadcrumbList.length - 1].value,()=>{
                 let packageDirectoryArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && item.isDirectory);
                 let packageFileArr = this.fileList.filter(item=>item.fileName === 'apkPackage' && !item.isDirectory);
+
+                // 授权打包插件
+                let authorizePackagePathFun = ()=>{
+                    $.ajax({
+                        url: getContext() + "/attachmentInfo/authorizePackagePath",
+                        type: "get",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data) {
+                                if (data.isSuccess) {
+                                    console.log(data.data);
+                                }
+                            }
+                        },
+                        error: function (msg) {
+                        }
+                    });
+                };
+
+
                 // 不存在打包插件zip 且 打包插件已解压  直接提示已完成
                 if((!packageFileArr || ! packageFileArr.length) && (packageDirectoryArr && packageDirectoryArr.length)){
+                    authorizePackagePathFun();
                     window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成！', duration: '1000'});
                     return;
                 }
@@ -245,6 +266,7 @@ export default {
                                     window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成', duration: '1000'});
                                     // 重新加载文件列表
                                     _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                                    authorizePackagePathFun();
                                 }
                             }
                         },
@@ -274,6 +296,7 @@ export default {
                                         window.ZXW_VUE.$notify.success({message: '打包插件已初始化完成', duration: '1000'});
                                         // 重新加载文件列表
                                         _that.queryFileList(_that.breadcrumbList[_that.breadcrumbList.length - 1].value);
+                                        authorizePackagePathFun();
                                     }
                                 }
                             },

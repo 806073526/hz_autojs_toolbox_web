@@ -3065,7 +3065,7 @@ export default {
             let targetPath = row.pathName;
             let fileType = row.fileType || '';
             let isImage = ['png','jpg','jpeg'].includes(fileType);
-            let isText = ['js','json','css','txt','log','md',''].includes(fileType);
+            let isText = ['js','json','css','txt','log','md','vue','html','ts'].includes(fileType);
             // 关键key
             let dirPathKey = this.deviceInfo.deviceUuid + '_' + targetPath;
             // 更新手机端目录缓存

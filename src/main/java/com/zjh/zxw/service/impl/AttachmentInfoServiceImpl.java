@@ -276,6 +276,9 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     @Override
     public Boolean reNameFile(String oldFilePathName, String newFilePathName) {
         String prePath = this.getRootPath();
+        if(!UploadPathHelper.isWindowsSystem()){
+            newFilePathName = newFilePathName.replaceAll("\\\\",File.separator);
+        }
         if(!oldFilePathName.contains(prePath) || !newFilePathName.contains(prePath)){
             throw new BusinessException("非指定目录,不可进行操作");
         }
