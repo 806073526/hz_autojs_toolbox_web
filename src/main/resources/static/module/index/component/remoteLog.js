@@ -84,48 +84,92 @@ export default {
                     return String(i);
                 }
             }
-            utilsObj.getOnlineLog =()=> {
-                files.createWithDirs("/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/")
-                // 获取当前时间字符串
-                let currenTimes = utilsObj.getCurrentTime()
-                let fileName = "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/log" + currenTimes + ".txt";
-                let fileObj = files.open(fileName, "r");
-                let allLines = fileObj.readlines();
-                fileObj.close();
-                let targetLines = allLines.slice(-${this.onlineLogMaxLen})
-                return targetLines.join("\\r\\n");
-            }
-            utilsObj.timerStartPushLog=()=> {
+            utilsObj.timerStartPushLog =()=> {
                 let timerStorage = storages.create("zjh336.cn_timer");
                 timerStorage.remove('stop');
                 let timerFlag = true;
-                while (timerFlag) {
-                    let stop = timerStorage.get('stop');
-                    if (stop !== undefined) {
-                        timerFlag = false;
+                files.createWithDirs("/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/")
+                // 获取当前时间字符串
+                let currenTimes = utilsObj.getCurrentTime()
+                let filePath = "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/";
+                let fileName = "log" + currenTimes + ".txt";
+                let charset = "UTF-8"; // 文件编码
+                let lineNum = ${this.onlineLogMaxLen}; // 需要读取的行数
+                // 监听文件变化
+                let watchService = java.nio.file.FileSystems.getDefault().newWatchService();
+                let path = java.nio.file.Paths.get(filePath);
+                path.register(watchService, java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY);
+                let watchFun = () => {
+                    let key = watchService.take();
+                    while (timerFlag) {
+                        let stop = timerStorage.get('stop');
+                        if (stop !== undefined) {
+                            timerFlag = false;
+                        }
+                        let events = key.pollEvents();
+                        if (events.size() > 0) {
+                            for (var i = 0; i < events.size(); i++) {
+                                let event = events.get(i);
+                                if (event.kind() === java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY && String(event.context().toString()) === fileName) {
+                                    // 读取文件最后指定行
+                                    let file = new java.io.RandomAccessFile(filePath + fileName, "r");
+                                    let fileLength = file.length();
+                                    let pos = fileLength - 1;
+                                    let lineCount = 0;
+                                    let lineArr = [];
+                                    while (pos >= 0 && lineCount < lineNum) {
+                                        file.seek(pos);
+                                        let c = file.readByte();
+                                        if (c == 10 || c == 13) {
+                                            if (pos < fileLength - 1) {
+                                                lineArr.unshift(new java.lang.String(new java.lang.String(file.readLine()).getBytes("iso-8859-1"),charset));
+                                                lineCount++;
+                                            }
+                                        }
+                                        pos--;
+                                    }
+                                    if (pos < 0) {
+                                        lineArr.unshift(new java.lang.String(new java.lang.String(file.readLine()).getBytes("iso-8859-1"),charset));
+                                    }
+                                    file.close();
+                                    try{
+                                        sleep(100);
+                                        sleep(${this.appSpace});
+                                        let logContent = lineArr.join("\\n");
+                                        // url编码base64加密
+                                        let result = $base64.encode(encodeURI(logContent));
+                                        http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateLogMap', {
+                                            headers: {
+                                                "deviceUUID": commonStorage.get('deviceUUID')
+                                            },
+                                            method: 'POST',
+                                            contentType: 'application/json',
+                                            body: JSON.stringify({ 'key': commonStorage.get('deviceUUID'), 'logJson': result })
+                                        }, (e) => { });
+                                    }catch(e){
+                                        console.error("同步日志失败！",e);
+                                    }
+                                }
+                            }
+                            key.reset();
+                        } else {
+                            sleep(${this.appSpace});
+                        }
                     }
-                    try{
-                        sleep(100);
-                        sleep(${this.appSpace});
-                        let logContent = utilsObj.getOnlineLog();
-                        // url编码base64加密
-                        let result = $base64.encode(encodeURI(logContent));
-                        http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateLogMap', {
+                }
+                watchFun();
+            }
+            utilsObj.timerStopPushLog=()=> {
+                let timerStorage = storages.create("zjh336.cn_timer");
+                timerStorage.put('stop', 'stop');
+                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateLogMap', {
                             headers: {
                                 "deviceUUID": commonStorage.get('deviceUUID')
                             },
                             method: 'POST',
                             contentType: 'application/json',
-                            body: JSON.stringify({ 'key': commonStorage.get('deviceUUID'), 'logJson': result })
-                        }, (e) => { });
-                    }catch(e){
-                        console.error("同步日志失败！",e);
-                    }
-                }
-            }
-            utilsObj.timerStopPushLog=()=> {
-                let timerStorage = storages.create("zjh336.cn_timer");
-                timerStorage.put('stop', 'stop');
+                            body: JSON.stringify({ 'key': commonStorage.get('deviceUUID'), 'logJson': '' })
+                }, (e) => { })
             }
             // 先停止
             utilsObj.timerStopPushLog();
