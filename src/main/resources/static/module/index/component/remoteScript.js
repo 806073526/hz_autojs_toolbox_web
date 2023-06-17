@@ -508,10 +508,10 @@ export default {
         },
         // 停止脚本
         stopScript(){
-            let remoteScript = `let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js','/data/user/0/com.zjh336.cn.tools8822/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools8822/files/project/main.js']
+            let remoteScript = `let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js','/data/user/0/com.zjh336.cn.tools8822/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools8822/files/project/main.js','main.js']
             const all = engines.all()
             all.forEach(item => {
-            if (!notCloseSourceArr.indexOf(String(item.source))!==-1) {
+            if (notCloseSourceArr.indexOf(String(item.source))===-1) {
             item.forceStop()
             }
             });`;
