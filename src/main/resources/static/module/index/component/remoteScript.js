@@ -511,7 +511,7 @@ export default {
             let remoteScript = `let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js']
             const all = engines.all()
             all.forEach(item => {
-            if (!notCloseSourceArr.includes(String(item.source))) {
+            if (!notCloseSourceArr.indexOf(String(item.source))!==-1) {
             item.forceStop()
             }
             });`;
