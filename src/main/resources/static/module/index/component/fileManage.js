@@ -1840,6 +1840,7 @@ export default {
                     "splashText":this.packageProject.splashText,
                     "splashIcon":this.packageProject.splashIcon,
                     "customSignAlias":"",
+                    "resPathName": this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label || "",
                     "openObfuscator": this.packageProject.openObfuscator,
                     "obfuscatorIncludePaths": this.packageProject.obfuscatorIncludePaths
                 }),

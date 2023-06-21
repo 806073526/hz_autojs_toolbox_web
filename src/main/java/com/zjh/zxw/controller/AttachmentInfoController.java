@@ -871,33 +871,11 @@ public class AttachmentInfoController extends BaseController {
                 // 解压文件
                 attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
             }
-            // 资源包名称
-            String resName = webProjectName;
-            try {
-                Thread.sleep(200);
-                ZipFile zipFile = new ZipFile(projectResPath, "gbk"); //解决中文乱码问题
-                Enumeration<?> entries = zipFile.getEntries();
-                while (entries.hasMoreElements()) {
-                    ZipEntry entry = (ZipEntry) entries.nextElement();
-                    Thread.sleep(200);
-                    if (StringUtils.isNotBlank(entry.getName())) {
-                        resName = StrHelper.getObjectValue(entry.getName());
-                        int index = resName.indexOf("/");
-                        if(index == -1){
-                            continue;
-                        }
-                        resName = resName.substring(0,index);
-                        break;
-                    }
-                }
-                zipFile.close();
-            } catch (Exception e){
-                log.error(e.getMessage());
-            }
-            Thread.sleep(200);
+            // 资源包目录名称
+            String resName = StringUtils.isNotBlank(packageProjectDTO.getResPathName()) ? packageProjectDTO.getResPathName() : webProjectName;
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
-            Thread.sleep(500);
+            Thread.sleep(200);
             // 读取文件列表
             File assetsFile = new File(packageTemplatePath + File.separator + "assets");
             File[] files = assetsFile.exists() ? assetsFile.listFiles() : new File[0];

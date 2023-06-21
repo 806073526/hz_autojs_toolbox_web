@@ -133,4 +133,10 @@ public class PackageProjectDTO implements Serializable {
      */
     @ApiModelProperty(value = "混淆排除路径")
     private String obfuscatorIncludePaths;
+
+    /**
+     * 资源包目录名称(项目名称可能与目录名称不一致,此处取的是目录名称)
+     */
+    @ApiModelProperty(value = "资源包目录名称(项目名称可能与目录名称不一致,此处取的是目录名称)")
+    private String resPathName;
 }
