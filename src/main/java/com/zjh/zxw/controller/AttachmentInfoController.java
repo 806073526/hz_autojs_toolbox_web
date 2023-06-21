@@ -569,7 +569,7 @@ public class AttachmentInfoController extends BaseController {
             return e.getMessage();
         }
     }
- /*   @ApiOperation(value = "测试接口", notes = "测试接口")
+   @ApiOperation(value = "测试接口", notes = "测试接口")
     @GetMapping("/testhx")
     public R<String> testhx(@RequestParam("apkSourcePath") String apkSourcePath,
                             @RequestParam("webProjectRootPath") String webProjectRootPath,
@@ -577,7 +577,7 @@ public class AttachmentInfoController extends BaseController {
                             @RequestParam(value = "excludeUrls",required = false) String excludeUrls
                             ) throws IOException {
         return success(PackageProjectUtils.obfuscatorProjectRes(apkSourcePath,webProjectRootPath,webProjectName,excludeUrls));
-    }*/
+    }
 
 
     /**
