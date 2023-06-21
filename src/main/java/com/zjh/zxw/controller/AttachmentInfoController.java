@@ -874,17 +874,20 @@ public class AttachmentInfoController extends BaseController {
             // 资源包名称
             String resName = webProjectName;
             try {
+                System.out.println("开始获取resName");
                 ZipFile zipFile = new ZipFile(projectResPath, "gbk"); //解决中文乱码问题
                 Enumeration<?> entries = zipFile.getEntries();
                 while (entries.hasMoreElements()) {
                     ZipEntry entry = (ZipEntry) entries.nextElement();
                     if (StringUtils.isNotBlank(entry.getName())) {
                         resName = StrHelper.getObjectValue(entry.getName());
+                        System.out.println("获取resName："+resName);
                         int index = resName.indexOf("/");
                         if(index == -1){
                             continue;
                         }
                         resName = resName.substring(0,index);
+                        System.out.println("获取resName2："+resName);
                         break;
                     }
                 }
@@ -892,6 +895,7 @@ public class AttachmentInfoController extends BaseController {
             } catch (Exception e){
                 log.error(e.getMessage());
             }
+            System.out.println("最终resName:"+resName);
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
             // 读取文件列表

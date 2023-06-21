@@ -1861,6 +1861,7 @@ export default {
                             }
                         } else {
                             _that.alreadyHandlerPackageRes = false;
+                            console.log(data.msg);
                             window.ZXW_VUE.$message.error(data.msg);
                         }
                     }
