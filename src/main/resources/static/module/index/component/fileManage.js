@@ -290,7 +290,9 @@ export default {
                 hideLogs:true,
                 splashText:'',
                 splashIcon:'',
-                customSignStorePath:''
+                customSignStorePath:'',
+                openObfuscator:false,
+                obfuscatorIncludePaths:''
             },
             appIconLoading:false,
             splashIconLoading:false,
@@ -1566,6 +1568,8 @@ export default {
                 saveProjectJsonObj.signingConfig = {};
             }
             saveProjectJsonObj.signingConfig.keystore = this.packageProject.customSignStorePath;
+            saveProjectJsonObj.openObfuscator = this.packageProject.openObfuscator;
+            saveProjectJsonObj.obfuscatorIncludePaths = this.packageProject.obfuscatorIncludePaths;
             // 将json写入本地文件
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             let targetPath = toPath + "/project.json";
@@ -1605,7 +1609,8 @@ export default {
             this.packageProject.hideLogs = launchConfig.hideLogs !=null ? launchConfig.hideLogs : true;
             this.packageProject.splashText = launchConfig.splashText || "";
             this.packageProject.splashIcon = launchConfig.splashIcon || "";
-
+            this.packageProject.openObfuscator = this.projectJsonObj.openObfuscator;
+            this.packageProject.obfuscatorIncludePaths = this.projectJsonObj.obfuscatorIncludePaths;
             let signingConfig = this.projectJsonObj.signingConfig;
             // 自定义签名处理
             this.packageProject.customSignStorePath = signingConfig ? signingConfig.keystore : "";
@@ -1834,14 +1839,29 @@ export default {
                     "hideLogs":this.packageProject.hideLogs,
                     "splashText":this.packageProject.splashText,
                     "splashIcon":this.packageProject.splashIcon,
-                    "customSignAlias":""
+                    "customSignAlias":"",
+                    "openObfuscator": this.packageProject.openObfuscator,
+                    "obfuscatorIncludePaths": this.packageProject.obfuscatorIncludePaths
                 }),
                 success: function (data) {
                     if (data) {
                         if (data.isSuccess) {
-                            if(data.data){
-                                _that.alreadyHandlerPackageRes = true;
+                            _that.alreadyHandlerPackageRes = true;
+                            let messageInfo  = "【混淆代码出现错误】\r\n" +
+                                "【请检查js代码中ui部分代码是否未使用``,或者是否存在其他不严谨语法】\r\n" +
+                                "【无需混淆的第三方代码可以设置路径进行排除】\r\n" +
+                                "【具体错误】:\r\n"+data.data;
+                            console.log(messageInfo);
+                            if(data.data && data.data.indexOf("命令执行有错误")!==-1){
+                                _that.alreadyHandlerPackageRes = false;
+                                window.ZXW_VUE.$message.error({
+                                    message: messageInfo,
+                                    duration: '2000'
+                                });
                             }
+                        } else {
+                            _that.alreadyHandlerPackageRes = false;
+                            window.ZXW_VUE.$message.error(data.msg);
                         }
                     }
                     _that.packageProjectStepLoading = false;

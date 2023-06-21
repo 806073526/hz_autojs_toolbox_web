@@ -267,7 +267,7 @@
         </span>
     </el-dialog>
 
-    <el-dialog  :visible.sync="packageProjectDialog" title="打包项目" center :close-on-click-modal="false" width="80vw" height="40vh">
+    <el-dialog  :visible.sync="packageProjectDialog" :close-on-press-escape="false" title="打包项目" center :close-on-click-modal="false" width="80vw" height="40vh">
         <el-steps :active="packageProjectActive" finish-status="success" style="margin-top: 10px;margin-bottom: 5px;">
             <el-step title="项目配置"></el-step>
             <el-step title="初始化打包模板"></el-step>
@@ -367,6 +367,20 @@
                                         ffmpeg
                                     </el-checkbox>
                                 </el-checkbox-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        混淆加密
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width25" label-width="100px">
+                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="混淆排除目录:" prop="obfuscatorIncludePaths" class="width75" label-width="100px">
+                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
+                                          class="width100" />
                             </el-form-item>
                         </div>
                     </el-row>

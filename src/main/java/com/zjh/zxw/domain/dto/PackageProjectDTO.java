@@ -122,4 +122,15 @@ public class PackageProjectDTO implements Serializable {
     @ApiModelProperty(value = "项目配置-自定义签名别名")
     private String customSignAlias;
 
+    /**
+     * 开启混淆
+     */
+    @ApiModelProperty(value = "开启混淆")
+    private Boolean openObfuscator;
+
+    /**
+     * 混淆排除路径
+     */
+    @ApiModelProperty(value = "混淆排除路径")
+    private String obfuscatorIncludePaths;
 }

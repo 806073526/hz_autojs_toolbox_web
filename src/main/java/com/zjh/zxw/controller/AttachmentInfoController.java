@@ -569,6 +569,16 @@ public class AttachmentInfoController extends BaseController {
             return e.getMessage();
         }
     }
+ /*   @ApiOperation(value = "测试接口", notes = "测试接口")
+    @GetMapping("/testhx")
+    public R<String> testhx(@RequestParam("apkSourcePath") String apkSourcePath,
+                            @RequestParam("webProjectRootPath") String webProjectRootPath,
+                            @RequestParam("webProjectName") String webProjectName,
+                            @RequestParam(value = "excludeUrls",required = false) String excludeUrls
+                            ) throws IOException {
+        return success(PackageProjectUtils.obfuscatorProjectRes(apkSourcePath,webProjectRootPath,webProjectName,excludeUrls));
+    }*/
+
 
     /**
      * 复制文件(单个文件，递归复制)
@@ -827,7 +837,7 @@ public class AttachmentInfoController extends BaseController {
      */
     @ApiOperation(value = "处理打包项目资源", notes = "处理打包项目资源")
     @PostMapping("/handlerPackageProjectRes")
-    public R<Boolean> handlerPackageProjectRes(@RequestBody PackageProjectDTO packageProjectDTO) {
+    public R<String> handlerPackageProjectRes(@RequestBody PackageProjectDTO packageProjectDTO) {
         try {
             String webProjectRootPath = packageProjectDTO.getWebProjectRootPath();
             String webProjectName = packageProjectDTO.getWebProjectName();
@@ -1210,10 +1220,47 @@ public class AttachmentInfoController extends BaseController {
 
             // packageResAlreadyHandler.json文件的生成
             File alreadyFile = new File(packageTemplatePath + File.separator + "packageResAlreadyHandler.json");
-            if(!alreadyFile.exists()){
-                alreadyFile.createNewFile();
+
+            boolean openObfuscator = Objects.nonNull(packageProjectDTO.getOpenObfuscator()) ? packageProjectDTO.getOpenObfuscator() : false;
+            if(openObfuscator){
+                // 混淆js代码
+                String obfuscatorResult = PackageProjectUtils.obfuscatorProjectRes(apkSourcePath,webProjectRootPath,webProjectName,StrHelper.getObjectValue(packageProjectDTO.getObfuscatorIncludePaths()));
+                // 项目文件混淆输出路径
+                String projectOutPath = webProjectRootPath + File.separator + webProjectName + File.separator + "assets" + File.separator + "project_out";
+                // 检测输出路径
+                File outPathFile = new File(projectOutPath);
+                // 如果目录存在
+                if(outPathFile.exists()){
+                    // 则说明成功 移除project_out目录
+                    attachmentInfoService.deleteFile(projectOutPath);
+                    if(StringUtils.isNotBlank(obfuscatorResult) && obfuscatorResult.contains("命令执行有错误")){
+                        // 删除
+                        if(alreadyFile.exists()){
+                            alreadyFile.delete();
+                        }
+                    } else {
+                        // 创建文件
+                        if(!alreadyFile.exists()){
+                            alreadyFile.createNewFile();
+                        }
+                    }
+                    return success(obfuscatorResult);
+                } else {
+                    // 删除
+                    if(alreadyFile.exists()){
+                        alreadyFile.delete();
+                    }
+                    // 返回错误信息
+                    return fail(obfuscatorResult);
+                }
+            } else {
+                // 创建文件
+                if(!alreadyFile.exists()){
+                    alreadyFile.createNewFile();
+                }
+                // 未开启混淆直接返回空
+                return success("");
             }
-            return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
