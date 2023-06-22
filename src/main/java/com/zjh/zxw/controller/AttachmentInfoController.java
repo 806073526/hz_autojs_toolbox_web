@@ -1214,8 +1214,12 @@ public class AttachmentInfoController extends BaseController {
                 File outPathFile = new File(projectOutPath);
                 // 如果目录存在
                 if(outPathFile.exists()){
-                    // 则说明成功 移除project_out目录
-                    attachmentInfoService.deleteFile(projectOutPath);
+                    try {
+                        // 则说明成功 移除project_out目录
+                        attachmentInfoService.deleteFile(projectOutPath);
+                    }catch (Exception e){
+                        log.error(e.getMessage(),e);
+                    }
                     if(StringUtils.isNotBlank(obfuscatorResult) && obfuscatorResult.contains("命令执行有错误")){
                         // 删除
                         if(alreadyFile.exists()){
@@ -1248,7 +1252,7 @@ public class AttachmentInfoController extends BaseController {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return fail("初始化打包模板异常！请联系管理员");
+            return fail("打包资源处理异常！请联系管理员"+e.getMessage());
         }
     }
 
