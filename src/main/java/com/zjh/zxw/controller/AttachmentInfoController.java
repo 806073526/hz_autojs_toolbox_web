@@ -1205,7 +1205,7 @@ public class AttachmentInfoController extends BaseController {
 
             boolean openObfuscator = Objects.nonNull(packageProjectDTO.getOpenObfuscator()) ? packageProjectDTO.getOpenObfuscator() : false;
             if(openObfuscator){
-                Thread.sleep(2000);
+                Thread.sleep(1000);
                 // 混淆js代码
                 String obfuscatorResult = PackageProjectUtils.obfuscatorProjectRes(apkSourcePath,webProjectRootPath,webProjectName,StrHelper.getObjectValue(packageProjectDTO.getObfuscatorIncludePaths()));
                 // 项目文件混淆输出路径
@@ -1215,7 +1215,24 @@ public class AttachmentInfoController extends BaseController {
                 // 如果目录存在
                 if(outPathFile.exists()){
                     try {
-                        // 则说明成功 移除project_out目录
+                        // 目标项目路径
+                        String targetProjectPath = webProjectRootPath + File.separator + webProjectName + File.separator + "assets" + File.separator + "project";
+                        // 输出项目路径
+                        String projectOutBakFilePath = webProjectRootPath + File.separator + webProjectName + "_projectOut.zip";
+                        // 先移除文件
+                        attachmentInfoService.deleteFile(projectOutBakFilePath);
+                        attachmentInfoService.deleteFile(projectOutPath);
+                        Thread.sleep(100);
+                        // 拷贝文件
+                        attachmentInfoService.copyFile(targetProjectPath,projectOutPath);
+                        Thread.sleep(200);
+                        // 移除插件目录
+                        attachmentInfoService.deleteFile(projectOutPath + File.separator + "project" + File.separator + "plugins");
+                        Thread.sleep(200);
+                        // 压缩混淆后项目文件
+                        attachmentInfoService.zipServerFileZip(projectOutPath + File.separator + "project",projectOutBakFilePath,"");
+                        Thread.sleep(100);
+                        // 再次移除目录
                         attachmentInfoService.deleteFile(projectOutPath);
                     }catch (Exception e){
                         log.error(e.getMessage(),e);

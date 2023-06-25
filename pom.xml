@@ -295,6 +295,7 @@
                     <exclude>static/**/*.woff2</exclude>
                     <exclude>static/**/*.ttf</exclude>
                     <exclude>static/*.zip</exclude>
+                    <exclude>static/*.dex</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -305,6 +306,7 @@
                     <include>static/**/*.woff2</include>
                     <include>static/**/*.ttf</include>
                     <include>static/*.zip</include>
+                    <include>static/*.dex</include>
                 </includes>
             </resource>
         </resources>

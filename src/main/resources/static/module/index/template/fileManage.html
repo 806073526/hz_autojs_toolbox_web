@@ -131,7 +131,7 @@
         <el-tab-pane label="手机端文件" name="phone">
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
-                    <div class="d-flex a-center">
+                    <div class="d-flex a-center flex-wrap">
                         <el-button size="mini" type="primary" @click="phoneCreateFile">新建文件(夹)</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitOfficialExample">初始化官方示例</el-button>
@@ -141,6 +141,7 @@
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
+                        <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
                         <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
                         <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
                         <!--<el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
@@ -236,11 +237,14 @@
                 </el-tooltip>
             </div>
         </div>
-        <div id="phoneFileEditor" style="height: 85vh;width: 100%;">
+        <div id="phoneFileEditor" style="height: 85vh;width: 100%;" v-loading="phoneFileEditorLoading">
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent">
             保存
+          </el-button>
+          <el-button type="info"  @click.stop.native="refreshPhoneEditorArrClick">
+            重新加载
           </el-button>
           <el-button type="warning"  @click.stop.native="phoneRunScriptByDialog">
             运行当前
@@ -252,7 +256,7 @@
             最小化
           </el-button>
         </span>
-        <el-tooltip style="left: 85px;position: absolute;bottom: 0px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【运行当前 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
+        <el-tooltip style="left: 85px;position: absolute;bottom: 0px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【远程运行ctrl+i】【运行当前 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
            <span>快捷键说明</span>
         </el-tooltip>
     </el-dialog>
@@ -439,6 +443,7 @@
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyHandlerPackageRes" class="el-icon-success"></i><i v-show="!alreadyHandlerPackageRes" class="el-icon-warning"></i>{{alreadyHandlerPackageRes ? '已' : '未'}}完成打包资源处理</span>
                     <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
+                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProjectToPhone"  icon="el-icon-thumb">{{ "下载混淆后项目到手机" }}</el-button>
                 </div>
             </div>
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===4">

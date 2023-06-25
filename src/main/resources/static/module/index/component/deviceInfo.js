@@ -268,7 +268,7 @@ export default {
         authorizedFun(){
             let message =  "<div>您的机器码是【"+ this.getSelfMachineCode()+"】</div>";
             if(!this.authorizeStatus){
-                message += "<div>请点击确定,联系QQ806073526,进行机器码授权</div>";
+                message += "<div>请点击确定,联系QQ806073526,进行机器码授权(授权后可以支持项目打包)</div>";
             }
             this.$msgbox({
                 title: '提示',

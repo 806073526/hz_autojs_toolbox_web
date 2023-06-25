@@ -260,7 +260,7 @@ export default {
             phoneCheckAllFile: false,// 手机端全选文件
             previewList: [],// 单个上传
             uploadFileList: [],// 需要上传的文件列表
-            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js',
+            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js,.jar,.dex,.bat,.sh',
             curFileData: {},// 选中的文件数据
             copyFileList: [],// 复制文件列表
             phoneCopyFileList:[],// 手机端复制文件列表
@@ -354,6 +354,7 @@ export default {
             alreadyHandlerPackageRes:false,// 是否已处理打包资源
             alreadyCompletePackageProject:false,// 是否已完成打包项目
             packageProjectMessage:'',// 打包日志信息
+            phoneFileEditorLoading:false, // 手机端文件编辑器loading
         }
     },
     mounted() {
@@ -431,6 +432,11 @@ export default {
         // 手机端编辑器缓存数组文件是否修改记录数组
         phoneFileChangeArr(){
            return this.phoneFileCacheArr.map(item=> item.sourceFileContent !== item.fileContent);
+        },
+        // 手机端当前目录是否存在project.json文件
+        phoneCurPathExitProject(){
+            let projectFileArr = this.phoneFileList.filter(item=>item.fileType==='json' && item.fileName === 'project');
+            return !(!projectFileArr || projectFileArr.length === 0);
         }
     },
     watch:{
@@ -1172,8 +1178,11 @@ export default {
             if(!this.phoneFileEditVisible){
                 return;
             }
-            // 保存 ctrl+s
-            if(e.ctrlKey && e.keyCode === 83){
+            // 快捷运行程序  ctrl+i
+            if(e.ctrlKey && e.keyCode === 73){
+                this.phoneRemoteRunScript();
+                // 保存 ctrl+s
+            }else if(e.ctrlKey && e.keyCode === 83){
                 // 获取当前点击的文件对象
                 let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                 if(!fileObj){
@@ -1216,8 +1225,7 @@ export default {
         },
         // 打包项目
         phonePackageProject(){
-            let projectFileArr = this.phoneFileList.filter(item=>item.fileType==='json' && item.fileName === 'project');
-            if(!projectFileArr || projectFileArr.length===0){
+            if(!this.phoneCurPathExitProject){
                 window.ZXW_VUE.$confirm('未检测到project.json,是否需要在当前目录生成文件?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -1848,7 +1856,7 @@ export default {
                     if (data) {
                         if (data.isSuccess) {
                             _that.alreadyHandlerPackageRes = true;
-                            let messageInfo  = "【混淆代码出现错误】\r\n" +
+                            let messageInfo  = "【混淆代码可能出现错误】\r\n" +
                                 "【请检查js代码中ui部分代码是否未使用``,或者是否存在其他不严谨语法】\r\n" +
                                 "【无需混淆的第三方代码可以设置路径进行排除】\r\n" +
                                 "【具体错误】:\r\n"+data.data;
@@ -1858,6 +1866,11 @@ export default {
                                 window.ZXW_VUE.$message.error({
                                     message: messageInfo,
                                     duration: '2000'
+                                });
+                            } else {
+                                window.ZXW_VUE.$message.warning({
+                                    message: "如果混淆未成功，可按F12在控制台,查看具体错误信息",
+                                    duration: '1000'
                                 });
                             }
                         } else {
@@ -2008,6 +2021,21 @@ export default {
             dom.click();
             document.getElementById("upload-file-dom")?.remove();
         },
+        // 下载混淆项目到手机
+        downloadObscureProjectToPhone(){
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            toPath = toPath.substring(0,toPath.length - 1);
+            toPath = toPath.replace("/sdcard","");
+            let localFileUrl = toPath + "_projectOut.zip";
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + "_projectOut.zip";
+            // 创建目录代码 如果不是/ 则需要创建目录
+            let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{toastLog('下载完成')});";
+            this.remoteExecuteScript(script);
+            window.ZXW_VUE.$message.info({
+                message: "请注意查看手机端下载提示！！！",
+                duration: '2000'
+            });
+        },
         // 下载项目到手机
         downloadPackageProjectToPhone(){
             if(!this.alreadyCompletePackageProject){
@@ -2136,6 +2164,290 @@ export default {
             },()=>{
                 this.phoneFileLoading = false;
                 this.downloadFile(row)
+            });
+        },
+        // 手机端js转dex功能
+        phoneJs2Dex(){
+            if(!this.phoneCurPathExitProject){
+                return;
+            }
+            let row = {};
+            row.pathName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            row.pathName = row.pathName.substring(0, row.pathName.length - 1);
+
+            let execFun = ()=>{
+            let remoteScript =
+            `try {
+                importClass(java.io.RandomAccessFile);
+                importClass(java.io.BufferedInputStream);
+                importClass(java.io.BufferedOutputStream);
+                importClass(java.io.File);
+                importClass(java.io.FileInputStream);
+                importClass(java.io.FileNotFoundException);
+                importClass(java.io.FileOutputStream);
+                importClass(java.io.IOException);
+                importClass(java.io.InputStream);
+                importClass(java.io.OutputStream);
+            } catch (e) {}
+            
+            function getDir(filePath) {
+                let arr = filePath.split("/");
+                arr.splice(-1, 1);
+                return arr.join("/");
+            }
+            
+            function getFileName(filePath) {
+                return files.getNameWithoutExtension(filePath);
+            }
+            
+            function isUI(filePath) {
+                let fileContent = files.read(filePath);
+                if (fileContent.match(/"ui";|'ui';/)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+            function rewriteJsFile(jsFilePath, projectDir) {
+                let template = getTemplate(jsFilePath, projectDir);
+                if (isUI(jsFilePath)) {
+                    template = '"ui";\\n' + template;
+                }
+                files.write(jsFilePath, template);
+            }
+            
+            function getTemplate(jsFilePath, projectDir) {
+                let dir = getDir(jsFilePath);
+            
+                let relativePath = jsFilePath.replace(projectDir, "").substr(1);
+                let sourceFileName = getFileName(jsFilePath);
+                let arr = relativePath.split("/");
+                arr.splice(-1, 1);
+                let fileName = (arr && arr.length ? arr.join("_") + "_" : "") + sourceFileName;
+                if (fileName.indexOf("-") !== -1) {
+                    fileName = fileName.replace(/-/g, "").replace(/@/, "")
+                }
+                let arr2 = relativePath.split("/");
+                arr2.splice(-1, 1);
+                let relativePathFileName = (arr2 && arr2.length ? arr2.join("/") + "/" : "") + fileName;
+                return (
+                    'let dexFilePath = "' +
+                    relativePathFileName +
+                    '" + ".dex";\\nruntime.loadDex(dexFilePath);\\nnew Packages["' +
+                    fileName +
+                    '"]()();'
+                );
+            }
+            
+            
+            function js2class(jsFilePath) {
+                if (!files.exists(jsFilePath)) {
+                    throw new Error("文件不存在: " + jsFilePath);
+                }
+                if (files.getExtension(jsFilePath) !== "js") {
+                    throw new Error("不是js文件: " + jsFilePath);
+                }
+            
+                // class文件所在文件夹
+                let dir = getDir(jsFilePath);
+                // let fileName = getFileName(jsFilePath);
+                let sourceFileName = getFileName(jsFilePath);
+                let relativePath = jsFilePath.replace(projectDir, "").substr(1);
+                let arr = relativePath.split("/");
+                arr.splice(-1, 1);
+                let fileName = (arr && arr.length ? arr.join("_") + "_" : "") + sourceFileName;
+            
+                if (fileName.indexOf("-") !== -1) {
+                    fileName = fileName.replace(/-/g, "").replace(/@/, "")
+                }
+                console.log(fileName);
+                let args = ["-version", "200", "-opt", "1", "-encoding", "UTF-8", "-nosource", "-o", fileName, "-d", dir, jsFilePath];
+                org.mozilla.javascript.tools.jsc.Main.main(args);
+                let classFilePath = files.join(dir, fileName + ".class");
+            
+                return classFilePath;
+            }
+            
+            
+            function zipFile(classFilePath, jarFilePath) {
+                jarFilePath = new java.io.File(jarFilePath);
+                jarFilePath.delete();
+                var mArrayList = new java.util.ArrayList();
+                mArrayList.add(new java.io.File(classFilePath));
+                new net.lingala.zip4j.core.ZipFile(jarFilePath).addFiles(mArrayList, new net.lingala.zip4j.model.ZipParameters());
+                return jarFilePath;
+            }
+            
+            function class2jar(classFilePath) {
+                if (!files.exists(classFilePath)) {
+                    throw new Error("文件不存在: " + classFilePath);
+                }
+                if (files.getExtension(classFilePath) !== "class") {
+                    throw new Error("不是class文件: " + classFilePath);
+                }
+            
+                let dir = getDir(classFilePath);
+                let fileName = getFileName(classFilePath);
+                var jarFilePath = dir + "/" + fileName + ".jar";
+                zipFile(classFilePath, jarFilePath);
+            
+                return jarFilePath;
+            }
+            
+            function removeIntermediateFile(dexFilePath) {
+                let dir = getDir(dexFilePath);
+                let fileName = getFileName(dexFilePath);
+                files.remove(files.join(dir, fileName + ".class"));
+                files.remove(files.join(dir, fileName + ".jar"));
+            }
+            
+            
+            
+            function jar2dex(jarFilePath) {
+                if (!files.exists(jarFilePath)) {
+                    throw new Error("文件不存在: " + jarFilePath);
+                }
+                if (files.getExtension(jarFilePath) !== "jar") {
+                    throw new Error("不是jar文件: " + jarFilePath);
+                }
+            
+                let dir = getDir(jarFilePath);
+                let fileName = getFileName(jarFilePath);
+                var dexFilePath = dir + "/" + fileName + ".dex";
+                Main.main(["--dex", "--output=" + dexFilePath, jarFilePath]);
+                removeIntermediateFile(dexFilePath);
+                return dexFilePath;
+            }
+            
+            
+            function changeJsFileToDexFile(jsFilePath) {
+                let classFilePath = js2class(jsFilePath);
+                let jarFilePath = class2jar(classFilePath);
+                let dexFilePath = jar2dex(jarFilePath);
+                rewriteJsFile(jsFilePath, projectDir);
+                return dexFilePath;
+            }
+            
+            function getFilePathList(dirPath, filePathList) {
+                filePathList = filePathList || [];
+                var fileNameList = files.listDir(dirPath);
+                var len = fileNameList.length;
+                for (var i = 0; i < len; i++) {
+                    let filepath = files.join(dirPath, fileNameList[i]);
+                    if (files.isFile(filepath)) {
+                        filePathList.push(filepath);
+                    } else {
+                        // 文件夹, 继续向下递
+                        getFilePathList(filepath, filePathList);
+                    }
+                }
+                // 文件遍历完成, 终止条件, 返回结果
+                return filePathList;
+            }
+            
+            
+            function getJsFilePathList(dirPath, filePathList) {
+                filePathList = filePathList || [];
+                var fileNameList = files.listDir(dirPath);
+                var len = fileNameList.length;
+                for (var i = 0; i < len; i++) {
+                    let filepath = files.join(dirPath, fileNameList[i]);
+                    if (files.isFile(filepath) && files.getExtension(filepath) === "js") {
+                        filePathList.push(filepath);
+                    } else {
+                        // 文件夹, 继续向下递
+                        getJsFilePathList(filepath, filePathList);
+                    }
+                }
+                // 文件遍历完成, 终止条件, 返回结果
+                return filePathList;
+            }
+            
+            function getTime(time, rule) {
+                rule = rule || "yyyy-MM-dd HH:mm:ss";
+                if (time) {
+                    return new java.text.SimpleDateFormat(rule).format(new Date(time));
+                } else {
+                    return new java.text.SimpleDateFormat(rule).format(new Date());
+                }
+            }
+            
+            function backupProject(projectDir) {
+                let filePathList = getFilePathList(projectDir);
+                let time = getTime(time, "yyyyMMdd_HHmmss");
+                let newProjectDir = projectDir + "_bak_" + time + "/";
+                //let newProjectDir = projectDir + "_bak" + "/";
+                files.create(newProjectDir);
+                filePathList.map((fromPath) => {
+                    let toPath = fromPath.replace(projectDir, newProjectDir);
+                    files.copy(fromPath, toPath);
+                });
+            }
+            
+            let projectDir = '${row.pathName}';
+            
+            let execFun = ()=>{
+                backupProject(projectDir);
+                let excludesPath = '${row.excluedPath}'.split(',') || []
+                let jsFilePathList = getJsFilePathList(projectDir);
+                jsFilePathList.map((filepath) => {
+                    let arr = excludesPath.filter(item=>{
+                        return filepath.indexOf(item)!==-1;
+                    });
+                    if(arr.length>0){
+                        return;
+                    }
+                    try {
+                        changeJsFileToDexFile(filepath);
+                    } catch (e) {
+                        console.error(e)
+                    }
+                });
+                toastLog("转换完成");
+            }
+            try{
+                let dexFilePath = "/sdcard/appSync/dx.dex";
+                // 如果不存在
+                if(!files.exists(dexFilePath)){
+                    console.log("开始下载依赖");
+                    // 执行下载
+                    utilsObj.downLoadFile("${getContext()}/dx.dex","appSync/dx.dex",()=>{
+                        console.log("下载依赖完成");
+                        runtime.loadDex(dexFilePath);
+                        importClass(com.android.dx.command.Main);
+                        execFun();
+                    });
+                } else {
+                    console.log("已有依赖");
+                    runtime.loadDex(dexFilePath);
+                    importClass(com.android.dx.command.Main);
+                    execFun();
+                }
+            }catch(e){
+                console.error(e);
+            }
+            
+            `;
+            this.remoteExecuteScript(remoteScript);
+            };
+
+            window.ZXW_VUE.$confirm('是否确认将【'+row.pathName+'】的js转换为dex？原项目将会自动备份【如需设置排除路径,请修改project.json的obfuscatorIncludePaths值】', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                // 读取当前目录project.json文件
+                this.getPhoneProjectJson((projectJson)=>{
+                    if(!projectJson){
+                        window.ZXW_VUE.$message.warning('未检测到project.json');
+                    } else {
+                        this.projectJsonObj = JSON.parse(projectJson);
+                        // 获取需要排除的路径
+                        row.excluedPath = this.projectJsonObj.obfuscatorIncludePaths || "";
+                        execFun();
+                    }
+                });
             });
         },
         // 手机端一键下载
@@ -2501,6 +2813,7 @@ export default {
             window.ZXW_VUE.$prompt('请输入新的名称', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
+                inputValue: (row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType),
                 inputValidator: function(val) {
                     if (!val) {
                         return '不能为空！'
@@ -2540,6 +2853,7 @@ export default {
             window.ZXW_VUE.$prompt('请输入新的名称', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
+                inputValue: (row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType),
                 inputValidator: function(val) {
                     if (!val) {
                         return '不能为空！'
@@ -3011,6 +3325,28 @@ export default {
             }
 
         },
+        // 重新加载
+        refreshPhoneEditorArrClick(){
+            let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+            if(!fileObj){
+                return;
+            }
+            if(!fileObj.sourceRow){
+                return;
+            }
+            // 如果当前内容有变化 则进行提示
+            if(fileObj.sourceFileContent!==fileObj.fileContent){
+                window.ZXW_VUE.$confirm('当前文件未保存，是否确认重新加载最新文件?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    this.updatePhoneFileCache(fileObj.sourceRow,true);
+                });
+            } else {
+                this.updatePhoneFileCache(fileObj.sourceRow);
+            }
+        },
         // 手机文件编辑器关闭文件缓存
         closePhoneEditorArrClick(index){
             let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
@@ -3083,7 +3419,7 @@ export default {
             }
         },
         // 更新手机端文件缓存
-        updatePhoneFileCache(row) {
+        updatePhoneFileCache(row,forceRefreshFileContent = false) {
             let targetPath = row.pathName;
             let fileType = row.fileType || '';
             let isImage = ['png','jpg','jpeg'].includes(fileType);
@@ -3114,6 +3450,7 @@ export default {
                 }, (e) => { });`;
                 this.remoteExecuteScript(remoteScript);
             };
+            this.phoneFileEditorLoading = true;
             // 查询缓存数据方法
             queryCacheData(() => {
                 $.ajax({
@@ -3173,6 +3510,18 @@ export default {
                         this.phoneFileSelectIndex = curExitsIndex;
                         let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
                         if(fileObj){
+                            // 强制刷新内容或者 内容一致
+                            if(forceRefreshFileContent || fileObj.sourceFileContent===fileObj.fileContent){
+                                // 更新文件信息
+                                fileObj.fileContent = fileContent;
+                                // 更新缓存内容
+                                fileObj.sourceFileContent = fileContent;
+                            } else {
+                                setTimeout(()=>{
+                                    // 则仅提示内容未保存
+                                    window.ZXW_VUE.$message.warning({message: '当前文件内容已进行修改,如需加载最新文件,请点击重新加载！', duration: 1500});
+                                },200);
+                            }
                             this.phoneScriptEditor.setValue(fileObj.fileContent || '');
                             if(!fileObj.scroll){
                                 fileObj.scroll = {
@@ -3195,7 +3544,8 @@ export default {
                             fileSavePath:row.pathName,
                             fileName: row.fileName + (row.fileType ? ('.' + row.fileType) : ''),
                             sourceFileContent: fileContent,
-                            fileContent: fileContent
+                            fileContent: fileContent,
+                            sourceRow: row
                         };
                         this.phoneFileCacheArr.push(fileObj);
                         // 记录索引
@@ -3231,6 +3581,7 @@ export default {
                     this.phoneImageBase64 = 'data:image/png;base64,' + cacheResultData;
                 }
                 this.phoneFileLoading = false;
+                this.phoneFileEditorLoading = false;
             });
         },
         // 手机端华仔autoJs工具箱热更新
