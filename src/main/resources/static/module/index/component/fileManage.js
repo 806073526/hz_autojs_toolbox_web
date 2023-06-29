@@ -2234,7 +2234,7 @@ export default {
                 return (
                     'let dexFilePath = "' +
                     relativePathFileName +
-                    '" + ".dex";\\nruntime.loadDex(dexFilePath);\\nnew Packages["' +
+                    '" + ".dex";\\nruntime.unloadDex(dexFilePath);\\nruntime.loadDex(dexFilePath);\\nnew Packages["' +
                     fileName +
                     '"]()();'
                 );
