@@ -2261,11 +2261,9 @@ export default {
                 if (fileName.indexOf("-") !== -1) {
                     fileName = fileName.replace(/-/g, "").replace(/@/, "")
                 }
-                console.log(fileName);
                 let args = ["-version", "200", "-opt", "1", "-encoding", "UTF-8", "-nosource", "-o", fileName, "-d", dir, jsFilePath];
                 org.mozilla.javascript.tools.jsc.Main.main(args);
                 let classFilePath = files.join(dir, fileName + ".class");
-            
                 return classFilePath;
             }
             
@@ -2383,6 +2381,7 @@ export default {
                     let toPath = fromPath.replace(projectDir, newProjectDir);
                     files.copy(fromPath, toPath);
                 });
+                console.log("备份项目完成【"+newProjectDir+"】")
             }
             
             let projectDir = '${row.pathName}';
@@ -2390,14 +2389,16 @@ export default {
             let execFun = ()=>{
                 backupProject(projectDir);
                 let excludesPath = '${row.excluedPath}'.split(',') || []
+                console.log("排除无需转换路径【"+excludesPath+"】");
                 let jsFilePathList = getJsFilePathList(projectDir);
                 jsFilePathList.map((filepath) => {
                     let arr = excludesPath.filter(item=>{
-                        return filepath.indexOf(item)!==-1;
+                        return item && filepath.indexOf(item)!==-1;
                     });
                     if(arr.length>0){
                         return;
                     }
+                    console.log("执行js文件转换【"+filepath+"】");
                     try {
                         changeJsFileToDexFile(filepath);
                     } catch (e) {
@@ -2410,16 +2411,16 @@ export default {
                 let dexFilePath = "/sdcard/appSync/dx.dex";
                 // 如果不存在
                 if(!files.exists(dexFilePath)){
-                    console.log("开始下载依赖");
+                    console.log("开始下载dx依赖");
                     // 执行下载
                     utilsObj.downLoadFile("${getContext()}/dx.dex","appSync/dx.dex",()=>{
-                        console.log("下载依赖完成");
+                        console.log("下载dx依赖完成");
                         runtime.loadDex(dexFilePath);
                         importClass(com.android.dx.command.Main);
                         execFun();
                     });
                 } else {
-                    console.log("已有依赖");
+                    console.log("已有dx依赖");
                     runtime.loadDex(dexFilePath);
                     importClass(com.android.dx.command.Main);
                     execFun();
