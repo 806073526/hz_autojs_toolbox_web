@@ -442,8 +442,11 @@
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===3">
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyHandlerPackageRes" class="el-icon-success"></i><i v-show="!alreadyHandlerPackageRes" class="el-icon-warning"></i>{{alreadyHandlerPackageRes ? '已' : '未'}}完成打包资源处理</span>
-                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
-                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProjectToPhone"  icon="el-icon-thumb">{{ "下载混淆后项目到手机" }}</el-button>
+                    <div style="margin-top: 5px;">
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProject"  icon="el-icon-thumb">下载混淆后项目</el-button>
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProjectToPhone"  icon="el-icon-thumb">下载混淆后项目到手机</el-button>
+                    </div>
                 </div>
             </div>
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===4">

@@ -1048,6 +1048,16 @@ public class AttachmentInfoController extends BaseController {
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpeg");
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.jpg");
             attachmentInfoService.deleteFile(appIconTargetRootPath + File.separator + "ic_launcher.png");
+
+            int icLauncherCount = 0;
+            while (Files.exists(Paths.get(appIconTargetRootPath + File.separator + "ic_launcher.png"))) {
+                Thread.sleep(100);
+                icLauncherCount++;
+                if(icLauncherCount>10){
+                    break;
+                }
+            }
+
             // 等待删除完成
             Thread.sleep(100);
             // 再复制当目标目录
@@ -1091,6 +1101,16 @@ public class AttachmentInfoController extends BaseController {
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpg");
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.jpeg");
             attachmentInfoService.deleteFile(splashIconTargetRootPath + File.separator + "splash_icon.png");
+
+            int splashIconCount = 0;
+            while (Files.exists(Paths.get(appIconTargetRootPath + File.separator + "splash_icon.png"))) {
+                Thread.sleep(100);
+                splashIconCount++;
+                if(splashIconCount>10){
+                    break;
+                }
+            }
+
             // 等待删除完成
             Thread.sleep(100);
             // 再复制当目标目录

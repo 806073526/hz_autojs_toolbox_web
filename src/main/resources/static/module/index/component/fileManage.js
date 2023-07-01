@@ -1861,16 +1861,16 @@ export default {
                                 "【无需混淆的第三方代码可以设置路径进行排除】\r\n" +
                                 "【具体错误】:\r\n"+data.data;
                             console.log(messageInfo);
-                            if(data.data && data.data.indexOf("命令执行有错误")!==-1){
+                            if(data.data && (data.data.indexOf("命令执行有错误")!==-1 || data.data.indexOf("throw new Error")!==-1  )){
                                 _that.alreadyHandlerPackageRes = false;
                                 window.ZXW_VUE.$message.error({
                                     message: messageInfo,
                                     duration: '2000'
                                 });
-                            } else {
+                            } else if(_that.packageProject.openObfuscator){
                                 window.ZXW_VUE.$message.warning({
-                                    message: "如果混淆未成功，可按F12在控制台,查看具体错误信息",
-                                    duration: '1000'
+                                    message: "当前开启了js混淆,可下载js项目检查混淆结果,如果混淆未成功可按F12查看日志",
+                                    duration: '3000'
                                 });
                             }
                         } else {
@@ -2021,13 +2021,30 @@ export default {
             dom.click();
             document.getElementById("upload-file-dom")?.remove();
         },
+        // 直接下载混淆项目
+        downloadObscureProject(){
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            toPath = toPath.substring(0,toPath.length - 1);
+            toPath = toPath.replace("/sdcard","");
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + "_projectOut.zip?t="+(new Date().getTime());
+            // 创建a标签，通过a标签实现下载
+            const dom = document.createElement("a");
+            dom.href = downloadFilUrl;
+            console.log(dom.href);
+            dom.id = "upload-file-dom";
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            // 触发点击事件
+            dom.click();
+            document.getElementById("upload-file-dom")?.remove();
+        },
         // 下载混淆项目到手机
         downloadObscureProjectToPhone(){
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             toPath = toPath.substring(0,toPath.length - 1);
             toPath = toPath.replace("/sdcard","");
             let localFileUrl = toPath + "_projectOut.zip";
-            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + "_projectOut.zip";
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + "_projectOut.zip?t="+(new Date().getTime());
             // 创建目录代码 如果不是/ 则需要创建目录
             let script =  "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{toastLog('下载完成')});";
             this.remoteExecuteScript(script);
