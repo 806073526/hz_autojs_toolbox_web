@@ -811,19 +811,23 @@ public class AttachmentInfoController extends BaseController {
            if(copySuccess){
                // 解压文件
                attachmentInfoService.unServerFileZip(targetPath + File.separator +  "template.zip", targetPath);
+               Thread.sleep(100);
                // 重命名文件
                attachmentInfoService.reNameFile(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName);
+               Thread.sleep(100);
                // 删除压缩文件
                attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
-
+               Thread.sleep(100);
                // 删除lib依赖
-               attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName + File.separator + "lib");
+              attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName + File.separator + "lib");
+               Thread.sleep(100);
                // 删除project
                attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName + File.separator + "assets" + File.separator + "project");
            } else {
                return success(false);
            }
-           return success(true);
+           File checkFile1 = new File(targetPath + File.separator +  webProjectName);
+           return success(checkFile1.exists());
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
