@@ -288,22 +288,36 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
             throw new BusinessException("当前名称已存在");
         }
         boolean renameTo = false;
-        try (FileChannel channel = new RandomAccessFile(file, "rw").getChannel()) {
-            FileLock lock = null;
-            while (lock == null) {
-                System.out.println("未获取到锁");
-                lock = channel.tryLock();
-                System.out.println("尝试获取");
-                if (lock == null) {
-                    System.out.println("等待1秒");
-                    Thread.sleep(1000); // 等待1秒后再尝试获取锁
-                }
-            }
-            System.out.println("获取到锁，尝试重命名");
+        renameTo = file.renameTo(newFile);
+        System.out.println("返回重命名结果");
+        return renameTo;
+    }
+
+    @Override
+    public Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount) {
+        String prePath = this.getRootPath();
+        if(!UploadPathHelper.isWindowsSystem()){
+            newFilePathName = newFilePathName.replaceAll("\\\\",File.separator);
+        }
+        if(!oldFilePathName.contains(prePath) || !newFilePathName.contains(prePath)){
+            throw new BusinessException("非指定目录,不可进行操作");
+        }
+
+        File file = new File(oldFilePathName);
+        File newFile = new File(newFilePathName);
+        if(newFile.exists()){
+            throw new BusinessException("当前名称已存在");
+        }
+        int count = 0;
+        boolean renameTo = false;
+        renameTo = file.renameTo(newFile);
+        while(!renameTo){
+            Thread.sleep(100);
             renameTo = file.renameTo(newFile);
-            lock.release();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            count ++ ;
+            if(count > reCount){
+                break;
+            }
         }
         System.out.println("返回重命名结果");
         return renameTo;

@@ -34,6 +34,8 @@ public interface AttachmentInfoService {
 
     Boolean reNameFile(String oldFilePathName, String newFilePathName);
 
+    Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount);
+
     Boolean deleteFile(String filePath) throws IOException;
 
     Boolean createFolder(String folderName);
