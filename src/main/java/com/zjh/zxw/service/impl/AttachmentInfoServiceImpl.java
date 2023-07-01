@@ -289,12 +289,16 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         }
         boolean renameTo = false;
         try (FileChannel channel = new RandomAccessFile(file, "rw").getChannel()) {
-            FileLock lock = channel.lock();
+            FileLock lock = null;
+            while (lock == null) {
+                lock = channel.tryLock();
+                if (lock == null) {
+                    Thread.sleep(1000); // 等待1秒后再尝试获取锁
+                }
+            }
             renameTo = file.renameTo(newFile);
-            // 文件已被锁定
-            System.out.println("文件已被锁定");
             lock.release();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return renameTo;
