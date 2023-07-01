@@ -879,22 +879,21 @@ public class AttachmentInfoController extends BaseController {
             String resName = StringUtils.isNotBlank(packageProjectDTO.getResPathName()) ? packageProjectDTO.getResPathName() : webProjectName;
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
-            Thread.sleep(200);
-            // 读取文件列表
-            File assetsFile = new File(packageTemplatePath + File.separator + "assets");
-            File[] files = assetsFile.exists() ? assetsFile.listFiles() : new File[0];
-            if(Objects.nonNull(files) && files.length>0){
-                // 查找以项目名称开头的文件
-                String finalResName = resName;
-                List<File> targetFiles = Arrays.stream(files).filter(file -> Objects.nonNull(file) && StrHelper.getObjectValue(file.getName()).startsWith(finalResName)).collect(Collectors.toList());
-                if(CollectionUtils.isNotEmpty(targetFiles)){
-                    // 先删除文件
-                    attachmentInfoService.deleteFile(targetFiles.get(0).getParent() + File.separator + "project");
-                    Thread.sleep(100);
-                    // 重命名文件为project
-                    attachmentInfoService.reNameFile(targetFiles.get(0).getAbsolutePath(), targetFiles.get(0).getParent() + File.separator + "project");
+
+            // 等待解压完成
+            int unZipCount = 0;
+            while (!Files.exists(Paths.get(packageTemplatePath + File.separator + "assets" + File.separator + resName))) {
+                Thread.sleep(100);
+                unZipCount++;
+                if(unZipCount>20){
+                    break;
                 }
             }
+            // 先删除文件
+            attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "project");
+            Thread.sleep(100);
+            // 重命名文件为project
+            attachmentInfoService.reNameFile(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project");
 
             // plugins的复制
             String plugins = packageProjectDTO.getPlugins();
