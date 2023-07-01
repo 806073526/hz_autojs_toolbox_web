@@ -291,16 +291,21 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         try (FileChannel channel = new RandomAccessFile(file, "rw").getChannel()) {
             FileLock lock = null;
             while (lock == null) {
+                System.out.println("未获取到锁");
                 lock = channel.tryLock();
+                System.out.println("尝试获取");
                 if (lock == null) {
+                    System.out.println("等待1秒");
                     Thread.sleep(1000); // 等待1秒后再尝试获取锁
                 }
             }
+            System.out.println("获取到锁，尝试重命名");
             renameTo = file.renameTo(newFile);
             lock.release();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("返回重命名结果");
         return renameTo;
     }
 
