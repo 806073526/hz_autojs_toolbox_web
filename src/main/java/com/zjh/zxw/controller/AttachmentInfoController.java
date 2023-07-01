@@ -881,6 +881,8 @@ public class AttachmentInfoController extends BaseController {
             System.out.println("传入资源路径名称："+packageProjectDTO.getResPathName());
             // 资源包目录名称
             String resName = StringUtils.isNotBlank(packageProjectDTO.getResPathName()) ? packageProjectDTO.getResPathName() : webProjectName;
+
+
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
 
@@ -896,6 +898,7 @@ public class AttachmentInfoController extends BaseController {
             }
             System.out.println(Files.exists(Paths.get(packageTemplatePath + File.separator + "assets" + File.separator + resName)));
             Thread.sleep(100);
+
             // 重命名文件为project
             Boolean reNameFlag = attachmentInfoService.reNameFile(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project");
             System.out.println("重命名结果："+reNameFlag);

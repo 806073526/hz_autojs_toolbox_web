@@ -18,10 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -288,7 +287,16 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         if(newFile.exists()){
             throw new BusinessException("当前名称已存在");
         }
-        boolean renameTo = file.renameTo(newFile);
+        boolean renameTo = false;
+        try (FileChannel channel = new RandomAccessFile(file, "rw").getChannel()) {
+            FileLock lock = channel.lock();
+            renameTo = file.renameTo(newFile);
+            // 文件已被锁定
+            System.out.println("文件已被锁定");
+            lock.release();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return renameTo;
     }
 
