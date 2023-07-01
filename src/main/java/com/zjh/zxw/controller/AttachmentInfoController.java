@@ -875,10 +875,15 @@ public class AttachmentInfoController extends BaseController {
                 // 解压文件
                 attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
             }
+            // 先删除文件
+            attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "project");
+
+            System.out.println("传入资源路径名称："+packageProjectDTO.getResPathName());
             // 资源包目录名称
             String resName = StringUtils.isNotBlank(packageProjectDTO.getResPathName()) ? packageProjectDTO.getResPathName() : webProjectName;
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
+
 
             // 等待解压完成
             int unZipCount = 0;
@@ -889,11 +894,12 @@ public class AttachmentInfoController extends BaseController {
                     break;
                 }
             }
-            // 先删除文件
-            attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "project");
+            System.out.println(Files.exists(Paths.get(packageTemplatePath + File.separator + "assets" + File.separator + resName)));
             Thread.sleep(100);
             // 重命名文件为project
-            attachmentInfoService.reNameFile(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project");
+            Boolean reNameFlag = attachmentInfoService.reNameFile(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project");
+            System.out.println("重命名结果："+reNameFlag);
+
 
             // plugins的复制
             String plugins = packageProjectDTO.getPlugins();
