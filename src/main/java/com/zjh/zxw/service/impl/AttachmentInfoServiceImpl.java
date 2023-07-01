@@ -294,7 +294,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     }
 
     @Override
-    public Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount) {
+    public Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount) throws InterruptedException {
         String prePath = this.getRootPath();
         if(!UploadPathHelper.isWindowsSystem()){
             newFilePathName = newFilePathName.replaceAll("\\\\",File.separator);

@@ -34,7 +34,7 @@ public interface AttachmentInfoService {
 
     Boolean reNameFile(String oldFilePathName, String newFilePathName);
 
-    Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount);
+    Boolean reNameFileReCount(String oldFilePathName, String newFilePathName, Integer reCount) throws InterruptedException;
 
     Boolean deleteFile(String filePath) throws IOException;
 
