@@ -886,7 +886,6 @@ public class AttachmentInfoController extends BaseController {
             // 解压项目资源到 打包模板的assets目录
             attachmentInfoService.unServerFileZip(projectResPath, packageTemplatePath + File.separator + "assets");
 
-
             // 等待解压完成
             int unZipCount = 0;
             while (!Files.exists(Paths.get(packageTemplatePath + File.separator + "assets" + File.separator + resName))) {
@@ -896,12 +895,10 @@ public class AttachmentInfoController extends BaseController {
                     break;
                 }
             }
-            System.out.println(Files.exists(Paths.get(packageTemplatePath + File.separator + "assets" + File.separator + resName)));
             Thread.sleep(100);
 
             // 重命名文件为project
-            Boolean reNameFlag = attachmentInfoService.reNameFileReCount(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project",20);
-            System.out.println("重命名结果："+reNameFlag);
+            attachmentInfoService.reNameFileReCount(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project",20);
 
 
             // plugins的复制

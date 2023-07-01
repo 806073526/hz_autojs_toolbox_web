@@ -312,14 +312,13 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         boolean renameTo = false;
         renameTo = file.renameTo(newFile);
         while(!renameTo){
-            Thread.sleep(100);
+            Thread.sleep(200);
             renameTo = file.renameTo(newFile);
             count ++ ;
             if(count > reCount){
                 break;
             }
         }
-        System.out.println("返回重命名结果");
         return renameTo;
     }
 
