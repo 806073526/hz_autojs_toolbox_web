@@ -1216,7 +1216,12 @@ public class AttachmentInfoController extends BaseController {
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     if (eElement.getAttribute("android:name").equals("com.AutoBootActivity1")) {
-                        eElement.setAttribute("android:name", autoOpen ? "com.AutoBootActivity" : "com.AutoBootActivity1");
+                        if(autoOpen){
+                            eElement.setAttribute("android:name", "com.AutoBootActivity");
+                        } else {
+                            // 删除当前节点
+                            eElement.getParentNode().removeChild(eElement);
+                        }
                     }
                 }
             }
