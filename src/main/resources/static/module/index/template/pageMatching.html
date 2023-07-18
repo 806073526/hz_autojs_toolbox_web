@@ -3,7 +3,7 @@
         页面匹配
     </p>
     <el-row>
-        <div class="width100 d-flex a-center">
+        <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="页面配置名称:"  class="width100">
                 <el-input v-model="pageSettingParam.pageSettingParamName" placeholder="请输入页面配置名称"
                           class="width100" />
@@ -12,72 +12,74 @@
     </el-row>
     <el-row>
         <el-form-item label="调试图片路径:" class="width100" label-width="100px">
-            <div class="d-flex">
+            <div class="d-flex flex-wrap">
                 <el-input v-model="sourcePathName" placeholder="替换源路径" class="flex-1"/>
                 <el-input v-model="targetPathName" placeholder="替换目标路径" class="flex-1" style="margin-left: 5px;"/>
             </div>
         </el-form-item>
     </el-row>
     <el-row>
-        <el-button type="danger" size="mini" style="" id="remoteRunScript"
-                   @click.stop.prevent="remotePageMatching">
-            远程页面匹配
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-bottom: 5px;"
-                   @click.stop.prevent="initPageSettingParam">
-            页面配置示例
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="saveToDraft">
-            存为草稿
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="readForDraft">
-            从草稿读取
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="saveToFile">
-            存为文件
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="readForFile">
-            从文件读取
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="settingToJson">
-            页面配置转换为json
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="jsonToSetting">
-            json转换为页面配置
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="serviceOperateParamToJson">
-            业务参数配置转换为json
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="jsonToServiceOperateParam">
-            json转换为业务参数配置
-        </el-button>
+        <div class="d-flex flex-wrap">
+            <el-button type="danger" style="margin-bottom: 5px;" size="mini" id="remoteRunScript"
+                       @click.stop.prevent="remotePageMatching">
+                远程页面匹配
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-bottom: 5px;"
+                       @click.stop.prevent="initPageSettingParam">
+                页面配置示例
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="saveToDraft">
+                存为草稿
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="readForDraft">
+                从草稿读取
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="saveToFile">
+                存为文件
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="readForFile">
+                从文件读取
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="settingToJson">
+                页面配置转换为json
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="jsonToSetting">
+                json转换为页面配置
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="serviceOperateParamToJson">
+                业务参数配置转换为json
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                       @click.stop.prevent="jsonToServiceOperateParam">
+                json转换为业务参数配置
+            </el-button>
 
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;"
-                   @click.stop.prevent="expandAll">
-            全部展开
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;"
-                   @click.stop.prevent="packUpAll">
-            全部收缩
-        </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;margin-bottom: 5px;"
+                       @click.stop.prevent="expandAll">
+                全部展开
+            </el-button>
+            <el-button type="primary" size="mini" style="margin-left: 10px !important;float: right;margin-bottom: 5px;"
+                       @click.stop.prevent="packUpAll">
+                全部收缩
+            </el-button>
+        </div>
     </el-row>
     <el-row style="margin-top: 10px;">
         <el-card class="box-card" v-for="(page,pageIndex) in pageSettingParam.pageSettingParamArray" :key="'pageIndex'+pageIndex">
             <div slot="header" class="clearfix">
-                <div class="d-flex j-center a-center">
-                    <el-form-item label="页面名称:" class="width25" label-width="85px" style="margin-bottom: 0px;">
+                <div class="d-flex j-center a-center flex-wrap">
+                    <el-form-item label="页面名称:" label-width="85px" style="margin-bottom: 0px;flex: 5;">
                         <el-input v-model="page.pageName" placeholder="请输入页面名称" />
                     </el-form-item>
-                    <el-checkbox v-model="page.joinDebug" style="margin-left: 10px;">参与调试</el-checkbox>
-                    <div class="flex-1 d-flex j-end">
+                    <el-checkbox style="flex: 1;" v-model="page.joinDebug" style="margin-left: 10px;">参与调试</el-checkbox>
+                    <div class="d-flex j-end" style="flex: 5;">
                         <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop.prevent="addPage(pageIndex)"/>
                         <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop.prevent="deletePage(pageIndex)"/>
                         <el-link :underline="false" type="info" style="margin-right: 10px;" @click="page.expand = !page.expand">{{ page.expand ? '收缩':'展开' }}</el-link>
@@ -86,45 +88,45 @@
             </div>
             <el-card v-for="(setting,settingIndex) in page.pageSettingArray" :key="'settingIndex'+settingIndex" v-show="page.expand"  style="margin: 20px;">
                 <div slot="header" class="clearfix">
-                    <div class="d-flex j-center a-center width100">
-                        <el-form-item label="分辨率:" class="width35" label-width="75px" style="margin-bottom: 0px;">
-                            <div class="d-flex">
+                    <div class="d-flex j-center a-center width100 flex-wrap">
+                        <el-form-item label="分辨率:" label-width="75px" style="margin-bottom: 0px;flex: 3;">
+                            <div class="d-flex flex-wrap">
                                 <el-input v-model="setting.width" placeholder="请输入宽度" class="flex-1"/>
                                 <el-input v-model="setting.height" placeholder="请输入高度" class="flex-1" style="margin-left: 10px;"/>
-                                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                                <el-button type="primary" size="mini" style="margin-left: 10px !important;flex:1;"
                                            @click.stop.prevent="writeStandWidthHeight(setting)">
                                     写入标准分辨率
                                 </el-button>
                             </div>
                         </el-form-item>
-                        <div class="flex-1 d-flex j-end">
-                            <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop.prevent="addWidthHeight(pageIndex,settingIndex)"/>
-                            <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop.prevent="deleteWidthHeight(pageIndex,settingIndex)"/>
-                            <el-link :underline="false" type="info" style="margin-right: 10px;" @click="setting.expand = !setting.expand">{{ setting.expand ? '收缩':'展开' }}</el-link>
+                        <div class="d-flex j-end" style="flex:7;">
+                            <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;margin-bottom: 5px;" @click.stop.prevent="addWidthHeight(pageIndex,settingIndex)"/>
+                            <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;margin-bottom: 5px;" @click.stop.prevent="deleteWidthHeight(pageIndex,settingIndex)"/>
+                            <el-link :underline="false" type="info" style="margin-right: 10px;margin-bottom: 5px;" @click="setting.expand = !setting.expand">{{ setting.expand ? '收缩':'展开' }}</el-link>
                         </div>
                     </div>
                 </div>
                 <div v-show="setting.expand" style="margin: 20px;">
-                    <div class="d-flex">
-                        <el-form-item label="总关系:" class="width25" label-width="60px">
+                    <div class="d-flex flex-wrap">
+                        <el-form-item label="总关系:" class="flex-1" label-width="60px">
                             <el-select v-model="setting.relation.total" class="width100">
                                 <el-option label="或者" value="or"/>
                                 <el-option label="并且" value="and"/>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="文字识别:" class="width25" label-width="80px">
+                        <el-form-item label="文字识别:" class="flex-1" label-width="80px">
                             <el-select v-model="setting.relation.analysisChart" class="width100">
                                 <el-option label="或者" value="or"/>
                                 <el-option label="并且" value="and"/>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="多点找色:" class="width25" label-width="80px">
+                        <el-form-item label="多点找色:" class="flex-1" label-width="80px">
                             <el-select v-model="setting.relation.multipleColor" class="width100">
                                 <el-option label="或者" value="or"/>
                                 <el-option label="并且" value="and"/>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="区域找图:" class="width25" label-width="80px">
+                        <el-form-item label="区域找图:" class="flex-1" label-width="80px">
                             <el-select v-model="setting.relation.multipleImg" class="width100">
                                 <el-option label="或者" value="or"/>
                                 <el-option label="并且" value="and"/>
@@ -393,13 +395,13 @@
                         </div>
                         <el-card style="margin-top: 5px;" v-for="(param,paramIndex) in setting.serviceOperateParam" :key="'paramIndex'+paramIndex">
                             <div slot="header" class="clearfix">
-                                <div class="d-flex j-center a-center">
-                                    <el-form-item label="参数名称:" class="width25" label-width="85px" style="margin-bottom: 0px;">
+                                <div class="d-flex j-center a-center flex-wrap">
+                                    <el-form-item label="参数名称:" label-width="85px" style="margin-bottom: 0px;flex:3;">
                                         <el-input v-model="param.paramKey" placeholder="请输入业务参数配置名称" />
                                     </el-form-item>
-                                    <div class="flex-1 d-flex j-end">
-                                        <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="serviceOperateAddRow(pageIndex,settingIndex,paramIndex)"/>
-                                        <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop="serviceOperateDeleteRow(pageIndex,settingIndex,paramIndex)"/>
+                                    <div class="flex-1 d-flex j-end flex-wrap" style="flex:7;">
+                                        <i class="el-icon-circle-plus flex-1" style="font-size: 18px;margin-right: 5px;" @click.stop="serviceOperateAddRow(pageIndex,settingIndex,paramIndex)"/>
+                                        <i class="el-icon-remove flex-1" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop="serviceOperateDeleteRow(pageIndex,settingIndex,paramIndex)"/>
                                     </div>
                                 </div>
                             </div>
@@ -439,9 +441,9 @@
         <div style="margin-bottom: 12px;text-align: center;">json配置</div>
         <el-input v-model="selectRowObj.rowJs" :rows="4" type="textarea" label-width="0"
                   placeholder="json内容" class="width100" />
-        <div class="d-flex j-center">
-            <el-button class="mt-1" type="primary" @click="readJsonContentPopover">从json读取</el-button>
-            <el-button class="mt-1" type="info" @click="closeJsonContentPopover">关闭</el-button>
+        <div class="d-flex j-center flex-wrap">
+            <el-button class="mt-1 flex-1" type="primary" @click="readJsonContentPopover">从json读取</el-button>
+            <el-button class="mt-1 flex-1" type="info" @click="closeJsonContentPopover">关闭</el-button>
         </div>
     </el-popover>
 </div>

@@ -33,10 +33,8 @@
 }
 
 .fileList-head .fileName {
-    width: 50%;
 }
 .fileList-head .phoneFileName{
-    width: 70%;
 }
 .fileList-head .fileName .text-fileName{
     display: inline-block;
@@ -66,18 +64,14 @@
 }
 
 .fileList-head .lastUpdateTime {
-    width: 20%;
 }
 .fileList-head .fileSize{
-    width: 20%;
 }
 .fileList-head .operate {
-    width: 20%;
     text-align: center;
 }
 
 .fileList-head .phoneOperate {
-    width: 30%;
     text-align: center;
 }
 
@@ -97,7 +91,8 @@
 
 .fileList-body{
     position: relative;
-    height: 48px !important;
+    height: auto !important;
+    min-height: 48px;
 }
 
 .fileList-body:nth-child(2n - 1) {

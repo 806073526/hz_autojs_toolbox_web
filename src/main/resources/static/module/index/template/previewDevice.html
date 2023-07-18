@@ -2,28 +2,28 @@
     <p class="basicInfo">
         预览设备
     </p>
-    <el-tabs v-model="previewActiveName" style="padding-left: 20px;margin-top: 0!important;">
+    <el-tabs v-model="previewActiveName" style="    padding-left: 20px;margin-top: 0!important;">
         <el-tab-pane label="预览参数" name="previewParam">
             <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center">
-                    <el-form-item label="预览质量:" prop="imgQuality" class="width25">
+                <div class="width100 d-flex a-center flex-wrap">
+                    <el-form-item label="预览质量:" prop="imgQuality" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.imgQuality" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="100"
                                   @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="缩放倍数:" prop="scale" class="width25">
+                    <el-form-item label="缩放倍数:" prop="scale" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.imgScale" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="0" step="0.1"
                                   max="1" @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="预览高度:" prop="scale" class="width25">
+                    <el-form-item label="预览高度:" prop="scale" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.previewHeight" placeholder=""
                                   min="0" max="5000" @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="预览阈值:" prop="scale" class="width25">
+                    <el-form-item label="预览阈值:" prop="scale" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.imgThreshold" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="255"
                                   @change="autoDevicePreview" class="width100">
@@ -32,20 +32,20 @@
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center">
-                    <el-form-item label="APP刷新:" prop="appSpace" class="width25">
+                <div class="width100 d-flex a-center flex-wrap">
+                    <el-form-item label="APP刷新:" prop="appSpace" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.appSpace" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
                                   max="5000" @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="浏览器刷新:" prop="clientSpace" class="width25">
+                    <el-form-item label="浏览器刷新:" prop="clientSpace" class="flex-1">
                         <el-input type="number" v-model="devicePreviewParam.clientSpace" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
                                   max="5000" @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="操作记录:" prop="clientSpace" class="width50">
+                    <el-form-item label="操作记录:" prop="clientSpace" class="flex-2">
                         <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder=""
                                   class="width100">
                         </el-input>
@@ -55,34 +55,34 @@
         </el-tab-pane>
         <el-tab-pane label="通知监听" name="noticeMessage">
             <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
                     <div>通知监听规则名称</div>
                     <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; width: 200px; ">
                         <el-input placeholder="通知规则名称" v-model="noticeListenerName" class="flex-1"/>
                     </div>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="saveToDraft">
                         存为草稿
                     </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="readForDraft">
                         从草稿读取
                     </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="saveToFile">
                         存为文件
                     </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="readForFile">
                         从文件读取
                     </el-button>
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; ">
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                         <span>是否开启通知监听：</span>
                         <el-switch v-model="openNoticeMessageListenerFlag" :disabled="!allowOpenNoticeListener" @change="openNoticeMessageListenerChange"/>
                     </div>
                 </div>
                 <div class="width100 d-flex a-center">
-                    <el-table :data="noticeListenerRules"  border ref="noticeListenerRulesTable"                              highlight-current-row style="width: 100%">
+                    <el-table :data="noticeListenerRules"  border ref="noticeListenerRulesTable"  highlight-current-row style="width: 100%">
                         <el-table-column prop="matchingPackageName" align="left" label="匹配包名">
                             <template slot-scope="{ row, $index}">
                                 <el-input type="textarea" v-model="row.matchingPackageName" :rows="3"  placeholder="请输入匹配包名" class="width100">
@@ -131,13 +131,13 @@
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;;margin-top:10px;">
-                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
                     <div>历史通知</div>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="queryNoticeMessage">
                         查询通知
                     </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
                                @click.stop.prevent="clearNoticeMessage">
                         清理通知
                     </el-button>
@@ -159,7 +159,7 @@
         </el-tab-pane>
         <el-tab-pane label="脚本管理" name="scriptManage">
             <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
                     <el-button type="primary" size="mini" style="margin-left: 10px !important;"
                                @click.stop.prevent="queryScript">
                         查询脚本
@@ -190,7 +190,7 @@
         </el-tab-pane>
         <el-tab-pane label="定时任务" name="timerTask">
             <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center" style="margin-bottom: 5px;">
+                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
                     <el-button type="primary" size="mini" style="margin-left: 10px !important;"
                                @click.stop.prevent="queryTimerTask">
                         查询定时任务
@@ -221,9 +221,6 @@
                 </el-table>
             </el-row>
             <!--
-
-
-
             任务参数
                 延迟毫秒
                 间隔毫秒
@@ -238,19 +235,19 @@
         </el-tab-pane>
     </el-tabs>
     <el-row style="margin-top:10px;">
-        <div class="width100 d-flex a-center">
-            <el-form-item label="文本传输内容:" prop="textContent" class="width50">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="文本传输内容:" prop="textContent" class="flex-2">
                 <el-input type="textarea" v-model="textContent" placeholder=""
                           class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="文本框序号:" prop="textIndex" class="width25">
+            <el-form-item label="文本框序号:" prop="textIndex" class="flex-1">
                 <el-input type="number" v-model="textIndex" placeholder=""
                           oninput="if(value.length>10)value=value.slice(0,10)" step="1"
                           max="5000" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="传输类型:" prop="textType" class="width25">
+            <el-form-item label="传输类型:" prop="textType" class="flex-1">
                 <el-radio-group v-model="textType">
                     <el-radio label="text">
                         覆盖
@@ -263,148 +260,152 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="设备预览:" prop="previewImg" class="width100">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="设备预览:" prop="previewImg" class="width100" style="margin-bottom: 0!important;">
                 <div>
                     x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}
                 </div>
-                <div style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="sendTextContent">
-                        发送文本
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
-                        主页
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
-                        返回
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
-                        任务
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
-                        通知
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
-                        电源
-                    </el-button>
-                    <el-button type="primary" size="mini" style="margin-left:10px" @click.stop.prevent="devicePreviewParam.operateRecord = ''">
-                        清空操作记录
-                    </el-button>
-                </div>
-                <div style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+            </el-form-item>
+        </div>
+        <div class="width100 d-flex a-center flex-wrap" style="margin-top: 5px;">
+            <div class="flex-wrap" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="sendTextContent">
+                    发送文本
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('home')">
+                    主页
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('back')">
+                    返回
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('recents')">
+                    任务
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('quickSettings')">
+                    通知
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('powerDialog')">
+                    电源
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="devicePreviewParam.operateRecord = ''">
+                    清空操作记录
+                </el-button>
+            </div>
+        </div>
+        <div class="width100 d-flex a-center flex-wrap" style="margin-top: 5px;">
+            <div class="flex-wrap" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                         <span>
                             开启灰度化：
                         </span>
-                        <el-switch v-model="devicePreviewParam.isOpenGray" @change="autoDevicePreview"
-                        />
-                    </div>
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <el-switch v-model="devicePreviewParam.isOpenGray" @change="autoDevicePreview"
+                    />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                         <span>
                             开启阈值化：
                         </span>
-                        <el-switch v-model="devicePreviewParam.isOpenThreshold" @change="autoDevicePreview"
-                        />
-                    </div>
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <el-switch v-model="devicePreviewParam.isOpenThreshold" @change="autoDevicePreview"
+                    />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                         <span>
                             参数变化后自动预览：
                         </span>
-                        <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
-                    </div>
-                    <el-button type="danger" size="mini" style="margin-left:10px" id="allScreenPreviewImg"
-                               @click.stop.prevent="allScreenPreviewImg">
-                        全屏预览
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
-                               @click.stop.prevent="startPreviewDevice(true)">
-                        开始预览
-                    </el-button>
-                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
-                        停止预览
-                    </el-button>
+                    <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
                 </div>
-                <div style="min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
-                    <div style="font-size: 20px;color: rgba(29,140,128,0.29)" id="devicePreviewImgParent">
-                        <img id="devicePreviewImg" draggable="false" style="width: auto;margin: 0; padding: 0;height: 500px;max-width: 100%;"/>
-                        <div id="allScreenDiv" :style="{opacity:controlPanelOpen ? 1 : 0.3}" style="display: none;width: 250px;position: absolute;top: 0; background: #0e191a;padding: 5px;border: 1px solid whitesmoke;border-radius: 5px;">
-                            <div style="line-height: 20px;height: 20px;">
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="allScreenPreviewImg"
+                           @click.stop.prevent="allScreenPreviewImg">
+                    全屏预览
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="loadPreviewImg"
+                           @click.stop.prevent="startPreviewDevice(true)">
+                    开始预览
+                </el-button>
+                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="stopPreviewDevice(true)">
+                    停止预览
+                </el-button>
+            </div>
+            <div style="min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
+                <div style="font-size: 20px;color: rgba(29,140,128,0.29)" id="devicePreviewImgParent">
+                    <img id="devicePreviewImg" draggable="false" style="width: auto;margin: 0; padding: 0;height: 500px;max-width: 100%;"/>
+                    <div id="allScreenDiv" :style="{opacity:controlPanelOpen ? 1 : 0.3}" style="display: none;width: 250px;position: absolute;top: 0; background: #0e191a;padding: 5px;border: 1px solid whitesmoke;border-radius: 5px;">
+                        <div style="line-height: 20px;height: 20px;">
                                <span style="float: left;color: blanchedalmond;">
                                    控制面板
                                </span>
-                               <span style="cursor: pointer;color:chartreuse;font-size: 18px;line-height: 20px;float: right" @click.stop="controlPanelOpenChange">
+                            <span style="cursor: pointer;color:chartreuse;font-size: 18px;line-height: 20px;float: right" @click.stop="controlPanelOpenChange">
                                    {{ controlPanelOpen ? '收起' : '展开'}}
                                </span>
+                        </div>
+                        <div v-show="controlPanelOpen">
+                            <div style="color:wheat;font-size: 18px;">
+                                <el-form-item label="坐标:" prop="textContent" class="width100" style="color: whitesmoke">
+                                    <div style="text-align: left;width: 100%;">x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}</div>
+                                </el-form-item>
                             </div>
-                            <div v-show="controlPanelOpen">
-                                <div style="color:wheat;font-size: 18px;">
-                                    <el-form-item label="坐标:" prop="textContent" class="width100" style="color: whitesmoke">
-                                        <div style="text-align: left;width: 100%;">x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}</div>
-                                    </el-form-item>
-                                </div>
-                                <div class="width100 d-flex a-center">
-                                    <el-form-item label="文本传输内容:" prop="textContent" class="width100" style="color: whitesmoke">
-                                        <el-input type="textarea" v-model="textContent" placeholder=""
-                                                  class="width100">
-                                        </el-input>
-                                    </el-form-item>
-                                </div>
-                                <div class="width100 d-flex a-center" style="margin-top: 5px">
-                                    <el-form-item label="文本框序号:" prop="textIndex" class="width100" style="color: whitesmoke">
-                                        <el-input type="number" v-model="textIndex" placeholder=""
-                                                  oninput="if(value.length>10)value=value.slice(0,10)" step="1"
-                                                  max="5000" class="width100">
-                                        </el-input>
-                                    </el-form-item>
-                                </div>
-                                <div class="width100 d-flex a-center">
-                                    <el-form-item label="传输类型:" prop="textType" class="width100" style="color: whitesmoke">
-                                        <el-radio-group v-model="textType">
-                                            <el-radio label="text">
-                                                覆盖
-                                            </el-radio>
-                                            <el-radio label="input">
-                                                追加
-                                            </el-radio>
-                                        </el-radio-group>
-                                    </el-form-item>
-                                </div>
-                                <div style="justify-content: flex-end;align-items: center;text-align: center;width: 100%">
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="sendTextContent">
-                                        发送文本
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" id="allScreenPreviewImg"
-                                               @click.stop.prevent="allScreenPreviewImg">
-                                        退出全屏
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
-                                               @click.stop.prevent="startPreviewDevice(true)">
-                                        开始预览
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
-                                        停止预览
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
-                                        电源按钮
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
-                                        最近任务
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
-                                        下拉通知
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
-                                        返回主页
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
-                                        返回按钮
-                                    </el-button>
-                                </div>
+                            <div class="width100 d-flex a-center">
+                                <el-form-item label="文本传输内容:" prop="textContent" class="width100" style="color: whitesmoke">
+                                    <el-input type="textarea" v-model="textContent" placeholder=""
+                                              class="width100">
+                                    </el-input>
+                                </el-form-item>
+                            </div>
+                            <div class="width100 d-flex a-center" style="margin-top: 5px">
+                                <el-form-item label="文本框序号:" prop="textIndex" class="width100" style="color: whitesmoke">
+                                    <el-input type="number" v-model="textIndex" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" step="1"
+                                              max="5000" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                            </div>
+                            <div class="width100 d-flex a-center">
+                                <el-form-item label="传输类型:" prop="textType" class="width100" style="color: whitesmoke">
+                                    <el-radio-group v-model="textType">
+                                        <el-radio label="text">
+                                            覆盖
+                                        </el-radio>
+                                        <el-radio label="input">
+                                            追加
+                                        </el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </div>
+                            <div style="justify-content: flex-end;align-items: center;text-align: center;width: 100%">
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="sendTextContent">
+                                    发送文本
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" id="allScreenPreviewImg"
+                                           @click.stop.prevent="allScreenPreviewImg">
+                                    退出全屏
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
+                                           @click.stop.prevent="startPreviewDevice(true)">
+                                    开始预览
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
+                                    停止预览
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
+                                    电源按钮
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
+                                    最近任务
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
+                                    下拉通知
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
+                                    返回主页
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
+                                    返回按钮
+                                </el-button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </el-form-item>
+            </div>
         </div>
     </el-row>
 </div>

@@ -66,6 +66,8 @@ window.ZXW_VUE = new Vue({
                 return;
             }
             this.screenDirection = val.orientation === 1 ? "竖屏" : "横屏";
+            this.deviceInfo.debugModel = val.debugModel;
+            this.deviceInfo.debugSleep = val.debugSleep;
         },
         activeTab(val){
             // 执行页面组件初始化方法
@@ -141,12 +143,10 @@ window.ZXW_VUE = new Vue({
         // 初始化ace编辑器
         window.aceRange = ace.require('ace/range').Range;
         this.timeSyncOtherProperty();
-        // 每3秒同步一次其他属性
+        // 每60秒同步一次其他属性
         setInterval(() => {
             this.timeSyncOtherProperty()
-        }, 3 * 1000)
-
-
+        }, 60 * 1000);
 
         window.addEventListener('keydown',(e)=>{
             if(!this.fileDialogIsMin){
@@ -177,7 +177,8 @@ window.ZXW_VUE = new Vue({
                         scrollTo(0,this.showTabScrollTop)
                     })
                 }
-            }
+            },
+            timeSyncOtherPropertyFun: this.timeSyncOtherProperty // 同步其他属性
         }
     },
     methods: {

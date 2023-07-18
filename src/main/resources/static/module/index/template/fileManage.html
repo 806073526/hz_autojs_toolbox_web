@@ -3,34 +3,34 @@
         文件管理
     </p>
     <el-row style="margin-top: 10px;">
-        <div class="width100 d-flex a-center">
-            <el-form-item label="web端同步路径:" label-width="125px" class="width30">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="web端同步路径:" label-width="125px" style="flex:3">
                 <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="手机端同步路径:" label-width="125px" class="width30">
+            <el-form-item label="手机端同步路径:" label-width="125px"  style="flex:3">
                 <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <div class="width40 d-flex a-center" style="justify-content: right;margin-bottom:10px;">
-                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;">
+            <div class="d-flex a-center flex-wrap" style="justify-content: right;margin-bottom:10px;flex:4;">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;margin-bottom: 5px;">
                     <span>
                         自动同步web同步路径：
                     </span>
                     <el-switch v-model="autoSyncWebSyncPath"/>
                 </div>
-                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;margin-bottom: 5px;">
                     <span>
                         自动同步手机同步路径：
                     </span>
                     <el-switch v-model="autoSyncPhoneSyncPath"/>
                 </div>
-                <el-button @click.stop="syncFileToPhone">
+                <el-button @click.stop="syncFileToPhone" style="margin-bottom: 5px;">
                     同步到手机端
                 </el-button>
-                <el-button @click.stop="syncFileToWeb">
+                <el-button @click.stop="syncFileToWeb" style="margin-bottom: 5px;">
                     同步到web端
                 </el-button>
             </div>
@@ -59,7 +59,7 @@
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
-                <div class="d-flex a-center fileOperate primary-text-color pl-1">
+                <div class="d-flex a-center fileOperate primary-text-color pl-1 flex-wrap">
                     <el-tooltip class="item" v-if="copyFileList.length>0" effect="dark" :disabled="!copyFileNames" :content="copyFileNames" placement="top-start">
                         <span class="fileTips" >复制{{ copyFileList.length }}个文件(夹)</span>
                     </el-tooltip>
@@ -69,27 +69,27 @@
                     <el-tooltip class="item" v-else="checkFileCount>0" effect="dark" :disabled="!checkFileNames" :content="checkFileNames" placement="top-start">
                         <span class="fileTips" >已选{{ checkFileCount }}个文件(夹)</span>
                     </el-tooltip>
-                    <div class="operate d-flex a-center j-center">
-                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('copy')">复制</el-link>
-                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('move')">移动</el-link>
-                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('remove')">删除</el-link>
-                        <el-link v-if="copyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('paste')">粘贴到</el-link>
-                        <el-link v-if="moveFileList.length>0" :underline="false" :disabled="!allowMoveFileList.length>0" type="info" style="margin-left: 5px;" @click="operateFun('moveTo')">移动到</el-link>
-                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('syncToPhone')">同步到手机</el-link>
-                        <el-link v-if="copyFileList.length>0 || moveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="operateFun('cancel')">取消</el-link>
+                    <div class="operate d-flex a-center j-center flex-wrap">
+                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('copy')">复制</el-link>
+                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('move')">移动</el-link>
+                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('remove')">删除</el-link>
+                        <el-link v-if="copyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('paste')">粘贴到</el-link>
+                        <el-link v-if="moveFileList.length>0" :underline="false" :disabled="!allowMoveFileList.length>0" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('moveTo')">移动到</el-link>
+                        <el-link v-if="checkFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('syncToPhone')">同步到手机</el-link>
+                        <el-link v-if="copyFileList.length>0 || moveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="operateFun('cancel')">取消</el-link>
                     </div>
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
                 <div class="fileTableList" v-loading="fileLoading">
-                    <div class="fileList-head d-flex a-center">
-                        <div class="d-flex a-center fileName">
+                    <div class="fileList-head d-flex a-center flex-wrap">
+                        <div class="d-flex a-center fileName" style="flex:5">
                             <el-checkbox v-model="checkAllFile" @change="checkAllFileChange" />
                             <span style="margin-left: 8px">文件名</span>
                         </div>
-                        <div class="fileSize">文件大小</div>
-                        <div class="lastUpdateTime">最后更新时间</div>
-                        <div class="operate">操作</div>
+                        <div class="fileSize" style="flex:2">文件大小</div>
+                        <div class="lastUpdateTime" style="flex:2">最后更新时间</div>
+                        <div class="operate" style="flex:2">操作</div>
                     </div>
                     <el-scrollbar class="right-scrollbar-wrap">
                         <div v-for="(item, index) in uploadFileList" :key="'upload'+index" class="fileList-head fileList-body d-flex a-center uploadFileHover">
@@ -102,26 +102,26 @@
                             <span class="iconfont" @click.stop="cancelUpload(index)" style="cursor: pointer;">取消</span>
                             <el-progress :percentage="item.percentage" :stroke-width="3" />
                         </div>
-                        <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
-                            <div class="d-flex a-center fileName">
+                        <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center flex-wrap">
+                            <div class="d-flex a-center fileName" style="flex:5;">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
                                     <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                 </div>
                             </div>
-                            <div class="d-flex a-center fileSize">
+                            <div class="d-flex a-center fileSize" style="flex:2;">
                                 <span>{{ calculateSize(item.fileSize) }}</span>
                             </div>
-                            <div class="d-flex a-center lastUpdateTime">
+                            <div class="d-flex a-center lastUpdateTime" style="flex:2;">
                                 <span>{{ item.lastUpdateTime }}</span>
                             </div>
-                            <div class="operate d-flex a-center j-center">
-                                <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>
-                                <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
-                                <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
-                                <el-link :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
-                                <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;" @click="syncToPhoneSingle(item)">同步到手机</el-link>
-                                <el-link :underline="false" type="info" style="margin-left: 5px;" @click="removeFile(item)">删除</el-link>
+                            <div class="operate d-flex a-center j-center flex-wrap" style="flex:2;">
+                                <el-link v-show="!item.isDirectory" :underline="false" style="margin-bottom: 5px;" type="info" @click="downloadFile(item)">下载</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
+                                <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
+                                <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="reName(item)">重命名</el-link>
+                                <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToPhoneSingle(item)">同步到手机</el-link>
+                                <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="removeFile(item)">删除</el-link>
                             </div>
                         </div>
                     </el-scrollbar>
@@ -132,19 +132,19 @@
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
                     <div class="d-flex a-center flex-wrap">
-                        <el-button size="mini" type="primary" @click="phoneCreateFile">新建文件(夹)</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitOfficialExample">初始化官方示例</el-button>
-						<el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitOfficalShopExample">初始化商店示例</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneDownLoadGameScript">初始化脚手架项目</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneDownLoadImageExampleScript">初始化图色示例项目</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
-                        <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
-                        <el-button size="mini" style="margin-left: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
-                        <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
-                        <!--<el-button size="mini" style="margin-left: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
+                        <el-button size="mini" type="primary"  style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficialExample">初始化官方示例</el-button>
+						<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficalShopExample">初始化商店示例</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneDownLoadGameScript">初始化脚手架项目</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneDownLoadImageExampleScript">初始化图色示例项目</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
+                        <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
+                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
+                        <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
+                        <!--<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
                     </div>
                 </div>
             </el-row>
@@ -159,7 +159,7 @@
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
-                <div class="d-flex a-center fileOperate primary-text-color pl-1">
+                <div class="d-flex a-center fileOperate primary-text-color pl-1 flex-wrap">
                     <el-tooltip class="item" v-if="phoneCopyFileList.length>0" effect="dark" :disabled="!phoneCopyFileNames" :content="phoneCopyFileNames" placement="top-start">
                         <span class="fileTips" >复制{{ phoneCopyFileList.length }}个文件(夹)</span>
                     </el-tooltip>
@@ -169,43 +169,43 @@
                     <el-tooltip class="item" v-else="phoneCheckFileCount>0" effect="dark" :disabled="!phoneCheckFileNames" :content="phoneCheckFileNames" placement="top-start">
                         <span class="fileTips" >已选{{ phoneCheckFileCount }}个文件(夹)</span>
                     </el-tooltip>
-                    <div class="operate d-flex a-center j-center">
-                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('copy')">复制</el-link>
-                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('move')">移动</el-link>
-                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('remove')">删除</el-link>
-                        <el-link v-if="phoneCopyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('paste')">粘贴到</el-link>
-                        <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
-                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>
-                        <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
-                        <span v-if="phoneCheckFileCount>0" style="font-size: 12px;margin-left: 5px;color: #cf0808">文件夹不支持复制！！！</span>
+                    <div class="operate d-flex a-center j-center flex-wrap">
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('copy')">复制</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('move')">移动</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('remove')">删除</el-link>
+                        <el-link v-if="phoneCopyFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('paste')">粘贴到</el-link>
+                        <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
+                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>
+                        <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
+                        <span v-if="phoneCheckFileCount>0" style="font-size: 12px;margin-left: 5px;margin-bottom: 5px;color: #cf0808">文件夹不支持复制！！！</span>
                     </div>
                 </div>
             </el-row>
             <el-row style="padding-left: 0!important;">
                 <div class="fileTableList" v-loading="phoneFileLoading">
-                    <div class="fileList-head d-flex a-center">
-                        <div class="d-flex a-center phoneFileName">
+                    <div class="fileList-head d-flex a-center flex-wrap">
+                        <div class="d-flex a-center phoneFileName" style="flex:7;">
                             <el-checkbox v-model="phoneCheckAllFile" @change="phoneCheckAllFileChange" />
                             <span style="margin-left: 8px">文件名</span>
                         </div>
-                        <div class="phoneOperate">操作</div>
+                        <div class="phoneOperate" style="flex:3;">操作</div>
                     </div>
                     <el-scrollbar class="right-scrollbar-wrap" :key="phoneFileTableRandomKey">
-                        <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center">
-                            <div class="d-flex a-center phoneFileName">
+                        <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center flex-wrap">
+                            <div class="d-flex a-center phoneFileName" style="flex:7;">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">
                                     <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                 </div>
                             </div>
-                            <div class="phoneOperate d-flex a-center j-center">
-                                <el-link v-show="item.fileType==='js'" :underline="false" type="info" @click="phoneRunScriptPath(item)">运行</el-link>
-                                <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
-                                <el-link v-show="item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
-                                <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
-                                <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phoneReName(item)">重命名</el-link>
-                                <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
-                                <el-link :underline="false" type="info" style="margin-left: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
+                            <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:3;">
+                                <el-link v-show="item.fileType==='js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
+                                <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
+                                <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
+                                <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
+                                <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
+                                <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
                             </div>
                         </div>
                     </el-scrollbar>

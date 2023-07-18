@@ -3,8 +3,8 @@
         远程布局分析及上传
     </p>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="UI选择器:" class="width50">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="UI选择器:" class="flex-1">
                 <el-checkbox-group v-model="remoteHandler.param5.uiSelect">
                     <el-checkbox label="id">
                         id选择器
@@ -20,7 +20,7 @@
                     </el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
-            <el-form-item label="选择器条件:" class="width50">
+            <el-form-item label="选择器条件:" class="flex-1">
                 <el-radio-group v-model="remoteHandler.param5.uiSelectCondition">
                     <el-radio label="findOne">
                         找到一个(阻塞)findOne
@@ -42,8 +42,8 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="动作:" class="width50">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="动作:" class="flex-1">
                 <el-radio-group v-model="remoteHandler.param5.uiSelectAction">
                     <el-radio label="click">
                         点击click
@@ -56,7 +56,7 @@
                     </el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="布局分析范围:" label-width="140px" class="width50">
+            <el-form-item label="布局分析范围:" label-width="140px" class="flex-1">
                 <el-radio-group v-model="remoteHandler.param5.layoutAnalysisRange">
                     <el-radio label="active">
                         活跃窗口
@@ -69,13 +69,13 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="代码预览:" class="width60">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="代码预览:" style="flex:6">
                 <el-input type="textarea" v-model="remoteHandler.param5.scriptPreview"
                           :rows="5" placeholder="请点击控件后生成代码" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="控件信息:" class="width40">
+            <el-form-item label="控件信息:" style="flex:4">
                 <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="5"
                           placeholder="点击控件信息快速获取文本内容" class="width100">
                 </el-input>
@@ -83,43 +83,42 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center" style="margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;text-align: center;">
+        <div class="width100 d-flex a-center flex-wrap" style="margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;text-align: center;">
             <div>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="remoteLayoutAnalysisOneKey">
                     一键远程布局分析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="remoteLayoutAnalysis">
                     远程布局分析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="remoteLimitLayoutAnalysis">
                     远程限制应用布局分析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="uploadAndLoadNodeJson">
                     上传布局分析并解析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="loadNodeJson">
                     解析布局分析
                 </el-button>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="clearNodeJson(true)">
                     清空布局分析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="execNodePreviewScript">
                     执行代码
                 </el-button>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="clearNodePreviewScript">
                     清空代码
                 </el-button>
-
                 <el-dropdown trigger="click">
-                    <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                    <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                                size="mini">
                         常见自定义过滤函数
                     </el-button>
@@ -129,11 +128,11 @@
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="saveCustomFilterFunction">
                     保存自定义过滤函数
                 </el-button>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
+                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="loadCustomFilterFunction">
                     加载自定义过滤函数
                 </el-button>
@@ -199,14 +198,14 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center mt-1" v-loading="layoutLoading">
-            <el-tree :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
+        <div class="width100 d-flex a-center mt-1 flex-wrap" v-loading="layoutLoading">
+            <el-tree style="flex: 4;" :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
                      empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
                      :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
                      :default-expanded-keys="defaultExpandedKeys" :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
                      @node-click="nodeClickFun" @current-change="currentChangeFun" class="nodeTreeClass nodeDivCommon">
             </el-tree>
-            <div class="nodePreviewClass nodeDivCommon">
+            <div class="nodePreviewClass nodeDivCommon" style="flex: 4;">
                 <img id="nodePreviewImg" draggable="false" style="display: none;" />
                 <canvas v-if="remoteHandler.param5.rootNodeJson" id="nodePreviewCanvas"
                         style="width: 100%;margin: 0; padding: 0;">
@@ -220,7 +219,7 @@
                     请先上传控件或加载控件
                 </div>
             </div>
-            <div class="nodeDetailDiv nodeDivCommon">
+            <div class="nodeDetailDiv nodeDivCommon" style="flex: 3;">
                 <template v-if="remoteHandler.param5.dialogVisible">
                     <el-row class="nodeDetailRow">
                         <div class="labelClass">

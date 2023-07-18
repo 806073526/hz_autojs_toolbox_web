@@ -13,7 +13,7 @@ $.ajax({
 export default {
     template: template,
     name: 'DeviceInfo',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun'],
     props: {},
     data() {
         return {

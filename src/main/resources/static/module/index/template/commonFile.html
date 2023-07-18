@@ -6,12 +6,12 @@
     <div style="padding-left: 20px;margin-top: 0!important;">
         <el-row style="padding-left: 0!important;">
             <div class="d-flex j-sb a-center width100">
-                <div class="d-flex a-center">
-                    <el-button size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
-                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="createFolder">新建文件夹</el-button>
-                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="initPackPlugins">初始化打包插件</el-button>
-                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="settingJre">JAVA环境变量</el-button>
-                    <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="openCustomSignDialog">自定义签名</el-button>
+                <div class="d-flex a-center flex-wrap">
+                    <el-button size="mini" type="primary" style="margin-bottom: 5px;" @click="uploadFileClick">上传文件</el-button>
+                    <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="createFolder">新建文件夹</el-button>
+                    <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="initPackPlugins">初始化打包插件</el-button>
+                    <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="settingJre">JAVA环境变量</el-button>
+                    <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="openCustomSignDialog">自定义签名</el-button>
                 </div>
                 <input ref="commonInput" style="display: none;" type="file" name="file" :multiple="true" :accept="accept" @change="handleChange">
             </div>
@@ -49,18 +49,18 @@
         </el-row>
         <el-row style="padding-left: 0!important;">
             <div class="fileTableList" v-loading="fileLoading">
-                <div class="fileList-head d-flex a-center">
-                    <div class="d-flex a-center fileName">
+                <div class="fileList-head d-flex a-center flex-wrap">
+                    <div class="d-flex a-center fileName" style="flex:5">
                         <el-checkbox v-model="checkAllFile" @change="checkAllFileChange" />
                         <span style="margin-left: 8px">文件名</span>
                     </div>
-                    <div class="fileSize">文件大小</div>
-                    <div class="lastUpdateTime">最后更新时间</div>
-                    <div class="operate">操作</div>
+                    <div class="fileSize" style="flex:2;">文件大小</div>
+                    <div class="lastUpdateTime" style="flex:2;">最后更新时间</div>
+                    <div class="operate" style="flex:2;">操作</div>
                 </div>
                 <el-scrollbar class="right-scrollbar-wrap">
                     <div v-for="(item, index) in uploadFileList" :key="'upload'+index" class="fileList-head fileList-body d-flex a-center uploadFileHover">
-                        <div class="d-flex a-center fileName">
+                        <div class="d-flex a-center fileName" style="flex:5;">
                             <el-checkbox v-model="item.check" disabled />
                             <div class="fileNameWrap d-flex a-center flex-1">
                                 <span class="mr-16 text-fileName mt-0">{{ item.fileName }}</span>
@@ -70,24 +70,24 @@
                         <el-progress :percentage="item.percentage" :stroke-width="3" />
                     </div>
                     <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center">
-                        <div class="d-flex a-center fileName">
+                        <div class="d-flex a-center fileName" style="flex:5;">
                             <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native :disabled="!allowCheckFile(item)"/>
                             <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
                                 <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                             </div>
                         </div>
-                        <div class="d-flex a-center fileSize">
+                        <div class="d-flex a-center fileSize" style="flex:2;">
                             <span>{{ calculateSize(item.fileSize) }}</span>
                         </div>
-                        <div class="d-flex a-center lastUpdateTime">
+                        <div class="d-flex a-center lastUpdateTime" style="flex:2;">
                             <span>{{ item.lastUpdateTime }}</span>
                         </div>
-                        <div class="operate d-flex a-center j-center">
-                            <el-link v-show="!item.isDirectory" :underline="false" type="info" @click="downloadFile(item)">下载</el-link>
-                            <el-link v-show="allowOperateFile(item) && item.isDirectory" style="margin-left: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
-                            <el-link v-show="allowOperateFile(item) && item.fileType==='zip'" style="margin-left: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
-                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;" @click="reName(item)">重命名</el-link>
-                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;" @click="removeFile(item)">删除</el-link>
+                        <div class="operate d-flex a-center j-center" style="flex:2;">
+                            <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-bottom: 5px;" @click="downloadFile(item)">下载</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
+                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="reName(item)">重命名</el-link>
+                            <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="removeFile(item)">删除</el-link>
                         </div>
                     </div>
                 </el-scrollbar>

@@ -377,6 +377,7 @@ export default {
         },
         // 远程限制应用布局分析
         remoteLimitLayoutAnalysis() {
+            window.ZXW_VUE.$message.warning('客户端APP未去限制时,才需要使用该功能！');
             // 发送指令
             this.remoteExecuteScript('utilsObj.remoteLimitLayoutAnalysis("'+this.remoteHandler.param5.layoutAnalysisRange+'");');
         },

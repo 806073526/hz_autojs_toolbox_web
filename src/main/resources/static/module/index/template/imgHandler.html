@@ -3,35 +3,35 @@
         远程图像处理及上传
     </p>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="图片名称:" prop="localImageName" class="width50">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="图片名称:" prop="localImageName" label-width="100px" class="flex-1">
                 <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
                           class="width100" />
             </el-form-item>
-            <el-form-item label="文字识别:" prop="context" class="width50">
+            <el-form-item label="文字识别:" prop="context" label-width="100px" class="flex-1">
                 <el-input v-model="remoteHandler.param1.context" placeholder="请输入文字识别内容"
                           class="width100" />
             </el-form-item>
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="坐标x1:" prop="x1" class="width25">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="坐标x1:" prop="x1" label-width="100px" class="flex-1">
                 <el-input type="number" v-model="remoteHandler.param1.x1" oninput="if(value.length>10)value=value.slice(0,10)"
                           min="0" placeholder="请输入坐标值" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="坐标y1:" prop="y1" class="width25">
+            <el-form-item label="坐标y1:" prop="y1" label-width="100px" class="flex-1">
                 <el-input type="number" min="0" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.y1" placeholder="请输入坐标值" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="坐标x2:" prop="x1" class="width25">
+            <el-form-item label="坐标x2:" prop="x1" label-width="100px" class="flex-1">
                 <el-input type="number" v-model="remoteHandler.param1.x2" oninput="if(value.length>10)value=value.slice(0,10)"
                           min="0" placeholder="请输入坐标值" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="坐标y2:" prop="y2" class="width25">
+            <el-form-item label="坐标y2:" prop="y2" label-width="100px" class="flex-1">
                 <el-input type="number" min="0" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.y2" placeholder="请输入坐标值" class="width100">
                 </el-input>
@@ -39,13 +39,13 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="阈值化相似度:" prop="threshold" class="width50">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="阈值化相似度:" prop="threshold" label-width="100px" class="flex-1">
                 <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.threshold" placeholder="请输入阈值化相似度" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="阈值化最大值:" prop="maxVal" class="width50">
+            <el-form-item label="阈值化最大值:" prop="maxVal" label-width="100px" class="flex-1">
                 <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.maxVal" placeholder="请输入阈值化最大值" class="width100">
                 </el-input>
@@ -53,23 +53,23 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="图片相似度:" prop="threshold" class="width25">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="图片相似度:" prop="threshold" label-width="100px" class="flex-1">
                 <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.imgThreshold" placeholder="请输入图片相似度" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="颜色相似度:" prop="threshold" class="width25">
+            <el-form-item label="颜色相似度:" prop="threshold" label-width="100px" class="flex-1">
                 <el-input type="number" :min="0" :max="255" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.colorThreshold" placeholder="请输入颜色相似度" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="大图缩放比例:" prop="bigScale" class="width25">
+            <el-form-item label="大图缩放比例:" prop="bigScale" label-width="100px" class="flex-1">
                 <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.bigScale" placeholder="请输入大图缩放比例" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="小图缩放比例:" prop="smallScale" class="width25">
+            <el-form-item label="小图缩放比例:" prop="smallScale" label-width="100px" class="flex-1">
                 <el-input type="number" min="0" step="0.1" max="1" oninput="if(value.length>10)value=value.slice(0,10)"
                           v-model="remoteHandler.param1.smallScale" placeholder="请输入小图缩放比例" class="width100">
                 </el-input>
@@ -77,13 +77,13 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="坐标列表:" class="width40">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="坐标列表:" label-width="100px" style="flex:4;">
                 <el-input type="textarea" v-model="remoteHandler.param1.positionList"
                           placeholder="点击预览图片,获取点击位置的坐标,坐标列表可以用于解析坐标区域,多点找色等" :rows="5" class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item label="代码预览:" class="width60">
+            <el-form-item label="代码预览:" label-width="100px" style="flex:6">
                 <el-input type="textarea" v-model="remoteHandler.param1.scriptPreview"
                           placeholder="点击生成代码后,预览代码显示的区域" :rows="5" class="width100">
                 </el-input>
@@ -98,8 +98,8 @@
         </el-form-item>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="操作坐标key:" class="width15">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="操作坐标key:" style="flex:1;">
                 <el-select v-model="remoteHandler.param1.operatePositionKey" class="width100">
                     <el-option value="x1">
                         x1
@@ -115,12 +115,12 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="操作坐标值:" class="width15">
+            <el-form-item label="操作坐标值:" style="flex:1;">
                 <el-input type="number" :min="0" v-model="remoteHandler.param1.operatePositionVal"
                           class="width100">
                 </el-input>
             </el-form-item>
-            <el-form-item class="width70" style="display: flex;justify-content: flex-end;">
+            <el-form-item style="flex:5;display: flex;justify-content: flex-end;">
                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                     <el-radio-group v-model="screenDirection">
                         <el-radio label="横屏">

@@ -1,5 +1,5 @@
 <div>
-    <p class="basicInfo" style="position: relative;">
+    <p class="basicInfo" style="display: flex;justify-content: left;align-items: center;flex-wrap: wrap;height: auto !important;">
         已连接设备列表
         <i class="el-icon-refresh-right" style="cursor: pointer;font-weight: 600!important;"
            @click="getOnlineDevice">
@@ -8,7 +8,7 @@
         <span @click.stop="authorizedFun" target="_blank" style="margin-left: 2px;color: #9a2c25;cursor: pointer;">
             【设备{{authorizeStatus? '已' : '未'}}授权】
         </span>
-        <span style="position: absolute;right: 10px;">
+        <span class="flex-1" style="text-align: right">
             <a href="https://www.zjh336.cn/?id=2126" target="_blank" style="margin-right: 5px;color: #2f871a">
                 学习指南
             </a>
@@ -60,56 +60,66 @@
             </el-table>
         </div>
     </el-row>
-    <el-row style="margin-top: 10px;">
-        <div class="width100 d-flex a-center">
-            <el-form-item label="标准宽度:" prop="x1" class="width15">
+    <el-row>
+        <div class="width100 d-flex a-center flex-wrap" style="margin-top: 10px;">
+            <el-form-item label="标准宽度:" prop="x1"  label-width="100px" class="flex-1">
                 <el-input type="number" v-model="deviceInfo.standardWidth" placeholder="请设置标准宽度"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="标准高度:" prop="y1" class="width15">
+            <el-form-item label="标准高度:" prop="y1"  label-width="100px" class="flex-1">
                 <el-input type="number" v-model="deviceInfo.standardHeight" placeholder="请设置标准高度"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="x偏移系数:" prop="x1" class="width15">
+            <el-form-item label="x偏移系数:" prop="x1" label-width="100px"  class="flex-1">
                 <el-input type="number" v-model="deviceInfo.offsetX" placeholder="请设置x偏移系数"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="y偏移系数:" prop="y1" class="width15">
+            <el-form-item label="y偏移系数:" prop="y1"  label-width="100px" class="flex-1">
                 <el-input type="number" v-model="deviceInfo.offsetY" placeholder="请设置y偏移系数"
                           class="width100" @change="syncWidthHeightToApp">
                 </el-input>
             </el-form-item>
-            <el-form-item label="调试模式:" label-width="100px" class="width15">
-                <div class="d-flex j-center a-center">
+        </div>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+        <div class="width100 d-flex a-center flex-wrap">
+            <el-form-item label="调试模式:" label-width="100px" class="flex-1">
+                <div class="d-flex j-start a-center" style="height: 40px;">
                     <el-switch v-model="deviceInfo.debugModel" @change="syncWidthHeightToApp" style="margin-right: 5px;"/>
-                    <el-input type="number" v-model="deviceInfo.debugSleep" placeholder="请设置调试延时" class="flex-1"
-                              @change="syncWidthHeightToApp">
-                    </el-input>
                 </div>
             </el-form-item>
-           <el-form-item label="编辑器类型:" label-width="120px" class="width15">
-               <el-tooltip class="item" effect="dark"  content="请注意,修改编辑类型后,必须要刷新页面才能生效!" placement="top-start">
-                   <div class="d-flex j-center a-center" style="height: 40px;white-space: nowrap;">
-                       <el-radio-group v-model="editorType" @change="editorTypeChange">
-                               <el-radio label="vscode">
-                                   vscode
-                               </el-radio>
-                               <el-radio label="ace">
-                                   ace
-                               </el-radio>
-                       </el-radio-group>
-                       <i v-if="editorTypeNeedRefresh" class="el-icon-refresh-right" @click.stop="refreshPage" style="margin-left: 5px"/>
-                   </div>
-               </el-tooltip>
+            <el-form-item label="调试延时:" label-width="100px" class="flex-1">
+                <el-input type="number" v-model="deviceInfo.debugSleep" placeholder="请设置调试延时" class="flex-1"
+                          @change="syncWidthHeightToApp">
+                </el-input>
             </el-form-item>
-            <div class="width10 d-flex a-center" style="justify-content: right;margin-bottom:15px;">
+            <el-form-item label="编辑器类型:" label-width="100px" class="flex-1">
+                <el-tooltip class="item" effect="dark"  content="请注意,修改编辑类型后,必须要刷新页面才能生效!" placement="top-start">
+                    <div class="d-flex j-start a-center" style="height: 40px;white-space: nowrap;">
+                        <el-radio-group v-model="editorType" @change="editorTypeChange">
+                            <el-radio label="vscode">
+                                vscode
+                            </el-radio>
+                            <el-radio label="ace">
+                                ace
+                            </el-radio>
+                        </el-radio-group>
+                        <i v-if="editorTypeNeedRefresh" class="el-icon-refresh-right" @click.stop="refreshPage" style="margin-left: 5px"/>
+                    </div>
+                </el-tooltip>
+            </el-form-item>
+            <div class="d-flex j-start a-center flex-1"  style="margin-bottom:15px;">
                 <el-button @click.stop="syncWidthHeightToApp">
                     同步到APP
+                </el-button>
+                <el-button @click.stop="timeSyncOtherPropertyFun">
+                    从APP同步
                 </el-button>
             </div>
         </div>
     </el-row>
+
 </div>

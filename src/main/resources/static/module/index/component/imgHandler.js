@@ -11,7 +11,7 @@ $.ajax({
 export default {
     template: template,
     name: 'ImgHandler',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -75,6 +75,9 @@ export default {
         }
     },
     methods: {
+        init(){
+            this.timeSyncOtherPropertyFun();
+        },
         // 多点坐标转换
         multipleConvert() {
             let positionList = this.remoteHandler.param1.positionList;
