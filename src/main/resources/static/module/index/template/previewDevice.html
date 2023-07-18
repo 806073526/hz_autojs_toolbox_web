@@ -312,6 +312,10 @@
                         </span>
                         <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
                     </div>
+                    <el-button type="danger" size="mini" style="margin-left:10px" id="allScreenPreviewImg"
+                               @click.stop.prevent="allScreenPreviewImg">
+                        全屏预览
+                    </el-button>
                     <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
                                @click.stop.prevent="startPreviewDevice(true)">
                         开始预览
@@ -321,9 +325,83 @@
                     </el-button>
                 </div>
                 <div style="min-height: 40vh;width: 100%;display: flex;justify-content: center;align-items: center;text-align: center;">
-                    <div style="font-size: 20px;color: rgba(29,140,128,0.29)">
-                        <img id="devicePreviewImg" draggable="false" style="width: auto;margin: 0; padding: 0;height: 500px;max-width: 100%;"
-                        />
+                    <div style="font-size: 20px;color: rgba(29,140,128,0.29)" id="devicePreviewImgParent">
+                        <img id="devicePreviewImg" draggable="false" style="width: auto;margin: 0; padding: 0;height: 500px;max-width: 100%;"/>
+                        <div id="allScreenDiv" :style="{opacity:controlPanelOpen ? 1 : 0.3}" style="display: none;width: 250px;position: absolute;top: 0; background: #0e191a;padding: 5px;border: 1px solid whitesmoke;border-radius: 5px;">
+                            <div style="line-height: 20px;height: 20px;">
+                               <span style="float: left;color: blanchedalmond;">
+                                   控制面板
+                               </span>
+                               <span style="cursor: pointer;color:chartreuse;font-size: 18px;line-height: 20px;float: right" @click.stop="controlPanelOpenChange">
+                                   {{ controlPanelOpen ? '收起' : '展开'}}
+                               </span>
+                            </div>
+                            <div v-show="controlPanelOpen">
+                                <div style="color:wheat;font-size: 18px;">
+                                    <el-form-item label="坐标:" prop="textContent" class="width100" style="color: whitesmoke">
+                                        <div style="text-align: left;width: 100%;">x:{{deviceMousePosition.x }} y:{{deviceMousePosition.y}}</div>
+                                    </el-form-item>
+                                </div>
+                                <div class="width100 d-flex a-center">
+                                    <el-form-item label="文本传输内容:" prop="textContent" class="width100" style="color: whitesmoke">
+                                        <el-input type="textarea" v-model="textContent" placeholder=""
+                                                  class="width100">
+                                        </el-input>
+                                    </el-form-item>
+                                </div>
+                                <div class="width100 d-flex a-center" style="margin-top: 5px">
+                                    <el-form-item label="文本框序号:" prop="textIndex" class="width100" style="color: whitesmoke">
+                                        <el-input type="number" v-model="textIndex" placeholder=""
+                                                  oninput="if(value.length>10)value=value.slice(0,10)" step="1"
+                                                  max="5000" class="width100">
+                                        </el-input>
+                                    </el-form-item>
+                                </div>
+                                <div class="width100 d-flex a-center">
+                                    <el-form-item label="传输类型:" prop="textType" class="width100" style="color: whitesmoke">
+                                        <el-radio-group v-model="textType">
+                                            <el-radio label="text">
+                                                覆盖
+                                            </el-radio>
+                                            <el-radio label="input">
+                                                追加
+                                            </el-radio>
+                                        </el-radio-group>
+                                    </el-form-item>
+                                </div>
+                                <div style="justify-content: flex-end;align-items: center;text-align: center;width: 100%">
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="sendTextContent">
+                                        发送文本
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" id="allScreenPreviewImg"
+                                               @click.stop.prevent="allScreenPreviewImg">
+                                        退出全屏
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" id="loadPreviewImg"
+                                               @click.stop.prevent="startPreviewDevice(true)">
+                                        开始预览
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="stopPreviewDevice(true)">
+                                        停止预览
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('powerDialog')">
+                                        电源按钮
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('recents')">
+                                        最近任务
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('quickSettings')">
+                                        下拉通知
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('home')">
+                                        返回主页
+                                    </el-button>
+                                    <el-button type="danger" size="mini" style="margin-left:10px" @click.stop.prevent="fixedOperate('back')">
+                                        返回按钮
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </el-form-item>

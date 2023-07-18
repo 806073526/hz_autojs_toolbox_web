@@ -47,6 +47,7 @@ export default {
                 valueUpdateAfterAutoPreview: false,
                 operateRecord: ''
             },
+            controlPanelOpen:true,//控制面板是否展开
             textContent: '',// 文本信息传输
             textIndex: null, // 文本传输序号
             textType: 'text',// 文本传输类型
@@ -86,7 +87,26 @@ export default {
           return !notCompleted;
       }
     },
+    mounted(){
+        window.removeEventListener('resize',this.allScreenPreviewChange);
+        window.addEventListener('resize',this.allScreenPreviewChange);
+    },
+    beforeDestroy(){
+        window.removeEventListener('resize',this.allScreenPreviewChange);
+    },
     methods: {
+        allScreenPreviewChange() {
+            if (!!document.fullscreenElement) {
+                $("#devicePreviewImg").css("height", "100%");
+                $("#allScreenDiv").show();
+            } else {
+                $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
+                $("#allScreenDiv").hide();
+            }
+        },
+        controlPanelOpenChange(){
+          this.controlPanelOpen = !this.controlPanelOpen;
+        },
         // 开始预览设备
         startPreviewDevice(notice) {
             let messageStr = JSON.stringify(this.devicePreviewParam);
@@ -121,7 +141,50 @@ export default {
 
                 devicePreviewBox.removeEventListener('mouseup', this.deviceMouseUp);
                 devicePreviewBox.addEventListener('mouseup', this.deviceMouseUp, true);
+
+
+                devicePreviewBox.removeEventListener('touchstart', this.deviceTouchStart);
+                devicePreviewBox.addEventListener('touchstart', this.deviceTouchStart, true);
+
+                devicePreviewBox.removeEventListener('touchmove', this.deviceTouchMove);
+                devicePreviewBox.addEventListener('touchmove', this.deviceTouchMove);
+
+
+                devicePreviewBox.removeEventListener('touchend', this.deviceTouchEnd);
+                devicePreviewBox.addEventListener('touchend', this.deviceTouchEnd, true);
+
+                // 全屏监听
+                this.allScreenPreviewChange();
             })
+        },
+        allScreenPreviewImg(){
+            // 获取需要全屏展示的div
+            let fullarea = document.getElementById('devicePreviewImgParent');
+            if (!document.fullscreenElement) {
+                // 全屏
+                if(fullarea.requestFullscreen){
+                    fullarea.requestFullscreen();
+                } else if (fullarea.mozRequestFullScreen) {
+                    fullarea.mozRequestFullScreen();
+                } else if (fullarea.webkitRequestFullscreen) {
+                    fullarea.webkitRequestFullscreen();
+                } else if (fullarea.msRequestFullscreen) {
+                    fullarea.msRequestFullscreen();
+                }
+            } else {
+                // 退出全屏
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+            // 全屏监听
+            this.allScreenPreviewChange();
         },
         // 停止预览设备
         stopPreviewDevice(notice, callback) {
@@ -553,7 +616,6 @@ export default {
                 success: function (data) {
                     if (data) {
                         if (data.isSuccess) {
-                            console.log(data.data);
                             _that.historyNoticeMessageList = [];
                             let arr = data.data || [];
                             arr.forEach(item=>{
@@ -710,19 +772,163 @@ export default {
             window.deviceMouseX1 = this.deviceMousePosition.x;
             window.deviceMouseY1 = this.deviceMousePosition.y;
             window.deviceMouseStartTime = new Date().getTime();
+
+            // 初始化手势数组
+            window.deviceGestures = [{x:window.deviceMouseX1,y:window.deviceMouseY1,time:window.deviceMouseStartTime}];
+        },
+        // 手指按下
+        deviceTouchStart(e){
+            // 当前屏幕的触摸列表
+            let touchers = e.touches;
+            // 只有一个点触发时
+            if(touchers.length === 1){
+                let curToucher = touchers[0];
+                let result = this.convertPosition((curToucher.clientX-curToucher.target.x),(curToucher.clientY-curToucher.target.y));
+                this.deviceMousePosition.x = result.x;
+                this.deviceMousePosition.y = result.y;
+                // 按下记录开始鼠标位置
+                window.deviceTouchX1 = this.deviceMousePosition.x;
+                window.deviceTouchY1 = this.deviceMousePosition.y;
+                window.deviceTouchStartTime = new Date().getTime();
+
+                // 初始化手势数组
+                window.deviceGestures = [{x:window.deviceTouchX1,y:window.deviceTouchY1,time:window.deviceTouchStartTime}];
+            }
+            e.preventDefault();
+        },
+        deviceTouchMove(e){
+            // 当前屏幕的触摸列表
+            let touchers = e.touches;
+            if(touchers && touchers.length>0){
+                let curToucher = touchers[0];
+                let result = this.convertPosition((curToucher.clientX-curToucher.target.x),(curToucher.clientY-curToucher.target.y));
+                this.deviceMousePosition.x = result.x;
+                this.deviceMousePosition.y = result.y;
+
+                let deviceGestures = window.deviceGestures || [];
+                // 如果存在手势数组时
+                if(deviceGestures && deviceGestures.length){
+                    // 获取最后一个手势对象
+                    let lastGestureObj = deviceGestures[deviceGestures.length-1];
+                    // 时间差
+                    let differentTimes = new Date().getTime() - lastGestureObj.time;
+                    // 大于等于10毫秒
+                    if(differentTimes>=10){
+                        // 记录新的手势点
+                        let newGestureObj = {
+                            x:this.deviceMousePosition.x,
+                            y:this.deviceMousePosition.y,
+                            time:new Date().getTime()
+                        };
+                        window.deviceGestures.push(newGestureObj);
+                    }
+                }
+
+            }
+            e.preventDefault();
+        },
+        // 手指松开
+        deviceTouchEnd(e) {
+            // 当前屏幕的触摸列表
+            let touchers = e.touches;
+            // 没有点时触发
+            if(touchers.length === 0){
+                // 松开记录结束鼠标位置
+                window.deviceTouchX2 = this.deviceMousePosition.x;
+                window.deviceTouchY2 = this.deviceMousePosition.y;
+                window.deviceTouchEndTime = new Date().getTime();
+
+                let positionVal1 = window.deviceTouchX1 + "," + window.deviceTouchY1;
+                let positionVal2 = window.deviceTouchX2 + "," + window.deviceTouchY2;
+                // 坐标值不相同
+                if (positionVal1 !== positionVal2) {
+                    if (!this.deviceInfo.startPreview) {
+                        return
+                    }
+                    let deviceGestures = window.deviceGestures || [];
+                    if(deviceGestures && deviceGestures.length){
+                        let lastTime = deviceGestures[deviceGestures.length-1].time;
+                        let firstTime = deviceGestures[0].time;
+                        // 持续时长
+                        let duration = Number(lastTime)-Number(firstTime);
+                        // 拼接手势点
+                        let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
+                        // 拼接操作代码
+                        let operateCode =  `gesture(${duration},${otherPoints})`;
+                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                        // 发送滑动指令
+                        this.remoteExecuteScript(operateCode);
+                        window.deviceGestures = [];
+                        return;
+                    }
+                    let operateCode = 'swipe(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ',' + window.deviceTouchX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceTouchEndTime - window.deviceTouchStartTime) + ')';
+                    this.devicePreviewParam.operateRecord += operateCode + ";";
+                    // 发送滑动指令
+                    this.remoteExecuteScript(operateCode);
+                    // 坐标相同
+                } else {
+                    // 大于500毫秒 即为长按
+                    if (window.deviceTouchEndTime - window.deviceTouchStartTime > 500) {
+                        if (!this.deviceInfo.startPreview) {
+                            return
+                        }
+                        let operateCode = 'longClick(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ')';
+                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                        // 发送长按指令
+                        this.remoteExecuteScript(operateCode);
+                    } else {
+                        let operateCode = 'click(' + this.deviceMousePosition.x + ',' + this.deviceMousePosition.y + ')';
+                        this.remoteExecuteScript(operateCode);
+                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                    }
+                }
+            }
+            e.preventDefault();
+        },
+        // 转换坐标
+        convertPosition(x,y){
+            let box = document.querySelector('#devicePreviewImg');
+            let obj = {
+                x:0,
+                y:0
+            };
+            // 竖屏
+            if (this.screenDirection === "竖屏") {
+                obj.x = Number(x * (this.deviceInfo.screenWidth / box.width)).toFixed(0);
+                obj.y = Number(y * (this.deviceInfo.screenHeight / box.height)).toFixed(0);
+                // 横屏
+            } else if (this.screenDirection === "横屏") {
+                obj.x = Number(x * (this.deviceInfo.screenHeight / box.width)).toFixed(0);
+                obj.y = Number(y * (this.deviceInfo.screenWidth / box.height)).toFixed(0);
+            }
+            return obj;
         },
         // 设备鼠标移动
         deviceMouseMove(e) {
-            let box = document.querySelector('#devicePreviewImg');
-            // 竖屏
-            if (this.screenDirection === "竖屏") {
-                this.deviceMousePosition.x = Number(e.offsetX * (this.deviceInfo.screenWidth / box.width)).toFixed(0);
-                this.deviceMousePosition.y = Number(e.offsetY * (this.deviceInfo.screenHeight / box.height)).toFixed(0);
-                // 横屏
-            } else if (this.screenDirection === "横屏") {
-                this.deviceMousePosition.x = Number(e.offsetX * (this.deviceInfo.screenHeight / box.width)).toFixed(0);
-                this.deviceMousePosition.y = Number(e.offsetY * (this.deviceInfo.screenWidth / box.height)).toFixed(0);
+            // 转换坐标
+            let result = this.convertPosition(e.offsetX,e.offsetY);
+            this.deviceMousePosition.x = result.x;
+            this.deviceMousePosition.y = result.y;
+
+            let deviceGestures = window.deviceGestures || [];
+            // 如果存在手势数组时
+            if(deviceGestures && deviceGestures.length){
+                // 获取最后一个手势对象
+                let lastGestureObj = deviceGestures[deviceGestures.length-1];
+                // 时间差
+                let differentTimes = new Date().getTime() - lastGestureObj.time;
+                // 大于等于10毫秒
+                if(differentTimes>=10){
+                    // 记录新的手势点
+                    let newGestureObj = {
+                        x:this.deviceMousePosition.x,
+                        y:this.deviceMousePosition.y,
+                        time:new Date().getTime()
+                    };
+                    window.deviceGestures.push(newGestureObj);
+                }
             }
+
         },
         // 设备鼠标松开
         deviceMouseUp(e) {
@@ -737,6 +943,22 @@ export default {
             if (positionVal1 !== positionVal2) {
                 if (!this.deviceInfo.startPreview) {
                     return
+                }
+                let deviceGestures = window.deviceGestures || [];
+                if(deviceGestures && deviceGestures.length){
+                    let lastTime = deviceGestures[deviceGestures.length-1].time;
+                    let firstTime = deviceGestures[0].time;
+                    // 持续时长
+                    let duration = Number(lastTime)-Number(firstTime);
+                    // 拼接手势点
+                    let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
+                    // 拼接操作代码
+                    let operateCode =  `gesture(${duration},${otherPoints})`;
+                    this.devicePreviewParam.operateRecord += operateCode + ";";
+                    // 发送滑动指令
+                    this.remoteExecuteScript(operateCode);
+                    window.deviceGestures = [];
+                    return;
                 }
                 let operateCode = 'swipe(' + window.deviceMouseX1 + ',' + window.deviceMouseY1 + ',' + window.deviceMouseX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceMouseEndTime - window.deviceMouseStartTime) + ')';
                 this.devicePreviewParam.operateRecord += operateCode + ";";
