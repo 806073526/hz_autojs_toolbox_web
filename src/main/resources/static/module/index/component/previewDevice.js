@@ -776,6 +776,14 @@ export default {
             // 初始化手势数组
             window.deviceGestures = [{x:window.deviceMouseX1,y:window.deviceMouseY1,time:window.deviceMouseStartTime}];
         },
+        getElementTop(elem) {
+            const rect = elem.getBoundingClientRect(); // 获取元素大小、位置等信息
+            return rect.top + window.pageYOffset; // 返回元素顶部距离页面顶部的距离
+        },
+        getElementLeft(elem) {
+            const rect = elem.getBoundingClientRect(); // 获取元素大小、位置等信息
+            return rect.left + window.pageXOffset;
+        },
         // 手指按下
         deviceTouchStart(e){
             // 当前屏幕的触摸列表
@@ -783,7 +791,13 @@ export default {
             // 只有一个点触发时
             if(touchers.length === 1){
                 let curToucher = touchers[0];
-                let result = this.convertPosition((curToucher.clientX-curToucher.target.x),(curToucher.clientY-curToucher.target.y));
+                let curX = curToucher.pageX- this.getElementLeft(curToucher.target);
+                let curY = curToucher.pageY- this.getElementTop(curToucher.target);
+                let result = this.convertPosition(curX,curY);
+                if(!result){
+                    e.preventDefault();
+                    return;
+                }
                 this.deviceMousePosition.x = result.x;
                 this.deviceMousePosition.y = result.y;
                 // 按下记录开始鼠标位置
@@ -801,7 +815,13 @@ export default {
             let touchers = e.touches;
             if(touchers && touchers.length>0){
                 let curToucher = touchers[0];
-                let result = this.convertPosition((curToucher.clientX-curToucher.target.x),(curToucher.clientY-curToucher.target.y));
+                let curX = curToucher.pageX-this.getElementLeft(curToucher.target);
+                let curY = curToucher.pageY-this.getElementTop(curToucher.target);
+                let result = this.convertPosition(curX,curY);
+                if(!result){
+                    e.preventDefault();
+                    return;
+                }
                 this.deviceMousePosition.x = result.x;
                 this.deviceMousePosition.y = result.y;
 
@@ -837,6 +857,11 @@ export default {
                 window.deviceTouchX2 = this.deviceMousePosition.x;
                 window.deviceTouchY2 = this.deviceMousePosition.y;
                 window.deviceTouchEndTime = new Date().getTime();
+
+                if(!window.deviceTouchX1 && window.deviceTouchX1!==0){
+                    e.preventDefault();
+                    return;
+                }
 
                 let positionVal1 = window.deviceTouchX1 + "," + window.deviceTouchY1;
                 let positionVal2 = window.deviceTouchX2 + "," + window.deviceTouchY2;
@@ -896,10 +921,19 @@ export default {
             if (this.screenDirection === "竖屏") {
                 obj.x = Number(x * (this.deviceInfo.screenWidth / box.width)).toFixed(0);
                 obj.y = Number(y * (this.deviceInfo.screenHeight / box.height)).toFixed(0);
+                // 超过范围
+                if(obj.x < 0 || obj.x > (this.deviceInfo.screenWidth / box.width) * box.width || obj.y < 0 || obj.y > (this.deviceInfo.screenHeight / box.height) * box.height){
+                    return null;
+                }
                 // 横屏
             } else if (this.screenDirection === "横屏") {
                 obj.x = Number(x * (this.deviceInfo.screenHeight / box.width)).toFixed(0);
                 obj.y = Number(y * (this.deviceInfo.screenWidth / box.height)).toFixed(0);
+
+                // 超过范围
+                if(obj.x < 0 || obj.x > (this.deviceInfo.screenHeight / box.width) * box.width || obj.y < 0 || obj.y > (this.deviceInfo.screenWidth / box.height) * box.height){
+                    return null;
+                }
             }
             return obj;
         },
@@ -907,6 +941,10 @@ export default {
         deviceMouseMove(e) {
             // 转换坐标
             let result = this.convertPosition(e.offsetX,e.offsetY);
+            if(!result){
+                e.preventDefault();
+                return;
+            }
             this.deviceMousePosition.x = result.x;
             this.deviceMousePosition.y = result.y;
 
