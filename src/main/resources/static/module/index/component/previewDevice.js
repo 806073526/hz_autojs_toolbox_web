@@ -183,8 +183,16 @@ export default {
                     document.msExitFullscreen();
                 }
             }
-            // 全屏监听
-            this.allScreenPreviewChange();
+            let intervalTimes = 0;
+            // 设置定时器
+            let interval = setInterval(()=>{
+                // 全屏监听
+                this.allScreenPreviewChange();
+                intervalTimes++;
+                if(intervalTimes>=100){
+                    clearInterval(interval);
+                }
+            },10)
         },
         // 停止预览设备
         stopPreviewDevice(notice, callback) {
