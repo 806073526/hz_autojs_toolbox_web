@@ -106,6 +106,12 @@
                                 </el-input>
                             </template>
                         </el-table-column>
+                        <el-table-column prop="fixedMessage" label="固定内容" align="left">
+                            <template slot-scope="{ row, $index}">
+                                <el-input type="textarea" v-model="row.fixedMessage" :rows="3"  placeholder="请输入内容,用于标识信息来源" class="width100">
+                                </el-input>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="executeScript" label="执行代码" align="left">
                             <template slot-scope="{ row, $index}">
                                 <el-input type="textarea" v-model="row.executeScript" :rows="3" placeholder="请填写执行代码"
@@ -144,6 +150,10 @@
                 </div>
                 <el-table :data="historyNoticeMessageList"  border ref="historyNoticeMessageListTable"
                           highlight-current-row style="width: 100%">
+                    <el-table-column prop="来源设备" align="left" label="来源设备" width="200">
+                    </el-table-column>
+                    <el-table-column prop="固定内容" align="left" label="固定内容" width="200">
+                    </el-table-column>
                     <el-table-column prop="应用包名" align="left" label="应用包名" width="200">
                     </el-table-column>
                     <el-table-column prop="通知文本" label="通知文本" align="left">

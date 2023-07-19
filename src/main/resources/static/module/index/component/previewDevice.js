@@ -691,7 +691,8 @@ export default {
                             "通知目录": notification.category || "",
                             "通知时间": new Date(notification.when),
                             "通知数": notification.number || 0,
-                            "通知摘要": notification.tickerText || ""
+                            "通知摘要": notification.tickerText || "",
+                            "来源设备": deviceUUID
                         }
                         try{
                             matchingRules.forEach(item=>{
@@ -701,7 +702,12 @@ export default {
                                     if (item.autoClick) {
                                         notification.click();
                                     }
-                                    let message = JSON.stringify(messageObj)
+                                    // 设置固定消息内容 用于做标志
+                                    if(item.fixedMessage){
+                                        messageObj["固定内容"] = item.fixedMessage;
+                                    }
+                                    
+                                    let message =  JSON.stringify(messageObj)
                                     item.message = $base64.encode(encodeURI(message))
                                     item.title = "手机端通知消息";
                                     sleep(1000);
