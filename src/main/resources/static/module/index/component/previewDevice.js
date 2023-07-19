@@ -685,14 +685,15 @@ export default {
                     events.observeNotification();
                     events.onNotification(function(notification) {
                         let messageObj = {
-                            "应用包名": notification.getPackageName() || "",
+                            "固定内容": "",
                             "通知文本": notification.getText() || "",
+                            "通知摘要": notification.tickerText || "",
+                            "来源设备": deviceUUID,
+                            "应用包名": notification.getPackageName() || "",
                             "通知优先级": notification.priority || 0,
                             "通知目录": notification.category || "",
                             "通知时间": new Date(notification.when),
-                            "通知数": notification.number || 0,
-                            "通知摘要": notification.tickerText || "",
-                            "来源设备": deviceUUID
+                            "通知数": notification.number || 0
                         }
                         try{
                             matchingRules.forEach(item=>{
@@ -705,6 +706,8 @@ export default {
                                     // 设置固定消息内容 用于做标志
                                     if(item.fixedMessage){
                                         messageObj["固定内容"] = item.fixedMessage;
+                                    } else {
+                                        delete messageObj["固定内容"];
                                     }
                                     
                                     let message =  JSON.stringify(messageObj)
