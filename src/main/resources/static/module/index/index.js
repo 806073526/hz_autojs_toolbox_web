@@ -271,10 +271,12 @@ window.ZXW_VUE = new Vue({
                 success: function (data) {
                     if (data) {
                         if (data.isSuccess) {
-                            window.ZXW_VUE.$notify.success({
-                                message: '发送成功',
-                                duration: '1000'
-                            });
+                            if(!window.hideRemoteScriptNotify){
+                                window.ZXW_VUE.$notify.success({
+                                    message: '发送成功',
+                                    duration: '1000'
+                                });
+                            }
                             if (callback) {
                                 callback()
                             }

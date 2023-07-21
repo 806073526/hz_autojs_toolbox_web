@@ -39,6 +39,7 @@ export default {
                 imgQuality: 10,
                 imgScale: 1,
                 previewHeight: 500,
+                isOpenFastModel: false,
                 isOpenGray: false,
                 isOpenThreshold: false,
                 imgThreshold: 60, // 图片阈值相似度
@@ -281,8 +282,6 @@ export default {
                             afterImg = afterImg2
                         } 
                         let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
-                        // 临时图片路径
-                        files.remove(tempImgPath)
                         sleep(10)
                         http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
                             headers: {
@@ -292,7 +291,6 @@ export default {
                             contentType: 'application/json',
                             body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': images.toBase64(afterImg, "jpg", deviceParam.imgQuality) })
                         }, (e) => { 
-                            console.log('发送成功');
                         });
                         afterImg.recycle()
                         img.recycle()
@@ -401,6 +399,11 @@ export default {
             let remoteScript = `
             // 唤醒设备
             device.wakeUpIfNeeded();
+            if(utilsObj.raObj){
+              utilsObj.raObj.flush();
+              utilsObj.raObj.exit(true);
+              utilsObj.raObj = null;
+            }
             if(utilsObj.deviceThread){
                 toastLog("停止预览");
                 utilsObj.deviceThread.interrupt();
@@ -990,6 +993,64 @@ export default {
             this.remoteExecuteScript(operateCode);
             this.devicePreviewParam.operateRecord += operateCode + ";";
         },
+        // 灵敏模式按下事件
+        fastModelDown(eventType){
+            let needClear = false;
+            if(window.deviceMouseDown){
+                needClear = true;
+                window.hideRemoteScriptNotify = true;
+            }
+            if(eventType === 'mouse'){
+                window.deviceMouseDown = true;
+            } else {
+                window.deviceTouchDown = true;
+            }
+
+            let remoteScript = `
+                    if(!utilsObj.hasAdb){
+                        utilsObj.hasAdb =  $shell.checkAccess("adb") ? 1 : 2;
+                    }
+                    if (!utilsObj.hasRoot) {
+                        utilsObj.hasRoot =  $shell.checkAccess("root") ? 1 : 2;  
+                    }
+                    if(utilsObj.raObj && ${needClear}){
+                        utilsObj.raObj.flush();
+                        utilsObj.raObj.touchUp();
+                    }
+                    if(utilsObj.hasAdb === 1){
+                        utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                            adb: true
+                        });
+                    }
+                    if(utilsObj.hasRoot === 1){
+                        utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                            root: true
+                        });
+                    }
+                    
+                    
+                    let execFun = ()=>{
+                        if(!utilsObj.raObj){
+                            toastLog("无adb和root权限,建议使用Shizuku进行adb授权")
+                            return;
+                        }
+                        let ra = utilsObj.raObj;
+                        try{
+                            ra.touchDown([{
+                                x: ${eventType === 'mouse' ? window.deviceMouseX1 : window.deviceTouchX1},
+                                y: ${eventType === 'mouse' ? window.deviceMouseY1 : window.deviceTouchY2},
+                                id: 0
+                            }]);
+                        }catch(e){
+                            utilsObj.raObj.touchUp();
+                            utilsObj.raObj.flush();
+                        }
+                    }
+                    execFun();
+                `;
+            this.remoteExecuteScript(remoteScript);
+            window.hideRemoteScriptNotify = true;
+        },
         // 设备鼠标按下
         deviceMouseDown(e) {
             // 按下记录开始鼠标位置
@@ -999,6 +1060,10 @@ export default {
 
             // 初始化手势数组
             window.deviceGestures = [{x:window.deviceMouseX1,y:window.deviceMouseY1,time:window.deviceMouseStartTime}];
+            // 灵敏模式 鼠标按下 直接发送按下指令
+            if(this.devicePreviewParam.isOpenFastModel){
+                this.fastModelDown('mouse');
+            }
         },
         getElementTop(elem) {
             const rect = elem.getBoundingClientRect(); // 获取元素大小、位置等信息
@@ -1031,6 +1096,11 @@ export default {
 
                 // 初始化手势数组
                 window.deviceGestures = [{x:window.deviceTouchX1,y:window.deviceTouchY1,time:window.deviceTouchStartTime}];
+
+                // 灵敏模式 触摸按下 直接发送按下指令
+                if(this.devicePreviewParam.isOpenFastModel){
+                    this.fastModelDown('touch');
+                }
             }
             e.preventDefault();
         },
@@ -1065,6 +1135,11 @@ export default {
                             time:new Date().getTime()
                         };
                         window.deviceGestures.push(newGestureObj);
+
+                        // 灵敏模式 触摸移动 直接发送移动指令
+                        if(this.devicePreviewParam.isOpenFastModel && window.deviceTouchDown){
+                            this.fastModelMove();
+                        }
                     }
                 }
 
@@ -1089,11 +1164,18 @@ export default {
 
                 let positionVal1 = window.deviceTouchX1 + "," + window.deviceTouchY1;
                 let positionVal2 = window.deviceTouchX2 + "," + window.deviceTouchY2;
+
+                if (!this.deviceInfo.startPreview) {
+                    return
+                }
+                // 灵敏模式 触摸松开 直接发送松开指令
+                if(this.devicePreviewParam.isOpenFastModel){
+                    window.deviceTouchDown = false;
+                    this.fastModelUp();
+                    return;
+                }
                 // 坐标值不相同
                 if (positionVal1 !== positionVal2) {
-                    if (!this.deviceInfo.startPreview) {
-                        return
-                    }
                     let deviceGestures = window.deviceGestures || [];
                     if(deviceGestures && deviceGestures.length){
                         let lastTime = deviceGestures[deviceGestures.length-1].time;
@@ -1161,6 +1243,46 @@ export default {
             }
             return obj;
         },
+        // 灵敏模式移动事件
+        fastModelMove(eventType){
+            let remoteScript = `
+                if(!utilsObj.hasAdb){
+                    utilsObj.hasAdb =  $shell.checkAccess("adb") ? 1 : 2;
+                }
+                if (!utilsObj.hasRoot) {
+                    utilsObj.hasRoot =  $shell.checkAccess("root") ? 1 : 2;  
+                }
+                if(utilsObj.hasAdb === 1){
+                    utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                        adb: true
+                    });
+                }
+                if(utilsObj.hasRoot === 1){
+                    utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                        root: true
+                    });
+                }
+                let execFun = ()=>{
+                    if(!utilsObj.raObj){
+                        toastLog("无adb和root权限,建议使用Shizuku进行adb授权")
+                        return;
+                    }
+                    let ra = utilsObj.raObj;
+                    try{
+                        ra.touchMove([{
+                            x: ${this.deviceMousePosition.x},
+                            y: ${this.deviceMousePosition.y},
+                            id: 0
+                        }]);
+                    }catch(e){
+                        utilsObj.raObj.touchUp();
+                        utilsObj.raObj.flush();
+                    }
+                }
+                execFun();
+                `;
+            this.remoteExecuteScript(remoteScript);
+        },
         // 设备鼠标移动
         deviceMouseMove(e) {
             // 转换坐标
@@ -1188,9 +1310,51 @@ export default {
                         time:new Date().getTime()
                     };
                     window.deviceGestures.push(newGestureObj);
+                    // 灵敏模式 鼠标移动 直接发送移动指令
+                    if(this.devicePreviewParam.isOpenFastModel && window.deviceMouseDown){
+                        this.fastModelMove();
+                    }
                 }
             }
 
+        },
+        // 灵敏模式松开事件
+        fastModelUp(){
+            let remoteScript = `
+                        if(!utilsObj.hasAdb){
+                            utilsObj.hasAdb =  $shell.checkAccess("adb") ? 1 : 2;
+                        }
+                        if (!utilsObj.hasRoot) {
+                            utilsObj.hasRoot =  $shell.checkAccess("root") ? 1 : 2;  
+                        }
+                        if(utilsObj.hasAdb === 1){
+                            utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                                adb: true
+                            });
+                        }
+                        if(utilsObj.hasRoot === 1){
+                            utilsObj.raObj = utilsObj.raObj || new RootAutomator2({
+                                root: true
+                            });
+                        }
+                        let execFun = ()=>{
+                            if(!utilsObj.raObj){
+                                toastLog("无adb和root权限,建议使用Shizuku进行adb授权")
+                                return;
+                            }
+                            let ra = utilsObj.raObj;
+                            try{
+                                ra.touchUp();
+                                ra.flush();
+                             } catch(e){
+                                utilsObj.raObj.touchUp();
+                                utilsObj.raObj.flush();
+                             }
+                        }
+                        execFun();
+                    `;
+            this.remoteExecuteScript(remoteScript);
+            window.hideRemoteScriptNotify = false;
         },
         // 设备鼠标松开
         deviceMouseUp(e) {
@@ -1201,11 +1365,18 @@ export default {
 
             let positionVal1 = window.deviceMouseX1 + "," + window.deviceMouseY1;
             let positionVal2 = window.deviceMouseX2 + "," + window.deviceMouseY2;
+
+            if (!this.deviceInfo.startPreview) {
+                return
+            }
+            // 灵敏模式 鼠标松开 直接发送松开指令
+            if(this.devicePreviewParam.isOpenFastModel){
+                window.deviceMouseDown = false;
+                this.fastModelUp();
+                return;
+            }
             // 坐标值不相同
             if (positionVal1 !== positionVal2) {
-                if (!this.deviceInfo.startPreview) {
-                    return
-                }
                 let deviceGestures = window.deviceGestures || [];
                 if(deviceGestures && deviceGestures.length){
                     let lastTime = deviceGestures[deviceGestures.length-1].time;

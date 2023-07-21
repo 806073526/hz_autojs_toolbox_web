@@ -306,6 +306,13 @@
             <div class="flex-wrap" style="display: flex;justify-content: flex-end;align-items: center;text-align: center;width: 100%">
                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                         <span>
+                            开启灵敏模式(adb或root)：
+                        </span>
+                    <el-switch v-model="devicePreviewParam.isOpenFastModel" @change="autoDevicePreview"
+                    />
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
+                        <span>
                             开启灰度化：
                         </span>
                     <el-switch v-model="devicePreviewParam.isOpenGray" @change="autoDevicePreview"
