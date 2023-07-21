@@ -160,10 +160,16 @@ export default {
         allScreenPreviewImg(){
             // 获取需要全屏展示的div
             let fullarea = document.getElementById('devicePreviewImgParent');
+            let alreadyComplete = false;
             if (!document.fullscreenElement) {
                 // 全屏
                 if(fullarea.requestFullscreen){
-                    fullarea.requestFullscreen();
+                    fullarea.requestFullscreen().then(data=>{
+                        alreadyComplete = true;
+                        // 全屏监听
+                        this.allScreenPreviewChange();
+                    }).catch(e=>{
+                    });
                 } else if (fullarea.mozRequestFullScreen) {
                     fullarea.mozRequestFullScreen();
                 } else if (fullarea.webkitRequestFullscreen) {
@@ -183,16 +189,19 @@ export default {
                     document.msExitFullscreen();
                 }
             }
-            let intervalTimes = 0;
-            // 设置定时器
-            let interval = setInterval(()=>{
-                // 全屏监听
-                this.allScreenPreviewChange();
-                intervalTimes++;
-                if(intervalTimes>=100){
-                    clearInterval(interval);
-                }
-            },10)
+
+            if(!alreadyComplete){
+                let intervalTimes = 0;
+                // 设置定时器
+                let interval = setInterval(()=>{
+                    // 全屏监听
+                    this.allScreenPreviewChange();
+                    intervalTimes++;
+                    if(intervalTimes>=100){
+                        clearInterval(interval);
+                    }
+                },10)
+            }
         },
         // 停止预览设备
         stopPreviewDevice(notice, callback) {
