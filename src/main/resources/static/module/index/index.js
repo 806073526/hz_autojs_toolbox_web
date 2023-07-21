@@ -291,11 +291,14 @@ window.ZXW_VUE = new Vue({
             });
         },
         // 远程执行脚本
-        remoteExecuteScript(scriptContent) {
+        remoteExecuteScript(scriptContent,callback) {
             // 指令为remoteHandler
             // functionName为utils.js中的方法 remoteExecScript  解析传入脚本代码并通过eval执行
             let messageStr = '{"functionName":"remoteExecScript","functionParam":["' + encodeURIComponent(scriptContent) + '"]}';
             this.sendMsgToClient('remoteHandler', messageStr, () => {
+                if (callback) {
+                    callback()
+                }
             })
         },
         // 编辑器最大化

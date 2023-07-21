@@ -47,6 +47,9 @@ export default {
                 valueUpdateAfterAutoPreview: false,
                 operateRecord: ''
             },
+            previewBlobUrl: null,
+            // 当前选择的预览方式
+            selectPreviewType:"imgInterface",
             controlPanelOpen:true,//控制面板是否展开
             textContent: '',// 文本信息传输
             textIndex: null, // 文本传输序号
@@ -107,55 +110,223 @@ export default {
         controlPanelOpenChange(){
           this.controlPanelOpen = !this.controlPanelOpen;
         },
+        // 开始预览设备web监听方法
+        startPreviewDeviceWebListenerFun(notice){
+            this.deviceInfo.startPreview = true;
+            if (notice) {
+                window.ZXW_VUE.$notify.success({
+                    message: '开始预览',
+                    duration: '500'
+                })
+            }
+            if (window.refreshDeviceInterval) {
+                clearInterval(window.refreshDeviceInterval)
+            }
+            $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
+            window.refreshDeviceInterval = setInterval(() => {
+                /*fetch(window.deviceImgUrl).then(msg=>{
+                    if(msg.status === 200){
+                        $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+                        // 读取为blob
+                        msg.blob().then(blob=> {
+                            if(this.previewBlobUrl){
+                                URL.revokeObjectURL(this.previewBlobUrl);
+                                this.previewBlobUrl = "";
+                            }
+                            this.previewBlobUrl = URL.createObjectURL(blob);
+                            $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+                        })
+                    }
+                });*/
+                // 以图片文件的方式  读取图片路径
+                if(this.selectPreviewType === 'imgFile'){
+                    window.deviceImgUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/tempImg.jpg" + "?t=" + new Date().getTime();
+                // 以图片接口的方式  读取图片数据
+                } else if(this.selectPreviewType === 'imgInterface'){
+                    let cacheData = null;
+                    let dirPathKey = this.deviceInfo.deviceUuid+"_/sdcard/screenImg/tempImg.jpg";
+                    $.ajax({
+                        url: getContext() + "/attachmentInfo/queryFileMap",
+                        type: "GET",
+                        dataType: "json",
+                        async: false,
+                        data: {
+                            "dirPathKey": dirPathKey
+                        },
+                        success: function (data) {
+                            if (data) {
+                                if (data.isSuccess) {
+                                    cacheData = data.data;
+                                }
+                            }
+                        },
+                        error: function (msg) {
+                        }
+                    });
+                    window.deviceImgUrl = 'data:image/png;base64,' + cacheData;
+                }
+                $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+                window.deviceImgUrlBak = window.deviceImgUrl;
+            }, this.devicePreviewParam.clientSpace);
+
+
+            let devicePreviewBox = document.querySelector('#devicePreviewImg');
+            devicePreviewBox.removeEventListener('mousemove', this.deviceMouseMove);
+            devicePreviewBox.addEventListener('mousemove', this.deviceMouseMove);
+
+            devicePreviewBox.removeEventListener('click', this.deviceMouseClick);
+            devicePreviewBox.addEventListener('click', this.deviceMouseClick);
+
+            devicePreviewBox.removeEventListener('mousedown', this.deviceMouseDown);
+            devicePreviewBox.addEventListener('mousedown', this.deviceMouseDown, true);
+
+            devicePreviewBox.removeEventListener('mouseup', this.deviceMouseUp);
+            devicePreviewBox.addEventListener('mouseup', this.deviceMouseUp, true);
+
+
+            devicePreviewBox.removeEventListener('touchstart', this.deviceTouchStart);
+            devicePreviewBox.addEventListener('touchstart', this.deviceTouchStart, true);
+
+            devicePreviewBox.removeEventListener('touchmove', this.deviceTouchMove);
+            devicePreviewBox.addEventListener('touchmove', this.deviceTouchMove);
+
+
+            devicePreviewBox.removeEventListener('touchend', this.deviceTouchEnd);
+            devicePreviewBox.addEventListener('touchend', this.deviceTouchEnd, true);
+
+            // 全屏监听
+            this.allScreenPreviewChange();
+        },
+        // 以图片文件方式运行的 APP开始预览处理方法
+        startPreviewDeviceByImgFileAppHandler(messageStr,notice){
+            // 给app发送开始预览指令
+            this.sendMsgToClient('startPreviewDevice', messageStr, () => {
+                // 发送成功后执行 web端的监听方法
+                this.startPreviewDeviceWebListenerFun(notice);
+            })
+        },
+        // 以图片接口方式运行的 APP开始预览处理方法
+        startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice){
+            let remoteScript = ``;
+            remoteScript += `
+            let deviceParam = {
+                imgQuality: 100,
+                imgScale: 1,
+                isOpenGray: 0,
+                isOpenThreshold: 0,
+                imgThreshold: 60,
+                appSpace:500
+            }
+            // 唤醒设备
+            device.wakeUpIfNeeded();
+            // json字符串转换js对象
+            let operateObj = JSON.parse('${messageStr}')
+        
+            deviceParam.imgQuality = operateObj.imgQuality || 100
+            deviceParam.imgScale = operateObj.imgScale || 1
+        
+            deviceParam.isOpenGray = operateObj.isOpenGray ? 1 : 0
+            deviceParam.isOpenThreshold = operateObj.isOpenThreshold ? 1 : 0
+            deviceParam.imgThreshold = operateObj.imgThreshold || 60
+            deviceParam.appSpace = operateObj.appSpace || 500
+            if(utilsObj.clickThread){
+                console.log("关闭自动点击线程")
+                utilsObj.clickThread.interrupt()
+            }
+            
+            if(utilsObj.deviceThread){
+                console.log("关闭预览线程")
+                utilsObj.deviceThread.interrupt()
+            }
+            console.log("开启自动点击线程")
+            
+            utilsObj.clickThread = threads.start(function () {
+                while (true) {
+                    let click1 = text("立即开始").findOne(100);
+                    if(click1){
+                        click1.click()
+                    }
+                    let otherClickText = commonStorage.get("otherClickText")
+                    if(otherClickText){
+                      let click2 = text(otherClickText).findOne(100);
+                       if(click2){
+                         click2.click()
+                     }
+                    }
+                }
+            });
+            utilsObj.deviceThread = threads.start(() => {
+                try {
+                    console.log("重开权限")
+                    images.stopScreenCapture()
+                    images.requestScreenCapture({orientation:utilsObj.getOrientation()})
+                } catch (error) {
+                    console.error("重开截图权限错误",error)
+                }
+                files.createWithDirs("/sdcard/screenImg/")
+                sleep(500)
+                toastLog("开始预览")
+                while (true) {
+                    try {
+                        let img = images.captureScreen()
+                        let afterImg = images.scale(img, deviceParam.imgScale, deviceParam.imgScale)
+                         if (deviceParam.isOpenGray === 1) {
+                            let afterImg1 = images.grayscale(afterImg)
+                            afterImg.recycle()
+                            afterImg = afterImg1
+                        }
+                        if (deviceParam.isOpenThreshold === 1) {
+                            let afterImg2 = images.threshold(afterImg, deviceParam.imgThreshold, 255, 'BINARY');
+                            afterImg.recycle()
+                            afterImg = afterImg2
+                        } 
+                        let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
+                        // 临时图片路径
+                        files.remove(tempImgPath)
+                        sleep(10)
+                        http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                            headers: {
+                                "deviceUUID": commonStorage.get('deviceUUID')
+                            },
+                            method: 'POST',
+                            contentType: 'application/json',
+                            body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': images.toBase64(afterImg, "jpg", deviceParam.imgQuality) })
+                        }, (e) => { 
+                            console.log('发送成功');
+                        });
+                        afterImg.recycle()
+                        img.recycle()
+                        sleep(deviceParam.appSpace) 
+                    } catch (error) {
+                        console.error("预览错误",error)
+                        try {
+                            console.log("重开权限")
+                            images.stopScreenCapture()
+                            images.requestScreenCapture({orientation:utilsObj.getOrientation()})
+                        } catch (error1) {
+                            console.error("重开截图权限错误",error1)
+                        }
+                    }
+            
+                }
+            })
+            `;
+            // 直接执行 以图片接口上传缓存的方式 上传图片数据
+            this.remoteExecuteScript(remoteScript,()=>{
+                // 发送成功后执行 web端的监听方法
+                this.startPreviewDeviceWebListenerFun(notice);
+            });
+        },
         // 开始预览设备
         startPreviewDevice(notice) {
+            // 获取预览参数
             let messageStr = JSON.stringify(this.devicePreviewParam);
-            this.sendMsgToClient('startPreviewDevice', messageStr, () => {
-                this.deviceInfo.startPreview = true;
-                if (notice) {
-                    window.ZXW_VUE.$notify.success({
-                        message: '开始预览',
-                        duration: '500'
-                    })
-                }
-                if (window.refreshDeviceInterval) {
-                    clearInterval(window.refreshDeviceInterval)
-                }
-                $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
-                window.refreshDeviceInterval = setInterval(() => {
-                    window.deviceImgUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/tempImg.jpg" + "?t=" + new Date().getTime();
-                    $("#devicePreviewImg").attr("src", window.deviceImgUrl);
-                    window.deviceImgUrlBak = window.deviceImgUrl
-                }, this.devicePreviewParam.clientSpace);
-
-
-                let devicePreviewBox = document.querySelector('#devicePreviewImg');
-                devicePreviewBox.removeEventListener('mousemove', this.deviceMouseMove);
-                devicePreviewBox.addEventListener('mousemove', this.deviceMouseMove);
-
-                devicePreviewBox.removeEventListener('click', this.deviceMouseClick);
-                devicePreviewBox.addEventListener('click', this.deviceMouseClick);
-
-                devicePreviewBox.removeEventListener('mousedown', this.deviceMouseDown);
-                devicePreviewBox.addEventListener('mousedown', this.deviceMouseDown, true);
-
-                devicePreviewBox.removeEventListener('mouseup', this.deviceMouseUp);
-                devicePreviewBox.addEventListener('mouseup', this.deviceMouseUp, true);
-
-
-                devicePreviewBox.removeEventListener('touchstart', this.deviceTouchStart);
-                devicePreviewBox.addEventListener('touchstart', this.deviceTouchStart, true);
-
-                devicePreviewBox.removeEventListener('touchmove', this.deviceTouchMove);
-                devicePreviewBox.addEventListener('touchmove', this.deviceTouchMove);
-
-
-                devicePreviewBox.removeEventListener('touchend', this.deviceTouchEnd);
-                devicePreviewBox.addEventListener('touchend', this.deviceTouchEnd, true);
-
-                // 全屏监听
-                this.allScreenPreviewChange();
-            })
+            // 判断预览方式
+            if(this.selectPreviewType === 'imgFile'){
+                this.startPreviewDeviceByImgFileAppHandler(messageStr,notice)
+            } else if(this.selectPreviewType === 'imgInterface') {
+                this.startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice)
+            }
         },
         allScreenPreviewImg(){
             // 获取需要全屏展示的div
@@ -203,23 +374,50 @@ export default {
                 },10)
             }
         },
+        // 停止预览设备的web端处理
+        stopPreviewWebHandler(notice,callback){
+            this.deviceInfo.startPreview = false;
+            if (notice) {
+                window.ZXW_VUE.$notify.success({
+                    message: '停止预览',
+                    duration: '500'
+                })
+            }
+            if (window.refreshDeviceInterval) {
+                clearInterval(window.refreshDeviceInterval)
+            }
+            if (callback) {
+                callback()
+            }
+        },
+        // 以图片文件方式运行的 APP开始停止预览处理方法
+        stopPreviewDeviceByImgFileAppHandler(notice,callback){
+            this.sendMsgToClient('stopPreviewDevice', '', () => {
+                this.stopPreviewWebHandler(notice,callback);
+            })
+        },
+        // 以图片接口方式运行的 APP停止预览处理方法
+        stopPreviewDeviceByImgInterfaceAppHandler(notice,callback){
+            let remoteScript = `
+            // 唤醒设备
+            device.wakeUpIfNeeded();
+            if(utilsObj.deviceThread){
+                toastLog("停止预览");
+                utilsObj.deviceThread.interrupt();
+            }
+            `;
+            this.remoteExecuteScript(remoteScript,()=>{
+                this.stopPreviewWebHandler(notice,callback);
+            })
+        },
         // 停止预览设备
         stopPreviewDevice(notice, callback) {
-            this.sendMsgToClient('stopPreviewDevice', '', () => {
-                this.deviceInfo.startPreview = false;
-                if (notice) {
-                    window.ZXW_VUE.$notify.success({
-                        message: '停止预览',
-                        duration: '500'
-                    })
-                }
-                if (window.refreshDeviceInterval) {
-                    clearInterval(window.refreshDeviceInterval)
-                }
-                if (callback) {
-                    callback()
-                }
-            })
+            // 判断预览方式
+            if(this.selectPreviewType === 'imgFile'){
+                this.stopPreviewDeviceByImgFileAppHandler(notice,callback)
+            } else if(this.selectPreviewType === 'imgInterface') {
+                this.stopPreviewDeviceByImgInterfaceAppHandler(notice,callback)
+            }
         },
         // 表格添加行
         tableAddRow(tableName, index) {
