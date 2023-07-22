@@ -400,9 +400,13 @@ export default {
             // 唤醒设备
             device.wakeUpIfNeeded();
             if(utilsObj.raObj){
-              utilsObj.raObj.flush();
-              utilsObj.raObj.exit(true);
-              utilsObj.raObj = null;
+                try{
+                  utilsObj.raObj.flush();
+                  utilsObj.raObj.exit(true);
+                  utilsObj.raObj = null;
+                }catch(e){
+                      utilsObj.raObj = null;
+                }
             }
             if(utilsObj.deviceThread){
                 toastLog("停止预览");
