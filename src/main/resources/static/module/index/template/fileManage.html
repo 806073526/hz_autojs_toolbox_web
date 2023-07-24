@@ -142,6 +142,18 @@
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
                         <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
+
+                        <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                            <el-button size="mini" type="primary">
+                                Node相关<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item @click.native.prevent.stop="termuxPermSetting">APP调用Termux权限设置</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="termuxStorageSetting">Termux外部存储权限设置</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="termuxChangeRep">Termux切换源</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="termuxInitNode">Termux初始化Node环境</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
                         <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
                         <!--<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
@@ -200,12 +212,14 @@
                             </div>
                             <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:3;">
                                 <el-link v-show="item.fileType==='js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
+                                <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
                                 <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
                                 <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
+                                <el-link v-show="item.fileName==='package' && item.fileType === 'json'" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="termuxRunNpmInstall(item)">安装npm依赖</el-link>
                             </div>
                         </div>
                     </el-scrollbar>

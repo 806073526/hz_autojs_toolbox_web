@@ -4,9 +4,15 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.wf.captcha.ArithmeticCaptcha;
+import com.wf.captcha.ChineseCaptcha;
+import com.wf.captcha.GifCaptcha;
+import com.wf.captcha.SpecCaptcha;
+import com.wf.captcha.base.Captcha;
 import com.zjh.PackageProjectUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.ArithmeticCaptchaZ;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.exception.BusinessException;
@@ -1174,6 +1180,10 @@ public class AttachmentInfoController extends BaseController {
                     eElement.setAttribute("android:versionCode", packageProjectDTO.getVersionCode());
                     eElement.setAttribute("android:versionName", packageProjectDTO.getVersionName());
                 }
+                // 添加termux权限支持
+                Element termuxPermissionElement =  doc.createElement("uses-permission");
+                termuxPermissionElement.setAttribute("android:name","com.termux.permission.RUN_COMMAND");
+                nNode.appendChild(termuxPermissionElement);
             }
             NodeList providerList = doc.getElementsByTagName("provider");
             for (int temp = 0; temp < providerList.getLength(); temp++) {
@@ -1427,6 +1437,36 @@ public class AttachmentInfoController extends BaseController {
             log.error(e.getMessage(), e);
             return fail("打包项目异常！请联系管理员");
         }
+    }
+
+
+    private Captcha createCaptcha(String type) {
+        Captcha captcha = null;
+        if (StringUtils.equalsIgnoreCase(type, "gif")) {
+            captcha = new GifCaptcha(115, 42, 4);
+        } else if (StringUtils.equalsIgnoreCase(type, "png")) {
+            captcha = new SpecCaptcha(115, 42, 4);
+        } else if (StringUtils.equalsIgnoreCase(type, "arithmetic")) {
+            captcha = new ArithmeticCaptchaZ(115, 42);
+        } else if (StringUtils.equalsIgnoreCase(type, "chinese")) {
+            captcha = new ChineseCaptcha(115, 42);
+        }
+        captcha.setCharType(2);
+        return captcha;
+    }
+
+
+    @ApiOperation(value = "生成图形验证码", notes = "生成图形验证码")
+    @GetMapping("/generateImgVerify")
+    public R<Map<String,Object>> generateImgVerify(){
+        Map<String,Object> result = new HashMap<>();
+        Captcha captcha = createCaptcha("arithmetic");
+
+        ArithmeticCaptchaZ z = (ArithmeticCaptchaZ) captcha;
+        result.put("text",captcha.text());
+        result.put("list",z.getList());
+        result.put("image",captcha.toBase64());
+        return success(result);
     }
 
 }
