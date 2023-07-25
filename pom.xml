@@ -301,6 +301,7 @@
                     <exclude>static/**/*.ttf</exclude>
                     <exclude>static/*.zip</exclude>
                     <exclude>static/*.dex</exclude>
+                    <exclude>static/*.apk</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -312,6 +313,7 @@
                     <include>static/**/*.ttf</include>
                     <include>static/*.zip</include>
                     <include>static/*.dex</include>
+                    <include>static/*.apk</include>
                 </includes>
             </resource>
         </resources>

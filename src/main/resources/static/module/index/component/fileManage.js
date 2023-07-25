@@ -260,7 +260,7 @@ export default {
             phoneCheckAllFile: false,// 手机端全选文件
             previewList: [],// 单个上传
             uploadFileList: [],// 需要上传的文件列表
-            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js,.jar,.dex,.bat,.sh',
+            accept:'.jpg,.jpeg,.png,.pdf,.JPG,.JPEG,.PNG,.PDF,.doc,.docx,.xlsx,.xls,.ppt,.pptx,.rar,.zip,.txt,.mp4,.flv,.rmvb,.avi,.wmv,.js,.jar,.dex,.bat,.sh,.apk',
             curFileData: {},// 选中的文件数据
             copyFileList: [],// 复制文件列表
             phoneCopyFileList:[],// 手机端复制文件列表
@@ -3648,8 +3648,9 @@ utilsObj.checkIsInstallApp =()=> {
         context.getPackageManager().getPackageInfo("com.termux", 0);
         return true;
     } catch (e) {
-        toastLog("请先安装app:" + "com.termux")
-        app.openUrl("https://github.com/termux/termux-app/releases");
+        toastLog("检测未安装termux,自动下载等待安装");
+        sleep(1000);
+        utilsObj.downLoadFile("${getContext()+'/uploadPath/autoJsTools/webCommonPath/Termux0.119.apk'}","/Termux0.119.apk",()=>{app.viewFile("/sdcard/Termux0.119.apk");});
         return false;
     }
 }
@@ -3683,7 +3684,7 @@ utilsObj.manualExecCommand = (command)=> {
     // 存入剪切板
     setClip(command);
     // 长按
-    press(device.width / 2, device.height / 2, 1000);
+    press(device.width / 2, (device.height / 3) , 1000);
 
     // 在所有窗口找控件
     auto.setWindowFilter(function(window) {
@@ -3754,7 +3755,22 @@ utilsObj.intentExecCommand =(command, dir, isBackGround)=> {
 }
 
 
-// 意图执行命令 通过sh文件
+// 意图执行命令2  以com.termux.app.TermuxService服务执行,安装改包后的termux应用可用,使用之前必须授予外部储存权限
+utilsObj.intentExecCommandServiceExecute =(command, dir, isBackGround)=> {
+    files.write("/sdcard/serviceExecTemp.sh", command);
+    let backGroundFlag = true;
+    if (isBackGround != null && isBackGround != undefined) {
+        backGroundFlag = isBackGround;
+    }
+    let scriptUri = new android.net.Uri.Builder().scheme("com.termux.file").path("/sdcard/serviceExecTemp.sh").build();
+    let executeIntent = new android.content.Intent("com.termux.service_execute", scriptUri);
+    executeIntent.setClassName("com.termux", "com.termux.app.TermuxService");
+    executeIntent.putExtra("com.termux.execute.background", backGroundFlag);
+    context.startService(executeIntent);
+}
+
+
+// 意图执行命令 通过sh文件  (未改包应用必须要有com.termux.permission.RUN_COMMAND 权限才能执行 改包应用则无需)
 utilsObj.intentExecCommandSh = (command, isBackGround, timeoutTimes, callback)=> {
     // 写入临时文件
     files.write("/sdcard/temp.sh", command);
@@ -3811,15 +3827,30 @@ utilsObj.intentExecCommandSh = (command, isBackGround, timeoutTimes, callback)=>
 
     }, 100)
 }`;
-            window.hideRemoteScriptNotify = true;
-            this.remoteExecuteScript(extendFunScript);
-            window.hideRemoteScriptNotify = false;
+           return extendFunScript;
+        },
+        // 下载和安装termux
+        downLoadAndInstallTermux(){
+            let fun = ()=>{
+                let downloadFilUrl = getContext() + '/uploadPath/autoJsTools/webCommonPath/Termux0.119.apk';
+                let remoteScript = `
+                    utilsObj.downLoadFile('${downloadFilUrl}',"/Termux0.119.apk",()=>{app.viewFile('/sdcard/Termux0.119.apk');});
+                `;
+                this.remoteExecuteScript(remoteScript);
+            };
+            window.ZXW_VUE.$confirm('是否确认下载和安装termux(下载之前,请先在806074622群文件常用工具中下载Termux0.119.apk,并上传至公共文件根目录)?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                fun();
+            });
         },
         // APP调用Termux权限设置
         termuxPermSetting(){
             let fun = ()=>{
-                this.extendFunScript();
-                let remoteScript = `// 1、检验当前应用申请权限  2、检验termux是安装  3、允许外部调用
+                let remoteScript = this.extendFunScript();
+                remoteScript += `// 1、检验当前应用申请权限  2、检验termux是安装  3、允许外部调用
 // 设置允许外部app意图调用权限
 function setAllowExternalApps() {
     // 设置参数并重启
@@ -3839,33 +3870,32 @@ function setAllowExternalApps() {
     } else if ($shell.checkAccess("adb")) {
          options.adb = true;
          shell("am force-stop " + "com.termux", options);
+    } else {
+         toastLog("请手动重启应用,保证后续命令可以执行");
     }
     // 启动应用
     launchPackage("com.termux");
 }
 // 需要申请的权限
 let runCommondPermission = "com.termux.permission.RUN_COMMAND";
-// 检查权限 如果没有不继续执行
+// 检查权限 如果没有不继续执行  改包后无需判断权限
 if (!utilsObj.checkPermission(runCommondPermission)) {
     let options = {}
     if ($shell.checkAccess("root")) {
         options.root = true;
         shell("pm grant " + context.getPackageName() + " " + runCommondPermission, options);
-        setAllowExternalApps();
     } else if ($shell.checkAccess("adb")) {
         options.adb = true;
         shell("pm grant " + context.getPackageName() + " " + runCommondPermission, options);
-        setAllowExternalApps();
-    } else {
-        // 自动打开权限设置界面
-        utilsObj.openPermissionSetting();
     }
-} else {
+     // 自动打开权限设置界面
+     // utilsObj.openPermissionSetting();
+} 
   setAllowExternalApps();
-}`;
+`;
                 this.remoteExecuteScript(remoteScript);
             };
-            window.ZXW_VUE.$confirm('是否确认以下授权操作,工具箱授权RUN_COMMAND权限,termux应用授权allow-external-apps=true(允许工具箱调用termux应用的设置,工具箱必须要授予剪切板权限,可能需要手动确认命令)?', '提示', {
+            window.ZXW_VUE.$confirm('是否确认给termux应用授权allow-external-apps=true(允许工具箱调用termux应用的设置,工具箱必须要授予剪切板权限,可能需要手动确认命令)?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'info'
@@ -3876,8 +3906,8 @@ if (!utilsObj.checkPermission(runCommondPermission)) {
         // Termux外部存储权限设置
         termuxStorageSetting(){
             let fun = ()=>{
-                this.extendFunScript();
-                let remoteScript = `
+                let remoteScript = this.extendFunScript();
+                remoteScript += `
                   let isInstall = utilsObj.checkIsInstallApp("com.termux");
                   if (isInstall) {
                       // 启动应用
@@ -3899,8 +3929,8 @@ if (!utilsObj.checkPermission(runCommondPermission)) {
         // Termux切换源
         termuxChangeRep(){
             let fun = ()=>{
-                this.extendFunScript();
-                let remoteScript = `
+                let remoteScript = this.extendFunScript();
+                remoteScript += `
                 let isInstall = utilsObj.checkIsInstallApp("com.termux");
                 if (isInstall) {
                       // 启动应用
@@ -3922,8 +3952,8 @@ if (!utilsObj.checkPermission(runCommondPermission)) {
         // Termux初始化Node环境
         termuxInitNode(){
             let fun = ()=>{
-                this.extendFunScript();
-                let remoteScript = `
+                let remoteScript = this.extendFunScript();
+                remoteScript += `
                 // 初始化node环境
                 function initNode() {
                     let tempBashContent = \`result=$(node -v)
@@ -3960,8 +3990,8 @@ if (!utilsObj.checkPermission(runCommondPermission)) {
         // termux安装npm依赖
         termuxRunNpmInstall(row){
             let fun = ()=>{
-                this.extendFunScript();
-                let remoteScript = `
+                let remoteScript = this.extendFunScript();
+                remoteScript += `
                 let isInstall = utilsObj.checkIsInstallApp("com.termux");
                 if (isInstall) {
                     // 启动应用
@@ -3991,8 +4021,8 @@ if (!utilsObj.checkPermission(runCommondPermission)) {
         // termux运行sh脚本
         termuxRunBashByPath(row){
             let fun =()=>{
-                this.extendFunScript();
-                let remoteScript = `
+                let remoteScript = this.extendFunScript();
+                remoteScript += `
                  let isInstall = utilsObj.checkIsInstallApp("com.termux");
                 if (isInstall) {
                     // 启动应用

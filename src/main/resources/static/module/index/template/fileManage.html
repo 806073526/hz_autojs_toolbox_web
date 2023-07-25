@@ -148,6 +148,7 @@
                                 Node相关<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item @click.native.prevent.stop="downLoadAndInstallTermux">下载和安装Termux</el-dropdown-item>
                                 <el-dropdown-item @click.native.prevent.stop="termuxPermSetting">APP调用Termux权限设置</el-dropdown-item>
                                 <el-dropdown-item @click.native.prevent.stop="termuxStorageSetting">Termux外部存储权限设置</el-dropdown-item>
                                 <el-dropdown-item @click.native.prevent.stop="termuxChangeRep">Termux切换源</el-dropdown-item>
