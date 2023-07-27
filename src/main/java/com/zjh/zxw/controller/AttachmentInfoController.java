@@ -819,7 +819,7 @@ public class AttachmentInfoController extends BaseController {
                attachmentInfoService.unServerFileZip(targetPath + File.separator +  "template.zip", targetPath);
                Thread.sleep(100);
                // 重命名文件
-               attachmentInfoService.reNameFileReCount(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName, 20);
+               attachmentInfoService.reNameFileReCount(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName, 50);
                Thread.sleep(100);
                // 删除压缩文件
                attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
