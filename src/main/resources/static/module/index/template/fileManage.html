@@ -212,7 +212,7 @@
                                 </div>
                             </div>
                             <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:3;">
-                                <el-link v-show="item.fileType==='js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
+                                <el-link v-show="item.fileType==='js' || item.fileType==='mjs' || item.fileType === 'node.js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
                                 <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
                                 <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
