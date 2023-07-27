@@ -1263,21 +1263,70 @@ public class AttachmentInfoController extends BaseController {
                         String targetProjectPath = webProjectRootPath + File.separator + webProjectName + File.separator + "assets" + File.separator + "project";
                         // 输出项目路径
                         String projectOutBakFilePath = webProjectRootPath + File.separator + webProjectName + "_projectOut.zip";
-                        // 先移除文件
-                        attachmentInfoService.deleteFile(projectOutBakFilePath);
-                        attachmentInfoService.deleteFile(projectOutPath);
-                        Thread.sleep(100);
-                        // 拷贝文件
-                        attachmentInfoService.copyFile(targetProjectPath,projectOutPath);
-                        Thread.sleep(200);
-                        // 移除插件目录
-                        attachmentInfoService.deleteFile(projectOutPath + File.separator + "project" + File.separator + "plugins");
-                        Thread.sleep(200);
-                        // 压缩混淆后项目文件
-                        attachmentInfoService.zipServerFileZip(projectOutPath + File.separator + "project",projectOutBakFilePath,"");
-                        Thread.sleep(100);
-                        // 再次移除目录
-                        attachmentInfoService.deleteFile(projectOutPath);
+
+
+                        // 是windows服务
+                        if(UploadPathHelper.isWindowsSystem()){
+                            // 先移除文件
+                            attachmentInfoService.deleteFile(projectOutBakFilePath);
+                            attachmentInfoService.deleteFile(projectOutPath);
+                            Thread.sleep(100);
+                            // 拷贝文件
+                            attachmentInfoService.copyFile(targetProjectPath,projectOutPath);
+                            Thread.sleep(200);
+                            // 移除插件目录
+                            attachmentInfoService.deleteFile(projectOutPath + File.separator + "project" + File.separator + "plugins");
+                            Thread.sleep(200);
+                            // 压缩混淆后项目文件
+                            attachmentInfoService.zipServerFileZip(projectOutPath + File.separator + "project",projectOutBakFilePath,"");
+                            Thread.sleep(100);
+                            // 再次移除目录
+                            attachmentInfoService.deleteFile(projectOutPath);
+                        } else {
+                            // 先移除输出zip文件
+                            attachmentInfoService.deleteFile(projectOutBakFilePath);
+                            // System.out.println("移除："+projectOutBakFilePath);
+                            // 单独处理 复制操作 命令cp 太坑了 各种错误
+
+                            // 先压缩zip
+                            attachmentInfoService.zipServerFileZip(projectOutPath,projectOutPath+".zip","");
+                            // System.out.println("压缩："+projectOutBakFilePath + "到："+projectOutPath+".zip");
+
+                            // 再解压 模拟递归复制操作  将混淆后的文件解压到目标目录
+                            attachmentInfoService.unServerFileZip(projectOutPath+".zip",targetProjectPath);
+                            // System.out.println("解压："+projectOutPath+".zip" + "到："+targetProjectPath);
+
+                            // 临时文件路径
+                            String tempFilePath = projectOutPath + "_temp";
+                            attachmentInfoService.deleteFile(tempFilePath);
+                            //  System.out.println("删除："+tempFilePath);
+                            Thread.sleep(100);
+
+                            // 拷贝到临时文件目录
+                            attachmentInfoService.copyFile(targetProjectPath,tempFilePath);
+                            // System.out.println("复制："+targetProjectPath+"到："+tempFilePath);
+                            Thread.sleep(200);
+
+                            // 移除插件目录
+                            attachmentInfoService.deleteFile(tempFilePath + File.separator + "project" + File.separator + "plugins");
+                            // System.out.println("移除："+tempFilePath + File.separator + "project" + File.separator + "plugins");
+
+                            // 压缩混淆后项目文件
+                            attachmentInfoService.zipServerFileZip(tempFilePath + File.separator + "project",projectOutBakFilePath,"");
+                            // System.out.println("压缩："+tempFilePath + File.separator + "project" + "到："+projectOutBakFilePath);
+                            Thread.sleep(100);
+
+                            // 删除临时目录
+                            attachmentInfoService.deleteFile(tempFilePath);
+                            // System.out.println("移除："+tempFilePath);
+                            // 删除临时目录
+                            attachmentInfoService.deleteFile(projectOutPath);
+                            // System.out.println("移除："+projectOutPath);
+                            // 删除临时zip
+                            attachmentInfoService.deleteFile(projectOutPath+".zip");
+                            // System.out.println("移除："+projectOutPath+".zip");
+                        }
+
                     }catch (Exception e){
                         log.error(e.getMessage(),e);
                     }
