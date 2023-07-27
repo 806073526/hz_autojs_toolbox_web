@@ -819,7 +819,7 @@ public class AttachmentInfoController extends BaseController {
                attachmentInfoService.unServerFileZip(targetPath + File.separator +  "template.zip", targetPath);
                Thread.sleep(100);
                // 重命名文件
-               attachmentInfoService.reNameFileReCount(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName, 50);
+               attachmentInfoService.reNameFileReCount(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName, 150);
                Thread.sleep(100);
                // 删除压缩文件
                attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
@@ -904,7 +904,7 @@ public class AttachmentInfoController extends BaseController {
             Thread.sleep(100);
 
             // 重命名文件为project
-            attachmentInfoService.reNameFileReCount(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project",20);
+            attachmentInfoService.reNameFileReCount(packageTemplatePath + File.separator + "assets" + File.separator + resName, packageTemplatePath + File.separator + "assets" + File.separator + "project",150);
 
 
             // plugins的复制
@@ -1083,7 +1083,7 @@ public class AttachmentInfoController extends BaseController {
                 Thread.sleep(200);
                 String imgFileName = appIcon.substring(appIcon.lastIndexOf("/") + 1);
                 // 重命名图片
-                attachmentInfoService.reNameFileReCount(appIconTargetRootPath + File.separator + imgFileName, appIconTargetRootPath +File.separator + "ic_launcher." + appIconImgFileType,20);
+                attachmentInfoService.reNameFileReCount(appIconTargetRootPath + File.separator + imgFileName, appIconTargetRootPath +File.separator + "ic_launcher." + appIconImgFileType,150);
             }
 
 
@@ -1136,7 +1136,7 @@ public class AttachmentInfoController extends BaseController {
                 Thread.sleep(200);
                 String imgFileName = splashIcon.substring(splashIcon.lastIndexOf("/") + 1);
                 // 重命名图片
-                attachmentInfoService.reNameFileReCount(splashIconTargetRootPath + File.separator + imgFileName, splashIconTargetRootPath +File.separator + "splash_icon." + splashImgFileType, 20);
+                attachmentInfoService.reNameFileReCount(splashIconTargetRootPath + File.separator + imgFileName, splashIconTargetRootPath +File.separator + "splash_icon." + splashImgFileType, 150);
             }
 
             // apktool.yml 设置版本名称 版本号  apkFileName名称必须保持一致 否则版本号修改无效
