@@ -298,6 +298,8 @@ export default {
         openFastClipChange(val) {
             // 开启
             if (val) {
+                // 自动调整缩放
+                this.previewImageWidth = 100;
                 // 自动设置全屏
                 this.setParam1(false);
             }
