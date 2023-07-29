@@ -352,7 +352,7 @@
                 <el-button type="primary" size="mini" @click.stop.prevent="saveImage" v-if="remoteHandler.param1.previewImg">
                     保存图片
                 </el-button>
-                <div style="display: flex;width: 100%;">
+                <div style="display: flex;width: 100%;" v-if="remoteHandler.param1.previewImg">
                     <el-slider
                             style="flex:1;"
                             v-model="previewImageWidth"
