@@ -41,6 +41,8 @@ export default {
             },
             imgDrawLoading:false,
             positionShowType: 'cur', // 坐标显示类型
+            previewImageWidth: 100,
+            cells:Array.from({ length: 225 }),
             remoteHandler: {
                 param1: {
                     paramJson:"",
@@ -372,6 +374,11 @@ export default {
                         // 在canvas上画图片
                         window.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     };
+
+                    let canvasScale = document.getElementById('canvasScale');
+                    canvasScale.width = 200;
+                    canvasScale.height = 200;
+                    window.ctxScale = canvasScale.getContext('2d');
                 });
             }, 200);
         },
@@ -552,6 +559,19 @@ export default {
                 let rgba = 'rgba(' + data[0] + ',' + data[1] + ',' + data[2] + ',' + (data[3] / 255) + ')';
                 // 设置小正方形的背景颜色
                 this.imgMousePosition.color = rgb2hex(rgba)
+            }
+
+            if(window.ctxScale){
+                let canvas = document.getElementById('canvas');
+                let centerX = this.imgMousePosition.x;
+                let centerY = this.imgMousePosition.y;
+                let cutWidth = 50; // 裁剪的宽度
+                let cutHeight = 50; // 裁剪的高度
+                let x1 = (centerX - cutWidth / 2); // 裁剪区域的左上角 x 坐标
+                let y1 = centerY - cutHeight / 2; // 裁剪区域的左上角 y 坐标
+                window.ctxScale.clearRect(0, 0, 200, 200);
+                // 绘制
+                window.ctxScale.drawImage(canvas, x1, y1, cutWidth, cutHeight, 0, 0, 200, 200);
             }
             if (!this.remoteHandler.param1.isOpenFastClip) {
                 return;
