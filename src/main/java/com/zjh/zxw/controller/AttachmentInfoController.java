@@ -19,12 +19,14 @@ import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.*;
 import com.zjh.zxw.service.AttachmentInfoService;
+import com.zjh.zxw.websocket.AutoJsWebWsServerEndpoint;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.apache.tools.zip.ZipFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -225,10 +227,21 @@ public class AttachmentInfoController extends BaseController {
 
     @ApiOperation(value = "写入手机端通知消息", notes = "写入手机端通知消息")
     @GetMapping("/writeNoticeMessage")
-    public R<Boolean> writeNoticeMessage(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID,@ApiParam("message") @RequestParam(value = "message") String message){
+    public R<Boolean> writeNoticeMessage(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID,
+                                         @ApiParam("message") @RequestParam(value = "message") String message,
+                                         @ApiParam("pushRange 推送范围 onlyLine仅连接设备 all全部设备") @RequestParam(value = "pushRange",required = false) String pushRange,
+                                         @ApiParam("messagePushChannel 消息推送渠道 web web网页 app App端") @RequestParam(value = "messagePushChannel",required = false) String messagePushChannel) throws IOException {
         List<String> noticeMessageList = noticeMessageMap.getOrDefault(deviceUUID,new ArrayList<String>());
         noticeMessageList.add(message);
         noticeMessageMap.put(deviceUUID,noticeMessageList);
+        // 推送范围
+        if(StringUtils.isNotBlank(pushRange)){
+            AjMessageDTO ajMessageDTO = new AjMessageDTO();
+            ajMessageDTO.setAction("appPushNoticeMessage");
+            ajMessageDTO.setMessage(message+"&"+messagePushChannel);
+            // 推送消息通知到web端页面
+            AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice("onlyLine".equals(pushRange) ? deviceUUID : "","",ajMessageDTO);
+        }
         return success(true);
     }
 

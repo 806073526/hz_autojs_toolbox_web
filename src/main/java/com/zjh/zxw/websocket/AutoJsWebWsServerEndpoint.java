@@ -2,7 +2,6 @@ package com.zjh.zxw.websocket;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import cn.hutool.socket.aio.IoAction;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.PackageProjectUtils;
@@ -32,27 +31,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@ServerEndpoint(value = "/autoJsWs/{deviceUuid}/{deviceHeight}/{deviceWidth}", configurator = WebSocketConfigurator.class)
+@ServerEndpoint(value = "/autoJsWebWs/{deviceUuid}", configurator = WebSocketConfigurator.class)
 @Slf4j
 @EnableAutoConfiguration
 @Component
-public class AutoJsWsServerEndpoint {
+public class AutoJsWebWsServerEndpoint {
     /**
      * 当前在线连接数
      */
     private static AtomicInteger onlineCount = new AtomicInteger(0);
 
-    private static ConcurrentHashMap<String, AutoJsSession> sessionMap = new ConcurrentHashMap<String, AutoJsSession>();
+    private static ConcurrentHashMap<String, AutoJsWebSession> sessionMap = new ConcurrentHashMap<String, AutoJsWebSession>();
 
     private static ConcurrentHashMap<String, Object> curConnectMap = new ConcurrentHashMap<String, Object>();
 
-    private static String SESSION_CODE = "autoJsSession";
 
     private static EmailConfig emailConfig;
 
-    // app消息map
+    // web消息map
     // key deviceUUID_serviceKey   value:具体值
-    private static ConcurrentHashMap<String, String> appMessageMap = new ConcurrentHashMap<String,String>();
+    private static ConcurrentHashMap<String, String> webMessageMap = new ConcurrentHashMap<String,String>();
 
     private static DozerUtils dozerUtils;
 
@@ -60,23 +58,23 @@ public class AutoJsWsServerEndpoint {
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
-    private AutoJsSession autoJsSession;
+    private AutoJsWebSession autoJsSession;
 
     // 清除业务key的值
     public static void clearServiceKey(String appMsgServiceKey){
-        appMessageMap.remove(appMsgServiceKey);
+        webMessageMap.remove(appMsgServiceKey);
     }
 
     // 查询业务key的值
     public static String queryServiceKey(String appMsgServiceKey){
-        return appMessageMap.get(appMsgServiceKey);
+        return webMessageMap.get(appMsgServiceKey);
     }
 
     public static String getOtherPropertyJson(String deviceUUID){
         if(!sessionMap.containsKey(deviceUUID)){
             return "";
         }
-        AutoJsSession session = sessionMap.get(deviceUUID);
+        AutoJsWebSession session = sessionMap.get(deviceUUID);
         return session.getOtherPropertyJson();
     }
 
@@ -84,7 +82,7 @@ public class AutoJsWsServerEndpoint {
         if(!sessionMap.containsKey(deviceUUID)){
             return false;
         }
-        AutoJsSession session = sessionMap.get(deviceUUID);
+        AutoJsWebSession session = sessionMap.get(deviceUUID);
         return StringUtils.isNotBlank(session.getPassword());
     }
 
@@ -93,17 +91,17 @@ public class AutoJsWsServerEndpoint {
         if(!sessionMap.containsKey(deviceUUID)){
            return false;
         }
-        AutoJsSession session = sessionMap.get(deviceUUID);
+        AutoJsWebSession session = sessionMap.get(deviceUUID);
         return StrHelper.getObjectValue(session.getPassword()).equals(password);
     }
 
-    public static AutoJsSession getDeviceByAdmin(String deviceUUID){
+    public static AutoJsWebSession getDeviceByAdmin(String deviceUUID){
         if(!sessionMap.containsKey(deviceUUID)){
             return null;
         }
-        AutoJsSession session = sessionMap.get(deviceUUID);
+        AutoJsWebSession session = sessionMap.get(deviceUUID);
         // 获取复制参数
-        AutoJsSession copySession = dozerUtils.map(session,AutoJsSession.class);
+        AutoJsWebSession copySession = dozerUtils.map(session,AutoJsWebSession.class);
         copySession.setSession(null);
         return copySession;
     }
@@ -113,13 +111,13 @@ public class AutoJsWsServerEndpoint {
      *
      * @return
      */
-    public static List<AutoJsSession> getOnlineDevice() {
-        List<AutoJsSession> autoJsSessionList = sessionMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
-        List<AutoJsSession> otherList = new ArrayList<AutoJsSession>();
+    public static List<AutoJsWebSession> getOnlineDevice() {
+        List<AutoJsWebSession> autoJsSessionList = sessionMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        List<AutoJsWebSession> otherList = new ArrayList<AutoJsWebSession>();
 
         List<String> needRemoveList = new ArrayList<String>();
         if (CollectionUtils.isNotEmpty(autoJsSessionList)) {
-            for (AutoJsSession autoJsSession : autoJsSessionList) {
+            for (AutoJsWebSession autoJsSession : autoJsSessionList) {
 
                 LocalDateTime lastHeartTime = autoJsSession.getLastHeartTime();
                 if(Objects.nonNull(lastHeartTime)){
@@ -132,11 +130,10 @@ public class AutoJsWsServerEndpoint {
                         continue;
                     }
                 }
-                AutoJsSession obj = AutoJsSession.builder()
+                AutoJsWebSession obj = AutoJsWebSession.builder()
                         .deviceUuid(autoJsSession.getDeviceUuid())
+                        .selectAppDeviceUuid(autoJsSession.getSelectAppDeviceUuid())
                         .connectTime(autoJsSession.getConnectTime())
-                        .screenHeight(autoJsSession.getScreenHeight())
-                        .screenWidth(autoJsSession.getScreenWidth())
                         .otherPropertyJson(autoJsSession.getOtherPropertyJson())
                         .lastHeartTime(autoJsSession.getLastHeartTime()).build();
                 otherList.add(obj);
@@ -151,14 +148,29 @@ public class AutoJsWsServerEndpoint {
     }
 
     /**
+     * 获取已连接指定app的在线web设备  如果设备uuid为空 则发送所有设备
+     * @param appDeviceUuid
+     * @return
+     */
+    public static List<AutoJsWebSession> getOnlineDeviceBySelectAppDevice(String appDeviceUuid){
+        List<AutoJsWebSession> onlineDevices = getOnlineDevice();
+        if(StringUtils.isBlank(appDeviceUuid)){
+            return onlineDevices;
+        }
+        // 过滤数据  仅显示选中设备的
+        onlineDevices = Optional.ofNullable(onlineDevices).orElse(new ArrayList<>()).stream().filter(autoJsWebSession -> StrHelper.getObjectValue(appDeviceUuid).equals(StrHelper.getObjectValue(autoJsWebSession.getSelectAppDeviceUuid()))).collect(Collectors.toList());
+        return onlineDevices;
+    }
+
+    /**
      * 发送消息到客户端
      */
     public static void sendMessageToClient(AjMessageDTO messageDTO) throws IOException {
         messageDTO.setMessageDateTime(LocalDateTime.now());
         String deviceUUID = messageDTO.getDeviceUuid();
-        AutoJsSession curAutoJsSession = sessionMap.get(deviceUUID);
-        if (Objects.nonNull(curAutoJsSession)) {
-            curAutoJsSession.sendText(JSONUtil.toJsonStr(messageDTO));
+        AutoJsWebSession curAutoJsWebSession = sessionMap.get(deviceUUID);
+        if (Objects.nonNull(curAutoJsWebSession)) {
+            curAutoJsWebSession.sendText(JSONUtil.toJsonStr(messageDTO));
         }
     }
 
@@ -168,12 +180,43 @@ public class AutoJsWsServerEndpoint {
 
         List<String> deviceUUIDList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(deviceUUID,","));
         for (String deviceUUIDSingle : deviceUUIDList) {
-            AutoJsSession curAutoJsSession = sessionMap.get(deviceUUIDSingle);
-            if (Objects.nonNull(curAutoJsSession)) {
-                curAutoJsSession.sendText(JSONUtil.toJsonStr(messageDTO));
+            AutoJsWebSession curAutoJsWebSession = sessionMap.get(deviceUUIDSingle);
+            if (Objects.nonNull(curAutoJsWebSession)) {
+                curAutoJsWebSession.sendText(JSONUtil.toJsonStr(messageDTO));
             }
         }
     }
+
+
+    /**
+     * 群发指令到web页面
+     * @param selectAppDeviceUuid 选中app的deviceUUID  不为空 则发送选中了这个APP设备的在线web端  为空 则发送全部在线web端
+     * @param selectWebDeviceUuid 选中web的deviceUUID  不为空 则发送指定的的web端  为空 发送全部web端
+     * @param messageDTO
+     * @throws IOException
+     */
+    public static void sendMessageToClientSelectAppDevice(String selectAppDeviceUuid,String selectWebDeviceUuid,AjMessageDTO messageDTO) throws IOException {
+        List<AutoJsWebSession> autoJsWebSessions = getOnlineDeviceBySelectAppDevice(selectAppDeviceUuid);
+        if(CollectionUtils.isEmpty(autoJsWebSessions)){
+            return;
+        }
+        messageDTO.setMessageDateTime(LocalDateTime.now());
+        // 获取符合条件的 web端 设备uuid列表
+        List<String> deviceUUIDList = autoJsWebSessions.stream().map(AutoJsWebSession::getDeviceUuid).collect(Collectors.toList());
+        if(StringUtils.isNotBlank(selectWebDeviceUuid)){
+            deviceUUIDList = deviceUUIDList.stream().filter(s -> StrHelper.getObjectValue(selectWebDeviceUuid).equals(s)).collect(Collectors.toList());
+        }
+        if(CollectionUtils.isEmpty(deviceUUIDList)){
+            return;
+        }
+        for (String deviceUUIDSingle : deviceUUIDList) {
+            AutoJsWebSession curAutoJsWebSession = sessionMap.get(deviceUUIDSingle);
+            if (Objects.nonNull(curAutoJsWebSession)) {
+                curAutoJsWebSession.sendText(JSONUtil.toJsonStr(messageDTO));
+            }
+        }
+    }
+
 
 
     /**
@@ -181,26 +224,15 @@ public class AutoJsWsServerEndpoint {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("deviceUuid") String deviceUuid, @PathParam("deviceWidth") String deviceWidth, @PathParam("deviceHeight") String deviceHeight) throws IOException {
-        AutoJsSession autoJsSession = AutoJsSession.builder().lastHeartTime(LocalDateTime.now()).deviceUuid(deviceUuid).session(session).build();
+        AutoJsWebSession autoJsSession = AutoJsWebSession.builder().lastHeartTime(LocalDateTime.now()).deviceUuid(deviceUuid).session(session).build();
         autoJsSession.setConnectTime(LocalDateTime.now());
-        autoJsSession.setScreenWidth(deviceWidth);
-        autoJsSession.setScreenHeight(deviceHeight);
 
         Map<String, Object> userProperties = session.getUserProperties();
         String IP = (String) userProperties.get("IP");
         sessionMap.put(deviceUuid, autoJsSession);
         this.autoJsSession = autoJsSession;
         // 未包含的设备id
-        if(!curConnectMap.containsKey(deviceUuid) && StringUtils.isNotBlank(emailConfig.getReceiveEmail())){
-
-            String machineCode = "";
-            try {
-                machineCode = PackageProjectUtils.getMachineCode();
-            }catch (Exception e){
-                log.error(e.getMessage());
-            }
-            // 推送上线消息
-            EmailSender.sendAutoJsEmail(emailConfig.getReceiveEmail(),"《华仔AutoJs工具箱》"+deviceUuid+"已连接","服务端机器码:"+ machineCode + "<br>设备uuid："+deviceUuid+"<br>设备宽度："+deviceWidth+"<br>设备高度："+deviceHeight+"<br>连接时间："+ DateUtils.format(LocalDateTime.now(),DateUtils.DEFAULT_DATE_TIME_FORMAT)+"<br>服务端IP："+ InetAddress.getLocalHost().getHostAddress() +"<br>客户端IP："+IP);
+        if(!curConnectMap.containsKey(deviceUuid)){
             // 记录
             curConnectMap.put(deviceUuid,LocalDateTime.now());
         }
@@ -244,38 +276,12 @@ public class AutoJsWsServerEndpoint {
             if (StrUtil.isBlank(action)) {
                 return;
             }
-            //判断是否为同步日期指令。
-            if ("asyncTime".equals(action)) {
-                this.autoJsSession.sendText(action);
-            } else if("sendDeviceInfo".equals(action)){
+            // 同步选中app设备
+            if("syncSelectAppDeviceUuid".equals(action)){
                 if(StringUtils.isNotBlank(messageStr)){
-                    // 解析json对象
-                    JSONObject messageStrData = JSONObject.parseObject(new String(Base64.getDecoder().decode(messageStr.getBytes())));
-                    String deviceHeight = messageStrData.getString("deviceHeight");
-                    String deviceWidth =  messageStrData.getString("deviceWidth");
-                    String password = messageStrData.getString("password");
-                    String otherPropertyJson = messageStrData.getString("otherPropertyJson");
-
-                    String deviceUUID = this.autoJsSession.getDeviceUuid();
-                    this.autoJsSession.setScreenHeight(deviceHeight);
-                    this.autoJsSession.setScreenWidth(deviceWidth);
-                    this.autoJsSession.setPassword(password);
-
-                    String newOtherPropertyJson = new String(Base64.getDecoder().decode(otherPropertyJson.getBytes()));
-                    String oldOtherPropertyJson = this.autoJsSession.getOtherPropertyJson();
-
-                    // 如果同步其他属性时  检测到 前后不一致
-                    if(!newOtherPropertyJson.equals(oldOtherPropertyJson)){
-                        AjMessageDTO syncOtherPropertyMessage = new AjMessageDTO();
-                        syncOtherPropertyMessage.setAction("syncOtherPropertyJson");
-                        // 编码base64
-                        syncOtherPropertyMessage.setMessage(new String(Base64.getEncoder().encode(newOtherPropertyJson.getBytes())));
-                        // 则通知所有连接的在线web设备 更新缓存数据
-                        AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice(deviceUUID,"",syncOtherPropertyMessage);
-                    }
-                    this.autoJsSession.setOtherPropertyJson(newOtherPropertyJson);
+                    this.autoJsSession.setSelectAppDeviceUuid(messageStr);
                     // 设置到本地缓存
-                    sessionMap.put(deviceUUID, this.autoJsSession);
+                    sessionMap.put(this.autoJsSession.getDeviceUuid(), this.autoJsSession);
                 }
             // 更新业务key
             } else if("updateServiceKey".equals(action)){
@@ -287,7 +293,7 @@ public class AutoJsWsServerEndpoint {
                     String serviceValue =  messageStrData.getString("serviceValue");
                     log.info("action:"+action+" deviceUUID:"+deviceUUID +" serviceKey:"+serviceKey + "serviceValue:"+serviceValue);
                     // 设置到本地缓存
-                    appMessageMap.put(deviceUUID+"_"+serviceKey,serviceValue);
+                    webMessageMap.put(deviceUUID+"_"+serviceKey,serviceValue);
                 }
             }
         }
@@ -318,7 +324,7 @@ public class AutoJsWsServerEndpoint {
 
     @Autowired
     public void setApplicationContext(EmailConfig emailConfig) throws BeansException {
-        AutoJsWsServerEndpoint.emailConfig = emailConfig;
+        AutoJsWebWsServerEndpoint.emailConfig = emailConfig;
     }
 
 
@@ -328,10 +334,10 @@ public class AutoJsWsServerEndpoint {
     }
 
     public static synchronized void addOnlineCount() {
-        AutoJsWsServerEndpoint.onlineCount.getAndIncrement();
+        AutoJsWebWsServerEndpoint.onlineCount.getAndIncrement();
     }
 
     public static synchronized void subOnlineCount() {
-        AutoJsWsServerEndpoint.onlineCount.getAndDecrement();
+        AutoJsWebWsServerEndpoint.onlineCount.getAndDecrement();
     }
 }

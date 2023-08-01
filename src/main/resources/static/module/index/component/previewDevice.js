@@ -57,6 +57,7 @@ export default {
             textType: 'text',// 文本传输类型
             previewActiveName: 'previewParam',
             openNoticeMessageListenerFlag: false,
+            messagePushChannel:[],// 消息推送渠道
             noticeListenerRules: [],// 通知监听规则
             noticeListenerName:'noticeListenerRules.json',// 通知监听名称
             historyNoticeMessageList:[],// 历史通知消息列表
@@ -71,7 +72,9 @@ export default {
                     matchingText: "",
                     autoClick: false,
                     receiveEmail: "",
-                    executeScript: ""
+                    executeScript: "",
+                    fixedMessage:"",
+                    pushRange:"all"
                 }
             },
             deviceMousePosition: { // 设备鼠标坐标
@@ -893,6 +896,7 @@ export default {
             if(this.openNoticeMessageListenerFlag){
                 remoteExecuteScript = `
                     let deviceUUID = '${this.deviceInfo.deviceUuid}'
+                    let messagePushChannel = '${this.messagePushChannel.join(",")}';
                     let rules = decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(this.noticeListenerRules)))}'));
                     let matchingRules = rules ? JSON.parse(rules) : [];
                     events.removeAllListeners('notification');
@@ -935,7 +939,7 @@ export default {
                                         });
                                     }
                                     // 记录通知
-                                    utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + item.message, "GET", null, () => {
+                                    utilsObj.request("/attachmentInfo/writeNoticeMessage?deviceUUID=" + deviceUUID + "&message=" + item.message + "&pushRange=" + item.pushRange+"&messagePushChannel="+messagePushChannel, "GET", null, () => {
                                         // 如果有代码则执行
                                         if (item.executeScript) {
                                             //执行代码
