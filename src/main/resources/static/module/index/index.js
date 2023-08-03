@@ -75,13 +75,17 @@ window.ZXW_VUE = new Vue({
     computed: {
     },
     watch: {
-        otherProperty(val) {
-            if (!val) {
-                return;
-            }
-            this.screenDirection = val.orientation === 1 ? "竖屏" : "横屏";
-            this.deviceInfo.debugModel = val.debugModel;
-            this.deviceInfo.debugSleep = val.debugSleep;
+        otherProperty:{
+            handler(val){
+                if (!val) {
+                    return;
+                }
+                this.screenDirection = val.orientation === 1 ? "竖屏" : "横屏";
+                this.deviceInfo.debugModel = val.debugModel;
+                this.deviceInfo.debugSleep = val.debugSleep;
+            },
+            immediate: true, // 立即触发一次
+            deep: true // 可以深度检测到  对象的属性值的变化
         },
         activeTab(val){
             // 执行页面组件初始化方法
