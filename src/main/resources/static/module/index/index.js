@@ -92,6 +92,11 @@ window.ZXW_VUE = new Vue({
             if(this.$refs[val] && this.$refs[val].init){
                 this.$refs[val].init()
             }
+            if(val === 'previewDevice'){
+                this.timeSyncOtherProperty(()=>{
+                    this.screenDirection = this.otherProperty.orientation === 1 ? "竖屏" : "横屏";
+                });
+            }
         },
         pageLoadSuccess(val){
             // 页面加载成功后 建立websocket连接
