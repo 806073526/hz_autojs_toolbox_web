@@ -70,7 +70,7 @@ window.ZXW_VUE = new Vue({
         fileDialogIsMin: false,
         showFileDialogTab:'',
         showTabScrollTop:0,
-        screenDirection: '横屏'
+        screenDirection: '竖屏'
     },
     computed: {
     },
