@@ -30,7 +30,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {

@@ -625,6 +625,16 @@ export default {
         // 远程执行脚本
         remoteExecuteScriptFun(code){
             if(!this.remoteHandler.param4.isNodeScript){
+                if(code.startsWith('"ui"')){
+                    let remoteScript = `
+                    let remoteScriptPath = '/sdcard/appSync/tempRemoteScript/remoteScript.js'; 
+                    files.createWithDirs(remoteScriptPath)
+                    files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(code))}')));
+                    engines.execScriptFile("/sdcard/appSync/tempRemoteScript/remoteScript.js",{path:["/sdcard/appSync/tempRemoteScript/"]})
+                    `;
+                    this.remoteExecuteScript(remoteScript);
+                    return;
+                }
                 this.remoteExecuteScript(code);
             // NODE脚本 先写入手机端再执行文件
             } else {
