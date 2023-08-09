@@ -270,6 +270,7 @@ export default {
                 files.createWithDirs("/sdcard/screenImg/")
                 sleep(500)
                 toastLog("开始预览")
+                let lastImageBase = "";
                 while (true) {
                     try {
                         let img = images.captureScreen()
@@ -285,16 +286,21 @@ export default {
                             afterImg = afterImg2
                         } 
                         let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
+                        
+                        let curImageBase = images.toBase64(afterImg, "jpg", deviceParam.imgQuality);
                         sleep(10)
-                        http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
-                            headers: {
-                                "deviceUUID": commonStorage.get('deviceUUID')
-                            },
-                            method: 'POST',
-                            contentType: 'application/json',
-                            body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': images.toBase64(afterImg, "jpg", deviceParam.imgQuality) })
-                        }, (e) => { 
-                        });
+                        if(curImageBase !== lastImageBase){
+                            http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                                headers: {
+                                    "deviceUUID": commonStorage.get('deviceUUID')
+                                },
+                                method: 'POST',
+                                contentType: 'application/json',
+                                body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': curImageBase })
+                            }, (e) => { 
+                                lastImageBase = curImageBase;
+                            });
+                        }
                         afterImg.recycle()
                         img.recycle()
                         sleep(deviceParam.appSpace) 
