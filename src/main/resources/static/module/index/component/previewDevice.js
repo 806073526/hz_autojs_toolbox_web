@@ -62,6 +62,7 @@ export default {
             noticeListenerName:'noticeListenerRules.json',// 通知监听名称
             historyNoticeMessageList:[],// 历史通知消息列表
             historyNoticeLoading:false,
+            refreshType: "websocket",// 刷新类型 interval websocket
             scriptArr:[],// 脚本数组
             scriptLoading:false,
             timerTaskArr:[],
@@ -114,6 +115,52 @@ export default {
         controlPanelOpenChange(){
           this.controlPanelOpen = !this.controlPanelOpen;
         },
+        // 刷新预览设备图片方法
+        refreshPreviewImgFun(){
+            /*fetch(window.deviceImgUrl).then(msg=>{
+               if(msg.status === 200){
+                   $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+                   // 读取为blob
+                   msg.blob().then(blob=> {
+                       if(this.previewBlobUrl){
+                           URL.revokeObjectURL(this.previewBlobUrl);
+                           this.previewBlobUrl = "";
+                       }
+                       this.previewBlobUrl = URL.createObjectURL(blob);
+                       $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+                   })
+               }
+           });*/
+            // 以图片文件的方式  读取图片路径
+            if(this.selectPreviewType === 'imgFile'){
+                window.deviceImgUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/tempImg.jpg" + "?t=" + new Date().getTime();
+                // 以图片接口的方式  读取图片数据
+            } else if(this.selectPreviewType === 'imgInterface'){
+                let cacheData = null;
+                let dirPathKey = this.deviceInfo.deviceUuid+"_/sdcard/screenImg/tempImg.jpg";
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryFileMap",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "dirPathKey": dirPathKey
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                cacheData = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                window.deviceImgUrl = 'data:image/png;base64,' + cacheData;
+            }
+            $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+            window.deviceImgUrlBak = window.deviceImgUrl;
+        },
         // 开始预览设备web监听方法
         startPreviewDeviceWebListenerFun(notice){
             this.deviceInfo.startPreview = true;
@@ -123,56 +170,19 @@ export default {
                     duration: '500'
                 })
             }
-            if (window.refreshDeviceInterval) {
-                clearInterval(window.refreshDeviceInterval)
-            }
             $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
-            window.refreshDeviceInterval = setInterval(() => {
-                /*fetch(window.deviceImgUrl).then(msg=>{
-                    if(msg.status === 200){
-                        $("#devicePreviewImg").attr("src", window.deviceImgUrl);
-                        // 读取为blob
-                        msg.blob().then(blob=> {
-                            if(this.previewBlobUrl){
-                                URL.revokeObjectURL(this.previewBlobUrl);
-                                this.previewBlobUrl = "";
-                            }
-                            this.previewBlobUrl = URL.createObjectURL(blob);
-                            $("#devicePreviewImg").attr("src", window.deviceImgUrl);
-                        })
-                    }
-                });*/
-                // 以图片文件的方式  读取图片路径
-                if(this.selectPreviewType === 'imgFile'){
-                    window.deviceImgUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/tempImg.jpg" + "?t=" + new Date().getTime();
-                // 以图片接口的方式  读取图片数据
-                } else if(this.selectPreviewType === 'imgInterface'){
-                    let cacheData = null;
-                    let dirPathKey = this.deviceInfo.deviceUuid+"_/sdcard/screenImg/tempImg.jpg";
-                    $.ajax({
-                        url: getContext() + "/attachmentInfo/queryFileMap",
-                        type: "GET",
-                        dataType: "json",
-                        async: false,
-                        data: {
-                            "dirPathKey": dirPathKey
-                        },
-                        success: function (data) {
-                            if (data) {
-                                if (data.isSuccess) {
-                                    cacheData = data.data;
-                                }
-                            }
-                        },
-                        error: function (msg) {
-                        }
-                    });
-                    window.deviceImgUrl = 'data:image/png;base64,' + cacheData;
-                }
-                $("#devicePreviewImg").attr("src", window.deviceImgUrl);
-                window.deviceImgUrlBak = window.deviceImgUrl;
-            }, this.devicePreviewParam.clientSpace);
 
+            if("websocket" === this.refreshType){
+                window.ZXW_VUE.$EventBus.$off('refreshPreviewImg',this.refreshPreviewImgFun);
+                window.ZXW_VUE.$EventBus.$on('refreshPreviewImg', this.refreshPreviewImgFun);
+            } else {
+                if (window.refreshDeviceInterval) {
+                    clearInterval(window.refreshDeviceInterval)
+                }
+                window.refreshDeviceInterval = setInterval(() => {
+                    this.refreshPreviewImgFun();
+                }, this.devicePreviewParam.clientSpace);
+            }
 
             let devicePreviewBox = document.querySelector('#devicePreviewImg');
             devicePreviewBox.removeEventListener('mousemove', this.deviceMouseMove);
@@ -390,8 +400,12 @@ export default {
                     duration: '500'
                 })
             }
-            if (window.refreshDeviceInterval) {
-                clearInterval(window.refreshDeviceInterval)
+            if("websocket" === this.refreshType){
+                window.ZXW_VUE.$EventBus.$off('refreshPreviewImg',this.refreshPreviewImgFun);
+            } else {
+                if (window.refreshDeviceInterval) {
+                    clearInterval(window.refreshDeviceInterval)
+                }
             }
             if (callback) {
                 callback()

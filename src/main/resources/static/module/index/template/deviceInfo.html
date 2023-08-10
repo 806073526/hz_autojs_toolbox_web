@@ -46,8 +46,9 @@
                       highlight-current-row @current-change="selectRowChange" style="width: 100%">
                 <el-table-column prop="deviceUuid" align="left" label="设备UUID">
                     <template slot-scope="{ row, $index}">
-                        {{ row.deviceUuid }}
+                        {{ (row.aliasName ? "【"+row.aliasName+"】": "")  + row.deviceUuid }}
                     </template>
+                </el-table-column>
                 </el-table-column>
                 <el-table-column prop="connectTime" label="建立连接时间" align="left">
                 </el-table-column>

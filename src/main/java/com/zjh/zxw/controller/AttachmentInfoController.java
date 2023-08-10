@@ -337,7 +337,28 @@ public class AttachmentInfoController extends BaseController {
 
     @ApiOperation(value = "更新文件内容", notes = "更新文件内容")
     @PostMapping("/updateFileMap")
-    public R<Boolean> updateFileMap(@RequestBody Map<String,String> mapParam){
+    public R<Boolean> updateFileMap(@RequestBody Map<String,String> mapParam) throws IOException {
+
+        String dirPathKey = StrHelper.getObjectValue(mapParam.get("dirPathKey"));
+        String fileJson = StrHelper.getObjectValue(mapParam.get("fileJson"));
+
+        // 包含该路径 表示  预览设备的图片缓存
+        if(dirPathKey.contains("/sdcard/screenImg/tempImg.jpg")){
+            // 获取上次缓存的文件
+            String lastFileJson= fileMap.getOrDefault(dirPathKey,"");
+
+            // 内容发生变化
+            if(!lastFileJson.equals(fileJson)){
+                String deviceUUID = request.getHeader("deviceUUID");
+                // 发送指令 给web端  刷新预览图片
+                AjMessageDTO ajMessageDTO = new AjMessageDTO();
+                ajMessageDTO.setAction("refreshPreviewImg");
+                ajMessageDTO.setMessage(deviceUUID);
+                // 推送消息通知到web端页面
+                AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice(deviceUUID,"",ajMessageDTO);
+            }
+        }
+
         fileMap.put(mapParam.get("dirPathKey"),mapParam.get("fileJson"));
         return success(true);
     }

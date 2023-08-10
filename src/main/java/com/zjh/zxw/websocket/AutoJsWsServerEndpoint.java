@@ -10,6 +10,7 @@ import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.domain.dto.EmailConfig;
 import com.zjh.zxw.dozer.DozerUtils;
@@ -17,12 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.time.Duration;
@@ -132,12 +135,13 @@ public class AutoJsWsServerEndpoint {
                         continue;
                     }
                 }
+                String otherPropertyJson = autoJsSession.getOtherPropertyJson();
                 AutoJsSession obj = AutoJsSession.builder()
                         .deviceUuid(autoJsSession.getDeviceUuid())
                         .connectTime(autoJsSession.getConnectTime())
                         .screenHeight(autoJsSession.getScreenHeight())
                         .screenWidth(autoJsSession.getScreenWidth())
-                        .otherPropertyJson(autoJsSession.getOtherPropertyJson())
+                        .otherPropertyJson(otherPropertyJson)
                         .lastHeartTime(autoJsSession.getLastHeartTime()).build();
                 otherList.add(obj);
             }

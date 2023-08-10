@@ -26,6 +26,7 @@ export default {
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
+                aliasName:"", // 别名
                 standardWidth: null,
                 standardHeight: null,
                 standardConvert: false,

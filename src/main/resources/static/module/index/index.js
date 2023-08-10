@@ -105,6 +105,8 @@ window.ZXW_VUE = new Vue({
             }
         }
     },
+    created(){
+    },
     mounted() {
         // 从缓存中读取web设备uuid
         let webDeviceUuidCache = localStorage.getItem("webDeviceUuid");
@@ -325,6 +327,13 @@ window.ZXW_VUE = new Vue({
                        })
                    }
                }
+            // 接收刷新预览设备图片指令
+            } else if(messageData.action === "refreshPreviewImg"){
+                // 接收设备 uuid与 当前选中设备uuid一致
+                if(messageData.message === this.deviceInfo.deviceUuid){
+                    // 调用刷新图片方法
+                    window.ZXW_VUE.$EventBus.$emit('refreshPreviewImg');
+                }
             }
         },
         // 发送消息到web设备websocket
@@ -546,3 +555,4 @@ window.ZXW_VUE = new Vue({
         }
     }
 });
+window.ZXW_VUE.$EventBus = new Vue();

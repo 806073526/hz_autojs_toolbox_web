@@ -3,6 +3,7 @@ package com.zjh.zxw.websocket;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -59,6 +60,10 @@ public class AutoJsSession implements Serializable {
     @ApiModelProperty(value = "最后一次心跳时间")
     @JsonFormat(shape =JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastHeartTime;
+
+
+    @ApiModelProperty(value = "别名")
+    private String aliasName;
 
     /**
      * 发送消息

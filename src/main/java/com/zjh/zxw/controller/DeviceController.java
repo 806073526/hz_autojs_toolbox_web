@@ -1,10 +1,12 @@
 package com.zjh.zxw.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsSession;
@@ -19,6 +21,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.List;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -43,6 +49,9 @@ public class DeviceController extends BaseController {
     @Value("${com.zjh.pageAccessPassword}")
     private String pageAccessPassword;
 
+    @Value("${com.zjh.uploadPath}")
+    private String uploadPath;
+
 
     @ApiOperation(value = "检查页面访问限制", notes = "检查页面访问限制")
     @GetMapping("/checkPageAccessLimit")
@@ -57,6 +66,45 @@ public class DeviceController extends BaseController {
         return success(StrHelper.getObjectValue(pageAccessPassword).equals(inputVal));
     }
 
+    private List<AutoJsSession> getOnlineDeviceFun(){
+        List<AutoJsSession> autoJsSessionList = AutoJsWsServerEndpoint.getOnlineDevice();
+        String filePath = UploadPathHelper.getUploadPath(uploadPath) +  "autoJsTools" + File.separator + "webCommonPath" + File.separator + "deviceAliasName.json";
+        File file = new File(filePath);
+
+        JSONObject jsonObject = new JSONObject();
+        // 原始json
+        String sourceJsonStr = "";
+        if(file.exists()){
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            StringBuilder jsonString = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonString.append(line);
+            }
+            reader.close();
+            String jsonStr = jsonString.toString();
+            sourceJsonStr = jsonStr;
+            if(StringUtils.isNotBlank(jsonStr)){
+                jsonObject = JSONObject.parseObject(jsonStr);
+            }
+        }
+        for (AutoJsSession autoJsSession : autoJsSessionList) {
+            String deviceUuid = autoJsSession.getDeviceUuid();
+            String aliasName = jsonObject.containsKey(deviceUuid) ? jsonObject.getString(deviceUuid) :"";
+
+            autoJsSession.setAliasName(aliasName);
+            jsonObject.put(deviceUuid,aliasName);
+        }
+
+        String newJsonStr = jsonObject.toJSONString();
+        if(!sourceJsonStr.equals(newJsonStr)){
+            FileWriter fileWriter = new FileWriter(filePath);
+            fileWriter.write(newJsonStr);
+            fileWriter.close();
+        }
+        return autoJsSessionList;
+    }
+
     /**
      * 获取在线设备
      */
@@ -64,8 +112,7 @@ public class DeviceController extends BaseController {
     @PostMapping("/getOnlineDevice")
     public R<List<AutoJsSession>> getOnlineDevice() {
         try {
-            List<AutoJsSession> autoJsSessionList = AutoJsWsServerEndpoint.getOnlineDevice();
-            return success(autoJsSessionList);
+            return success(getOnlineDeviceFun());
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
