@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -72,7 +73,7 @@ public class DeviceController extends BaseController {
         // 原始json
         String sourceJsonStr = "";
         if(file.exists()){
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             StringBuilder jsonString = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -95,9 +96,10 @@ public class DeviceController extends BaseController {
 
         String newJsonStr = jsonObject.toJSONString();
         if(!sourceJsonStr.equals(newJsonStr)){
-            FileWriter fileWriter = new FileWriter(filePath);
-            fileWriter.write(newJsonStr);
-            fileWriter.close();
+            FileOutputStream fos = new FileOutputStream(filePath);
+            OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+            osw.write(newJsonStr);
+            osw.close();
         }
         return autoJsSessionList;
     }
