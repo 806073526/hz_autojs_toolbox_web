@@ -21,10 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.List;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -66,7 +63,7 @@ public class DeviceController extends BaseController {
         return success(StrHelper.getObjectValue(pageAccessPassword).equals(inputVal));
     }
 
-    private List<AutoJsSession> getOnlineDeviceFun(){
+    private List<AutoJsSession> getOnlineDeviceFun() throws IOException {
         List<AutoJsSession> autoJsSessionList = AutoJsWsServerEndpoint.getOnlineDevice();
         String filePath = UploadPathHelper.getUploadPath(uploadPath) +  "autoJsTools" + File.separator + "webCommonPath" + File.separator + "deviceAliasName.json";
         File file = new File(filePath);
