@@ -39,11 +39,19 @@
                                   max="5000" @change="autoDevicePreview" class="width100">
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="浏览器刷新:" prop="clientSpace" class="flex-1">
-                        <el-input type="number" v-model="devicePreviewParam.clientSpace" placeholder=""
+                    <el-form-item label="屏幕方向:" prop="clientSpace" class="flex-1">
+                        <!--<el-input type="number" v-model="devicePreviewParam.clientSpace" placeholder=""
                                   oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
                                   max="5000" @change="autoDevicePreview" class="width100">
-                        </el-input>
+                        </el-input>-->
+                        <el-radio-group v-model="screenDirection" class="width100">
+                            <el-radio label="横屏">
+                                横屏方向
+                            </el-radio>
+                            <el-radio label="竖屏">
+                                竖屏方向
+                            </el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="操作记录:" prop="clientSpace" class="flex-2">
                         <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder=""
