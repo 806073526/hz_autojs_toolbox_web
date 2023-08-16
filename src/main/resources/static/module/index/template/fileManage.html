@@ -445,20 +445,20 @@
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===1">
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyInitPackageTemplate" class="el-icon-success"></i><i v-show="!alreadyInitPackageTemplate" class="el-icon-warning"></i>{{alreadyInitPackageTemplate ? '已' : '未'}}检测到打包模板</span>
-                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="initPackageTemplate"  icon="el-icon-thumb">{{ alreadyInitPackageTemplate ? "点击重置" : "点击初始化"}}</el-button>
+                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="initPackageTemplate()"  icon="el-icon-thumb">{{ alreadyInitPackageTemplate ? "点击重置" : "点击初始化"}}</el-button>
                 </div>
             </div>
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===2">
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyUploadProjectRes" class="el-icon-success"></i><i v-show="!alreadyUploadProjectRes" class="el-icon-warning"></i>{{alreadyUploadProjectRes ? '已' : '未'}}检测到项目资源</span>
-                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="uploadProjectRes"  icon="el-icon-thumb">{{ alreadyUploadProjectRes ? "点击重新上传" : "点击上传"}}</el-button>
+                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="uploadProjectRes()"  icon="el-icon-thumb">{{ alreadyUploadProjectRes ? "点击重新上传" : "点击上传"}}</el-button>
                 </div>
             </div>
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===3">
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyHandlerPackageRes" class="el-icon-success"></i><i v-show="!alreadyHandlerPackageRes" class="el-icon-warning"></i>{{alreadyHandlerPackageRes ? '已' : '未'}}完成打包资源处理</span>
                     <div style="margin-top: 5px;">
-                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes()"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
                         <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProject"  icon="el-icon-thumb">下载混淆后项目</el-button>
                         <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProjectToPhone"  icon="el-icon-thumb">下载混淆后项目到手机</el-button>
                     </div>
@@ -468,7 +468,7 @@
                 <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
                     <span style="color:#67c23a;"><i v-show="alreadyCompletePackageProject" class="el-icon-success"></i><i v-show="!alreadyCompletePackageProject" class="el-icon-warning"></i>{{alreadyCompletePackageProject ? '已' : '未'}}完成打包项目</span>
                     <div style="margin-top: 5px;">
-                        <el-button style="font-size: 25px;" type="text" @click.stop="handlerPackageProject"  icon="el-icon-thumb">{{ alreadyCompletePackageProject ? "点击重新打包" : "点击打包"}}</el-button>
+                        <el-button style="font-size: 25px;" type="text" @click.stop="handlerPackageProject()"  icon="el-icon-thumb">{{ alreadyCompletePackageProject ? "点击重新打包" : "点击打包"}}</el-button>
                         <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProject" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到本地</el-button>
                         <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProjectToPhone" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到手机并安装</el-button>
                     </div>
@@ -476,15 +476,16 @@
             </div>
         </el-scrollbar>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary" v-show="packageProjectActive>0" @click.stop.native="preSteps" :disabled="packageProjectStepLoading">
+           <el-button type="primary" v-show="packageProjectActive===0"  @click.stop.native="oneKeyPackage" :disabled="packageProjectStepLoading">
+            一键打包
+          </el-button>
+            <el-button type="primary" v-show="packageProjectActive>0" @click.stop.native="preSteps" :disabled="packageProjectStepLoading">
             上一步
           </el-button>
           <el-button type="primary" v-show="packageProjectActive<4"  @click.stop.native="nextSteps" :disabled="packageProjectStepLoading">
             下一步
           </el-button>
-            <el-button type="primary" v-show="packageProjectActive===0"  @click.stop.native="oneKeyPackage" :disabled="packageProjectStepLoading">
-            一键打包
-          </el-button>
+
         </span>
     </el-dialog>
 </div>

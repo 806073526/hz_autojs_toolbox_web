@@ -1086,7 +1086,7 @@ public class AttachmentInfoController extends BaseController {
             }
 
             // 未包含 官方的ocr模块 则排除 对应依赖so
-            if(!pluginsList.contains("org.autojs.autojspro.plugin.mlkit.ocr") || !pluginsList.contains("org.autojs.autojspro.ocr.v2")){
+            if(!pluginsList.contains("org.autojs.autojspro.ocr.v2")){
                 excludesLibList.add("libocrautojspro.so");
                 excludesLibList.add("libpaddle_light_api_shared.so");
                 // 不包含官方ocr模块则需要删除
@@ -1140,6 +1140,13 @@ public class AttachmentInfoController extends BaseController {
             // 移除ocr内置模型
             if(needRemoveOcrModule){
                 attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "ocr");
+            } else {
+                attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "assets" + File.separator + "ocr");
+                // 模板资源目录
+                String sourcePath = apkSourcePath + File.separator + "apkTemplate" + File.separator + "template";
+
+                // 从打包插件模板资源目录拷贝到目标文件目录
+                Boolean copySuccess = attachmentInfoService.copyFile(sourcePath + File.separator + "assets" + File.separator + "ocr",  packageTemplatePath + File.separator + "assets");
             }
 
             // 桌面图标的复制  res/mipmap/ic_launcher.png

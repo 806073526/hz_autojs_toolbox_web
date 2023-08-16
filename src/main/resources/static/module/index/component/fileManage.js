@@ -1812,7 +1812,6 @@ export default {
                 url: getContext() + "/attachmentInfo/initPackageTemplateNew",
                 type: "GET",
                 dataType: "json",
-                async: false,
                 data: {
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
                     "webProjectName": this.packageProject.appName,
