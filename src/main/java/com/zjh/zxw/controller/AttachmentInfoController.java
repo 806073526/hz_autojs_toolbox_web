@@ -876,6 +876,83 @@ public class AttachmentInfoController extends BaseController {
         }
     }
 
+
+    /**
+     * 初始化打包模板
+     */
+    @ApiOperation(value = "初始化打包模板(新)", notes = "初始化打包模板(新)")
+    @GetMapping("/initPackageTemplateNew")
+    public R<Boolean> initPackageTemplateNew(
+            @RequestParam("webProjectRootPath") String webProjectRootPath,
+            @RequestParam("webProjectName") String webProjectName,
+            @RequestParam(value = "resetPackage",required = false) String resetPackage
+    ) {
+        try {
+            // 获取插件资源目录
+            String apkSourcePath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + "webCommonPath" + File.separator + "apkPackage";
+
+            // 检测打包插件是否存在
+            File checkFile = new File(apkSourcePath);
+            if(!checkFile.exists()){
+                return fail("未找到打包插件,请先在公共文件模块初始化！");
+            }
+
+            // 模板资源目录
+            String sourcePath = apkSourcePath + File.separator + "apkTemplate" + File.separator + "template";
+
+            File templateFie = new File(sourcePath);
+            // 模板资源目录不存在时 进行解压操作
+            if(!templateFie.exists()){
+                // 解压文件
+                attachmentInfoService.unServerFileZip(apkSourcePath + File.separator + "apkTemplate" + File.separator + "template.zip", apkSourcePath + File.separator + "apkTemplate");
+            }
+
+            // 目标资源目录
+            String targetPath  = webProjectRootPath;
+
+            // 参数不为空
+            if(StringUtils.isNotBlank(resetPackage)){
+                // 删除项目模板
+                attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName);
+            }
+
+            // 检测项目是否存在
+            File webProjectFile = new File(targetPath + File.separator +  webProjectName);
+
+            // 如果不存在项目
+            if(!webProjectFile.exists()){
+                // 先删除模板文件
+                attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
+                // 从打包插件模板资源目录拷贝到目标文件目录
+                Boolean copySuccess = attachmentInfoService.copyFile(sourcePath + ".zip",  targetPath);
+                // 复制成功
+                if(copySuccess){
+                    // 解压文件
+                    attachmentInfoService.unServerFileZip(targetPath + File.separator +  "template.zip", targetPath);
+                    Thread.sleep(100);
+                    // 重命名文件
+                    attachmentInfoService.reNameFileReCount(targetPath + File.separator + "template", targetPath + File.separator +  webProjectName, 150);
+                    Thread.sleep(100);
+                    // 删除压缩文件
+                    attachmentInfoService.deleteFile(targetPath + File.separator +  "template.zip");
+                } else {
+                    return success(false);
+                }
+            }
+            // 删除lib依赖
+            attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName + File.separator + "lib");
+            // 删除project
+            attachmentInfoService.deleteFile(targetPath + File.separator +  webProjectName + File.separator + "assets" + File.separator + "project");
+            File checkFile1 = new File(targetPath + File.separator +  webProjectName);
+            return success(checkFile1.exists());
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("处理打包项目资源异常！请联系管理员");
+        }
+    }
+
     /**
      * 处理打包项目资源
      */

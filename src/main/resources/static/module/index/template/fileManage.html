@@ -482,6 +482,9 @@
           <el-button type="primary" v-show="packageProjectActive<4"  @click.stop.native="nextSteps" :disabled="packageProjectStepLoading">
             下一步
           </el-button>
+            <el-button type="primary" v-show="packageProjectActive===0"  @click.stop.native="oneKeyPackage" :disabled="packageProjectStepLoading">
+            一键打包
+          </el-button>
         </span>
     </el-dialog>
 </div>

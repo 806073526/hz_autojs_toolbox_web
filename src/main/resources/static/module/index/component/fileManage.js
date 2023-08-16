@@ -229,6 +229,7 @@ export default {
     data() {
         return {
             isInit:false,
+            oneKeyPackageFlag:false, // 一键打包标记
             fileEditVisible:false, // 文件编辑器可见
             phoneFileEditVisible:false,
             phoneImagePreviewVisible:false,// 手机端图片预览
@@ -456,6 +457,10 @@ export default {
             }
         },
         packageProjectActive(val){
+            // 一键打包模式 不进行监听
+            if(this.oneKeyPackageFlag){
+                return;
+            }
             // 第二步  初始化打包模板
             if(val === 1){
                 // 检查是否已经初始化完成打包模板
@@ -1690,6 +1695,88 @@ export default {
                 }
             });
         },
+        oneKeyPackage(){
+            // 开启一键打包标志
+            this.oneKeyPackageFlag = true;
+
+            // 第一步 先校验配置表单
+            this.$refs["packageProjectFirst"].validate((valid) => {
+                if (valid) {
+                    // 校验通过调用保存配置方法
+                    this.saveProjectJsonFun();
+                    this.packageProjectActive++;
+                    this.$forceUpdate();
+                } else {
+                    window.ZXW_VUE.$message.warning('请将信息补充完整！');
+                    this.oneKeyPackageFlag = false;
+                }
+            });
+            if(!this.oneKeyPackageFlag){
+                return;
+            }
+            this.packageProjectStepLoading = true;
+            // 第二步  执行初始化打包模板
+            this.initPackageTemplate();
+            // 成功进行下一步
+            if(this.alreadyInitPackageTemplate){
+                this.packageProjectActive++;
+                this.$forceUpdate();
+            } else {
+                // 失败撤回第一步
+                this.packageProjectActive = 0;
+                this.oneKeyPackageFlag = false;
+                this.packageProjectStepLoading = false;
+                return;
+            }
+
+
+            // 关闭公共方法
+            let closeCommonFun = ()=>{
+                this.packageProjectStepLoading = false;
+                this.oneKeyPackageFlag = false;
+            };
+
+            // 第三步  上传项目资源
+            this.uploadProjectRes(()=>{
+                // 成功进行下一步
+                if(this.alreadyUploadProjectRes){
+                    this.packageProjectActive++;
+                    this.$forceUpdate();
+                } else {
+                    // 失败撤回第一步
+                    this.packageProjectActive = 0;
+                    closeCommonFun();
+                    return;
+                }
+
+                // 第四步 处理打包资源
+                this.handlerPackageRes();
+                // 成功进行下一步
+                if(this.alreadyHandlerPackageRes){
+                    this.packageProjectActive++;
+                    this.$forceUpdate();
+                } else {
+                    // 失败撤回第一步
+                    this.packageProjectActive = 0;
+                    closeCommonFun();
+                    return;
+                }
+
+                // 第五步 执行打包操作
+                this.handlerPackageProject();
+                // 成功进行下一步
+                if(!this.alreadyCompletePackageProject){
+                    // 失败撤回第一步
+                    this.packageProjectActive = 0;
+                    closeCommonFun();
+                    return;
+                }
+                closeCommonFun();
+            },()=>{
+                closeCommonFun();
+            });
+
+        },
         // 检测web端打包模板
         checkWebPackageTemplate(){
             let exits = false;
@@ -1720,12 +1807,14 @@ export default {
             let _that = this;
             this.packageProjectStepLoading = true;
             $.ajax({
-                url: getContext() + "/attachmentInfo/initPackageTemplate",
+                url: getContext() + "/attachmentInfo/initPackageTemplateNew",
                 type: "GET",
                 dataType: "json",
+                async: false,
                 data: {
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
-                    "webProjectName": this.packageProject.appName
+                    "webProjectName": this.packageProject.appName,
+                    "resetPackage": this.oneKeyPackageFlag ? "" : "true"
                 },
                 success: function (data) {
                     if (data) {
@@ -1774,7 +1863,7 @@ export default {
             return exits;
         },
         // 上传项目资源
-        uploadProjectRes(){
+        uploadProjectRes(callback,timeOutCallback){
             this.packageProjectStepLoading = true;
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             toPath = toPath.replace(/\/$/, "");
@@ -1792,6 +1881,13 @@ export default {
             },()=>{
                 this.packageProjectStepLoading = false;
                 this.alreadyUploadProjectRes = true;
+                if(callback){
+                    callback();
+                }
+            },()=>{
+                if(timeOutCallback){
+                    timeOutCallback();
+                }
             });
         },
         // 检测打包资源处理状态
@@ -1831,6 +1927,7 @@ export default {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
+                async: false,
                 data: JSON.stringify({
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
                     "webProjectName": this.packageProject.appName,
@@ -1970,6 +2067,7 @@ export default {
                 url: getContext() + "/attachmentInfo/packageProject",
                 type: "GET",
                 dataType: "json",
+                async:false,
                 data: {
                     "javaHome":javaHome,
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",

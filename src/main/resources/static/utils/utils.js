@@ -336,8 +336,9 @@ const getFileInfoByPath = (relativeFilePath) => {
  * @param changeFilePath 变化文件路径
  * @param changeBeforeFun 变化前处理函数
  * @param changeAfterFun 变化后处理函数
+ * @param timeOutFun 超时处理函数
  */
-export const handlerByFileChange = (changeFilePath, changeBeforeFun, changeAfterFun) => {
+export const handlerByFileChange = (changeFilePath, changeBeforeFun, changeAfterFun, timeOutFun) => {
     let fileNoChangeCount = 0;//连续未变化次数
     let startFlag = false; //开始处理标志
     // 原始文件信息
@@ -378,6 +379,15 @@ export const handlerByFileChange = (changeFilePath, changeBeforeFun, changeAfter
             refreshTimer = null;
         }
     }, 200);
+
+    setTimeout(()=>{
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+        if(timeOutFun){
+            timeOutFun();
+        }
+    },1000 * 30)
+
 };
 
 
