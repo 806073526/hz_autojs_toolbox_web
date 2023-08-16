@@ -1716,64 +1716,66 @@ export default {
             }
             this.packageProjectStepLoading = true;
             // 第二步  执行初始化打包模板
-            this.initPackageTemplate();
-            // 成功进行下一步
-            if(this.alreadyInitPackageTemplate){
-                this.packageProjectActive++;
-                this.$forceUpdate();
-            } else {
-                // 失败撤回第一步
-                this.packageProjectActive = 0;
-                this.oneKeyPackageFlag = false;
-                this.packageProjectStepLoading = false;
-                return;
-            }
-
-
-            // 关闭公共方法
-            let closeCommonFun = ()=>{
-                this.packageProjectStepLoading = false;
-                this.oneKeyPackageFlag = false;
-            };
-
-            // 第三步  上传项目资源
-            this.uploadProjectRes(()=>{
+            this.initPackageTemplate(()=>{
                 // 成功进行下一步
-                if(this.alreadyUploadProjectRes){
+                if(this.alreadyInitPackageTemplate){
                     this.packageProjectActive++;
                     this.$forceUpdate();
                 } else {
                     // 失败撤回第一步
                     this.packageProjectActive = 0;
-                    closeCommonFun();
+                    this.oneKeyPackageFlag = false;
+                    this.packageProjectStepLoading = false;
                     return;
                 }
 
-                // 第四步 处理打包资源
-                this.handlerPackageRes();
-                // 成功进行下一步
-                if(this.alreadyHandlerPackageRes){
-                    this.packageProjectActive++;
-                    this.$forceUpdate();
-                } else {
-                    // 失败撤回第一步
-                    this.packageProjectActive = 0;
-                    closeCommonFun();
-                    return;
-                }
+                // 关闭公共方法
+                let closeCommonFun = ()=>{
+                    this.packageProjectStepLoading = false;
+                    this.oneKeyPackageFlag = false;
+                };
 
-                // 第五步 执行打包操作
-                this.handlerPackageProject();
-                // 成功进行下一步
-                if(!this.alreadyCompletePackageProject){
-                    // 失败撤回第一步
-                    this.packageProjectActive = 0;
+                // 第三步  上传项目资源
+                this.uploadProjectRes(()=>{
+                    // 成功进行下一步
+                    if(this.alreadyUploadProjectRes){
+                        this.packageProjectActive++;
+                        this.$forceUpdate();
+                    } else {
+                        // 失败撤回第一步
+                        this.packageProjectActive = 0;
+                        closeCommonFun();
+                        return;
+                    }
+
+                    // 第四步 处理打包资源
+                    this.handlerPackageRes(()=>{
+                        // 成功进行下一步
+                        if(this.alreadyHandlerPackageRes){
+                            this.packageProjectActive++;
+                            this.$forceUpdate();
+                        } else {
+                            // 失败撤回第一步
+                            this.packageProjectActive = 0;
+                            closeCommonFun();
+                            return;
+                        }
+
+                        // 第五步 执行打包操作
+                        this.handlerPackageProject(()=>{
+                            // 成功进行下一步
+                            if(!this.alreadyCompletePackageProject){
+                                // 失败撤回第一步
+                                this.packageProjectActive = 0;
+                                closeCommonFun();
+                                return;
+                            }
+                            closeCommonFun();
+                        });
+                    });
+                },()=>{
                     closeCommonFun();
-                    return;
-                }
-                closeCommonFun();
-            },()=>{
-                closeCommonFun();
+                });
             });
 
         },
@@ -1803,7 +1805,7 @@ export default {
             return exits;
         },
         // 初始化打包模板
-        initPackageTemplate(){
+        initPackageTemplate(callback){
             let _that = this;
             this.packageProjectStepLoading = true;
             $.ajax({
@@ -1829,9 +1831,15 @@ export default {
                     } else {
                         _that.packageProjectStepLoading = false;
                     }
+                    if(callback){
+                        callback();
+                    }
                 },
                 error: function (msg) {
                     _that.packageProjectStepLoading = false;
+                    if(callback){
+                        callback();
+                    }
                 }
             });
         },
@@ -1918,7 +1926,7 @@ export default {
             return exits;
         },
         // 处理打包资源
-        handlerPackageRes(){
+        handlerPackageRes(callback){
             this.packageProjectStepLoading = true;
             // 调用接口
             let _that = this;
@@ -1927,7 +1935,6 @@ export default {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
-                async: false,
                 data: JSON.stringify({
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
                     "webProjectName": this.packageProject.appName,
@@ -1977,9 +1984,15 @@ export default {
                         }
                     }
                     _that.packageProjectStepLoading = false;
+                    if(callback){
+                        callback();
+                    }
                 },
                 error: function (msg) {
                     _that.packageProjectStepLoading = false;
+                    if(callback){
+                        callback();
+                    }
                 }
             });
 
@@ -2051,7 +2064,7 @@ export default {
             return keyStoreObj;
         },
         // 处理打包项目
-        handlerPackageProject(){
+        handlerPackageProject(callback){
             let _that = this;
             this.packageProjectStepLoading = true;
             // 获取javaHome
@@ -2061,13 +2074,15 @@ export default {
             if(!keyStoreObj || !Object.keys(keyStoreObj).length){
                 window.ZXW_VUE.$message.warning('未找到签名配置,请先到公共文件生成签名');
                 this.packageProjectStepLoading = false;
+                if(callback){
+                    callback();
+                }
                 return;
             }
             $.ajax({
                 url: getContext() + "/attachmentInfo/packageProject",
                 type: "GET",
                 dataType: "json",
-                async:false,
                 data: {
                     "javaHome":javaHome,
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
@@ -2096,9 +2111,15 @@ export default {
                     } else {
                         _that.packageProjectStepLoading = false;
                     }
+                    if(callback){
+                        callback();
+                    }
                 },
                 error: function (msg) {
                     _that.packageProjectStepLoading = false;
+                    if(callback){
+                        callback();
+                    }
                 }
             });
         },
