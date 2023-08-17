@@ -348,8 +348,17 @@ export const handlerByFileChange = (changeFilePath, changeBeforeFun, changeAfter
     if (changeBeforeFun) {
         changeBeforeFun()
     }
+    let refreshTimer = null;
+    let timeOutTimer = setTimeout(()=>{
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+        if(timeOutFun){
+            timeOutFun();
+        }
+    },1000 * 60);
+
     // 每隔200毫秒执行一次查询
-    let refreshTimer = setInterval(() => {
+    refreshTimer = setInterval(() => {
         // 当前文件信息
         let curFileInfo = getFileInfoByPath(changeFilePath);
         let curFileSize = curFileInfo ? curFileInfo.fileSize : 0;
@@ -374,19 +383,15 @@ export const handlerByFileChange = (changeFilePath, changeBeforeFun, changeAfter
                     changeAfterFun();
                 }
             }, 200);
+            // 关闭超时定时器
+            clearTimeout(timeOutTimer);
+            timeOutTimer = null;
+
             // 关闭定时器
             clearInterval(refreshTimer);
             refreshTimer = null;
         }
     }, 200);
-
-    setTimeout(()=>{
-        clearInterval(refreshTimer);
-        refreshTimer = null;
-        if(timeOutFun){
-            timeOutFun();
-        }
-    },1000 * 30)
 
 };
 
