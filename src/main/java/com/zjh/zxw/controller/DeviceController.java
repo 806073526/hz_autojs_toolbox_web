@@ -66,12 +66,16 @@ public class DeviceController extends BaseController {
 
     private List<AutoJsSession> getOnlineDeviceFun() throws IOException {
         List<AutoJsSession> autoJsSessionList = AutoJsWsServerEndpoint.getOnlineDevice();
-        String filePath = UploadPathHelper.getUploadPath(uploadPath) +  "autoJsTools" + File.separator + "webCommonPath" + File.separator + "deviceAliasName.json";
-        File file = new File(filePath);
-
+        String filePath = UploadPathHelper.getUploadPath(uploadPath) +  "autoJsTools" + File.separator + "webCommonPath" + File.separator;
+        File fileParent = new File(filePath);
+        if(!fileParent.exists()){
+            fileParent.mkdirs();
+        }
         JSONObject jsonObject = new JSONObject();
         // 原始json
         String sourceJsonStr = "";
+        filePath  += "deviceAliasName.json";
+        File file = new File(filePath);
         if(file.exists()){
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             StringBuilder jsonString = new StringBuilder();
