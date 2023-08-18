@@ -70,7 +70,10 @@ window.ZXW_VUE = new Vue({
         fileDialogIsMin: false,
         showFileDialogTab:'',
         showTabScrollTop:0,
-        screenDirection: '竖屏'
+        screenDirection: '竖屏',
+        openLogWindow:false,
+        showWindowLog:true,
+        windowLogContent:''
     },
     computed: {
     },
@@ -225,10 +228,16 @@ window.ZXW_VUE = new Vue({
                     })
                 }
             },
+            changeLogWindow:(value)=>{
+                this.openLogWindow = value;
+            },
             timeSyncOtherPropertyFun: this.timeSyncOtherProperty // 同步其他属性
         }
     },
     methods: {
+        changeShowWindowLog(){
+          this.showWindowLog=!this.showWindowLog;
+        },
         isNumberStr(str) {
             return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
         },
@@ -254,6 +263,10 @@ window.ZXW_VUE = new Vue({
                 }
                 // 发送心跳
                 this.webSocket.send("0");
+                if(this.deviceInfo.deviceUuid){
+                    // 设置当前选中App设备
+                    this.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid",this.deviceInfo.deviceUuid);
+                }
             }, this.webSocketConfig.heartTime)
         },
         // 清除心跳
@@ -334,6 +347,43 @@ window.ZXW_VUE = new Vue({
                     // 调用刷新图片方法
                     window.ZXW_VUE.$EventBus.$emit('refreshPreviewImg');
                 }
+            // 接收刷新 远程实时日志指令
+            } else if(messageData.action === 'refreshOnLineRemoteLog'){
+                if(messageData.message !== this.deviceInfo.deviceUuid){
+                    return;
+                }
+                // 调用接口查询日志
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/queryLog",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "key": _that.deviceInfo.deviceUuid
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                let content = decodeURI(atob(data.data));
+                                // 更新悬浮窗日志
+                                _that.windowLogContent = content.replace(/\n/g,"<br/>");
+                                _that.$nextTick(()=>{
+                                    // 滚动到底部
+                                    let windowLogDiv = document.getElementById("windowLogDiv");
+                                    windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
+                                    if(_that.activeTab === "remoteLog"){
+                                        // 更新实时日志
+                                        window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',content);
+                                    }
+                                });
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                        console.log(msg)
+                    }
+                });
             }
         },
         // 发送消息到web设备websocket
@@ -391,7 +441,7 @@ window.ZXW_VUE = new Vue({
                 _that.reConnectTimer = null;
 
                 // 设置清空 当前选中App设备
-                _that.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid", "");
+                // _that.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid", "");
             };
             this.webSocket.onclose = function (ev) {
                 console.log("与服务器端的websocket连接断开",ev);
@@ -420,8 +470,11 @@ window.ZXW_VUE = new Vue({
             // 更新屏幕方向
             this.screenDirection = screenDirection;
 
-            // 设置当前选中App设备
-            this.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid",this.deviceInfo.deviceUuid);
+            if(this.deviceInfo.deviceUuid){
+                // 设置当前选中App设备
+                this.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid",this.deviceInfo.deviceUuid);
+            }
+
 
             // 同步坐标
             setTimeout(() => {
@@ -540,7 +593,7 @@ window.ZXW_VUE = new Vue({
                 this.showFileDialogTab = this.activeTab;
 
                 // 获取当前body高度
-                this.showTabScrollTop =  document.documentElement.scrollTop;
+                this.showTabScrollTop =  document.documentElement.scrollTop + 10;
 
                 // 然后切换到文件管理
                 this.activeTab = 'fileManage';

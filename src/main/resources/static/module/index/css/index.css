@@ -154,3 +154,17 @@ table .el-input__inner, table .el-textarea textarea {
 .el-table__empty-block {
     height: 60px !important;
 }
+
+#windowLogDiv::-webkit-scrollbar {
+    width: 4px;
+}
+#windowLogDiv::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+#windowLogDiv:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+#windowLogDiv::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}

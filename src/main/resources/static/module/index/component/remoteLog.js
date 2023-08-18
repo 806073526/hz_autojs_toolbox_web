@@ -12,7 +12,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete','changeLogWindow'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -56,11 +56,62 @@ export default {
         // 默认当前时间日志
         this.remoteHandler.param2.logName = "log" + this.getLastHeartTimeStr() + ".txt";
     },
+    computed:{
+        convertLog(){
+            let log = this.onlineLogContent.replace(/\n/g,"<br/>");
+            return log;
+        }
+    },
     methods: {
         init(){
             // 初始化文件编辑器
             initFileEditor(this,'logEditor','logTextEditor',this.getMonacoEditorComplete,'','html','vs-dark',(e,value)=>{
             });
+
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryLog",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "key": _that.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            _that.refreshOnLineRemoteLogFun(decodeURI(atob(data.data)))
+                        }
+                    }
+                },
+                error: function (msg) {
+                    console.log(msg)
+                }
+            });
+        },
+        refreshOnLineRemoteLogFun(longContent){
+            let _that = this;
+            _that.onlineLogContent = longContent;
+            let completeTimer = setInterval(()=>{
+                if(!this.getMonacoEditorComplete()){
+                    return;
+                }
+                _that.logEditor.setValue(_that.onlineLogContent);
+                if(getEditorType() === 'ace'){
+                    _that.logEditor.clearSelection();
+                }
+                if(_that.autoScroll){
+                    _that.$nextTick(() =>{
+                        if(getEditorType() === 'ace'){
+                            const numRows = _that.logEditor.session.getLength();
+                            _that.logEditor.scrollToRow(numRows - 1);
+                        } else {
+                            _that.logEditor.revealLine(_that.logEditor.getModel().getLineCount());
+                        }
+                    });
+                }
+                clearInterval(completeTimer);
+            },200);
         },
         // 开启实时日志
         startOnLineLog(){
@@ -177,7 +228,12 @@ export default {
             utilsObj.timerStartPushLog();`;
             this.remoteExecuteScript(remoteScript);
 
-            if(this.logTimer){
+            this.changeLogWindow(true);
+
+            window.ZXW_VUE.$EventBus.$off('refreshOnLineRemoteLog',this.refreshOnLineRemoteLogFun);
+            window.ZXW_VUE.$EventBus.$on('refreshOnLineRemoteLog', this.refreshOnLineRemoteLogFun);
+
+            /*if(this.logTimer){
                 clearInterval(this.logTimer);
                 this.logTimer = null;
             }
@@ -194,21 +250,7 @@ export default {
                     success: function (data) {
                         if (data) {
                             if (data.isSuccess) {
-                                _that.onlineLogContent = decodeURI(atob(data.data));
-                                _that.logEditor.setValue(_that.onlineLogContent);
-                                if(getEditorType() === 'ace'){
-                                    _that.logEditor.clearSelection();
-                                }
-                                if(_that.autoScroll){
-                                    _that.$nextTick(() =>{
-                                        if(getEditorType() === 'ace'){
-                                            const numRows = _that.logEditor.session.getLength();
-                                            _that.logEditor.scrollToRow(numRows - 1);
-                                        } else {
-                                            _that.logEditor.revealLine(_that.logEditor.getModel().getLineCount());
-                                        }
-                                    });
-                                }
+
                             }
                         }
                     },
@@ -216,7 +258,7 @@ export default {
                         console.log(msg)
                     }
                 });
-            },100 + Number(this.clientSpace));
+            },100 + Number(this.clientSpace));*/
         },
         // 停止实时日志
         stopOnLineLog(){
@@ -227,6 +269,8 @@ export default {
                 clearInterval(this.logTimer);
             }
             this.logTimer = null;
+            this.changeLogWindow(false);
+            window.ZXW_VUE.$EventBus.$off('refreshOnLineRemoteLog',this.refreshOnLineRemoteLogFun);
         },
         getText(){
           console.log(this.onlineLogContent)

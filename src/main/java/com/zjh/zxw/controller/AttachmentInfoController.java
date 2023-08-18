@@ -287,8 +287,23 @@ public class AttachmentInfoController extends BaseController {
 
     @ApiOperation(value = "更新在线日志map", notes = "更新在线日志map")
     @PostMapping("/updateLogMap")
-    public R<Boolean> updateLogMap(@RequestBody Map<String,String> mapParam){
+    public R<Boolean> updateLogMap(@RequestBody Map<String,String> mapParam) throws IOException {
+        // 获取上次缓存的文件
+        String lastLogJson= onlineLogMap.getOrDefault(mapParam.get("key"),"");
+
         onlineLogMap.put(mapParam.get("key"),mapParam.get("logJson"));
+
+        // 内容发生变化
+        if(!lastLogJson.equals(mapParam.get("logJson"))){
+            String deviceUUID = request.getHeader("deviceUUID");
+            // 发送指令 给web端  刷新实时日志
+            AjMessageDTO ajMessageDTO = new AjMessageDTO();
+            ajMessageDTO.setAction("refreshOnLineRemoteLog");
+            ajMessageDTO.setMessage(deviceUUID);
+            // 推送消息通知到web端页面
+            AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice("","",ajMessageDTO);
+        }
+
         return success(true);
     }
 
