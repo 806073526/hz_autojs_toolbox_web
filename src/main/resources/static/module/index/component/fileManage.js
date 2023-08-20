@@ -2209,6 +2209,7 @@ export default {
             }).then(({value}) => {
                 let _that = this;
                 let pathName = this.absolutePrePath + this.deviceInfo.deviceUuid + value;
+                this.fileLoading = true;
                 $.ajax({
                     url: getContext() + "/attachmentInfo/zipServerFileZip",
                     type: "get",
@@ -2643,6 +2644,7 @@ export default {
             }).then(({value}) => {
                 let _that = this;
                 let pathName = this.absolutePrePath + this.deviceInfo.deviceUuid + value;
+                _that.fileLoading = true;
                $.ajax({
                     url: getContext() + "/attachmentInfo/unServerFileZip",
                     type: "get",

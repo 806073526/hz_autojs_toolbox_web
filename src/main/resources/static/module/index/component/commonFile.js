@@ -252,6 +252,7 @@ export default {
                 if((packageFileArr && packageFileArr.length) && (!packageDirectoryArr || !packageDirectoryArr.length)){
                     let pathName = this.absolutePrePath + this.webCommonPath + "/apkPackage.zip";
                     let _that = this;
+                    _that.fileLoading = true;
                     $.ajax({
                         url: getContext() + "/attachmentInfo/unServerFileZip",
                         type: "get",
@@ -280,6 +281,7 @@ export default {
                 if((packageFileArr && packageFileArr.length) && (packageDirectoryArr && packageDirectoryArr.length)){
                     let pathName = this.absolutePrePath + this.webCommonPath + "/apkPackage.zip";
                     let _that = this;
+                    _that.fileLoading = true;
                     let unServerFileZipFun = ()=>{
                         // 再重新解压
                         $.ajax({
@@ -1014,6 +1016,7 @@ export default {
             }).then(({value}) => {
                 let _that = this;
                 let pathName = this.absolutePrePath + this.webCommonPath + value;
+                _that.fileLoading = true;
                $.ajax({
                     url: getContext() + "/attachmentInfo/unServerFileZip",
                     type: "get",
