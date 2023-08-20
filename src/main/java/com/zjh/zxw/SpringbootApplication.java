@@ -1,6 +1,7 @@
 package com.zjh.zxw;
 
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
+import com.zjh.zxw.websocket.IPUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -68,12 +69,7 @@ public class SpringbootApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpringbootApplication.class, args);
         try {
-            String command = "for /f \"tokens=16\" %%i in ('ipconfig ^|find /i \"ipv4\"') do (\n" +
-                    "set myip=%%i\n" +
-                    "goto out\n" +
-                    ")\n" +
-                    ":out\n" +
-                    "cmd /c start http://%myip%:9998";
+            String command = "cmd /c start http://"+ IPUtil.getRealIP() +":9998";
             if(isWindowsSystem()){
                 executeBatScript(command);
             }
