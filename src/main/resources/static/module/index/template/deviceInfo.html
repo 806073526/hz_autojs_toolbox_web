@@ -1,43 +1,30 @@
 <div>
     <p class="basicInfo" style="display: flex;justify-content: left;align-items: center;flex-wrap: wrap;height: auto !important;">
-        已连接设备列表
+        在线设备列表
         <i class="el-icon-refresh-right" style="cursor: pointer;font-weight: 600!important;"
            @click="getOnlineDevice">
         </i>
         <span style="margin-left:5px;cursor: pointer;" @click.stop="expandDeviceFun">{{ expandDevice ? '收缩' : '展开'}}</span>
         <span @click.stop="authorizedFun" target="_blank" style="margin-left: 2px;color: #9a2c25;cursor: pointer;">
-            【设备{{authorizeStatus? '已' : '未'}}授权】
+            【服务端{{authorizeStatus? '已' : '未'}}授权】版本【V2.9.0】
+        </span>
+        <span style="margin-left: 2px;color: #9a2c25;">
+            {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
         </span>
         <span class="flex-1" style="text-align: right">
-            <a href="https://www.zjh336.cn/?id=2126" target="_blank" style="margin-right: 5px;color: #2f871a">
-                学习指南
-            </a>
-            <a href="https://sp.zjh336.cn/product/5.html" target="_blank" style="margin-right: 5px;color: #7d870d">
-                打包插件下载
-            </a>
             <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/releases" target="_blank"
-               style="margin-right: 5px;color: #2ECC40">
-                Web端下载【当前2.8.5】
-            </a>
+               style="margin-right: 5px;color: #9a2c25">Web端下载</a>
             <a href="https://gitee.com/zjh336/hz_autojs_toolbox/releases" target="_blank"
-               style="color: blue;">
-                APP端下载
-            </a>
+               style="color: #9a2c25;">APP端下载</a>
+            <a href="https://sp.zjh336.cn/product/5.html" target="_blank" style="margin-right: 5px;color: #9a2c25">打包插件下载</a>
             <a href="https://space.bilibili.com/69729485/channel/series" target="_blank"
-                   style="margin-right: 5px;color:#a59d3e;">
-                视频教程
-            </a>
+                   style="margin-right: 5px;color:#9a2c25;">视频教程</a>
             <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/wikis/pages" target="_blank"
-               style="margin-right: 5px;color:#d14b25;">
-                Web端文档【必看】
-            </a>
+               style="margin-right: 5px;color:red;">Web端文档【必读】</a>
+            <a href="https://www.zjh336.cn/?id=2126" target="_blank" style="margin-right: 5px;color: red">学习指南【必读】</a>
              <a href="/docs/zh/v8/app.html" target="_blank"
-                style="margin-right: 5px;color:#2f871a;">
-                AutoJsPro文档
-            </a>
-            <a href="https://jq.qq.com/?_wv=1027&k=QGefcWIC" target="_blank" style="color: #3c663f;">
-                QQ群：806074622
-            </a>
+                style="margin-right: 5px;color:#9a2c25;">AutoJsPro文档</a>
+            <a href="https://jq.qq.com/?_wv=1027&k=QGefcWIC" target="_blank" style="color: #9a2c25;">QQ群：806074622</a>
         </span>
     </p>
     <el-row v-show="expandDevice">

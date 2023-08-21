@@ -104,6 +104,7 @@ export default {
                 this.$set(this.deviceInfo, 'offsetY', 0);
                 this.$set(this.deviceInfo, 'debugModel', true);
                 this.$set(this.deviceInfo, 'debugSleep', 1000);
+                this.$set(this.deviceInfo, 'aliasName', row.aliasName);
                 // 同步设备信息
                 this.$emit('deviceSelectRowCallback', {
                     deviceInfo: this.deviceInfo,

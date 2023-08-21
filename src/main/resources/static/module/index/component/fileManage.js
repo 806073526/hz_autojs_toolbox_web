@@ -483,17 +483,17 @@ export default {
     methods: {
         // 初始化方法
         init() {
-            if(!this.isInit){
-                let relativeFilePath = this.deviceInfo.deviceUuid;
-                if(relativeFilePath){
-                    // 加载文件列表
-                    this.queryFileList(relativeFilePath);
-                    this.breadcrumbList = [{label: '根目录', value: this.deviceInfo.deviceUuid}]
-                }
-                // 获取手机端文件目录
-                this.updatePhoneDirCache(this.phoneBreadcrumbList.map(item => item.value).join('/'));
+            let deviceUuid = this.deviceInfo.deviceUuid;
+            if(deviceUuid){
+                let webSyncPathCacheKey = this.deviceInfo.deviceUuid + "_webSyncPathCache";
+                let phoneSyncPathCacheKey = this.deviceInfo.deviceUuid + "_phoneSyncPathCache";
+                // 从缓存读取同步路径
+                this.webSyncPath = window.localStorage.getItem(webSyncPathCacheKey) || "/";
+                this.phoneSyncPath = window.localStorage.getItem(phoneSyncPathCacheKey) || "/";
+                // 根据同步路径处理
+                this.enterWebPath();
+                this.enterPhonePath();
             }
-            this.isInit = true;
         },
         // 取消上传
         cancelUpload(i) {
@@ -2801,15 +2801,19 @@ export default {
             let breadcrumbArr = [];
             let pathArr = [];
             for (let i = 0; i < array.length; i++) {
-                pathArr.push(array[i]);
+                let value = array[i];
+                if(!value){
+                    continue;
+                }
+                pathArr.push(value);
                 breadcrumbArr.push({
                     label: i === 0 ? "根目录" : array[i],
                     value: pathArr.join("/")
                 });
             }
             this.breadcrumbList = breadcrumbArr;
-            //更新目录
-            this.queryFileList(this.breadcrumbList[this.breadcrumbList.length-1].value);
+            // 默认加载最后一个
+            this.breadcrumbChange(this.breadcrumbList[this.breadcrumbList.length - 1], (this.breadcrumbList.length - 1))
         },
         enterPhonePath() {
             if(!this.autoSyncPhoneSyncPath){
@@ -2832,7 +2836,7 @@ export default {
                 pathArr.push(value);
                 breadcrumbArr.push({
                     label: i === 0 ? "根目录" : array[i],
-                    value: "/"+pathArr.join("/") + "/"
+                    value: "/"+pathArr.join("/")
                 });
             }
             this.phoneBreadcrumbList = breadcrumbArr;
@@ -2852,8 +2856,13 @@ export default {
             }
             if(this.autoSyncWebSyncPath){
                 let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
-                let replacePath = toPath.replace(this.deviceInfo.deviceUuid,"");
-                this.webSyncPath =  replacePath + "/";
+                let tempPath = toPath.replace(this.deviceInfo.deviceUuid, "");
+                this.webSyncPath =  tempPath || "/";
+                let deviceUuid = this.deviceInfo.deviceUuid;
+                if(deviceUuid){
+                    let webSyncPathCacheKey = deviceUuid + "_webSyncPathCache";
+                    window.localStorage.setItem(webSyncPathCacheKey,this.webSyncPath);
+                }
             }
         },
         // 面包屑导航
@@ -2861,12 +2870,21 @@ export default {
             if (!this.validSelectDevice()) {
                 return;
             }
-            this.updatePhoneDirCache(item.value);
+            let value = item.value;
+            if(!value.endsWith("/")){
+                value +="/";
+            }
+            this.updatePhoneDirCache(value);
             // 重新加载面包屑
             this.phoneBreadcrumbList = this.phoneBreadcrumbList.slice(0, index + 1);
             if(this.autoSyncPhoneSyncPath){
                 let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
                 this.phoneSyncPath =  toPath.replace("/sdcard", "");
+                let deviceUuid = this.deviceInfo.deviceUuid;
+                if(deviceUuid){
+                    let phoneSyncPathCacheKey = deviceUuid + "_phoneSyncPathCache";
+                    window.localStorage.setItem(phoneSyncPathCacheKey,this.phoneSyncPath);
+                }
             }
         },
         // 刷新手机端路径
