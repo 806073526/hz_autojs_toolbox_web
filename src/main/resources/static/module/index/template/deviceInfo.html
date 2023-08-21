@@ -61,7 +61,7 @@
             </el-table>
         </div>
     </el-row>
-    <el-row>
+    <el-row v-show="expandDevice">
         <div class="width100 d-flex a-center flex-wrap" style="margin-top: 10px;">
             <el-form-item label="标准宽度:" prop="x1"  label-width="100px" class="flex-1">
                 <el-input type="number" v-model="deviceInfo.standardWidth" placeholder="请设置标准宽度"
@@ -85,7 +85,7 @@
             </el-form-item>
         </div>
     </el-row>
-    <el-row style="margin-top: 10px;">
+    <el-row v-show="expandDevice" style="margin-top: 10px;">
         <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="调试模式:" label-width="100px" class="flex-1">
                 <div class="d-flex j-start a-center" style="height: 40px;">
