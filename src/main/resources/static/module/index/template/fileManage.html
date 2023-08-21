@@ -5,12 +5,12 @@
     <el-row style="margin-top: 10px;">
         <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="web端同步路径:" label-width="125px" style="flex:3">
-                <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径"
+                <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径" @blur="enterWebPath" @keyup.native.enter="enterWebPath"
                           class="width100">
                 </el-input>
             </el-form-item>
             <el-form-item label="手机端同步路径:" label-width="125px"  style="flex:3">
-                <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)"
+                <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)" @blur="enterPhonePath" @keyup.native.enter="enterPhonePath"
                           class="width100">
                 </el-input>
             </el-form-item>

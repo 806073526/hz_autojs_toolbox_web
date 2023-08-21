@@ -2784,6 +2784,60 @@ export default {
                 fileObj.sourceFileContent = fileObj.fileContent;
             });
         },
+        enterWebPath() {
+            if(!this.autoSyncWebSyncPath){
+                return;
+            }
+            if(this.webSyncPath.includes(":")){
+                this.webSyncPath = "/";
+            }
+            //统一输入格式
+            if(!this.webSyncPath.startsWith("/")){
+                this.webSyncPath = "/"+this.webSyncPath;
+            }
+            let array = this.webSyncPath.split("/");
+            array[0] = this.deviceInfo.deviceUuid;
+            // 面包屑数组
+            let breadcrumbArr = [];
+            let pathArr = [];
+            for (let i = 0; i < array.length; i++) {
+                pathArr.push(array[i]);
+                breadcrumbArr.push({
+                    label: i === 0 ? "根目录" : array[i],
+                    value: pathArr.join("/")
+                });
+            }
+            this.breadcrumbList = breadcrumbArr;
+            //更新目录
+            this.queryFileList(this.breadcrumbList[this.breadcrumbList.length-1].value);
+        },
+        enterPhonePath() {
+            if(!this.autoSyncPhoneSyncPath){
+                return;
+            }
+            //统一输入格式
+            if(!this.phoneSyncPath.startsWith("/")){
+                this.phoneSyncPath = "/"+this.phoneSyncPath;
+            }
+            // 记录到面包屑导航栏
+            let array =  this.phoneSyncPath.split("/");
+            // 面包屑数组
+            let breadcrumbArr = [];
+            let pathArr = [];
+            for (let i = 0; i < array.length; i++) {
+                let value = i === 0 ? "sdcard" : array[i];
+                if(!value){
+                    continue;
+                }
+                pathArr.push(value);
+                breadcrumbArr.push({
+                    label: i === 0 ? "根目录" : array[i],
+                    value: "/"+pathArr.join("/") + "/"
+                });
+            }
+            this.phoneBreadcrumbList = breadcrumbArr;
+            this.phoneBreadcrumbChange(this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1], (this.phoneBreadcrumbList.length - 1))
+        },
         // 面包屑change
         breadcrumbChange(item, index) {
             if (!this.validSelectDevice()) {
@@ -2793,8 +2847,9 @@ export default {
             this.queryFileList(item.value);
             // 重新加载面包屑
             this.breadcrumbList = this.breadcrumbList.slice(0, index + 1);
-            this.$set(this.breadcrumbList, 0, {label: '根目录', value: this.deviceInfo.deviceUuid});
-
+            if(!this.webSyncPath.includes(":")) {
+                this.$set(this.breadcrumbList, 0, {label: '根目录', value: this.deviceInfo.deviceUuid});
+            }
             if(this.autoSyncWebSyncPath){
                 let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
                 let replacePath = toPath.replace(this.deviceInfo.deviceUuid,"");
