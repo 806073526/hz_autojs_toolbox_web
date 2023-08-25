@@ -2836,7 +2836,7 @@ export default {
                 pathArr.push(value);
                 breadcrumbArr.push({
                     label: i === 0 ? "根目录" : array[i],
-                    value: "/"+pathArr.join("/")
+                    value: "/"+pathArr.join("/") + "/"
                 });
             }
             this.phoneBreadcrumbList = breadcrumbArr;
