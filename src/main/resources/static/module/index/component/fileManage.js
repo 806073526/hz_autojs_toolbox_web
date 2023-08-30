@@ -223,7 +223,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {
@@ -247,7 +247,7 @@ export default {
              */
             scriptEditor:null,
             phoneScriptEditor:null,
-            fileActiveName:'web',
+            fileActiveName:'phone',
             webSyncPath: "/",
             phoneSyncPath: "/",
             autoSyncWebSyncPath:true,
@@ -280,8 +280,8 @@ export default {
             packageProject:{
                 appName:'',//
                 packageName:'',//
-                versionName:'',
-                versionCode:'',
+                versionName:'默认',
+                versionCode:'1.0.0',
                 appIcon:'',
                 openNodeJs:false,
                 openImageModule:true,
@@ -1185,7 +1185,7 @@ export default {
             }
             // 快捷运行程序  ctrl+i
             if(e.ctrlKey && e.keyCode === 73){
-                this.phoneRemoteRunScript();
+                this.phoneRemoteRunScript(true);
                 // 保存 ctrl+s
             }else if(e.ctrlKey && e.keyCode === 83){
                 // 获取当前点击的文件对象
@@ -1205,7 +1205,7 @@ export default {
                 e.stopPropagation();
                 e.preventDefault();
                 this.phoneMinFileEditorDialog();
-            // 运行当前 ctrl+1
+            // 运行文件 ctrl+1
             }else if(e.ctrlKey && (e.keyCode === 49 || e.keyCode === 97)){
                 e.stopPropagation();
                 e.preventDefault();
@@ -2259,11 +2259,22 @@ export default {
         },
         // 手机端运行选中脚本 弹窗
         phoneRunScriptByDialog(){
+
+
+
             let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
             let savePath = fileObj.fileSavePath;
             if(!savePath){
                 return;
             }
+
+            //先保存下当前文件
+            let remoteSaveScript = `let writableTextFile = files.write('${fileObj.fileSavePath}',decodeURI($base64.decode('${btoa(encodeURI(fileObj.fileContent))}')));`;
+            this.remoteExecuteScript(remoteSaveScript);
+            // 更新原始缓存值
+            fileObj.sourceFileContent = fileObj.fileContent;
+
+
             let parentSavePath = savePath.substring(0,savePath.lastIndexOf('/'));
             let remoteScript = `engines.execScriptFile("${savePath}",{path:["${parentSavePath}"]})`;
             this.remoteExecuteScript(remoteScript);
@@ -2603,9 +2614,13 @@ export default {
             });
         },
         // 手机端压缩文件
-        phoneZipFile(row){
+        phoneZipFile(row,flag){
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
-            window.ZXW_VUE.$prompt('请输入要压缩到的目录及文件名(根目录是/sdcard/)', '提示', {
+            let str = "请输入要压缩到的目录及文件名(根目录是/sdcard/)";
+            if(!flag){
+                str = "请输入要压缩到的目录(根目录是/sdcard/),压缩不含父目录"
+            }
+            window.ZXW_VUE.$prompt(str, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 inputValue: toPath + row.fileName + '.zip',
@@ -2617,7 +2632,7 @@ export default {
                     }
                 }
             }).then(({value}) => {
-                let remoteScript = `$zip.zipDir('${row.pathName}', '${value}')`;
+                let remoteScript = `$zip.zipDir('${row.pathName}', '${value}',{includeRootFolder:${flag}})`;
                 this.remoteExecuteScript(remoteScript);
                 setTimeout(()=>{
                     // 刷新手机目录
@@ -2929,10 +2944,10 @@ export default {
                 window.ZXW_VUE.$message.warning("web端同步路径必须以/开头");
                 return false;
             }
-            if(!this.webSyncPath.endsWith("/")){
+           /* if(!this.webSyncPath.endsWith("/")){
                 window.ZXW_VUE.$message.warning("web端同步路径必须以/结尾");
                 return false;
-            }
+            }*/
             if (!this.phoneSyncPath) {
                 window.ZXW_VUE.$message.warning('请设置手机端同步路径');
                 return false;
@@ -3354,9 +3369,129 @@ export default {
             }).catch(() => {
             });
         },
+        getMainScriptPath(curPath) {
+            // main.js脚本路径
+            let mainScriptPath = "";
+
+            let pathArr = curPath.split("/").filter(item => !!item);
+            // 获取json结果对象
+            let result = this.getProjectJson(pathArr);
+
+            if (!result.projectJson) {
+                return "";
+            }
+            // 获取配置对象
+            let projectObj = JSON.parse(result.projectJson);
+            // 对象为空或者解析属性为空
+            if (!projectObj || !projectObj.main) {
+                return "";
+            }
+            // 读取后缀
+            mainScriptPath = projectObj.main;
+            // 拼接文件
+            mainScriptPath = "/" + result.pathArr.join("/") + "/" + mainScriptPath;
+
+            return mainScriptPath;
+        }, getProjectJson(pathArr) {
+            let result = {
+                projectJson: "",
+                pathArr: []
+            };
+            if (!pathArr) {
+                return result;
+            }
+            // 拼接文件路径
+            let projectJsonPath = "/" + pathArr.join("/") + "/" + "project.json";
+            // 判断是否存在
+            let exitsProjectJson = files.exists(projectJsonPath);
+            // 存在文件 直接读取
+            if (exitsProjectJson) {
+                // 读取文件内容
+                result.projectJson = files.read(projectJsonPath);
+                // 设置路径
+                result.pathArr = pathArr;
+                return result;
+            }
+
+            // 不存在文件 获取上级目录
+            let parentPathArr = pathArr.slice(0, pathArr.length - 1);
+            // 获取上级目录结果
+            return getProjectJson(parentPathArr);
+        },
         // 手机端远程运行程序
-        phoneRemoteRunScript(){
-            let remoteScript = `engines.execScriptFile("/sdcard/appSync/main.js");`;
+        phoneRemoteRunScript(isDialogFileProject){
+            let runPath = "/sdcard" + this.phoneSyncPath;
+            if(isDialogFileProject){
+                let fileObj = this.phoneFileCacheArr[this.phoneFileSelectIndex];
+                let savePath = fileObj.fileSavePath;
+                if(!savePath){
+                    return;
+                }
+                runPath = savePath;
+            }
+            let remoteScript = `
+            let curPathParam = "${runPath}";
+            function getMainScriptPath(curPath) {
+                // main.js脚本路径
+                let mainScriptPath = "";
+            
+                let pathArr = curPath.split("/").filter(item => !!item);
+                // 获取json结果对象
+                let result = getProjectJson(pathArr);
+            
+                if (!result.projectJson) {
+                    return "";
+                }
+                // 获取配置对象
+                let projectObj = JSON.parse(result.projectJson);
+                // 对象为空或者解析属性为空
+                if (!projectObj || !projectObj.main) {
+                    return "";
+                }
+                // 读取后缀
+                mainScriptPath = projectObj.main;
+                // 拼接文件
+                mainScriptPath = "/" + result.pathArr.join("/") + "/" + mainScriptPath;
+            
+                return mainScriptPath;
+            }
+            
+            
+            function getProjectJson(pathArr) {
+                let result = {
+                    projectJson: "",
+                    pathArr: []
+                };
+                if (!pathArr && !pathArr.length) {
+                    return result;
+                }
+                // 拼接文件路径
+                let projectJsonPath = "/" + pathArr.join("/") + "/" + "project.json";
+                // 判断是否存在
+                let exitsProjectJson = files.exists(projectJsonPath);
+                // 存在文件 直接读取
+                if (exitsProjectJson) {
+                    // 读取文件内容
+                    result.projectJson = files.read(projectJsonPath);
+                    // 设置路径
+                    result.pathArr = pathArr;
+                    return result;
+                }
+            
+                // 不存在文件 获取上级目录
+                let parentPathArr = pathArr.slice(0, pathArr.length - 1);
+                // 获取上级目录结果
+                return getProjectJson(parentPathArr);
+            }
+            let mainScriptPath = getMainScriptPath(curPathParam);
+            if(mainScriptPath){
+                let parentMainScriptPath = mainScriptPath.substring(0,mainScriptPath.lastIndexOf("/")) + "/";
+                engines.execScriptFile(mainScriptPath,{path:[parentMainScriptPath]});
+                toastLog("运行项目【"+mainScriptPath+"】");
+            } else {
+                toastLog("未找到项目");          
+            }
+`;
             this.remoteExecuteScript(remoteScript);
         },
         // 手机端远程停止程序
@@ -3706,6 +3841,9 @@ export default {
                 this.phoneImageBase64 = '';
                 if(isText){
                     this.phoneFileEditVisible = true;
+                    //后加 修复 最小化再打开新文件 最小化存在bug
+                    this.updateFileDialogIsMin(false);
+
                     fileContent = cacheResultData ? decodeURI(atob(cacheResultData)) : '';
                     this.phoneFileEditorName = '文本编辑';
                     this.phoneFileSavePath = row.pathName;

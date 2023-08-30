@@ -29,7 +29,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {
@@ -58,14 +58,33 @@ export default {
                     layoutAnalysisRange:'active',// 布局分析范围 active活跃窗口 all全部窗口
                     nodeInfo: '',// 节点信息
                     uiSelect: ['id', 'text', 'desc', 'className'],// ui选择器
-                    uiSelectCondition: 'findOne',// ui选择器条件
-                    uiSelectAction: 'click',// 动作
+                    uiSelectCondition: 'findOnce',// ui选择器条件
+                    uiSelectAction: 'clickCenter',// 动作
                     checkStrictly: true,// 父子相关联
                     defaultProps: {
                         children: 'children',
                         label: 'label'
                     },
-                    nodeType: 'tree'
+                    nodeType: 'tree',
+                    uiSelectConditionOption:[
+                        {label:'找到findOnce', value:'findOnce',},
+                        {label:'找到一个(阻塞)findOne', value:'findOne',},
+                        {label:'找到所有untilFind', value:'untilFind',},
+                        {label:'等待出现waitFor', value:'waitFor',},
+                        {label:'存在exists', value:'exists',},
+                        {label:"空", value:null,}
+                    ],
+                    uiSelectActionOption:[
+                        {label:'点击中心clickCenter', value:'clickCenter',},
+                        {label:'点击click', value:'click',},
+                        {label:'长按longClick', value:'longClick',},
+                        {label:"空", value:null,}
+                    ],
+                    layoutAnalysisRangeOption:[
+
+                        {label:'活跃窗口', value:'active',},
+                        {label:'全部窗口(限制应用暂不支持)', value:'all',},
+                    ],
                 }
             },
             commonCustomFilterFunction:[
@@ -147,7 +166,7 @@ export default {
             window.ZXW_VUE.$notify.success({message: '操作成功', duration: '1000'})
         },
         // 保存自定义过滤函数
-        saveCustomFilterFunction(){
+        loadCustomFilterFunction(){
             // 获取代码内容
             let scriptContent = "window.customFilterFunction="+this.remoteHandler.param5.filterFunction;
             // 执行代码
@@ -156,13 +175,9 @@ export default {
                 // 触发过滤
                 this.openCustomFilterFunctionChange();
             },200);
-            window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'})
+            window.ZXW_VUE.$notify.success({message: '执行成功', duration: '1000'})
         },
-        // 加载自定义过滤函数
-        loadCustomFilterFunction(){
-            this.remoteHandler.param5.filterFunction =  window.customFilterFunction ? String(window.customFilterFunction) : '';
-            window.ZXW_VUE.$notify.success({message: '加载成功', duration: '1000'})
-        },
+
         // 仅显示可见控件方法
         onlyShowVisible() {
             // 重置key数组
@@ -415,6 +430,21 @@ export default {
         // 节点信息点击
         nodeContentClick(e) {
             this.remoteHandler.param5.nodeInfo = String(e.target.innerHTML).replace(/(^\s*)|(\s*$)/g, "");
+
+            try{
+                $.ajax({
+                    url: getContext() + "/addController/recordeControlInfo",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        message:this.remoteHandler.param5.nodeInfo
+                    },success(){
+                        window.ZXW_VUE.$notify.success({message: '已复制到剪切板', duration: '1000'})
+                    }
+                });
+            }catch (e){}
+
+
         },
         // 节点左键点击
         nodeClickFun(data, node, component) {

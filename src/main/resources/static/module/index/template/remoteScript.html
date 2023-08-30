@@ -3,128 +3,188 @@
         远程脚本执行
     </p>
     <el-row>
-        <div class="width100 d-flex a-center">
-            <el-form-item label="脚本名称:"  class="width100">
+        <div class="width100 d-flex a-center" style="justify-content: space-between;">
+            <el-form-item label="脚本名称:" >
                 <el-input v-model="remoteHandler.param4.scriptName" placeholder="请输入脚本名称"
                           class="width100" />
             </el-form-item>
+            <div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;">
+                    <span>
+                        一键执行：
+                    </span>
+                    <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>
+                </div>
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                    <span>
+                        Node脚本：
+                    </span>
+                    <el-switch v-model="remoteHandler.param4.isNodeScript"/>
+                </div>
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="saveToDraft">
+                    存为草稿
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="readForDraft">
+                    从草稿读取
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="saveToFile">
+                    存为文件
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="readForFile">
+                    从文件读取
+                </el-button>
+            </div>
         </div>
+
     </el-row>
     <el-row>
         <div class="width100 d-flex a-start">
             <el-form-item label="脚本内容:" prop="scriptText" class="width100">
                 <el-input v-show="false" v-model="remoteHandler.param4.scriptText" :rows="20" type="textarea"
                           placeholder="请输入脚本内容" class="width100" />
-                <div id="scriptTextEditor" style="width: 100%;margin-top:10px;height: 500px;"></div>
+                <div id="scriptTextEditor" style="width: 100%;height: 500px;"></div>
             </el-form-item>
         </div>
-    </el-row>
-    <el-row>
-        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;">
-                <span>
-                    一键远程执行：
-                </span>
-            <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>
+        <div style="display: flex;justify-content: space-between;align-items: center;margin-left:100px;background-color: #f0f0f0;">
+           <div>
+               <!-- <span>
+                   一键远程执行：
+               </span>
+               <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>-->
+           </div>
+
+            <div style="padding: 10px;">
+                <el-button type="danger" size="mini" style="margin-left: 10px !important;" id="remoteRunScript"
+                           @click.stop.prevent="remoteExecuteScriptFun(remoteHandler.param4.scriptText)">
+                    运行脚本
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-bottom: 5px;"
+                           @click.stop.prevent="clearScript">
+                    清空脚本
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-bottom: 5px;"
+                           @click.stop.prevent="stopScript">
+                    停止脚本
+                </el-button>
+
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="customScriptSetting">
+                    自定义模块设置
+                </el-button>
+                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                           @click.stop.prevent="initCustomScript">
+                    加载自定义模块
+                </el-button>
+            </div>
         </div>
-        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;">
-                <span>
-                    Node脚本：
-                </span>
-            <el-switch v-model="remoteHandler.param4.isNodeScript"/>
-        </div>
-        <el-button type="danger" size="mini" style="margin-left: 10px !important;" id="remoteRunScript"
-                   @click.stop.prevent="remoteExecuteScriptFun(remoteHandler.param4.scriptText)">
-            运行脚本
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-bottom: 5px;"
-                   @click.stop.prevent="clearScript">
-            清空脚本
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-bottom: 5px;"
-                   @click.stop.prevent="stopScript">
-            停止脚本
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="saveToDraft">
-            存为草稿
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="readForDraft">
-            从草稿读取
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="saveToFile">
-            存为文件
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="readForFile">
-            从文件读取
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="customScriptSetting">
-            自定义模块设置
-        </el-button>
-        <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                   @click.stop.prevent="initCustomScript">
-            加载自定义模块
-        </el-button>
+
     </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="App模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptApp" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
+
+    <el-row style="margin-top: 10px;margin-left: 100px;">
+        <el-tabs v-model="activeName" @tab-click="handleClick" class="fontSize16">
+            <el-tab-pane label="App模块" name="app">
+                <el-button v-for="(btn,index) in remoteScriptApp" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="Device模块" name="device">
+                <el-button v-for="(btn,index) in remoteScriptDevice" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="Keys模块" name="keys">
+                <el-button v-for="(btn,index) in remoteScriptKeys" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="Operate模块" name="operate">
+                <el-button v-for="(btn,index) in remoteScriptOperate" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="Task模块" name="task">
+                <el-button v-for="(btn,index) in remoteScriptTask" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="Other模块" name="other">
+                <el-button v-for="(btn,index) in remoteScriptOther" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="内置模块" name="remote">
+                <el-button v-for="(btn,index) in remoteScriptInternal" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
+                    {{btn.name}}
+                </el-button>
+            </el-tab-pane>
+            <el-tab-pane label="自定义模块" name="custom">
+                <el-button v-for="(btn,index) in customScript" :key="index" type="danger" class="grayButton" style="margin:10px" size="mini" @click.stop.prevent="getCustomRemoteScript(btn.scriptName)">
+                    {{btn.moduleName}}
+                </el-button>
+            </el-tab-pane>
+
+        </el-tabs>
     </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="Device模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptDevice" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="Keys模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptKeys" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="Operate模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptOperate" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="Task模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptTask" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="Other模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptOther" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="内置模块" class="width100">
-            <el-button v-for="(btn,index) in remoteScriptInternal" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">
-                {{btn.name}}
-            </el-button>
-        </el-form-item>
-    </el-row>
-    <el-row style="margin-top: 10px">
-        <el-form-item label="自定义模块" class="width100">
-            <el-button v-for="(btn,index) in customScript" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getCustomRemoteScript(btn.scriptName)">
-                {{btn.moduleName}}
-            </el-button>
-        </el-form-item>
-    </el-row>
+<!--    <el-row>-->
+<!--        <el-form-item label="App模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptApp" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="Device模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptDevice" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="Keys模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptKeys" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="Operate模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptOperate" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="Task模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptTask" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="Other模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptOther" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="内置模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in remoteScriptInternal" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getRemoteScript(btn.code)">-->
+<!--                {{btn.name}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
+<!--    <el-row style="margin-top: 10px">-->
+<!--        <el-form-item label="自定义模块" class="width100">-->
+<!--            <el-button v-for="(btn,index) in customScript" :key="index" type="danger" style="margin-left:5px" size="mini" @click.stop.prevent="getCustomRemoteScript(btn.scriptName)">-->
+<!--                {{btn.moduleName}}-->
+<!--            </el-button>-->
+<!--        </el-form-item>-->
+<!--    </el-row>-->
     <el-popover
             ref="customScriptSettingPopover"
             placement="right"

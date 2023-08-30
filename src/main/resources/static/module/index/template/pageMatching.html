@@ -75,10 +75,10 @@
         <el-card class="box-card" v-for="(page,pageIndex) in pageSettingParam.pageSettingParamArray" :key="'pageIndex'+pageIndex">
             <div slot="header" class="clearfix">
                 <div class="d-flex j-center a-center flex-wrap">
-                    <el-form-item label="页面名称:" label-width="85px" style="margin-bottom: 0px;flex: 5;">
+                    <el-form-item label="页面名称:" label-width="85px" style="margin-bottom:0px;flex: 5;">
                         <el-input v-model="page.pageName" placeholder="请输入页面名称" />
                     </el-form-item>
-                    <el-checkbox style="flex: 1;" v-model="page.joinDebug" style="margin-left: 10px;">参与调试</el-checkbox>
+                    <el-checkbox style="flex: 1;margin-left:10px;" v-model="page.joinDebug">参与调试</el-checkbox>
                     <div class="d-flex j-end" style="flex: 5;">
                         <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop.prevent="addPage(pageIndex)"/>
                         <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;margin-right: 5px;" @click.stop.prevent="deletePage(pageIndex)"/>

@@ -95,7 +95,7 @@ window.ZXW_VUE = new Vue({
             if(this.$refs[val] && this.$refs[val].init){
                 this.$refs[val].init()
             }
-            if(val === 'previewDevice'){
+            if(val === 'previewDevice' || val === 'imgHandler' || val === 'layoutAnalysis'){
                 this.timeSyncOtherProperty(()=>{
                     this.screenDirection = this.otherProperty.orientation === 1 ? "竖屏" : "横屏";
                 });
@@ -305,6 +305,15 @@ window.ZXW_VUE = new Vue({
                 return
             }
             let messageData = JSON.parse(text);
+            if(messageData.action === "appWebSocketCloseSuccess" || messageData.action === "appWebSocketConnectSuccess"){
+
+                if(messageData.message=="下线"){
+                    this.$refs["deviceInfo"].downLine(messageData.deviceUuid)
+                }else if(messageData.message=="上线"){
+                    this.$refs["deviceInfo"].online(messageData.deviceUuid)
+                }
+
+            }
             // 同步其他属性
             if (messageData.action === "syncOtherPropertyJson") {
                 let propertyJson = atob(messageData.message);
@@ -470,6 +479,10 @@ window.ZXW_VUE = new Vue({
             // 更新屏幕方向
             this.screenDirection = screenDirection;
 
+            // 记录最后选择设备
+            window.localStorage.setItem("lastSelectDeviceUuid",this.deviceInfo.deviceUuid);
+
+
             if(this.deviceInfo.deviceUuid){
                 // 设置当前选中App设备
                 this.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid",this.deviceInfo.deviceUuid);
@@ -520,7 +533,7 @@ window.ZXW_VUE = new Vue({
                             if (json) {
                                 // 解析对象
                                 _that.otherProperty = JSON.parse(json);
-                                if(callback){
+                                if(typeof(callback)=="function"){
                                     callback();
                                 }
                             }
@@ -560,7 +573,7 @@ window.ZXW_VUE = new Vue({
                                     duration: '1000'
                                 });
                             }
-                            if (callback) {
+                            if (typeof(callback)=="function") {
                                 callback()
                             }
                         } else {
@@ -581,7 +594,7 @@ window.ZXW_VUE = new Vue({
             // functionName为utils.js中的方法 remoteExecScript  解析传入脚本代码并通过eval执行
             let messageStr = '{"functionName":"remoteExecScript","functionParam":["' + encodeURIComponent(scriptContent) + '"]}';
             this.sendMsgToClient('remoteHandler', messageStr, () => {
-                if (callback) {
+                if (typeof(callback)=="function") {
                     callback()
                 }
             })

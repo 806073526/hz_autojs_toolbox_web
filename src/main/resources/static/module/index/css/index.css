@@ -168,3 +168,6 @@ table .el-input__inner, table .el-textarea textarea {
 #windowLogDiv::-webkit-scrollbar-track {
     background: hsla(0, 0%, 53%, 0.1);
 }
+.fontsize17{
+    font-size: 17px;
+}

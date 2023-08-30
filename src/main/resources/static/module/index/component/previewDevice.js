@@ -223,110 +223,115 @@ export default {
         startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice){
             let remoteScript = ``;
             remoteScript += `
-            let deviceParam = {
-                imgQuality: 100,
-                imgScale: 1,
-                isOpenGray: 0,
-                isOpenThreshold: 0,
-                imgThreshold: 60,
-                appSpace:500
-            }
-            // 唤醒设备
-            device.wakeUpIfNeeded();
-            // json字符串转换js对象
-            let operateObj = JSON.parse('${messageStr}')
-        
-            deviceParam.imgQuality = operateObj.imgQuality || 100
-            deviceParam.imgScale = operateObj.imgScale || 1
-        
-            deviceParam.isOpenGray = operateObj.isOpenGray ? 1 : 0
-            deviceParam.isOpenThreshold = operateObj.isOpenThreshold ? 1 : 0
-            deviceParam.imgThreshold = operateObj.imgThreshold || 60
-            deviceParam.appSpace = operateObj.appSpace || 500
-            if(utilsObj.clickThread){
-                console.log("关闭自动点击线程")
-                utilsObj.clickThread.interrupt()
-            }
-            
-            if(utilsObj.deviceThread){
-                console.log("关闭预览线程")
-                utilsObj.deviceThread.interrupt()
-            }
-            console.log("开启自动点击线程")
-            
-            utilsObj.clickThread = threads.start(function () {
-                while (true) {
-                    let click1 = text("立即开始").findOne(100);
-                    if(click1){
-                        click1.click()
-                    }
-                    let otherClickText = commonStorage.get("otherClickText")
-                    if(otherClickText){
-                      let click2 = text(otherClickText).findOne(100);
-                       if(click2){
-                         click2.click()
-                     }
-                    }
+            let fun()=>{
+                let deviceParam = {
+                    imgQuality: 100,
+                    imgScale: 1,
+                    isOpenGray: 0,
+                    isOpenThreshold: 0,
+                    imgThreshold: 60,
+                    appSpace:500
                 }
-            });
-            utilsObj.deviceThread = threads.start(() => {
-                try {
-                    console.log("重开权限")
-                    images.stopScreenCapture()
-                    images.requestScreenCapture({orientation:utilsObj.getOrientation()})
-                } catch (error) {
-                    console.error("重开截图权限错误",error)
+                // 唤醒设备
+                device.wakeUpIfNeeded();
+                // json字符串转换js对象
+                let operateObj = JSON.parse('${messageStr}')
+            
+                deviceParam.imgQuality = operateObj.imgQuality || 100
+                deviceParam.imgScale = operateObj.imgScale || 1
+            
+                deviceParam.isOpenGray = operateObj.isOpenGray ? 1 : 0
+                deviceParam.isOpenThreshold = operateObj.isOpenThreshold ? 1 : 0
+                deviceParam.imgThreshold = operateObj.imgThreshold || 60
+                deviceParam.appSpace = operateObj.appSpace || 500
+                if(utilsObj.clickThread){
+                    console.log("关闭自动点击线程")
+                    utilsObj.clickThread.interrupt()
                 }
-                files.createWithDirs("/sdcard/screenImg/")
-                sleep(500)
-                toastLog("开始预览")
-                let lastImageBase = "";
-                while (true) {
+                
+                if(utilsObj.deviceThread){
+                    console.log("关闭预览线程")
+                    utilsObj.deviceThread.interrupt()
+                }
+                console.log("开启自动点击线程")
+                utilsObj.clickThread = threads.start(function () {
+                    while (true) {
+                        let click1 = text("立即开始").findOne(100);
+                        if(click1){
+                            click1.click()
+                        }
+                        let otherClickText = commonStorage.get("otherClickText")
+                        if(otherClickText){
+                          let click2 = text(otherClickText).findOne(100);
+                           if(click2){
+                             click2.click()
+                         }
+                        }
+                    }
+                });
+                utilsObj.deviceThread = threads.start(() => {
                     try {
-                        let img = images.captureScreen()
-                        let afterImg = images.scale(img, deviceParam.imgScale, deviceParam.imgScale)
-                         if (deviceParam.isOpenGray === 1) {
-                            let afterImg1 = images.grayscale(afterImg)
-                            afterImg.recycle()
-                            afterImg = afterImg1
-                        }
-                        if (deviceParam.isOpenThreshold === 1) {
-                            let afterImg2 = images.threshold(afterImg, deviceParam.imgThreshold, 255, 'BINARY');
-                            afterImg.recycle()
-                            afterImg = afterImg2
-                        } 
-                        let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
-                        
-                        let curImageBase = images.toBase64(afterImg, "jpg", deviceParam.imgQuality);
-                        sleep(10)
-                        if(curImageBase !== lastImageBase){
-                            http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
-                                headers: {
-                                    "deviceUUID": commonStorage.get('deviceUUID')
-                                },
-                                method: 'POST',
-                                contentType: 'application/json',
-                                body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': curImageBase })
-                            }, (e) => { 
-                                lastImageBase = curImageBase;
-                            });
-                        }
-                        afterImg.recycle()
-                        img.recycle()
-                        sleep(deviceParam.appSpace) 
+                        console.log("重开权限")
+                        images.stopScreenCapture()
+                        images.requestScreenCapture({orientation:utilsObj.getOrientation()})
                     } catch (error) {
-                        console.error("预览错误",error)
+                        console.error("重开截图权限错误",error)
+                    }
+                    files.createWithDirs("/sdcard/screenImg/")
+                    sleep(500)
+                    toastLog("开始预览")
+                    let lastImageBase = "";
+                    while (true) {
                         try {
-                            console.log("重开权限")
-                            images.stopScreenCapture()
-                            images.requestScreenCapture({orientation:utilsObj.getOrientation()})
-                        } catch (error1) {
-                            console.error("重开截图权限错误",error1)
+                            let img = images.captureScreen()
+                            let afterImg = images.scale(img, deviceParam.imgScale, deviceParam.imgScale)
+                             if (deviceParam.isOpenGray === 1) {
+                                let afterImg1 = images.grayscale(afterImg)
+                                afterImg.recycle()
+                                afterImg = afterImg1
+                            }
+                            if (deviceParam.isOpenThreshold === 1) {
+                                let afterImg2 = images.threshold(afterImg, deviceParam.imgThreshold, 255, 'BINARY');
+                                afterImg.recycle()
+                                afterImg = afterImg2
+                            } 
+                            let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
+                            
+                            let curImageBase = images.toBase64(afterImg, "jpg", deviceParam.imgQuality);
+                            sleep(10)
+                            if(curImageBase !== lastImageBase){
+                                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                                    headers: {
+                                        "deviceUUID": commonStorage.get('deviceUUID')
+                                    },
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': curImageBase })
+                                }, (e) => { 
+                                    lastImageBase = curImageBase;
+                                });
+                            }
+                            afterImg.recycle()
+                            img.recycle()
+                            sleep(deviceParam.appSpace) 
+                        } catch (error) {
+                            console.error("预览错误",error)
+                            try {
+                                console.log("重开权限")
+                                images.stopScreenCapture()
+                                images.requestScreenCapture({orientation:utilsObj.getOrientation()})
+                            } catch (error1) {
+                                console.error("重开截图权限错误",error1)
+                            }
                         }
                     }
-            
-                }
-            })
+                })
+            }
+            if(utilsObj.requestScreenCaptureCommonFun){
+                events.broadcast.emit("startPreviewDevice", '${btoa(messageStr)}');
+            } else {
+                fun();
+            }
             `;
             // 直接执行 以图片接口上传缓存的方式 上传图片数据
             this.remoteExecuteScript(remoteScript,()=>{
@@ -420,20 +425,24 @@ export default {
         // 以图片接口方式运行的 APP停止预览处理方法
         stopPreviewDeviceByImgInterfaceAppHandler(notice,callback){
             let remoteScript = `
-            // 唤醒设备
-            device.wakeUpIfNeeded();
-            if(utilsObj.raObj){
-                try{
-                  utilsObj.raObj.flush();
-                  utilsObj.raObj.exit(true);
-                  utilsObj.raObj = null;
-                }catch(e){
+             if(utilsObj.requestScreenCaptureCommonFun){
+                events.broadcast.emit("stopPreviewDevice", '');
+             } else {
+                // 唤醒设备
+                device.wakeUpIfNeeded();
+                if(utilsObj.raObj){
+                    try{
+                      utilsObj.raObj.flush();
+                      utilsObj.raObj.exit(true);
                       utilsObj.raObj = null;
+                    }catch(e){
+                       utilsObj.raObj = null;
+                    }
                 }
-            }
-            if(utilsObj.deviceThread){
-                toastLog("停止预览");
-                utilsObj.deviceThread.interrupt();
+                if(utilsObj.deviceThread){
+                    toastLog("停止预览");
+                    utilsObj.deviceThread.interrupt();
+                }
             }
             `;
             this.remoteExecuteScript(remoteScript,()=>{

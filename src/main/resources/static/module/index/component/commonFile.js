@@ -31,7 +31,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {
@@ -528,6 +528,7 @@ export default {
         },
         // 允许操作文件 操作按钮显示
         allowOperateFile(item){
+
             let flag = true;
             let allowOperateFile = urlParam("allowOperateFile");
             if(allowOperateFile){
@@ -1236,6 +1237,16 @@ export default {
             // 触发点击事件
             dom.click();
             document.getElementById("upload-file-dom")?.remove();
+        },testScriptContext(){
+
+            //this.saveFileEditorContent()
+            try {
+                JSON.parse(this.scriptEditor.getValue())
+            }catch (e) {
+                console.info(e)
+                window.ZXW_VUE.$notify.success({message: '检验失败，控制台查看问题', duration: '1000'});
+            }
+            window.ZXW_VUE.$notify.success({message: '校验通过', duration: '1000'});
         }
     }
 }

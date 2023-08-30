@@ -350,7 +350,10 @@
         <div class="width100 d-flex a-center">
             <el-form-item label="图片预览:" prop="previewImg" class="width100">
                 <el-button type="primary" size="mini" @click.stop.prevent="saveImage" v-if="remoteHandler.param1.previewImg">
-                    保存图片
+                    保存图片到电脑
+                </el-button>
+                <el-button type="primary" size="mini" @click.stop.prevent="saveImageToPhone" v-if="remoteHandler.param1.previewImg">
+                    保存图片到手机
                 </el-button>
                 <div style="display: flex;width: 100%;" v-if="remoteHandler.param1.previewImg">
                     <el-slider

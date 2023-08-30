@@ -17,6 +17,50 @@ export const getEditorType = ()=> {
     return window.localStorage.getItem("editorType") || 'ace';
 };
 
+//获取自定义提示内容
+function getCustomPrompt(){
+    var json = [];
+    $.ajax({
+        url: getContext() + '/uploadPath/autoJsTools/webCommonPath/customPrompt.json?timestamp='+new Date().getTime(),
+        type: 'get',
+        async: false,
+        dataType:"TEXT", //返回值的类型
+        success: function (res) {
+            try{
+                json  = JSON.parse(res)
+            }catch (e) {
+                console.log(e)
+                alert("自定义方法提示格式有误")
+            }
+            return json;
+
+        },
+        error: function (msg) {
+            let scriptFile = new File(['[{"caption": "xsw.Console","meta": "输出方法","score": 19,"value": "xsw.Console"}]'], "customPrompt.json", {
+                type: "text/plain",
+            });
+            const param = new FormData();
+            param.append('file', scriptFile);
+            param.append('pathName', '/webCommonPath/');
+            $.ajax({
+                url: getContext() + "/attachmentInfo/uploadFileSingle",
+                type: 'post',
+                data: param,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        console.info("初始化自定方法配置文件")
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        }
+    });
+    return json;
+}
 /**
  * 校验只要是数字（包含正负整数，0以及正负浮点数）就返回true
  **/
@@ -267,6 +311,27 @@ export const initFileEditor = (_that, editorKey, containerId, getEditorCompleteF
                     e.preventDefault();
                     editor.beautify();
             };
+
+
+
+            let setCompleteData = function(data) {
+                let langTools = ace.require("ace/ext/language_tools");
+                langTools.addCompleter({
+                    getCompletions: function(editor, session, pos, prefix, callback) {
+
+                        if (prefix.length === 0) {
+                            return callback(null, []);
+                        } else {
+                            return callback(null, data);
+                        }
+                    }
+                });
+            }
+           // var dataArry = [{caption: "xsw.Console",meta: "属性",score: 19,value: "xsw.Console"}];
+            var dataArry = getCustomPrompt();
+            //获取自定义方法
+            setCompleteData(dataArry)
+
             _that[editorKey]=editor;
         }
     })
@@ -330,6 +395,8 @@ const getFileInfoByPath = (relativeFilePath) => {
     });
     return fileInfo;
 };
+
+
 
 /**
  * 处理数据在文件变化后

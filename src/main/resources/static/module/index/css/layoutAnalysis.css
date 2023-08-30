@@ -1,5 +1,13 @@
 .nodeDivCommon{
-    height: 80vh;
+    height: 77vh;
+    overflow-y: auto;
+    width: 100% !important;
+}
+
+
+
+.nodeDivCommon2{
+    height: 76vh;
     overflow-y: auto;
     border:  1px solid #cdc4c4;
 }
@@ -83,4 +91,32 @@
     font-size: 20px;
     overflow: hidden;
     cursor: pointer;
+}
+.el-form-item__label {
+    color: #909399;
+}
+.filterFunction .el-form-item__label {
+    width: 114px !important;
+}
+
+.width97 {
+    width: 97% !important;
+}
+.width95 {
+    width: 95% !important;
+}
+
+.width94 {
+    width: 94.6% !important;
+}
+.el-button--mini, .el-button--mini.is-round {
+    padding: 12px 15px;
+}
+
+
+.width1001 .el-textarea__inner {
+    height: 60px;
+}
+.width1001 {
+    width: 100% !important;
 }

@@ -70,7 +70,7 @@ public class AutoJsSession implements Serializable {
      * @param message
      * @throws IOException
      */
-    public void sendText(String message) throws IOException {
+    public synchronized  void sendText(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
 }

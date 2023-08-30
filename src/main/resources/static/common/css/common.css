@@ -5,7 +5,7 @@ html {
 
 body {
     font-family: 'Microsoft YaHei' !important;
-    font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;
+    font: 14px Helvetica Neue, Helvetica, PingFang SC, Tahoma, Arial, sans-serif;
     line-height: 1.428571429;
     color: #444;
     margin: 0px;
@@ -219,7 +219,6 @@ input, button, h1, h2, h3, h4, h5, h6，div, label, a {
 .a-self-baseline {
     align-self: baseline;
 }
-
 
 
 .p-0 {
@@ -643,6 +642,7 @@ body:hover::-webkit-scrollbar-track {
     top: 50%;
     transform: translateY(-50%);
 }
+
 .el-dialog--center .el-dialog__body {
     padding: 0px 25px 0px !important;
 }
@@ -650,3 +650,157 @@ body:hover::-webkit-scrollbar-track {
 .commodityInfoClass {
     width: auto !important;
 }
+
+
+.el-switch__label--left {
+    position: relative;
+    left: 64px;
+    color: #fff;
+    z-index: -1111;
+}
+
+.el-switch__core {
+    width: 50px !important;
+    height: 24px !important;
+}
+.el-switch__core::after {
+    width: 19px;
+    height: 19px;
+}
+.el-switch__label--right {
+    position: relative;
+    right: 63px;
+    color: #fff;
+    z-index: -1111;
+}
+.el-switch__label--right {
+    margin-left: -12px;
+}
+.el-switch__label--left {
+    margin-left: -12px;
+}
+
+.el-switch__label--right.is-active {
+    z-index: 1111;
+    color: #fff !important;
+}
+
+.el-switch__label--left.is-active {
+    z-index: 1111;
+    color: #9c9c9c !important;
+}
+
+.el-input__inner {
+    height: 34px;
+    line-height: 34px;
+}
+.el-input-number {
+    position: relative;
+    display: inline-block;
+    width: 180px;
+    line-height: 27px;
+}
+.el-input-number.is-controls-right .el-input-number__decrease, .el-input-number.is-controls-right .el-input-number__increase {
+    height: auto;
+    line-height: 17px;
+}
+.el-input-number__decrease, .el-input-number__increase {
+    position: absolute;
+    z-index: 1;
+    top: 1px;
+    width: 23px;
+    height: auto;
+    text-align: center;
+    background: #F5F7FA;
+    color: #606266;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+
+.demo .el-switch__core {
+    width: 80px !important;
+    height: 25px;
+}
+.demo .el-switch__core::after {
+    width: 20px;
+    height: 20px;
+}
+.demo .el-switch.is-checked .el-switch__core::after{
+    margin-left: -25px;
+
+}
+
+
+
+.el-switch.is-checked .el-switch__core::after {
+    left: 100%;
+    margin-left: -25px;
+
+}
+.syncButton .el-button {
+    padding: 0px 13px !important;
+
+}
+
+.syncButton .el-button [class*=el-icon-]+span {
+    margin-left: -53px;
+}
+
+.el-table td, .el-table th {
+    text-align: center !important;
+}
+.el-table .cell{
+    text-align: center;
+}
+
+/*.el-button--primary:focus, .el-button--primary:hover{*/
+/*    background: #e2f0ff;*/
+/*    border-color: #66b1ff;*/
+/*    color: #66b1ff;*/
+/*}*/
+/*.el-button--primary{*/
+/*    background: #e2f0ff;*/
+/*    border-color: #66b1ff;*/
+/*    color: #66b1ff;*/
+/*}*/
+
+/*.el-button--danger {*/
+/*    color: #f56c6c;*/
+/*    background-color: #ffeded;*/
+/*    border-color: #F56C6C;*/
+/*}*/
+/*.el-button--danger:focus, .el-button--danger:hover{*/
+/*    color: #f56c6c;*/
+/*    background-color: #ffeded;*/
+/*    border-color: #F56C6C;*/
+/*}*/
+.grayButton {
+    color: #666666;
+    background-color: #f0f0f0;
+    border-color: #e0e0e0;
+}
+.grayButton:focus,.grayButton:hover{
+    color: #666666;
+    background-color: #f0f0f0;
+    border-color: #e0e0e0;
+}
+.fontSize16 .el-tabs__item{
+    font-size: 16px;
+}
+.el-dropdown-menu{
+    margin: 5px -30px;
+}
+/*.nodeDropdown .el-dropdown-menu{*/
+/*    margin: 5px -50px;*/
+/*}*/
+.hiddenOverflow .el-scrollbar__wrap{
+    overflow-x: hidden;
+}
+
+ .el-form-item.is-required.delStar:not(.is-no-asterisk)>.el-form-item__label:before {
+    content:' ';
+}
+ .textLeft .el-form-item__label{
+     text-align: left;
+ }

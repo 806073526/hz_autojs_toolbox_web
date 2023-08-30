@@ -30,7 +30,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {
@@ -294,6 +294,8 @@ export default {
         },
         // 加载日志
         loadPreviewLog() {
+
+
             if (!this.validSelectDevice()) {
                 return
             }
@@ -303,6 +305,11 @@ export default {
                 this.remoteHandler.param2.previewLog = logUrl;
                 this.$nextTick(() => {
                     $("#previewLog").attr("src", logUrl + "?t=" + new Date().getTime());
+                    setTimeout(() =>{
+                        var iframe = document.getElementById('previewLog');
+                        var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                        iframeDocument.body.style.color = '#ffffff';
+                    },1500)
                 });
             }, 200);
         },

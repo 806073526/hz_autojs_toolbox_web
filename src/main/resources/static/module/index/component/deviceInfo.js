@@ -23,6 +23,7 @@ export default {
             editorTypeNeedRefresh:false,
             expandDevice:true,
             authorizeStatus: false,
+            showRefresh:true,
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
@@ -60,8 +61,48 @@ export default {
         }
         // 检查设备授权状态
         this.authorizeStatus = this.checkSelfMachineAuthorize();
+
+
+        // 获取当前缓存中最后一次选中的设备
+        let lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
+        // 如果缓存为空 直接返回
+        if(!lastSelectDeviceUuid){
+            return;
+        }
+        setTimeout(() => {
+            this.$nextTick(() => {
+                // 自动选择设备
+                this.autoSelectDevice(lastSelectDeviceUuid);
+            });
+        }, 500);
     },
     methods: {
+
+        //上线处理
+        online(deviceUuid) {
+            //已连接无需检测
+            if (this.deviceInfo.deviceUuid !="") return;
+            //寻找上一次连接的设备号
+            let lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
+            // 如果缓存为空 直接返回
+            if(!lastSelectDeviceUuid) return;
+            // 自动选择设备
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    // 自动选择设备
+                    this.autoSelectDevice(lastSelectDeviceUuid);
+                });
+            }, 500);
+        }
+
+        ,
+        //app断开连接处理
+        downLine(deviceUuid){
+            this.getOnlineDevice();
+            if(deviceUuid==this.deviceInfo.deviceUuid){
+                this.$set(this.deviceInfo, 'deviceUuid', "");
+            }
+        },
         expandDeviceFun(){
             this.expandDevice = !this.expandDevice;
         },
@@ -75,6 +116,8 @@ export default {
             let cacheEditorType = window.localStorage.getItem('editorType');
             // 设置需要刷新标记
             this.editorTypeNeedRefresh = cacheEditorType !== this.editorType;
+            //刷新页面----
+            this.expandDeviceFun();
         },
         refreshPage(){
             window.ZXW_VUE.$confirm('编辑器类型已修改,刷新后才能生效,是否确认刷新页面?', '提示', {
@@ -85,8 +128,22 @@ export default {
                 window.location.reload();
             });
         },
+        // 自动选择设备
+        autoSelectDevice(selectDeviceUuid){
+            // 请求查询设备列表接口
+            this.getOnlineDevice(()=>{
+                // 获取与选中设备uuid相同的设备
+                let selectArr =  this.deviceList.filter(item=> item.deviceUuid === selectDeviceUuid);
+                if(selectArr && selectArr.length){
+                    // 选中行
+                    this.$refs.deviceTable.setCurrentRow(selectArr[0]);
+                }
+            });
+        },
         // 选中行
         selectRowChange(row) {
+            if(row==null) return;
+
             // 初始化设备
             let initDevice = (row) => {
                 this.$set(row, 'standardWidth', row.screenWidth);
@@ -185,7 +242,7 @@ export default {
             });
         },
         // 获取在线设备
-        getOnlineDevice() {
+        getOnlineDevice(callback) {
             let _this = this;
             _this.deviceLoading = true;
             $.ajax({
@@ -197,6 +254,9 @@ export default {
                     if (data) {
                         if (data.isSuccess) {
                             _this.deviceList = data.data;
+                            if(typeof(callback)=="function"){
+                                callback();
+                            }
                         }
                     }
                     setTimeout(() => {

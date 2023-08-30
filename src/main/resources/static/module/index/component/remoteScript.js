@@ -31,7 +31,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     computed:{
@@ -70,10 +70,12 @@ export default {
                 param4: {
                     scriptName:'remoteScript.js',
                     scriptText: '',
-                    scriptImmediatelyExec: false,
+                    scriptImmediatelyExec: true,
                     isNodeScript: false
                 }
             },
+            //tab页选中
+            activeName:'app',
             scriptEditor: null,
             tempCustomScript:[],// 自定义模块缓存数据
             customScript:[],// 自定义模块 [{moduleName:'',scriptName:''}]
@@ -426,6 +428,10 @@ export default {
         }
     },
     methods: {
+        //tab页切换
+        handleClick(tab, event) {
+            console.log(tab, event);
+        },
         init(){
             let fileContent = this.remoteHandler.param4.scriptText ? this.remoteHandler.param4.scriptText : "";
             // 初始化文件编辑器

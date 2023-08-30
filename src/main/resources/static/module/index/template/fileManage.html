@@ -80,7 +80,7 @@
                     </div>
                 </div>
             </el-row>
-            <el-row style="padding-left: 0!important;">
+            <el-row style="padding-left: 0!important;height: 450px;overflow-y: auto;">
                 <div class="fileTableList" v-loading="fileLoading">
                     <div class="fileList-head d-flex a-center flex-wrap">
                         <div class="d-flex a-center fileName" style="flex:5">
@@ -132,7 +132,8 @@
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
                     <div class="d-flex a-center flex-wrap">
-                        <el-button size="mini" type="primary"  style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                        <el-button size="medium" type="primary"  style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                        <!--
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficialExample">初始化官方示例</el-button>
 						<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficalShopExample">初始化商店示例</el-button>
@@ -142,9 +143,37 @@
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
                         <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
                         <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
+-->
+
 
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
-                            <el-button size="mini" type="primary">
+                            <el-button size="medium" type="primary">
+                                初始化示例<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item @click.native.prevent.stop="phoneInitSyncDir">初始化同步目录</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phoneInitOfficialExample">初始化官方示例</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phoneInitOfficalShopExample">初始化商店示例</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phoneDownLoadGameScript">初始化脚手架项目</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phoneDownLoadImageExampleScript">初始化图色示例项目</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <!--<el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                           <el-button size="medium" type="primary">
+                               远程程序<i class="el-icon-arrow-down el-icon--right"></i>
+                           </el-button>
+                           <el-dropdown-menu slot="dropdown">
+                              <el-dropdown-item @click.native.prevent.stop="phoneInitFile">初始化运行程序</el-dropdown-item>
+                               <el-dropdown-item @click.native.prevent.stop="phoneRemoteRunScript">远程运行程序</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phoneRemoteStopScript">远程停止程序</el-dropdown-item>
+
+                            </el-dropdown-menu>
+                        </el-dropdown>-->
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript()">运行当前项目</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">停止全部程序</el-button>
+                        <el-button size="medium" v-if="!phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
+                        <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                            <el-button size="medium" type="primary" >
                                 Node相关<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
@@ -155,7 +184,7 @@
                                 <el-dropdown-item @click.native.prevent.stop="termuxInitNode">Termux初始化Node环境</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
                         <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
                         <!--<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
                     </div>
@@ -194,7 +223,7 @@
                     </div>
                 </div>
             </el-row>
-            <el-row style="padding-left: 0!important;">
+            <el-row style="padding-left: 0!important;height: 450px;overflow-y: auto;">
                 <div class="fileTableList" v-loading="phoneFileLoading">
                     <div class="fileList-head d-flex a-center flex-wrap">
                         <div class="d-flex a-center phoneFileName" style="flex:7;">
@@ -215,7 +244,8 @@
                                 <el-link v-show="item.fileType==='js' || item.fileType==='mjs' || item.fileType === 'node.js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
                                 <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
-                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item)">压缩</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,true)">压缩</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">子文件压缩</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
                                 <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
@@ -229,7 +259,7 @@
         </el-tab-pane>
     </el-tabs>
     <el-dialog  :visible.sync="fileEditVisible" :title="navigatePath + '/' + fileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
-        <div id="fileEditor" style="height: 85vh;width: 100%;">
+        <div id="fileEditor" style="height: 83vh;width: 100%;">
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button type="primary"  @click.stop.native="saveFileEditorContent">
@@ -252,31 +282,37 @@
                 </el-tooltip>
             </div>
         </div>
-        <div id="phoneFileEditor" style="height: 85vh;width: 100%;" v-loading="phoneFileEditorLoading">
+        <div id="phoneFileEditor" style="height: 83vh;width: 100%;" v-loading="phoneFileEditorLoading">
         </div>
         <span slot="footer" class="dialog-footer">
+          <el-button type="info"  @click.stop.native="refreshPhoneEditorArrClick">
+            刷新
+          </el-button>
           <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent">
             保存
           </el-button>
-          <el-button type="info"  @click.stop.native="refreshPhoneEditorArrClick">
-            重新加载
-          </el-button>
-          <el-button type="warning"  @click.stop.native="phoneRunScriptByDialog">
-            运行当前
-          </el-button>
+          <el-dropdown style="margin-left: 10px;margin-right: 10px;">
+                <el-button type="warning">
+                    运行<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click.native.prevent.stop="phoneRemoteRunScript(true)">当前项目</el-dropdown-item>
+                    <el-dropdown-item @click.native.prevent.stop="phoneRunScriptByDialog">当前文件</el-dropdown-item>
+                </el-dropdown-menu>
+          </el-dropdown>
           <el-button type="warning"  @click.stop.native="phoneStopAllScript">
-            停止全部
+            停止
           </el-button>
           <el-button type="info" @click.stop.native="phoneMinFileEditorDialog">
             最小化
           </el-button>
         </span>
-        <el-tooltip style="left: 85px;position: absolute;bottom: 0px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【远程运行ctrl+i】【运行当前 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
-           <span>快捷键说明</span>
+        <el-tooltip style="left: 85px;position: absolute;bottom: 30px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【运行当前项目ctrl+i】【运行当前文件 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
+            <span>快捷键说明</span>
         </el-tooltip>
     </el-dialog>
     <el-dialog :visible.sync="phoneImagePreviewVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
-        <div style="height: 85vh;width: 100%;display: inline-flex;justify-content: center;align-items: center;">
+        <div style="height: 78vh;width: 100%;display: inline-flex;justify-content: center;align-items: center;">
             <img id="imagePreview" :src="phoneImageBase64" />
         </div>
         <span slot="footer" class="dialog-footer">
@@ -294,7 +330,7 @@
             <el-step title="打包资源处理"></el-step>
             <el-step title="项目打包以及下载"></el-step>
         </el-steps>
-        <el-scrollbar v-loading="packageProjectStepLoading" style="height: 70vh;width: 100%;">
+        <el-scrollbar v-loading="packageProjectStepLoading" style="height: 70vh;width: 100%;" class="hiddenOverflow">
             <div style="height: 100%;width: 100%;" v-show="packageProjectActive===0">
                 <el-form :model="packageProject" ref="packageProjectFirst" :rules="packageProjectRules">
                     <p class="basicInfo">
@@ -302,29 +338,27 @@
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="应用名称:" prop="appName" class="width50" label-width="100px">
+                            <el-form-item label="应用名称:" prop="appName" class="" label-width="100px">
                                 <el-input v-model="packageProject.appName" placeholder="请输入应用名称"
                                           class="width100" />
                             </el-form-item>
-                            <el-form-item label="应用包名:" prop="packageName" class="width50" label-width="100px">
+                            <el-form-item label="应用包名:" prop="packageName" class="" label-width="100px" style="width: 33%;">
                                 <el-input v-model="packageProject.packageName" placeholder="请输入应用包名"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="版本名称:" prop="versionName" class="delStar" label-width="100px">
+                                <el-input v-model="packageProject.versionName" placeholder="请输入版本名称"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="版本号:" prop="versionCode" class="delStar" label-width="100px">
+                                <el-input v-model="packageProject.versionCode" placeholder="请输入版本号"
                                           class="width100" />
                             </el-form-item>
                         </div>
                     </el-row>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="版本名称:" prop="versionName" class="width50" label-width="100px">
-                                <el-input v-model="packageProject.versionName" placeholder="请输入版本名称"
-                                          class="width100" />
-                            </el-form-item>
-                            <el-form-item label="版本号:" prop="versionCode" class="width50" label-width="100px">
-                                <el-input v-model="packageProject.versionCode" placeholder="请输入版本号"
-                                          class="width100" />
-                            </el-form-item>
-                        </div>
-                        <div class="width100 d-flex a-center">
-                            <el-form-item label="应用图标:" prop="appIcon" class="width50" label-width="100px">
+                            <el-form-item label="应用图标:" prop="appIcon" class="delStar" label-width="100px" style="width: 33%;">
                                 <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径"
                                           class="width100" />
                             </el-form-item>
@@ -336,16 +370,16 @@
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="NodeJs:" prop="openNodeJs" class="width25" label-width="100px">
+                            <el-form-item label="NodeJs:" prop="openNodeJs" class="" label-width="100px">
                                 <el-switch v-model="packageProject.openNodeJs" class="width100"/>
                             </el-form-item>
-                            <el-form-item label="图色模块:" prop="openImageModule" class="width25" label-width="100px">
+                            <el-form-item label="图色模块:" prop="openImageModule" class="" label-width="100px">
                                 <el-switch v-model="packageProject.openImageModule" class="width100"/>
                             </el-form-item>
-                            <el-form-item label="开机自启动:" prop="autoOpen" class="width25" label-width="100px">
+                            <el-form-item label="开机自启动:" prop="autoOpen" class="" label-width="100px">
                                 <el-switch v-model="packageProject.autoOpen" class="width100"/>
                             </el-form-item>
-                            <el-form-item label="CPU架构:" prop="abis" class="width50" label-width="100px">
+                            <el-form-item label="CPU架构:" prop="abis" class="width50" label-width="100px" style="margin-left: 30px;">
                                 <el-checkbox-group v-model="packageProject.abis">
                                     <el-checkbox label="arm64-v8a">
                                         arm64-v8a
@@ -389,54 +423,55 @@
                             </el-form-item>
                         </div>
                     </el-row>
-                    <p class="basicInfo">
-                        混淆加密
-                    </p>
-                    <el-row>
-                        <div class="width100 d-flex a-center">
-                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width25" label-width="100px">
-                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
-                            </el-form-item>
-                            <el-form-item label="混淆排除目录:" prop="obfuscatorIncludePaths" class="width75" label-width="100px">
-                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
-                                          class="width100" />
-                            </el-form-item>
-                        </div>
-                    </el-row>
+
                     <p class="basicInfo">
                         运行配置
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="隐藏日志:" prop="hideLogs" class="width50" label-width="100px">
+                            <el-form-item label="隐藏日志:" prop="hideLogs" class="" label-width="100px">
                                 <el-switch v-model="packageProject.hideLogs" class="width100"/>
                             </el-form-item>
-                            <el-form-item label="启动界面文本:" prop="splashText" class="width50" label-width="100px">
+                            <el-form-item label="启动界面文本:" prop="splashText" class="" label-width="100px" style="margin-left: 30px;">
                                 <el-input v-model="packageProject.splashText" placeholder="请输入启动界面文本"
                                           class="width100" />
                             </el-form-item>
-                        </div>
-                    </el-row>
-                    <el-row>
-                        <div class="width100 d-flex a-center">
-                            <el-form-item label="启动界面图:" prop="splashIcon" class="width50" label-width="100px">
+                            <el-form-item label="启动界面图:" prop="splashIcon" class="delStar" label-width="100px" style="margin-left: 30px;width: 30%;">
                                 <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径"
                                           class="width100" />
                             </el-form-item>
                             <span v-loading="splashIconLoading" style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.splashIcon,'splashIcon')">预览</span>
                         </div>
                     </el-row>
+                    <el-row>
+
+                    </el-row>
                     <p class="basicInfo">
                         签名
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="自定义签名:" prop="customSignStorePath" class="width100" label-width="100px">
+                            <el-form-item label="自定义签名:" prop="customSignStorePath" class="width100" label-width="100px" style="margin-left: 20px;">
                                 <el-radio-group v-model="packageProject.customSignStorePath">
                                     <el-radio :label="item" v-for="(item,index) in keyStoreArr" :key="index">
                                         {{item}}
                                     </el-radio>
                                 </el-radio-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        混淆加密
+                    </p>
+                    <el-row>
+                        <div class=" d-flex a-center" style="width: 50%;">
+                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width25" label-width="100px">
+                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
+                                <div style="margin-left: -70px;">混淆排除目录:</div>
+                            </el-form-item>
+                            <el-form-item label="" prop="obfuscatorIncludePaths" class="width75" >
+                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
+                                          class="width100" :rows="4" />
                             </el-form-item>
                         </div>
                     </el-row>

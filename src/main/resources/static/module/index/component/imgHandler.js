@@ -29,7 +29,7 @@ export default {
         },
         screenDirection: {
             type: String,
-            default: '横屏'
+            default: '竖屏'
         }
     },
     data() {
@@ -659,6 +659,37 @@ export default {
                         }
                     });
                 });
+            }).catch(() => {
+            });
+        },
+        // 保存图片到手机
+        saveImageToPhone(){
+            let phoneSyncPath = window.localStorage.getItem(this.deviceInfo.deviceUuid + "_phoneSyncPathCache") || "/";
+            window.ZXW_VUE.$prompt('是否确认保存图片到手机端,请输入保存路径和名称!', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue: phoneSyncPath+this.remoteHandler.param1.localImageName,
+                inputValidator: function(val) {
+                    if(val){
+                        if(!val.startsWith("/")){
+                            return "必须以/开头"
+                        }
+                        if(!val.endsWith(".png")){
+                            return "必须以.png结尾"
+                        }
+                    } else {
+                        return "不能为空";
+                    }
+                    return true;
+                }
+            }).then(({value}) => {
+                let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + this.remoteHandler.param1.localImageName;
+                // 如果有值且  是以/开头
+                let localFileUrl = value;
+                // 创建目录代码 如果不是/ 则需要创建目录
+                let createWithDirsCode = value !=='/' ? "files.createWithDirs('/sdcard"+value+"');" : "";
+                let remoteExecuteScriptContent = createWithDirsCode + "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{});";
+                this.remoteExecuteScript(remoteExecuteScriptContent);
             }).catch(() => {
             });
         },

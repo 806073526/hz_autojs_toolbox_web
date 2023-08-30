@@ -1,11 +1,15 @@
 <div>
-    <p class="basicInfo">
-        远程布局分析及上传
+
+ <!--   <p  style="display: flex;align-items: center;font-size: 15px;margin-left: 20px">
+        <img src="../module/index/image/layoutAnalysis.png" style="width: 25px"> 远程布局分析及上传
+    </p>-->
+    <p class="basicInfo" style="position: relative;">
+        布局分析
     </p>
     <el-row>
         <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="UI选择器:" class="flex-1">
-                <el-checkbox-group v-model="remoteHandler.param5.uiSelect">
+                <el-checkbox-group v-model="remoteHandler.param5.uiSelect" style="width: 727px">
                     <el-checkbox label="id">
                         id选择器
                     </el-checkbox>
@@ -21,7 +25,7 @@
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item label="选择器条件:" class="flex-1">
-                <el-radio-group v-model="remoteHandler.param5.uiSelectCondition">
+                <!--<el-radio-group v-model="remoteHandler.param5.uiSelectCondition">
                     <el-radio label="findOne">
                         找到一个(阻塞)findOne
                     </el-radio>
@@ -37,55 +41,98 @@
                     <el-radio label="exists">
                         存在exists
                     </el-radio>
-                </el-radio-group>
+                </el-radio-group>-->
+
+                <el-select v-model="remoteHandler.param5.uiSelectCondition" placeholder="请选择">
+                    <el-option
+                            v-for="item in remoteHandler.param5.uiSelectConditionOption"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
             </el-form-item>
-        </div>
-    </el-row>
-    <el-row>
-        <div class="width100 d-flex a-center flex-wrap">
+
             <el-form-item label="动作:" class="flex-1">
-                <el-radio-group v-model="remoteHandler.param5.uiSelectAction">
-                    <el-radio label="click">
-                        点击click
-                    </el-radio>
-                    <el-radio label="clickCenter">
-                        点击中心clickCenter
-                    </el-radio>
-                    <el-radio label="longClick">
-                        长按longClick
-                    </el-radio>
-                </el-radio-group>
+                <el-select v-model="remoteHandler.param5.uiSelectAction" placeholder="请选择">
+                    <el-option
+                            v-for="item in remoteHandler.param5.uiSelectActionOption"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
             </el-form-item>
-            <el-form-item label="布局分析范围:" label-width="140px" class="flex-1">
-                <el-radio-group v-model="remoteHandler.param5.layoutAnalysisRange">
-                    <el-radio label="active">
-                        活跃窗口
-                    </el-radio>
-                    <el-radio label="all">
-                        全部窗口(限制应用暂不支持)
-                    </el-radio>
-                </el-radio-group>
+            <el-form-item label="布局分析范围:" class="flex-1" >
+                <el-select v-model="remoteHandler.param5.layoutAnalysisRange" placeholder="请选择">
+                    <el-option
+                            v-for="item in remoteHandler.param5.layoutAnalysisRangeOption"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
             </el-form-item>
         </div>
     </el-row>
+    <!-- <el-row>
+         <div class="width100 d-flex a-center flex-wrap">
+             <el-form-item label="动作:" class="flex-1">
+                 <el-radio-group v-model="remoteHandler.param5.uiSelectAction">
+                     <el-radio label="click">
+                         点击click
+                     </el-radio>
+                     <el-radio label="clickCenter">
+                         点击中心clickCenter
+                     </el-radio>
+                     <el-radio label="longClick">
+                         长按longClick
+                     </el-radio>
+                 </el-radio-group>
+             </el-form-item>
+             <el-form-item label="布局分析范围:" label-width="140px" class="flex-1">
+                 <el-radio-group v-model="remoteHandler.param5.layoutAnalysisRange">
+                     <el-radio label="active">
+                         活跃窗口
+                     </el-radio>
+                     <el-radio label="all">
+                         全部窗口(限制应用暂不支持)
+                     </el-radio>
+                 </el-radio-group>
+             </el-form-item>
+         </div>
+     </el-row>-->
     <el-row>
         <div class="width100 d-flex a-center flex-wrap">
-            <el-form-item label="代码预览:" style="flex:6">
+            <el-form-item label="代码预览:" style="width: 970px">
                 <el-input type="textarea" v-model="remoteHandler.param5.scriptPreview"
-                          :rows="5" placeholder="请点击控件后生成代码" class="width100">
+                          :rows="5" placeholder="请点击控件后生成代码" class="width95">
                 </el-input>
             </el-form-item>
-            <el-form-item label="控件信息:" style="flex:4">
-                <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="5"
-                          placeholder="点击控件信息快速获取文本内容" class="width100">
+            <!-- <el-form-item label="控件信息:" style="flex:4">
+                 <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="5"
+                           placeholder="点击控件信息快速获取文本内容" class="width100">
+                 </el-input>
+             </el-form-item>-->
+
+            <el-form-item label="自定义过滤函数:" style="flex:4" class="filterFunction">
+                <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
+                          :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width97">
                 </el-input>
             </el-form-item>
+            <!-- <div class="width50 d-flex a-center">
+                 <el-form-item label="自定义过滤函数:" class="width100">
+                     <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
+                               :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
+                     </el-input>
+                 </el-form-item>
+             </div>-->
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center flex-wrap" style="margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;text-align: center;">
+        <div class="width100 d-flex a-center flex-wrap" style="margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;text-align: center;margin-left: 91px">
             <div>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="remoteLayoutAnalysisOneKey">
                     一键远程布局分析
                 </el-button>
@@ -105,52 +152,57 @@
                            size="mini" @click.stop.prevent="loadNodeJson">
                     解析布局分析
                 </el-button>-->
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                <el-button type="danger"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="clearNodeJson(true)">
                     清空布局分析
                 </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="execNodePreviewScript">
                     执行代码
                 </el-button>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                <el-button type="danger"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="clearNodePreviewScript">
                     清空代码
                 </el-button>
                 <el-dropdown trigger="click">
-                    <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                    <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                                size="mini">
                         常见自定义过滤函数
                     </el-button>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item v-for="(item,index) in commonCustomFilterFunction" @click.native.prevent.stop="generateCommonCustomFilterFunction(item.code)">
+                        <el-dropdown-item v-for="(item,index) in commonCustomFilterFunction" :key="index" @click.native.prevent.stop="generateCommonCustomFilterFunction(item.code)">
                             {{ item.name }}
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+               <!-- <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="saveCustomFilterFunction">
                     保存自定义过滤函数
-                </el-button>
-                <el-button type="primary" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                </el-button>-->
+                <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="loadCustomFilterFunction">
-                    加载自定义过滤函数
+                    执行自定义过滤函数
                 </el-button>
             </div>
         </div>
     </el-row>
     <el-row>
         <div class="width100 d-flex a-center">
-            <el-form-item label="自定义过滤函数:" class="width100">
-                <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
-                          :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
+            <!-- <el-form-item label="自定义过滤函数:" class="width100">
+                 <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
+                           :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
+                 </el-input>
+             </el-form-item>-->
+            <el-form-item label="控件信息:" style="flex:4">
+                <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="1"
+                          placeholder="点击控件信息快速获取文本内容" class="width1001">
                 </el-input>
             </el-form-item>
         </div>
     </el-row>
     <el-row>
         <div class="width100 d-flex a-center" style="display: flex;justify-content: flex-start;align-items: center;text-align: center;">
-            <div>
+            <div style="margin-left: 87px">
                 <el-checkbox style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px"
                              v-model="remoteHandler.param5.checkAll" @change="checkAllNode">
                     全选
@@ -198,287 +250,290 @@
         </div>
     </el-row>
     <el-row>
-        <div class="width100 d-flex a-center mt-1 flex-wrap" v-loading="layoutLoading">
-            <el-tree style="flex: 4;" :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
-                     empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
-                     :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
-                     :default-expanded-keys="defaultExpandedKeys" :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
-                     @node-click="nodeClickFun" @current-change="currentChangeFun" class="nodeTreeClass nodeDivCommon">
-            </el-tree>
-            <div class="nodePreviewClass nodeDivCommon" style="flex: 4;">
-                <img id="nodePreviewImg" draggable="false" style="display: none;" />
-                <canvas v-if="remoteHandler.param5.rootNodeJson" id="nodePreviewCanvas"
-                        style="width: 100%;margin: 0; padding: 0;">
-                </canvas>
-                <div v-else style="width: 100%;
+        <div class="width94 d-flex a-center mt-1 flex-wrap" v-loading="layoutLoading" style="margin-left: 95px">
+            <div class="nodePreviewClass nodeDivCommon" style="display: flex ">
+                <el-tree style="flex: 4;" :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
+                         empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
+                         :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
+                         :default-expanded-keys="defaultExpandedKeys" :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
+                         @node-click="nodeClickFun" @current-change="currentChangeFun" class="nodeTreeClass nodeDivCommon2">
+                </el-tree>
+                <div class="nodePreviewClass nodeDivCommon2" style="flex: 4;">
+                    <img id="nodePreviewImg" draggable="false" style="display: none;" />
+                    <canvas v-if="remoteHandler.param5.rootNodeJson" id="nodePreviewCanvas"
+                            style="width: 100%;margin: 0; padding: 0;">
+                    </canvas>
+                    <div v-else style="width: 100%;
                 height: 100%;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 color: #909399;">
-                    请先上传控件或加载控件
+                        请先上传控件或加载控件
+                    </div>
                 </div>
-            </div>
-            <div class="nodeDetailDiv nodeDivCommon" style="flex: 3;">
-                <template v-if="remoteHandler.param5.dialogVisible">
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            className:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.className }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            packageName:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.packageName }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            text:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.text }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            desc:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.desc }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            id:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.id }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            sourceNodeId:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.sourceNodeId }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            bounds:
-                        </div>
-                        <div class="contentClass">
-                            {{ '['+remoteHandler.param5.selectNode.boundsInfo.left+','+
-                            remoteHandler.param5.selectNode.boundsInfo.top+',' +
-                            remoteHandler.param5.selectNode.boundsInfo.right + ',' +
-                            remoteHandler.param5.selectNode.boundsInfo.bottom + ']' }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            boundsInParent:
-                        </div>
-                        <div class="contentClass">
-                            {{ '['+remoteHandler.param5.selectNode.boundsInParent.left+','+
-                            remoteHandler.param5.selectNode.boundsInParent.top+',' +
-                            remoteHandler.param5.selectNode.boundsInParent.right + ',' +
-                            remoteHandler.param5.selectNode.boundsInParent.bottom + ']' }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            indexInParent:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.indexInParent }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            depth:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.depth }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            checkable:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.checkable }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            checked:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.checked }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            focusable:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.focusable }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            focused:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.focused }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            accessibilityFocused:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.accessibilityFocused }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            selected:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.selected }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            clickable:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.clickable }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            drawingOrder:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.drawingOrder }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            longClickable:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.longClickable }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            enabled:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.enabled }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            password:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.password }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            scrollable:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.scrollable }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            visible:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.visible }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            column:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.column }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            columnCount:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.columnCount }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            columnCount:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.columnCount }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            columnSpan:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.columnSpan }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            row:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.row }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            rowCount:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.rowCount }}
-                        </div>
-                    </el-row>
-                    <el-row class="nodeDetailRow">
-                        <div class="labelClass">
-                            rowSpan:
-                        </div>
-                        <div class="contentClass">
-                            {{ remoteHandler.param5.selectNode.rowSpan }}
-                        </div>
-                    </el-row>
-                </template>
-                <template v-else>
-                    <div style="width: 100%;
+                <div class="nodeDetailDiv nodeDivCommon2" style="flex: 3;overflow-x: auto" >
+                    <template v-if="remoteHandler.param5.dialogVisible" >
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                className:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.className }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                packageName:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.packageName }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                text:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.text }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                desc:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.desc }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                id:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.id }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                sourceNodeId:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.sourceNodeId }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                bounds:
+                            </div>
+                            <div class="contentClass">
+                                {{ '['+remoteHandler.param5.selectNode.boundsInfo.left+','+
+                                remoteHandler.param5.selectNode.boundsInfo.top+',' +
+                                remoteHandler.param5.selectNode.boundsInfo.right + ',' +
+                                remoteHandler.param5.selectNode.boundsInfo.bottom + ']' }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                boundsInParent:
+                            </div>
+                            <div class="contentClass">
+                                {{ '['+remoteHandler.param5.selectNode.boundsInParent.left+','+
+                                remoteHandler.param5.selectNode.boundsInParent.top+',' +
+                                remoteHandler.param5.selectNode.boundsInParent.right + ',' +
+                                remoteHandler.param5.selectNode.boundsInParent.bottom + ']' }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                indexInParent:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.indexInParent }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                depth:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.depth }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                checkable:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.checkable }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                checked:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.checked }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                focusable:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.focusable }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                focused:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.focused }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                accessibilityFocused:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.accessibilityFocused }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                selected:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.selected }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                clickable:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.clickable }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                drawingOrder:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.drawingOrder }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                longClickable:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.longClickable }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                enabled:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.enabled }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                password:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.password }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                scrollable:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.scrollable }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                visible:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.visible }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                column:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.column }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                columnCount:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.columnCount }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                columnCount:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.columnCount }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                columnSpan:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.columnSpan }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                row:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.row }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                rowCount:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.rowCount }}
+                            </div>
+                        </el-row>
+                        <el-row class="nodeDetailRow">
+                            <div class="labelClass">
+                                rowSpan:
+                            </div>
+                            <div class="contentClass">
+                                {{ remoteHandler.param5.selectNode.rowSpan }}
+                            </div>
+                        </el-row>
+                    </template>
+                    <template v-else>
+                        <div style="width: 100%;
                     height: 100%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     color: #909399;">
-                        请点击控件节点或者图中矩形
-                    </div>
-                </template>
+                            请点击控件节点或者图中矩形
+                        </div>
+                    </template>
+                </div>
             </div>
+
         </div>
     </el-row>
 </div>
