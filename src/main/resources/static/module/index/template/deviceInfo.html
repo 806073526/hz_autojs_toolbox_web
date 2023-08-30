@@ -15,7 +15,7 @@
         <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
         <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
         <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
-        <span style="width: 250px">
+        <span style="width: 300px">
             <span style="margin-left: 10px;color: #419EFDFF;">
                {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
             </span>
@@ -63,19 +63,19 @@
     <el-row v-show="expandDevice">
         <div class="width100 d-flex a-center flex-wrap" style="margin-top: 10px; ">
             <el-form-item label="标准宽度:" prop="x1"  label-width="100px" class="flex-1" >
-                <el-input-number v-model="deviceInfo.standardWidth" controls-position="right" @change="syncWidthHeightToApp" :min="1"  style="width: 100px"></el-input-number>
+                <el-input-number v-model="deviceInfo.standardWidth" controls-position="right" @change="syncWidthHeightToApp" :min="0"  style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="标准高度:" prop="y1"  label-width="100px" class="flex-1">
-                <el-input-number v-model="deviceInfo.standardHeight" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
+                <el-input-number v-model="deviceInfo.standardHeight" controls-position="right" @change="syncWidthHeightToApp" :min="0" style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="x偏移系数:" prop="x1" label-width="100px"  class="flex-1">
-                <el-input-number v-model="deviceInfo.offsetX" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
+                <el-input-number v-model="deviceInfo.offsetX" controls-position="right" @change="syncWidthHeightToApp" :min="0" style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="y偏移系数:" prop="y1"  label-width="100px" class="flex-1">
-                <el-input-number v-model="deviceInfo.offsetY" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
+                <el-input-number v-model="deviceInfo.offsetY" controls-position="right" @change="syncWidthHeightToApp" :min="0" style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="调试延时:" label-width="100px" class="flex-1">
-                <el-input-number  v-model="deviceInfo.debugSleep" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
+                <el-input-number  v-model="deviceInfo.debugSleep" controls-position="right" @change="syncWidthHeightToApp" :min="0" style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="调试模式:" label-width="100px" class="flex-1">
                 <div class="d-flex j-start a-center" style="height: 40px;">
