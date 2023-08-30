@@ -25,6 +25,10 @@
                     <!-- 公共文件组件  -->
                     <common-file :deviceInfo="deviceInfo" :screenDirection="screenDirection"  ref="commonFile" />
                 </el-tab-pane>
+                <el-tab-pane label="文件管理" name="fileManage">
+                    <!-- 文件管理组件  -->
+                    <file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="fileManage" />
+                </el-tab-pane>
                 <el-tab-pane label="图像处理" name="imgHandler">
                     <!-- 图像处理组件 -->
                     <img-handler :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="imgHandler" />
@@ -37,11 +41,6 @@
                     <!-- 远程脚本组件 -->
                     <remote-script :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteScript" />
                 </el-tab-pane>
-                <el-tab-pane label="文件管理" name="fileManage">
-                    <!-- 文件管理组件  -->
-                    <file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="fileManage" />
-                </el-tab-pane>
-
                 <el-tab-pane label="远程日志" name="remoteLog">
                     <!-- 远程日志组件 -->
                     <remote-log :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteLog" />

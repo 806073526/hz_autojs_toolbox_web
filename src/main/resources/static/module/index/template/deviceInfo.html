@@ -10,19 +10,16 @@
                  【设备{{authorizeStatus? '已' : '未'}}授权】版本【V2.9.0】
              </span>-->
 
-        <span @click.stop="authorizedFun" target="_blank" style="margin-left: 2px;cursor: pointer; ">
-            &nbsp;&nbsp;(设备{{authorizeStatus? '已' : '未'}}授权) 版本【2.9.0】
-        </span>
+        <span @click.stop="authorizedFun" target="_blank" :style="{'color': authorizeStatus ? '#6b3dff' : '#d13026'}" style="margin-left: 0px;cursor: pointer;">【服务端{{authorizeStatus? '已' : '未'}}授权】</span>
+        <span>【V3.0.0】</span>
+        <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
+        <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
+        <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
         <span style="width: 250px">
-            <span style="margin-left: 2px;color: #419EFDFF;">
+            <span style="margin-left: 10px;color: #419EFDFF;">
                {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
             </span>
         </span>
-        <el-button plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#c0c4cc;font-size: 14px;padding: 0px 13px !important " @click="getOnlineDevice()">刷新</el-button>
-
-        <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#c0c4cc;font-size: 14px; padding: 0px 0px" @click.stop="expandDeviceFun">收缩</el-button>
-        <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#c0c4cc;font-size: 14px;padding: 0px 0px" @click.stop="expandDeviceFun">展开</el-button>
-
         <span class="flex-1" style="text-align: right;">
             <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/releases" target="_blank"
                style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">Web端下载</a>
@@ -37,6 +34,9 @@
              <a href="/docs/zh/v8/app.html" target="_blank"
                 style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">AutoJsPro文档</a>
             <a href="https://jq.qq.com/?_wv=1027&k=QGefcWIC" target="_blank" style="color: #909399;text-decoration: none;font-size: 14px">QQ群：806074622</a>
+        </span>
+        <span>
+           <i class="el-icon-setting" @click.stop="showSystemSettingDialog" style="margin: 0 10px;font-size: 20px;"></i>
         </span>
     </p>
     <el-row v-show="expandDevice">
@@ -63,65 +63,25 @@
     <el-row v-show="expandDevice">
         <div class="width100 d-flex a-center flex-wrap" style="margin-top: 10px; ">
             <el-form-item label="标准宽度:" prop="x1"  label-width="100px" class="flex-1" >
-                <!--    <el-input type="number" v-model="deviceInfo.standardWidth" placeholder="请设置标准宽度"
-                              class="width30" @change="syncWidthHeightToApp">
-                    </el-input>-->
                 <el-input-number v-model="deviceInfo.standardWidth" controls-position="right" @change="syncWidthHeightToApp" :min="1"  style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="标准高度:" prop="y1"  label-width="100px" class="flex-1">
-                <!--     <el-input type="number" v-model="deviceInfo.standardHeight" placeholder="请设置标准高度"
-                               class="width100" @change="syncWidthHeightToApp">
-                     </el-input>-->
                 <el-input-number v-model="deviceInfo.standardHeight" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
             </el-form-item>
             <el-form-item label="x偏移系数:" prop="x1" label-width="100px"  class="flex-1">
-                <!--           <el-input type="number" v-model="deviceInfo.offsetX" placeholder="请设置x偏移系数"
-                                     class="width100" @change="syncWidthHeightToApp">
-                           </el-input>-->
                 <el-input-number v-model="deviceInfo.offsetX" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
-
             </el-form-item>
             <el-form-item label="y偏移系数:" prop="y1"  label-width="100px" class="flex-1">
-                <!-- <el-input type="number" v-model="deviceInfo.offsetY" placeholder="请设置y偏移系数"
-                           class="width100" @change="syncWidthHeightToApp">
-
-                 </el-input>-->
                 <el-input-number v-model="deviceInfo.offsetY" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
-
             </el-form-item>
-
             <el-form-item label="调试延时:" label-width="100px" class="flex-1">
-                <!--<el-input type="number" v-model="deviceInfo.debugSleep" placeholder="请设置调试延时" class="flex-1"
-                          @change="syncWidthHeightToApp">
-                </el-input>-->
                 <el-input-number  v-model="deviceInfo.debugSleep" controls-position="right" @change="syncWidthHeightToApp" :min="1" style="width: 100px"></el-input-number>
-
             </el-form-item>
-
             <el-form-item label="调试模式:" label-width="100px" class="flex-1">
-
                 <div class="d-flex j-start a-center" style="height: 40px;">
                     <el-switch  v-model="deviceInfo.debugModel" @change="syncWidthHeightToApp" style="margin-right: 5px;"/>
                 </div>
             </el-form-item>
-
-            <!--  <el-form-item label="编辑器类型:" label-width="100px" class="flex-1">
-                      <el-tooltip class="item" effect="dark"  content="请注意,修改编辑类型后,必须要刷新页面才能生效!" placement="top-start">
-                            <div class="d-flex j-start a-center" style="height: 40px;white-space: nowrap;">
-                                <el-radio-group v-model="editorType" @change="editorTypeChange">
-                                    <el-radio label="vscode">
-                                        vscode
-                                    </el-radio>
-                                    <el-radio label="ace">
-                                        ace
-                                    </el-radio>
-                                </el-radio-group>
-                                <i v-if="editorTypeNeedRefresh" class="el-icon-refresh-right" @click.stop="refreshPage" style="margin-left: 5px"/>
-                            </div>
-                        </el-tooltip>
-                <el-switch class="demo" v-model="editorType" @change="refreshPage" style="margin-right: 5px;" active-value="vscode" inactive-value="ace" active-text="vscode" inactive-text="ace"/>
-
-            </el-form-item>-->
             <div class="d-flex j-start a-center flex-1"  style="margin-bottom:15px;">
                 <el-button @click.stop="syncWidthHeightToApp">
                     同步到APP
@@ -132,4 +92,35 @@
             </div>
         </div>
     </el-row>
+
+    <el-dialog
+            title="系统设置"
+            :visible.sync="systemSettingDialog"
+            width="40%"
+            center
+            >
+        <div style="height: 300px;padding-top: 15px;">
+            <el-row class="d-flex">
+                   <el-form-item label="设备状态通知:" label-width="100px"  class="flex-1">
+                       <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.deviceStatusNotice" @change="deviceStatusNoticeChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                       </div>
+                   </el-form-item>
+                <el-form-item label="最后一次连接设备:" label-width="130px"  class="flex-1">
+                    {{systemConfig.lastSelectDeviceUuid}}
+                </el-form-item>
+                    <el-popover ref="popover1" placement="top-start" width="260" trigger="hover">
+                        <div>
+                            是否显示APP的设备上线和离线通知,开启后,APP连接服务端和断开服务端均会在右下角显示通知。
+                        </div>
+                    </el-popover>
+            </el-row>
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="systemSettingDialog = false">关闭</el-button>
+        </span>
+    </el-dialog>
 </div>

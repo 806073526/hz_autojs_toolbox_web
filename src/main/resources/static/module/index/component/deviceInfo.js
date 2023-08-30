@@ -24,6 +24,11 @@ export default {
             expandDevice:true,
             authorizeStatus: false,
             showRefresh:true,
+            systemConfig:{
+                deviceStatusNotice: true,
+                lastSelectDeviceUuid: ""
+            },
+            systemSettingDialog: false,
             deviceInfo: {// 当前设备信息
                 startPreview: false,
                 deviceUuid: '',
@@ -39,6 +44,13 @@ export default {
         }
     },
     mounted() {
+        let systemConfigCache = window.localStorage.getItem("systemConfig");
+        if(systemConfigCache){
+            let systemConfigObj = JSON.parse(systemConfigCache);
+            if(systemConfigObj.deviceStatusNotice!=null){
+                this.systemConfig.deviceStatusNotice = systemConfigObj.deviceStatusNotice;
+            }
+        }
         this.getOnlineDevice();
 
         // 获取编辑器类型未刷新标记
@@ -77,11 +89,21 @@ export default {
         }, 500);
     },
     methods: {
-
+        // 显示系统设置弹窗
+        showSystemSettingDialog(){
+          this.systemConfig.lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
+          this.systemSettingDialog  = true;
+        },
+        deviceStatusNoticeChange(){
+            window.localStorage.setItem("systemConfig",JSON.stringify(this.systemConfig));
+            window.ZXW_VUE.$notify.success({message: '修改成功', duration: '1000'});
+        },
         //上线处理
         online(deviceUuid) {
             //已连接无需检测
-            if (this.deviceInfo.deviceUuid !="") return;
+            if (this.deviceInfo.deviceUuid){
+                return;
+            }
             //寻找上一次连接的设备号
             let lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
             // 如果缓存为空 直接返回
@@ -89,17 +111,31 @@ export default {
             // 自动选择设备
             setTimeout(() => {
                 this.$nextTick(() => {
+                    if(this.systemConfig.deviceStatusNotice){
+                        window.ZXW_VUE.$notify({
+                            title: 'APP上线通知',
+                            dangerouslyUseHTMLString: true,
+                            message: "设备【"+deviceUuid+"】已上线",
+                            position: 'bottom-right'
+                        });
+                    }
                     // 自动选择设备
                     this.autoSelectDevice(lastSelectDeviceUuid);
                 });
             }, 500);
-        }
-
-        ,
+        },
         //app断开连接处理
         downLine(deviceUuid){
             this.getOnlineDevice();
-            if(deviceUuid==this.deviceInfo.deviceUuid){
+            if(this.systemConfig.deviceStatusNotice){
+                window.ZXW_VUE.$notify({
+                    title: 'APP离线通知',
+                    dangerouslyUseHTMLString: true,
+                    message: "设备【"+deviceUuid+"】已离线",
+                    position: 'bottom-right'
+                });
+            }
+            if(deviceUuid===this.deviceInfo.deviceUuid){
                 this.$set(this.deviceInfo, 'deviceUuid', "");
             }
         },

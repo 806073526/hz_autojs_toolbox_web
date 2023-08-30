@@ -210,7 +210,7 @@ public class AutoJsWsServerEndpoint {
         }
         // 发送指令 给所以连接了的web端  推送app连接成功消息
         AjMessageDTO ajMessageDTO = new AjMessageDTO();
-        ajMessageDTO.setDeviceUuid("deviceUuid");
+        ajMessageDTO.setDeviceUuid(deviceUuid);
         ajMessageDTO.setAction("appWebSocketConnectSuccess");
         ajMessageDTO.setMessage("上线");
         // 推送消息通知到web端页面

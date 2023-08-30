@@ -306,13 +306,11 @@ window.ZXW_VUE = new Vue({
             }
             let messageData = JSON.parse(text);
             if(messageData.action === "appWebSocketCloseSuccess" || messageData.action === "appWebSocketConnectSuccess"){
-
-                if(messageData.message=="下线"){
-                    this.$refs["deviceInfo"].downLine(messageData.deviceUuid)
-                }else if(messageData.message=="上线"){
-                    this.$refs["deviceInfo"].online(messageData.deviceUuid)
+                if(messageData.message === "下线"){
+                    this.$refs["deviceInfo"].downLine(messageData.deviceUuid);
+                } else if(messageData.message === "上线"){
+                    this.$refs["deviceInfo"].online(messageData.deviceUuid);
                 }
-
             }
             // 同步其他属性
             if (messageData.action === "syncOtherPropertyJson") {
@@ -479,11 +477,10 @@ window.ZXW_VUE = new Vue({
             // 更新屏幕方向
             this.screenDirection = screenDirection;
 
-            // 记录最后选择设备
-            window.localStorage.setItem("lastSelectDeviceUuid",this.deviceInfo.deviceUuid);
-
-
             if(this.deviceInfo.deviceUuid){
+                // 记录最后选择设备
+                window.localStorage.setItem("lastSelectDeviceUuid",this.deviceInfo.deviceUuid);
+
                 // 设置当前选中App设备
                 this.sendMessageToWebDeviceWebSocket("syncSelectAppDeviceUuid",this.deviceInfo.deviceUuid);
             }
