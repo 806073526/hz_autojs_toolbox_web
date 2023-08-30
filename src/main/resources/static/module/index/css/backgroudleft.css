@@ -1,0 +1,38 @@
+.el-tabs__item{
+    font-size: 16px;
+    height: 62px;
+    line-height: 62px;
+    /*margin: 30px 0 0 0;*/
+    padding: 0 30px;
+}
+.el-tabs__item.is-left.is-active{
+    background-color: #ecf5ff ;
+}
+
+.el-tabs__item.is-left:hover{
+    color: #409EFF;
+    cursor: pointer;
+}
+.el-tooltip.fileTips.item{
+    color: #364760;
+}
+.basicInfo{
+    background-color: white;
+}
+.d-flex.a-center.fileOperate.primary-text-color.pl-1 {
+    height: 34px;
+
+    border: 1px solid #dcedfd;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.fileList-head {
+    height: 34px;
+    background-color: white;
+    color: #364760;
+    padding-left: 8px;
+    font-size: 14px;
+}
+.fileList-body:hover {
+    background-color: #edf6fe !important;
+}
