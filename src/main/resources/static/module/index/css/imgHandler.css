@@ -1,6 +1,41 @@
 .draw-box {
     position: relative;
 }
+
+.imgDivContainer{
+    border: 1px solid #dbd2d2;
+    padding: 5px;
+    border-radius: 5px;
+    height: 1500px;
+    overflow-y: scroll;
+}
+
+.imgDivContainer::-webkit-scrollbar {
+    width: 4px;
+}
+.imgDivContainer::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.imgDivContainer:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.imgDivContainer::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+
+.imgToolsDiv{
+    background: #e7f0f5;
+    padding: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.positionInput textarea{
+    height: 100% !important;
+}
+
 .positionListFixed{
     position: fixed;
     bottom: 0;
@@ -21,36 +56,53 @@
     margin-left: 0px !important;
 }
 .mousePositionCls{
-    position: fixed;
-    top: 5px;
-    right: 5px;
     font-size: 15px;
     font-weight: 600;
-    z-index: 999999999999999;
     background: #75d7b6;
-    height: 200px;
-    width: 200px;
+    height: 250px;
+    // width: 250px;
     display: grid;
     grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(15, 1fr);
     box-shadow: -8px 8px 12px rgba(0, 0, 8, 0.3);
 }
-.mousePositionCls #canvasScale{
-    position: fixed;
-    height: 200px;
-    width: 200px;
+.hamburger  .el-icon-arrow-left{
+    transition: .3s;
 }
-.mousePositionCls .mousePositionDiv{
-    position: fixed;
-    z-index: 999999999999;
-    height: 20px;
-    line-height: 20px;
-    background: beige;
-    font-size: 13px;
+.hamburger:hover{
+    background-color: #4BABF6;
+}
+.hamburger .rotate{
+    transform: rotate(180deg);
+}
+.hamburger {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    display: inline-block;
+    width: 18px;
+    line-height: 36px;
+    height: 36px;
+    background-color: #DDDDDD;
+    color: #fff;
+    border-radius: 0 15px 15px 0;
+    text-align: center;
+}
+
+.mousePositionCls #canvasScale{
+    position: absolute;
+    height: 250px;
+    z-index: 1;
+}
+.mousePositionDiv{
+    margin-bottom: 5px;
+    padding-left: 5px
 }
 .mousePositionCls .cell {
     border: 1px solid black;
-    z-index: 999999;
+    z-index: 9;
 }
 .mousePositionCls .selectCell{
     border: 1px solid white;

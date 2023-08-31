@@ -89,6 +89,101 @@ export default {
         }, 500);
     },
     methods: {
+        // 刷新截图权限
+        refreshCaptureScreen(){
+            if (!this.validSelectDevice()) {
+                return
+            }
+            let script = `
+            utilsObj.requestScreenCaptureCommonFun = (callback)=>{
+                try {
+                    // 获取截图权限参数
+                    let screenCaptureOptions = images.getScreenCaptureOptions();
+                    // 不为空
+                    if(screenCaptureOptions){
+                        if(callback){
+                            callback();
+                        }
+                        // 已有截图权限 直接返回
+                        return;
+                    }
+                    // 未开启无障碍服务
+                    if(!auto.service){
+                        console.error("未开启无障碍服务")
+                        // 直接返回
+                        return;
+                    }
+            
+                    // 是否存在截图权限
+                    let exitsScreenCaputreOptions = false;
+            
+                    // 读取其他点击文字数据
+                    let otherClickText = commonStorage.get("otherClickText");
+            
+                    let textRegExp = new RegExp('(允许|立即开始|同意'+(otherClickText ? '|' + otherClickText : '')+')')
+            
+                    // 停止截图点击线程
+                    if(utilsObj.requestScreenClickThread){
+                        utilsObj.requestScreenClickThread.interrupt();
+                    }
+            
+                    // 开启点击线程
+                    utilsObj.requestScreenClickThread = threads.start(function () {
+                        while (true) {
+                            let click1 = textMatches(textRegExp).findOne(100);
+                            if(click1){
+                                click1.click();
+                            }
+                            let checkScreenCaptureOptions = images.getScreenCaptureOptions();
+                            if(checkScreenCaptureOptions){
+                                // 设置标志
+                                exitsScreenCaputreOptions = true;
+                                if(utilsObj.requestScreenClickThread){
+                                    // 停止点击线程
+                                    utilsObj.requestScreenClickThread.interrupt();
+                                }
+                            }
+                        }
+                    });
+                    // 申请截图权限
+                    images.requestScreenCapture({orientation:utilsObj.getOrientation()});
+            
+                    let timeoutLimit = 0;
+                    // 没有截图权限时 循环等待
+                    while (!exitsScreenCaputreOptions) {
+                        sleep(100);
+                        timeoutLimit++;
+                        // 超过30秒 退出等待
+                        if(timeoutLimit> 10 * 30){
+                            break;
+                        }
+                    }
+                    if(timeoutLimit < 10 * 30){
+                        // 未超时 执行回调
+                        if(callback){
+                            sleep(1000);
+                            callback();
+                        }
+                    }
+                    // 超时不做处理
+                } catch (error) {
+                    if (commonStorage.get('debugModel')) {
+                        console.error("申请截图权限错误", error)
+                    }
+                    // 如果出现错误 则先停止截图权限
+                    images.stopScreenCapture()
+                    // 再重新申请截图权限
+                    images.requestScreenCapture({orientation:utilsObj.getOrientation()});
+                }
+            }
+            // 则先停止截图权限
+            images.stopScreenCapture();
+            utilsObj.requestScreenCaptureCommonFun(()=>{
+                toastLog("刷新截图权限完成");
+            });
+            `;
+            this.remoteExecuteScript(script);
+        },
         // 显示系统设置弹窗
         showSystemSettingDialog(){
           this.systemConfig.lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
@@ -198,6 +293,14 @@ export default {
                 this.$set(this.deviceInfo, 'debugModel', true);
                 this.$set(this.deviceInfo, 'debugSleep', 1000);
                 this.$set(this.deviceInfo, 'aliasName', row.aliasName);
+
+                let otherPropertyJson = row.otherPropertyJson;
+                if(otherPropertyJson){
+                    let otherPropertyObj = JSON.parse(otherPropertyJson);
+                    if(otherPropertyObj!=null){
+                        row.orientation = otherPropertyObj.orientation;
+                    }
+                }
                 // 同步设备信息
                 this.$emit('deviceSelectRowCallback', {
                     deviceInfo: this.deviceInfo,

@@ -41,6 +41,9 @@ public class AutoJsSession implements Serializable {
     @ApiModelProperty(value = "设备宽度")
     private String screenWidth;
 
+    @ApiModelProperty(value = "屏幕方向")
+    private Integer orientation = 1;
+
     @ApiModelProperty(value = "访问密码")
     private String password;
 

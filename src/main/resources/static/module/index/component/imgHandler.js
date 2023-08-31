@@ -41,8 +41,20 @@ export default {
             },
             imgDrawLoading:false,
             positionShowType: 'cur', // 坐标显示类型
-            previewImageWidth: 100,
+            previewImageWidth: 50,
             cells:Array.from({ length: 225 }),
+            lastPreview:{
+                naturalWidth:"",
+                naturalHeight:""
+            },
+            isActive:false,
+            arrowArr:{
+                commonParam:true,
+                otherParam:true,
+                scriptPreview:true,
+                jsonParam:true,
+                otherOperate:true
+            },
             remoteHandler: {
                 param1: {
                     paramJson:"",
@@ -69,11 +81,47 @@ export default {
                     isOpenGray: false,
                     isOpenThreshold: false,
                     showFixedPositionList: false,
+                    openSplit:true,
                     positionList: '',// 坐标列表
                     operatePositionKey: 'x1',// 操作key
                     operatePositionVal: 100,// 操作坐标值
                 }
             }
+        }
+    },
+    computed:{
+        // 满足以下几种条件时  禁止进行全屏截图操作 1、没有预览图 2、坐标未全屏 3、预览图不是全屏预览图
+        disabledAllCaptureScreenScale() {
+            // 没有预览图
+            if(!this.remoteHandler.param1.previewImg){
+                // 禁止全屏裁剪
+                return true;
+            }
+            let standPosition = {x1:0,y1:0};
+            if ("竖屏" === this.screenDirection) {
+                standPosition.x2 = this.deviceInfo.standardWidth;
+                standPosition.y2 = this.deviceInfo.standardHeight;
+            } else {
+                standPosition.x2 = this.deviceInfo.standardHeight;
+                standPosition.y2 = this.deviceInfo.standardWidth;
+            }
+            // 坐标不是全屏坐标
+            if(String(standPosition.x1) !== String(this.remoteHandler.param1.x1) ||
+                String(standPosition.x2) !== String(this.remoteHandler.param1.x2) ||
+                String(standPosition.y1) !== String(this.remoteHandler.param1.y1) ||
+                String(standPosition.y2) !== String(this.remoteHandler.param1.y2)
+            ){
+                // 禁止全屏裁剪
+                return true;
+            }
+            // 预览图不是全屏预览图
+            if(String(standPosition.x2) !== String(this.lastPreview.naturalWidth) ||
+                String(standPosition.y2) !== String(this.lastPreview.naturalHeight)
+            ){
+                // 禁止全屏裁剪
+                return true;
+            }
+            return false;
         }
     },
     methods: {
@@ -239,6 +287,18 @@ export default {
             }
             window.ZXW_VUE.$notify.success({message: '读取坐标成功', duration: '1000'})
         },
+        // 全屏截图
+        allCaptureScreen(){
+            // 设置为全屏坐标
+            this.setParam1(false);
+            // 执行截图操作
+            this.sendImgAction("remoteClipGrayscaleAndThresholdToServer");
+        },
+        // 全屏裁剪
+        allCaptureScreenScale(){
+            // 开启裁剪模式
+            this.remoteHandler.param1.isOpenFastClip = true;
+        },
         // 发送图像处理指令
         sendImgAction(functionName) {
             if (!this.validSelectDevice()) {
@@ -299,7 +359,7 @@ export default {
             // 开启
             if (val) {
                 // 自动调整缩放
-                this.previewImageWidth = 100;
+                // this.previewImageWidth = 100;
                 // 自动设置全屏
                 this.setParam1(false);
             }
@@ -375,11 +435,22 @@ export default {
                     img.onload = function () {
                         // 在canvas上画图片
                         window.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        // 加载完后 设置最后一次预览图片 的真实宽高
+                        let previewImg = document.getElementById('previewImg');
+                        if(previewImg){
+                            _this.lastPreview.naturalWidth = previewImg.naturalWidth;
+                            _this.lastPreview.naturalHeight = previewImg.naturalHeight;
+                        } else {
+                            _this.lastPreview.naturalWidth = "";
+                            _this.lastPreview.naturalHeight = "";
+                        }
                     };
 
                     let canvasScale = document.getElementById('canvasScale');
-                    canvasScale.width = 200;
-                    canvasScale.height = 200;
+                    let width = canvasScale.parentNode.offsetWidth || 250;
+                    let height = canvasScale.parentNode.offsetHeight || 250;
+                    canvasScale.width = width;
+                    canvasScale.height = height;
                     window.ctxScale = canvasScale.getContext('2d');
                 });
             }, 200);
@@ -571,9 +642,13 @@ export default {
                 let cutHeight = 50; // 裁剪的高度
                 let x1 = (centerX - cutWidth / 2); // 裁剪区域的左上角 x 坐标
                 let y1 = centerY - cutHeight / 2; // 裁剪区域的左上角 y 坐标
-                window.ctxScale.clearRect(0, 0, 200, 200);
+
+                let canvasScale = document.getElementById('canvasScale');
+                let width = canvasScale.parentNode.offsetWidth || 250;
+                let height = canvasScale.parentNode.offsetHeight || 250;
+                window.ctxScale.clearRect(0, 0, width, height);
                 // 绘制
-                window.ctxScale.drawImage(canvas, x1, y1, cutWidth, cutHeight, 0, 0, 200, 200);
+                window.ctxScale.drawImage(canvas, x1, y1, cutWidth, cutHeight, 0, 0, width, height);
             }
             if (!this.remoteHandler.param1.isOpenFastClip) {
                 return;

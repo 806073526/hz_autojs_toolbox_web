@@ -143,7 +143,7 @@ table .el-input__inner, table .el-textarea textarea {
     border-radius: 5px;
 }
 
-.el-popover{
+.indexPopper.el-popover{
     position: fixed;
     top: 50%;
     left: 50%;
