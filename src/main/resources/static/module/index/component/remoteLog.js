@@ -140,10 +140,7 @@ export default {
                 timerStorage.remove('stop');
                 let timerFlag = true;
                 files.createWithDirs("/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/")
-                // 获取当前时间字符串
-                let currenTimes = utilsObj.getCurrentTime()
                 let filePath = "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/";
-                let fileName = "log" + currenTimes + ".txt";
                 let charset = "UTF-8"; // 文件编码
                 let lineNum = ${this.onlineLogMaxLen}; // 需要读取的行数
                 // 监听文件变化
@@ -157,6 +154,9 @@ export default {
                         if (stop !== undefined) {
                             timerFlag = false;
                         }
+                        // 获取当前时间字符串
+                        let currenTimes = utilsObj.getCurrentTime()
+                        let fileName = "log" + currenTimes + ".txt";
                         let events = key.pollEvents();
                         if (events.size() > 0) {
                             for (var i = 0; i < events.size(); i++) {
