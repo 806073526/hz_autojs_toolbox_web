@@ -1,0 +1,30 @@
+.previewDivContainer{
+    border: 1px solid #dbd2d2;
+    padding: 5px;
+    border-radius: 5px;
+    height: 1500px;
+    overflow-y: scroll;
+}
+
+.previewDivContainer::-webkit-scrollbar {
+    width: 4px;
+}
+.previewDivContainer::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.previewDivContainer:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.previewDivContainer::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+
+.previewToolsDiv{
+    background: #e7f0f5;
+    padding: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}

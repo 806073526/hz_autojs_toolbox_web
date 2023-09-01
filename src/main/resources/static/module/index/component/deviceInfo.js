@@ -133,13 +133,19 @@ export default {
                     let screenCaptureOptions = images.getScreenCaptureOptions();
                     // 不为空
                     if(screenCaptureOptions){
-                        // 开启一个延时1秒关闭的点击线程 
-                        utilsObj.startRequestScreenClickTreadWait(1000);
-                        if(callback){
-                            callback();
+                        // 截图权限与当前屏幕方向相同 
+                        if(String(screenCaptureOptions.orientation) === String(utilsObj.getOrientation())){
+                            // 开启一个延时1秒关闭的点击线程 
+                            utilsObj.startRequestScreenClickTreadWait(1000);
+                            if(callback){
+                                callback();
+                            }
+                            // 已有截图权限 直接返回
+                            return;
                         }
-                        // 已有截图权限 直接返回
-                        return;
+                        // 关闭当前截图权限 
+                        images.stopScreenCapture();
+                        sleep(100);
                     }
                     // 未开启无障碍服务
                     if(!auto.service){

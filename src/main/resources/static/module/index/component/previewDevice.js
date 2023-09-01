@@ -1,4 +1,4 @@
-import {getContext,handlerAppByCacheChange,sortByKey} from "./../../../utils/utils.js";
+import {getContext, handlerAppByCacheChange, sortByKey} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
@@ -48,6 +48,16 @@ export default {
                 valueUpdateAfterAutoPreview: false,
                 operateRecord: ''
             },
+            previewImageWidth: 50,
+            noPreviewImg: true,
+            isActive:false,
+            arrowArr:{
+                commonParam:true,
+                otherParam:true,
+                scriptPreview:true,
+                jsonParam:true,
+                otherOperate:true
+            },
             previewBlobUrl: null,
             // 当前选择的预览方式
             selectPreviewType:"imgInterface",
@@ -55,7 +65,7 @@ export default {
             textContent: '',// 文本信息传输
             textIndex: null, // 文本传输序号
             textType: 'text',// 文本传输类型
-            previewActiveName: 'previewParam',
+            previewActiveName: 'noticeMessage',
             openNoticeMessageListenerFlag: false,
             messagePushChannel:[],// 消息推送渠道
             noticeListenerRules: [],// 通知监听规则
@@ -95,7 +105,29 @@ export default {
           return !notCompleted;
       }
     },
+    watch:{
+        previewImageWidth(val){
+            window.localStorage.setItem("preview_previewImageWidth",val || 50);
+        },
+        devicePreviewParam:{
+            handler(val){
+                window.localStorage.setItem("preview_devicePreviewParam",JSON.stringify(val));
+            },
+            immediate: true, // 立即触发一次
+            deep: true // 可以深度检测到  对象的属性值的变化
+        }
+    },
     mounted(){
+        // 处理宽度缓存
+        this.previewImageWidth = window.localStorage.getItem("preview_previewImageWidth") || 50;
+        // 处理预览参数缓存
+        let devicePreviewParam = window.localStorage.getItem("preview_devicePreviewParam");
+        if(devicePreviewParam){
+            let devicePreviewParamObj =  JSON.parse(devicePreviewParam);
+            if(devicePreviewParamObj){
+                this.devicePreviewParam = devicePreviewParamObj;
+            }
+        }
         window.removeEventListener('resize',this.allScreenPreviewChange);
         window.addEventListener('resize',this.allScreenPreviewChange);
     },
@@ -105,11 +137,11 @@ export default {
     methods: {
         allScreenPreviewChange() {
             if (!!document.fullscreenElement) {
-                $("#devicePreviewImg").css("height", "100%");
                 $("#allScreenDiv").show();
+                $("#devicePreviewImg").css("width","auto");
             } else {
-                $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
                 $("#allScreenDiv").hide();
+                $("#devicePreviewImg").css("width","100%");
             }
         },
         controlPanelOpenChange(){
@@ -159,6 +191,7 @@ export default {
                 window.deviceImgUrl = 'data:image/png;base64,' + cacheData;
             }
             $("#devicePreviewImg").attr("src", window.deviceImgUrl);
+            this.noPreviewImg = false;
             window.deviceImgUrlBak = window.deviceImgUrl;
         },
         // 开始预览设备web监听方法
@@ -170,8 +203,6 @@ export default {
                     duration: '500'
                 })
             }
-            $("#devicePreviewImg").css("height", this.devicePreviewParam.previewHeight + "px");
-
             if("websocket" === this.refreshType){
                 window.ZXW_VUE.$EventBus.$off('refreshPreviewImg',this.refreshPreviewImgFun);
                 window.ZXW_VUE.$EventBus.$on('refreshPreviewImg', this.refreshPreviewImgFun);
@@ -1002,7 +1033,7 @@ export default {
                 return
             }
             let operateCode = operateName + '()';
-            this.devicePreviewParam.operateRecord += operateCode + ";";
+            // this.devicePreviewParam.operateRecord += operateCode + ";";
             this.remoteExecuteScript(operateCode);
         },
         // 设备鼠标点击
@@ -1028,7 +1059,7 @@ export default {
             }
             let operateCode = 'click(' + this.deviceMousePosition.x + ',' + this.deviceMousePosition.y + ')';
             this.remoteExecuteScript(operateCode);
-            this.devicePreviewParam.operateRecord += operateCode + ";";
+            // this.devicePreviewParam.operateRecord += operateCode + ";";
         },
         // 灵敏模式按下事件
         fastModelDown(eventType){
@@ -1223,14 +1254,14 @@ export default {
                         let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
                         // 拼接操作代码
                         let operateCode =  `gesture(${duration},${otherPoints})`;
-                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                        // this.devicePreviewParam.operateRecord += operateCode + ";";
                         // 发送滑动指令
                         this.remoteExecuteScript(operateCode);
                         window.deviceGestures = [];
                         return;
                     }
                     let operateCode = 'swipe(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ',' + window.deviceTouchX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceTouchEndTime - window.deviceTouchStartTime) + ')';
-                    this.devicePreviewParam.operateRecord += operateCode + ";";
+                    // this.devicePreviewParam.operateRecord += operateCode + ";";
                     // 发送滑动指令
                     this.remoteExecuteScript(operateCode);
                     // 坐标相同
@@ -1241,13 +1272,13 @@ export default {
                             return
                         }
                         let operateCode = 'longClick(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ')';
-                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                        // this.devicePreviewParam.operateRecord += operateCode + ";";
                         // 发送长按指令
                         this.remoteExecuteScript(operateCode);
                     } else {
                         let operateCode = 'click(' + this.deviceMousePosition.x + ',' + this.deviceMousePosition.y + ')';
                         this.remoteExecuteScript(operateCode);
-                        this.devicePreviewParam.operateRecord += operateCode + ";";
+                        // this.devicePreviewParam.operateRecord += operateCode + ";";
                     }
                 }
             }
@@ -1424,14 +1455,14 @@ export default {
                     let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
                     // 拼接操作代码
                     let operateCode =  `gesture(${duration},${otherPoints})`;
-                    this.devicePreviewParam.operateRecord += operateCode + ";";
+                    // this.devicePreviewParam.operateRecord += operateCode + ";";
                     // 发送滑动指令
                     this.remoteExecuteScript(operateCode);
                     window.deviceGestures = [];
                     return;
                 }
                 let operateCode = 'swipe(' + window.deviceMouseX1 + ',' + window.deviceMouseY1 + ',' + window.deviceMouseX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceMouseEndTime - window.deviceMouseStartTime) + ')';
-                this.devicePreviewParam.operateRecord += operateCode + ";";
+                // this.devicePreviewParam.operateRecord += operateCode + ";";
                 // 发送滑动指令
                 this.remoteExecuteScript(operateCode);
                 // 坐标相同
@@ -1442,7 +1473,7 @@ export default {
                         return
                     }
                     let operateCode = 'longClick(' + window.deviceMouseX1 + ',' + window.deviceMouseY1 + ')';
-                    this.devicePreviewParam.operateRecord += operateCode + ";";
+                    // this.devicePreviewParam.operateRecord += operateCode + ";";
                     // 发送长按指令
                     this.remoteExecuteScript(operateCode);
                 }

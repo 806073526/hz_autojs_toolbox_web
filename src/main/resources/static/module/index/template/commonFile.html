@@ -8,10 +8,10 @@
             <div class="d-flex j-sb a-center width100">
                 <div class="d-flex a-center flex-wrap">
                     <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="uploadFileClick">上传文件</el-button>
-                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" @click="createFolder">新建文件夹</el-button>
+                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="createFolder">新建文件夹</el-button>
                     <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="initPackPlugins">初始化打包插件</el-button>
-                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"   @click="settingJre">JAVA环境变量</el-button>
-                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  @click="openCustomSignDialog">自定义签名</el-button>
+                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="settingJre">JAVA环境变量</el-button>
+                    <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary"  @click="openCustomSignDialog">自定义签名</el-button>
                 </div>
                 <input ref="commonInput" style="display: none;" type="file" name="file" :multiple="true" :accept="accept" @change="handleChange">
             </div>

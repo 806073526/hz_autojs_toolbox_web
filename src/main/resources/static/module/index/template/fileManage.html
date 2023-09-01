@@ -169,9 +169,9 @@
 
                             </el-dropdown-menu>
                         </el-dropdown>-->
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript()">运行当前项目</el-button>
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">停止全部程序</el-button>
-                        <el-button size="medium" v-if="!phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行当前项目</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止全部程序</el-button>
+                        <el-button size="medium" v-if="!phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                             <el-button size="medium" type="primary" >
                                 Node相关<i class="el-icon-arrow-down el-icon--right"></i>
@@ -184,7 +184,7 @@
                                 <el-dropdown-item @click.native.prevent.stop="termuxInitNode">Termux初始化Node环境</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phonePackageProject">打包项目</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phonePackageProject">打包项目</el-button>
                         <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
                         <!--<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
                     </div>
@@ -338,19 +338,19 @@
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="应用名称:" prop="appName" class="" label-width="100px">
+                            <el-form-item label="应用名称:" prop="appName" class="delStar flex-1" label-width="100px">
                                 <el-input v-model="packageProject.appName" placeholder="请输入应用名称"
                                           class="width100" />
                             </el-form-item>
-                            <el-form-item label="应用包名:" prop="packageName" class="" label-width="100px" style="width: 33%;">
+                            <el-form-item label="应用包名:" prop="packageName" class="delStar flex-1" label-width="100px">
                                 <el-input v-model="packageProject.packageName" placeholder="请输入应用包名"
                                           class="width100" />
                             </el-form-item>
-                            <el-form-item label="版本名称:" prop="versionName" class="delStar" label-width="100px">
+                            <el-form-item label="版本名称:" prop="versionName" class="delStar flex-1" label-width="100px">
                                 <el-input v-model="packageProject.versionName" placeholder="请输入版本名称"
                                           class="width100" />
                             </el-form-item>
-                            <el-form-item label="版本号:" prop="versionCode" class="delStar" label-width="100px">
+                            <el-form-item label="版本号:" prop="versionCode" class="delStar flex-1" label-width="100px">
                                 <el-input v-model="packageProject.versionCode" placeholder="请输入版本号"
                                           class="width100" />
                             </el-form-item>
@@ -358,11 +358,12 @@
                     </el-row>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="应用图标:" prop="appIcon" class="delStar" label-width="100px" style="width: 33%;">
-                                <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径"
-                                          class="width100" />
+                            <el-form-item label="应用图标:" prop="appIcon" class="delStar" label-width="100px" style="width: 25%;">
+                                <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径,不填为默认图"
+                                          class="width100">
+                                    <el-button v-loading="appIconLoading" slot="append" icon="el-icon-search" @click.stop="previewIconByPath(packageProject.appIcon,'appIcon')"></el-button>
+                                </el-input>
                             </el-form-item>
-                            <span v-loading="appIconLoading" style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.appIcon,'appIcon')">预览</span>
                         </div>
                     </el-row>
                     <p class="basicInfo">
@@ -370,16 +371,7 @@
                     </p>
                     <el-row>
                         <div class="width100 d-flex a-center">
-                            <el-form-item label="NodeJs:" prop="openNodeJs" class="" label-width="100px">
-                                <el-switch v-model="packageProject.openNodeJs" class="width100"/>
-                            </el-form-item>
-                            <el-form-item label="图色模块:" prop="openImageModule" class="" label-width="100px">
-                                <el-switch v-model="packageProject.openImageModule" class="width100"/>
-                            </el-form-item>
-                            <el-form-item label="开机自启动:" prop="autoOpen" class="" label-width="100px">
-                                <el-switch v-model="packageProject.autoOpen" class="width100"/>
-                            </el-form-item>
-                            <el-form-item label="CPU架构:" prop="abis" class="width50" label-width="100px" style="margin-left: 30px;">
+                            <el-form-item label="CPU架构:" prop="abis" class="flex-1" label-width="100px">
                                 <el-checkbox-group v-model="packageProject.abis">
                                     <el-checkbox label="arm64-v8a">
                                         arm64-v8a
@@ -388,6 +380,15 @@
                                         armeabi-v7a
                                     </el-checkbox>
                                 </el-checkbox-group>
+                            </el-form-item>
+                            <el-form-item label="NodeJs:" prop="openNodeJs" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.openNodeJs" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="图色模块:" prop="openImageModule" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.openImageModule" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="开机自启动:" prop="autoOpen" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.autoOpen" class="width100"/>
                             </el-form-item>
                         </div>
                     </el-row>
@@ -423,28 +424,39 @@
                             </el-form-item>
                         </div>
                     </el-row>
-
                     <p class="basicInfo">
                         运行配置
                     </p>
                     <el-row>
-                        <div class="width100 d-flex a-center">
-                            <el-form-item label="隐藏日志:" prop="hideLogs" class="" label-width="100px">
-                                <el-switch v-model="packageProject.hideLogs" class="width100"/>
-                            </el-form-item>
-                            <el-form-item label="启动界面文本:" prop="splashText" class="" label-width="100px" style="margin-left: 30px;">
+                        <div class="width100 d-flex a-center j-start">
+                            <el-form-item label="启动界面文本:" prop="splashText" class="delStar width25" label-width="100px">
                                 <el-input v-model="packageProject.splashText" placeholder="请输入启动界面文本"
                                           class="width100" />
                             </el-form-item>
-                            <el-form-item label="启动界面图:" prop="splashIcon" class="delStar" label-width="100px" style="margin-left: 30px;width: 30%;">
-                                <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径"
-                                          class="width100" />
+                            <el-form-item label="启动界面图:" prop="splashIcon" class="delStar width25" label-width="100px">
+                                <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径,不填为默认图"
+                                          class="width100" style="margin-top: 4px;" >
+                                    <i v-loading="splashIconLoading" slot="append" style="cursor:pointer;" class="el-icon-search" @click.stop="previewIconByPath(packageProject.splashIcon,'splashIcon')"></i>
+                                </el-input>
                             </el-form-item>
-                            <span v-loading="splashIconLoading" style="display: flex;margin-bottom: 15px;margin-left: 15px;cursor: pointer;" @click.stop="previewIconByPath(packageProject.splashIcon,'splashIcon')">预览</span>
+                            <el-form-item label="隐藏日志:" prop="hideLogs" class="delStar width25" label-width="100px">
+                                <el-switch v-model="packageProject.hideLogs" class="width100"/>
+                            </el-form-item>
                         </div>
                     </el-row>
+                    <p class="basicInfo">
+                        混淆加密
+                    </p>
                     <el-row>
-
+                        <div class="d-flex" style="width: 100%;flex-direction: column;">
+                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width100" label-width="100px">
+                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
+                            </el-form-item>
+                            <el-form-item class="width100" v-show="packageProject.openObfuscator">
+                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
+                                          class="width100" :rows="4" style="margin-left: 15px;" />
+                            </el-form-item>
+                        </div>
                     </el-row>
                     <p class="basicInfo">
                         签名
@@ -457,21 +469,6 @@
                                         {{item}}
                                     </el-radio>
                                 </el-radio-group>
-                            </el-form-item>
-                        </div>
-                    </el-row>
-                    <p class="basicInfo">
-                        混淆加密
-                    </p>
-                    <el-row>
-                        <div class=" d-flex a-center" style="width: 50%;">
-                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width25" label-width="100px">
-                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
-                                <div style="margin-left: -70px;">混淆排除目录:</div>
-                            </el-form-item>
-                            <el-form-item label="" prop="obfuscatorIncludePaths" class="width75" >
-                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
-                                          class="width100" :rows="4" />
                             </el-form-item>
                         </div>
                     </el-row>

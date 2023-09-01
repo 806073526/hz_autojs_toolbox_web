@@ -83,7 +83,7 @@ export default {
                     layoutAnalysisRangeOption:[
 
                         {label:'活跃窗口', value:'active',},
-                        {label:'全部窗口(限制应用暂不支持)', value:'all',},
+                        {label:'全部窗口', value:'all',},
                     ],
                 }
             },
