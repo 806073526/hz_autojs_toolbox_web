@@ -133,19 +133,6 @@
                 <div class="d-flex j-sb a-center width100">
                     <div class="d-flex a-center flex-wrap">
                         <el-button size="medium" type="primary"  style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
-                        <!--
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitSyncDir">初始化同步目录</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficialExample">初始化官方示例</el-button>
-						<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitOfficalShopExample">初始化商店示例</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneDownLoadGameScript">初始化脚手架项目</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneDownLoadImageExampleScript">初始化图色示例项目</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneInitFile">初始化运行程序</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteRunScript">远程运行程序</el-button>
-                        <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneRemoteStopScript">远程停止程序</el-button>
-                        <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneJs2Dex">js转dex</el-button>
--->
-
-
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                             <el-button size="medium" type="primary">
                                 初始化示例<i class="el-icon-arrow-down el-icon--right"></i>
@@ -158,17 +145,6 @@
                                 <el-dropdown-item @click.native.prevent.stop="phoneDownLoadImageExampleScript">初始化图色示例项目</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <!--<el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
-                           <el-button size="medium" type="primary">
-                               远程程序<i class="el-icon-arrow-down el-icon--right"></i>
-                           </el-button>
-                           <el-dropdown-menu slot="dropdown">
-                              <el-dropdown-item @click.native.prevent.stop="phoneInitFile">初始化运行程序</el-dropdown-item>
-                               <el-dropdown-item @click.native.prevent.stop="phoneRemoteRunScript">远程运行程序</el-dropdown-item>
-                                <el-dropdown-item @click.native.prevent.stop="phoneRemoteStopScript">远程停止程序</el-dropdown-item>
-
-                            </el-dropdown-menu>
-                        </el-dropdown>-->
                         <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行当前项目</el-button>
                         <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止全部程序</el-button>
                         <el-button size="medium" v-if="!phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
@@ -186,7 +162,73 @@
                         </el-dropdown>
                         <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phonePackageProject">打包项目</el-button>
                         <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
-                        <!--<el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="primary" @click="phoneAutoJsToolHotUpdate">远程更新工具箱APP</el-button>-->
+                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
+                            <div>
+                                <b>web端同步路径:</b>
+                                <span>当前web端所在路径,修改路径会进行同步跳转</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>手机端同步路径:</b>
+                                <span>当前手机端所在路径,修改路径会进行同步跳转</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>同步到手机端:</b>
+                                <span>将当前web同步路径下的所有内容同步到手机端的同步路径下(文件夹不会递归同步,如有同步项目需求,建议先压缩zip后再同步)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>同步到web端:</b>
+                                <span>将当前手机端同步路径下的所有内容同步到web端的同步路径下(文件夹不会递归同步,如有同步项目需求,建议先压缩zip后再同步)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>新建文件(夹):</b>
+                                <span>手机端新建文件夹需要以/结尾。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>初始化示例:</b>
+                                <span>系统提供了许多内置示例项目,可进行参考学习。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>运行当前项目:</b>
+                                <span>运行手机端同步路径所在项目。(以手机端同步路径为基础向上寻找project.json对应的main入口文件,然后运行该js)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>停止全部程序:</b>
+                                <span>停止手机端除工具箱核心脚本外的所有其他脚本引擎。(如果要停止某一个引擎,可到设备预览-运行中脚本进行关闭)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>Node相关:</b>
+                                <span>手机上运行Node脚本需要做的操作。(核心依赖Termux工具,群文件下载改包apk)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>打包项目:</b>
+                                <span>首先必须购买WEB端打包套餐进行授权,然后需要初始化打包插件,配置JAVA环境变量,生成自定义签名。(打包默认是Pro9.3.11的功能,可以支持Pro8.8.22和其他版本,需要自己反编译APK生成打包模板。)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>面包屑导航:</b>
+                                <span>点击功能按钮下方面包屑导航,可刷新选择目录。(自动记录最后一次选择目录)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>手机端文件常用操作:</b>
+                                <span><br/>1、勾选复选框批量复制、批量移动、批量删除、批量同步;<br/>
+                                      2、单个文件(夹)下载、压缩、子文件压缩、重命名、删除、同步;<br/>
+                                      3、双击编辑js、txt、json、ts、mjs、html、css等文本文件,预览图片文件。
+                                </span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>文本编辑器:</b>
+                                <span><br/>
+                                      1、同时打开多个文件,显示路径文件路径。<br/>
+                                      2、关闭时文件已修改未保存提示。<br/>
+                                      3、autojs代码补全支持,以及自定义代码提示。<br/>
+                                      4、右键自动代码格式化。<br/>
+                                      5、按键功能支持【刷新】【保存】【运行单个js】【运行项目】【停止全部】【最小化】。<br/>
+                                      6、快捷键支持【切换tab ctrl+0】【保存 ctrl+s】【运行当前项目ctrl+i】【运行当前文件 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】。
+                                </span>
+                            </div>
+                        </el-popover>
                     </div>
                 </div>
             </el-row>

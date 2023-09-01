@@ -12,7 +12,36 @@
                     <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="initPackPlugins">初始化打包插件</el-button>
                     <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;"  type="primary" @click="settingJre">JAVA环境变量</el-button>
                     <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="primary"  @click="openCustomSignDialog">自定义签名</el-button>
+                    <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                    </span>
                 </div>
+                <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
+                    <div>
+                        <b>上传文件:</b>
+                        <span>点击上传文件按钮或者拖拽文件到表格区域上传。</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>初始化打包插件:</b>
+                        <span>web端打包依赖插件,点击初始化打包插件购买授权后下载插件包,再将zip上传到根目录,再次点击初始化打包插件,点击根目录刷新文件等待解压完成。(如果解压失败,可打开右上角系统设置,开启公共文件编辑后,删除插件包,然后重新上传)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>JAVA环境变量:</b>
+                        <span>初始化打包插件后进行设置,如果安装环境配置了JAVA_HOME,则可以清空配置读取默认JAVA_HOME,如果安装环境没有配置JAVA_HOME,可以设置为exe所在同级的jre目录。(环境变量不正确会影响WEB端打包功能)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>自定义签名:</b>
+                        <span>初始化打包插件后进行设置,WEB端打包需要先生成签名。</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>customPrompt.json文件:</b>
+                        <span>代码编辑器的自定义提示配置,参考文件中的示例进行配置,打开代码编辑器写代码时会自动补全。(修改配置后,重新加载页面生效)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>deviceAliasName.json文件:</b>
+                        <span>设备别名设置,对应设备uuid配置别名,可用于区分设备。</span>
+                    </div>
+                </el-popover>
                 <input ref="commonInput" style="display: none;" type="file" name="file" :multiple="true" :accept="accept" @change="handleChange">
             </div>
         </el-row>
@@ -84,8 +113,8 @@
                         </div>
                         <div class="operate d-flex a-center j-center" style="flex:2;">
                             <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-bottom: 5px;color: blue; " @click="downloadFile(item)">下载</el-link>
-                            <el-link v-show="allowOperateFile(item) && item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
-                            <el-link v-show="allowOperateFile(item) && item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.isDirectory" style="margin-left: 20px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
+                            <el-link v-show="allowOperateFile(item) && item.fileType==='zip'" style="margin-left: 20px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
                             <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 20px;margin-bottom: 5px;color: blue;" @click="reName(item)">重命名</el-link>
                             <el-link v-show="allowOperateFile(item)" :underline="false" type="info" style="margin-left: 20px;margin-bottom: 5px;color: red;" @click="removeFile(item)">删除</el-link>
                         </div>

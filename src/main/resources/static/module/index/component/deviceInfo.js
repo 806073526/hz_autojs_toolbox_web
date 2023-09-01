@@ -26,6 +26,7 @@ export default {
             showRefresh:true,
             systemConfig:{
                 deviceStatusNotice: true,
+                allowOperateFile: false,
                 lastSelectDeviceUuid: ""
             },
             systemSettingDialog: false,
@@ -43,12 +44,31 @@ export default {
             }
         }
     },
+    computed:{
+        allowOperateFile(){
+            return this.systemConfig.allowOperateFile;
+        }
+    },
+    watch:{
+        systemConfig:{
+            handler(val){
+                window.localStorage.setItem("systemConfig",JSON.stringify(val));
+                // 参数发生变化 重新初始化公共文件模块
+                if(val.allowOperateFile !== window.allowOperateFile){
+                    window.ZXW_VUE.$EventBus.$emit('initModule', "commonFile");
+                }
+                window.allowOperateFile = val.allowOperateFile;
+            },
+            /*immediate: true, // 立即触发一次*/
+            deep: true // 可以深度检测到  对象的属性值的变化
+        }
+    },
     mounted() {
         let systemConfigCache = window.localStorage.getItem("systemConfig");
         if(systemConfigCache){
             let systemConfigObj = JSON.parse(systemConfigCache);
-            if(systemConfigObj.deviceStatusNotice!=null){
-                this.systemConfig.deviceStatusNotice = systemConfigObj.deviceStatusNotice;
+            if(systemConfigObj){
+                this.systemConfig = systemConfigObj;
             }
         }
         this.getOnlineDevice();
@@ -232,8 +252,7 @@ export default {
           this.systemConfig.lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
           this.systemSettingDialog  = true;
         },
-        deviceStatusNoticeChange(){
-            window.localStorage.setItem("systemConfig",JSON.stringify(this.systemConfig));
+        systemConfigChange(){
             window.ZXW_VUE.$notify.success({message: '修改成功', duration: '1000'});
         },
         //上线处理

@@ -209,6 +209,17 @@ window.ZXW_VUE = new Vue({
                 return false;
             }
         },false);
+
+        let interval = setInterval(()=>{
+            if(window.ZXW_VUE.$EventBus){
+                window.ZXW_VUE.$EventBus.$off('initModule',this.initModule);
+                window.ZXW_VUE.$EventBus.$on('initModule', this.initModule);
+                clearInterval(interval);
+            }
+        },1000);
+        setTimeout(()=>{
+             clearInterval(interval);
+        },10000)
     },
     provide() {
         return {
@@ -235,6 +246,14 @@ window.ZXW_VUE = new Vue({
         }
     },
     methods: {
+        initModule(moduleName){
+            this.$nextTick(()=>{
+                // 执行页面组件初始化方法
+                if(this.$refs[moduleName] && this.$refs[moduleName].init){
+                    this.$refs[moduleName].init()
+                }
+            })
+        },
         changeShowWindowLog(){
           this.showWindowLog=!this.showWindowLog;
         },

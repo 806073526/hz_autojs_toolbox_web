@@ -92,6 +92,55 @@
                 <el-button @click.stop="refreshCaptureScreen">
                     刷新截图权限
                 </el-button>
+                <span v-popover:popover10 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                  <i class="el-icon-question" />
+                </span>
+                <el-popover ref="popover10" placement="top-start" width="600" trigger="hover">
+                    <div>
+                        <b>服务端授权:</b>
+                        <span>目前只影响web端打包功能,未授权不支持打包。</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>已连接设备列表:</b>
+                        <span>加载当前连接服务端的app设备,可通过公共文件-deviceAliasName.json设置别名。(最后一次连接设备,当APP建立连接后,web页面自动连接)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>标准宽度:</b>
+                        <span>默认读取设备宽度。(基于游戏脚本脚手架,编写多分辨率图色脚本时需要用到该参数)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>标准高度:</b>
+                        <span>默认读取设备高度。(基于游戏脚本脚手架,编写多分辨率图色脚本时需要用到该参数)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>x偏移系数:</b>
+                        <span>默认0,当前设备不是标准分辨率时,横向坐标轴进行双向偏移的系数值。(基于游戏脚本脚手架,编写多分辨率图色脚本时需要用到该参数)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>y偏移系数:</b>
+                        <span>默认0,当前设备不是标准分辨率时,纵向坐标轴进行双向偏移的系数值。(基于游戏脚本脚手架,编写多分辨率图色脚本时需要用到该参数)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>调试延时:</b>
+                        <span>开启调试模式后,调用封装图色api进行测试时,屏幕绘制匹配框延时一定时间后消失。(工具箱运行图像处理生成代码、游戏脚本脚手架代码)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>调试模式:</b>
+                        <span>开启调试模式后,调用封装图色api进行测试时,屏幕绘制匹配框,增加延时消失,产生更多输出日志,远程执行代码显示。(增强调试代码功能)</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>同步到APP:</b>
+                        <span>左侧常用参数同步到APP端</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>从APP同步:</b>
+                        <span>从APP端将这些参数同步到web显示</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>刷新截图权限:</b>
+                        <span>进行远程截图操作时,意外导致截图权限异常,可使用此功能重新请求截图权限。(设备预览、图像处理、布局分析)</span>
+                    </div>
+                </el-popover>
             </div>
         </div>
     </el-row>
@@ -104,9 +153,9 @@
             >
         <div style="height: 300px;padding-top: 15px;">
             <el-row class="d-flex">
-                   <el-form-item label="设备状态通知:" label-width="100px"  class="flex-1">
+                   <el-form-item label="设备状态通知:" label-width="130px"  class="flex-1">
                        <div class="d-flex a-center j-start" style="height: 40px;">
-                        <el-switch  v-model="systemConfig.deviceStatusNotice" @change="deviceStatusNoticeChange" style="margin-right: 5px;"/>
+                        <el-switch  v-model="systemConfig.deviceStatusNotice" @change="systemConfigChange" style="margin-right: 5px;"/>
                         <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
@@ -120,6 +169,21 @@
                             是否显示APP的设备上线和离线通知,开启后,APP连接服务端和断开服务端均会在右下角显示通知。
                         </div>
                     </el-popover>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="公共文件允许编辑:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.allowOperateFile" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover2 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover2" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启编辑后,可以修改删除公共文件中全部文件
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
             </el-row>
         </div>
         <span slot="footer" class="dialog-footer">

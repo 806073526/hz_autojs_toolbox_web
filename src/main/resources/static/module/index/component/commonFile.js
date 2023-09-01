@@ -166,7 +166,7 @@ export default {
         // 允许批量操作文件
         allowBatchOperateFile(){
             let flag = true;
-            let allowOperateFile = urlParam("allowOperateFile");
+            let allowOperateFile = urlParam("allowOperateFile") || window.allowOperateFile;
             if(allowOperateFile){
                 return true;
             }
@@ -182,7 +182,7 @@ export default {
         // 允许保存文件
         allowSaveFile(){
             let flag = true;
-            let allowOperateFile = urlParam("allowOperateFile");
+            let allowOperateFile = urlParam("allowOperateFile") || window.allowOperateFile;
             if(allowOperateFile){
                 return true;
             }
@@ -513,7 +513,7 @@ export default {
         // 允许复选框勾选文件
         allowCheckFile(item){
             let flag = true;
-            let allowOperateFile = urlParam("allowOperateFile");
+            let allowOperateFile = urlParam("allowOperateFile") || window.allowOperateFile;
             if(allowOperateFile){
                 return true;
             }
@@ -530,7 +530,7 @@ export default {
         allowOperateFile(item){
 
             let flag = true;
-            let allowOperateFile = urlParam("allowOperateFile");
+            let allowOperateFile = urlParam("allowOperateFile")  || window.allowOperateFile;
             if(allowOperateFile){
                 return true;
             }
@@ -543,15 +543,15 @@ export default {
         },
         // 初始化方法
         init() {
-            if(!this.isInit){
+            // if(!this.isInit){
                 let relativeFilePath = this.webCommonPath;
                 if(relativeFilePath){
                     // 加载文件列表
                     this.queryFileList(relativeFilePath);
                     this.breadcrumbList = [{label: '根目录', value: this.webCommonPath}]
                 }
-            }
-            this.isInit = true;
+            // }
+            // this.isInit = true;
         },
         // 取消上传
         cancelUpload(i) {
