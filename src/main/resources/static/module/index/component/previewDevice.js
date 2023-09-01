@@ -70,11 +70,13 @@ export default {
             messagePushChannel:[],// 消息推送渠道
             noticeListenerRules: [],// 通知监听规则
             noticeListenerName:'noticeListenerRules.json',// 通知监听名称
+            defaultNoticeListenerName:'defaultNoticeListenerRules', // 默认监听规则名称
             historyNoticeMessageList:[],// 历史通知消息列表
             historyNoticeLoading:false,
             refreshType: "websocket",// 刷新类型 interval websocket
             scriptArr:[],// 脚本数组
             scriptLoading:false,
+            historyNoticeMessageLoading:false,
             timerTaskArr:[],
             timerTaskLoading:false,
             tableDefaultRowMap: {// 默认行数据
@@ -107,27 +109,37 @@ export default {
     },
     watch:{
         previewImageWidth(val){
-            window.localStorage.setItem("preview_previewImageWidth",val || 50);
+            if(this.deviceInfo.deviceUuid){
+                window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_previewImageWidth",val || 50);
+            }
+        },
+        messagePushChannel:{
+            handler(val){
+                if(this.deviceInfo.deviceUuid){
+                    window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_messagePushChannel",val ? val.join(',') : '');
+                }
+            },
+            immediate: true, // 立即触发一次
+            deep: true // 可以深度检测到  对象的属性值的变化
+        },
+        noticeListenerRules:{
+            handler(val){
+                this.saveToDraft();
+            },
+            immediate: true, // 立即触发一次
+            deep: true // 可以深度检测到  对象的属性值的变化
         },
         devicePreviewParam:{
             handler(val){
-                window.localStorage.setItem("preview_devicePreviewParam",JSON.stringify(val));
+                if(this.deviceInfo.deviceUuid) {
+                    window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_devicePreviewParam", JSON.stringify(val));
+                }
             },
             immediate: true, // 立即触发一次
             deep: true // 可以深度检测到  对象的属性值的变化
         }
     },
     mounted(){
-        // 处理宽度缓存
-        this.previewImageWidth = window.localStorage.getItem("preview_previewImageWidth") || 50;
-        // 处理预览参数缓存
-        let devicePreviewParam = window.localStorage.getItem("preview_devicePreviewParam");
-        if(devicePreviewParam){
-            let devicePreviewParamObj =  JSON.parse(devicePreviewParam);
-            if(devicePreviewParamObj){
-                this.devicePreviewParam = devicePreviewParamObj;
-            }
-        }
         window.removeEventListener('resize',this.allScreenPreviewChange);
         window.addEventListener('resize',this.allScreenPreviewChange);
     },
@@ -135,6 +147,28 @@ export default {
         window.removeEventListener('resize',this.allScreenPreviewChange);
     },
     methods: {
+        init(){
+            if (this.deviceInfo.deviceUuid) {
+                // 处理宽度缓存
+                this.previewImageWidth = window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_previewImageWidth") || 50;
+                // 处理消息推送渠道
+                this.messagePushChannel = (window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_messagePushChannel") || "").split(",");
+                // 处理预览参数缓存
+                let devicePreviewParam = window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_devicePreviewParam");
+                if(devicePreviewParam){
+                    let devicePreviewParamObj =  JSON.parse(devicePreviewParam);
+                    if(devicePreviewParamObj){
+                        this.devicePreviewParam = devicePreviewParamObj;
+                    }
+                }
+                // 从缓存读取通知监听规则
+                this.readForDraft();
+                // 查询脚本
+                this.queryScript();
+                // 查询定时任务
+                this.queryTimerTask();
+            }
+        },
         allScreenPreviewChange() {
             if (!!document.fullscreenElement) {
                 $("#allScreenDiv").show();
@@ -761,27 +795,20 @@ export default {
         },
         // 保存到草稿
         saveToDraft(){
-            if(!this.noticeListenerName){
-                window.ZXW_VUE.$message.warning('请设置规则名称');
-                return false;
+            if(this.deviceInfo.deviceUuid){
+                let notCompleted =this.noticeListenerRules.find(item=> JSON.stringify(item) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"]));
+                if(notCompleted){
+                    return false;
+                }
+                window.localStorage.setItem("noticeListenerRules_"+ this.deviceInfo.deviceUuid + "_" + this.defaultNoticeListenerName,JSON.stringify(this.noticeListenerRules));
             }
-            let notCompleted =this.noticeListenerRules.find(item=> JSON.stringify(item) === JSON.stringify(this.tableDefaultRowMap["noticeListenerRules"]));
-            if(notCompleted){
-                window.ZXW_VUE.$message.warning('请将规则填写完整');
-                return false;
-            }
-            window.localStorage.setItem("noticeListenerRules_"+this.noticeListenerName,JSON.stringify(this.noticeListenerRules));
-            window.ZXW_VUE.$notify.success({message: '保存草稿成功', duration: '1000'});
         },
         // 从草稿读取
         readForDraft(){
-            if(!this.noticeListenerName){
-                window.ZXW_VUE.$message.warning('请设置规则名称');
-                return false;
+            if(this.deviceInfo.deviceUuid){
+                let noticeListenerRulesJson = window.localStorage.getItem("noticeListenerRules_"+this.deviceInfo.deviceUuid + "_" +this.defaultNoticeListenerName);
+                this.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
             }
-            let noticeListenerRulesJson = window.localStorage.getItem("noticeListenerRules_"+this.noticeListenerName);
-            this.noticeListenerRules = noticeListenerRulesJson ? JSON.parse(noticeListenerRulesJson) : [];
-            window.ZXW_VUE.$notify.success({message: '读取草稿成功', duration: '1000'});
         },
         // 存为文件
         saveToFile(){
@@ -874,6 +901,8 @@ export default {
                 remoteScript = 'input(' + param + ')';
             }
             this.remoteExecuteScript(remoteScript);
+            // 发送完成后置空输入
+            this.textContent = "";
         },
         // 远程脚本查询
         queryRemoteScript() {
@@ -890,6 +919,7 @@ export default {
         // 消息通知查询
         queryNoticeMessage() {
             let _that = this;
+            this.historyNoticeMessageLoading = true;
             $.ajax({
                 url: getContext() + "/attachmentInfo/queryNoticeMessageByKey",
                 type: "GET",
@@ -914,9 +944,11 @@ export default {
                         }
                     }
                     setTimeout(() => {
+                        _that.historyNoticeMessageLoading = false;
                     }, 200)
                 },
                 error: function (msg) {
+                    _that.historyNoticeMessageLoading = false;
                 }
             });
         },

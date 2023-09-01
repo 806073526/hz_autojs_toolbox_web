@@ -27,18 +27,18 @@
                                 竖屏方向
                             </el-radio>
                         </el-radio-group>
-                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
-                          <i class="el-icon-question" />
-                        </span>
-                        <div style="margin-left: 5px;">
+                        <div style="margin-left: 10px;">
                             <span class="mousePositionX">
                                  x:{{deviceMousePosition.x }}
                             </span>
-                                    <span class="mousePositionY">
+                            <span class="mousePositionY">
                                 y:{{deviceMousePosition.y}}
                             </span>
                         </div>
-                        <el-popover ref="popover1" placement="top-start" width="400" trigger="hover">
+                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
                             <div>
                                 <b>全屏预览:</b>
                                 <span>设备操作区域全屏显示。</span>
@@ -55,14 +55,61 @@
                                 <b>屏幕方向:</b>
                                 <span>所选设备的屏幕方向,手机端旋转屏幕时,会自动监听变化。(如果监听失效,可手动修改)</span>
                             </div>
+                            <div style="margin-top: 10px;">
+                                <b>APP刷新:</b>
+                                <span>预览图像的频率,数值越低刷新频率越高,越占用带宽。(局域网可以设置为30,部署公网带宽低的不建议设置过低)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>预览质量:</b>
+                                <span>预览图像的压缩质量,数值越低图像越模糊,响应速度越快。(最大值为100,默认10,为提高响应速度可设置为6)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>缩放倍数:</b>
+                                <span>预览图像的缩放备注,数值越低图像越模糊,响应速度越快。(默认为1,不缩放,为提高响应速度可设置1以下)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>预览阈值:</b>
+                                <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>文本框序号:</b>
+                                <span>传输文本到设备时,指定输入框序号,为空则发送给所有输入框。(仅支持常规输入框控件)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>传输类型:</b>
+                                <span>传输文本到设备,追加文本或者覆盖文本内容。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>灵敏模式:</b>
+                                <span>常规预览模式,web端绘制完成指令后发送给APP执行,有一定的延迟。灵敏模式,web端实时绘制指令并发送到APP执行,如按下、移动、松开模拟滑动操作。(需要adb权限或者root权限支持)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>开启灰度化:</b>
+                                <span>开启灰度化后,预览设备显示为灰度化效果。(主要用于开发图色脚本时,实时测试灰度化效果)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>开启阈值化:</b>
+                                <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>运行中脚本:</b>
+                                <span>查看APP中正在运行的AutoJs脚本,支持停止脚本。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>定时任务:</b>
+                                <span>查看APP中已开启的定时任务,支持停止定时任务。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>通知监听:</b>
+                                <span>根据规则配置，监听设备的指定包名包含指定内容的通知,符合条件的可以支持推送消息到Web、APP控制面板消息、邮件转发、自定义代码执行等。下方表格还可以查询服务端启动后，监听成功的历史通知。</span>
+                            </div>
                         </el-popover>
                     </div>
                 </div>
                 <div class="width100">
                     <div class="width100">
                         <div class="d-flex a-center j-start" style="margin-top: 5px;">
-                            <el-input type="textarea" v-model="textContent" placeholder="请输入文本内容" clearable
-                                      class="width100">
+                            <el-input type="textarea" v-model="textContent" placeholder="请输入文本内容" clearable class="width100">
                             </el-input>
                             <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="sendTextContent">
                                 发送
@@ -268,21 +315,40 @@
                 </div>
                 <div style="margin-top: 10px;">
                     <el-card>
-                        <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.otherParam=!arrowArr.otherParam">
-                            <span>通知监听</span>
-                            <i :class="{'el-icon-arrow-down':arrowArr.otherParam,'el-icon-arrow-up':!arrowArr.otherParam}"  style="float: right;"></i>
-                        </div>
-                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.otherParam">
-                        </div>
-                    </el-card>
-                </div>
-                <div style="margin-top: 10px;">
-                    <el-card>
                         <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.scriptPreview=!arrowArr.scriptPreview">
                             <span>运行中脚本</span>
                             <i :class="{'el-icon-arrow-down':arrowArr.scriptPreview,'el-icon-arrow-up':!arrowArr.scriptPreview}"  style="float: right;"></i>
                         </div>
                         <div style="padding: 15px 0 20px 0;" v-show="arrowArr.scriptPreview">
+                            <el-row style="padding-left: 0!important;">
+                                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                                               @click.stop.prevent="queryScript">
+                                        查询脚本
+                                    </el-button>
+                                </div>
+                                <el-table :data="scriptArr" v-loading="scriptLoading" border ref="scriptArrTable"
+                                          highlight-current-row style="width: 100%">
+                                    <el-table-column prop="id" align="left" label="脚本id" width="200">
+                                    </el-table-column>
+                                    <el-table-column prop="source" label="脚本路径" align="left">
+                                    </el-table-column>
+                                    <el-table-column prop="cwd" label="脚本目录" align="left">
+                                    </el-table-column>
+                                    <el-table-column width="100">
+                                        <template slot="header">
+                                            <div class="d-flex a-center">
+                                                操作
+                                            </div>
+                                        </template>
+                                        <template slot-scope="{ row, $index }">
+                                            <div class="d-flex j-start a-center">
+                                                <el-link :underline="false" type="primary" @click="stopScript(row)">停止脚本</el-link>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-row>
                         </div>
                     </el-card>
                 </div>
@@ -293,225 +359,178 @@
                             <i :class="{'el-icon-arrow-down':arrowArr.jsonParam,'el-icon-arrow-up':!arrowArr.jsonParam}"  style="float: right;"></i>
                         </div>
                         <div style="padding: 15px 0 20px 0;" v-show="arrowArr.jsonParam">
+                            <el-row style="padding-left: 0!important;">
+                                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                                               @click.stop.prevent="queryTimerTask">
+                                        查询定时任务
+                                    </el-button>
+                                </div>
+                                <el-table :data="timerTaskArr" v-loading="timerTaskLoading" border ref="scriptArrTable"
+                                          highlight-current-row style="width: 100%">
+                                    <el-table-column prop="id" align="left" label="任务id" width="100px">
+                                    </el-table-column>
+                                    <el-table-column prop="taskType" label="任务类型" align="left"  width="150px">
+                                    </el-table-column>
+                                    <el-table-column prop="scriptPath" label="脚本路径" align="left" width="300px">
+                                    </el-table-column>
+                                    <el-table-column prop="timerParamJson" label="任务参数" align="left">
+                                    </el-table-column>
+                                    <el-table-column width="100px">
+                                        <template slot="header">
+                                            <div class="d-flex a-center">
+                                                操作
+                                            </div>
+                                        </template>
+                                        <template slot-scope="{ row, $index }">
+                                            <div class="d-flex j-start a-center">
+                                                <el-link :underline="false" type="primary" @click="stopTimerTask(row)">停止任务</el-link>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-row>
+                        </div>
+                    </el-card>
+                </div>
+                <div style="margin-top: 10px;">
+                    <el-card>
+                        <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.otherParam=!arrowArr.otherParam">
+                            <span>通知监听</span>
+                            <i :class="{'el-icon-arrow-down':arrowArr.otherParam,'el-icon-arrow-up':!arrowArr.otherParam}"  style="float: right;"></i>
+                        </div>
+                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.otherParam">
+                            <el-row style="padding-left: 0!important;">
+                                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
+                                    <div style="margin-left: 10px;">通知监听规则名称</div>
+                                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; width: 200px; ">
+                                        <el-input placeholder="通知规则名称" v-model="noticeListenerName" class="flex-1"/>
+                                    </div>
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                                               @click.stop.prevent="saveToFile">
+                                        存为文件
+                                    </el-button>
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                                               @click.stop.prevent="readForFile">
+                                        从文件读取
+                                    </el-button>
+                                    <div class="flex-wrap" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
+                                        <span>消息推送渠道：</span>
+                                        <el-checkbox-group v-model="messagePushChannel" style="line-height: 32px;height: 32px;">
+                                            <el-checkbox label="web">
+                                                web网页
+                                            </el-checkbox>
+                                            <el-checkbox label="app">
+                                                app消息
+                                            </el-checkbox>
+                                        </el-checkbox-group>
+                                    </div>
+                                    <div class="flex-wrap" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
+                                        <span>开启通知监听：</span>
+                                        <el-switch v-model="openNoticeMessageListenerFlag" :disabled="!allowOpenNoticeListener" @change="openNoticeMessageListenerChange"/>
+                                    </div>
+                                </div>
+                                <div class="width100 d-flex a-center">
+                                    <el-table :data="noticeListenerRules"  border ref="noticeListenerRulesTable"  highlight-current-row style="width: 100%">
+                                        <el-table-column prop="matchingPackageName" align="left" label="匹配包名">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-input type="textarea" v-model="row.matchingPackageName" :rows="3"  placeholder="请输入匹配包名" class="width100">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="matchingText" label="匹配文本" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-input type="textarea" v-model="row.matchingText" :rows="3"  placeholder="请输入匹配文本" class="width100">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="autoClick" label="自动点击" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-switch v-model="row.autoClick"/>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="receiveEmail" label="邮件地址" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-input type="textarea" v-model="row.receiveEmail" :rows="3"  placeholder="请输入邮件地址,为空则不推送" class="width100">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="fixedMessage" label="固定内容" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-input type="textarea" v-model="row.fixedMessage" :rows="3"  placeholder="请输入内容,用于标识信息来源" class="width100">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="pushRange" label="web推送范围" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-radio-group v-model="row.pushRange">
+                                                    <el-radio label="onlyLine">
+                                                        仅连接
+                                                    </el-radio>
+                                                    <el-radio label="all">
+                                                        全部
+                                                    </el-radio>
+                                                </el-radio-group>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="executeScript" label="执行代码" align="left">
+                                            <template slot-scope="{ row, $index}">
+                                                <el-input type="textarea" v-model="row.executeScript" :rows="3" placeholder="请填写执行代码"
+                                                          class="width100">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column width="100">
+                                            <template slot="header">
+                                                <div class="d-flex a-center">
+                                                    操作
+                                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="tableAddRow('noticeListenerRules',-1)"/>
+                                                </div>
+                                            </template>
+                                            <template slot-scope="{ row, $index }">
+                                                <div class="d-flex j-start a-center">
+                                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('noticeListenerRules',$index)"/>
+                                                    <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('noticeListenerRules',$index)"/>
+                                                </div>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+                            </el-row>
+                            <el-row style="padding-left: 0!important;;margin-top:10px;">
+                                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
+                                    <div style="margin-left: 10px;">历史通知</div>
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                                               @click.stop.prevent="queryNoticeMessage">
+                                        查询通知
+                                    </el-button>
+                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
+                                               @click.stop.prevent="clearNoticeMessage">
+                                        清理通知
+                                    </el-button>
+                                </div>
+                                <el-table v-loading="historyNoticeMessageLoading" :data="historyNoticeMessageList"  border ref="historyNoticeMessageListTable"
+                                          highlight-current-row style="width: 100%">
+                                    <el-table-column prop="来源设备" align="left" label="来源设备" width="200">
+                                    </el-table-column>
+                                    <el-table-column prop="固定内容" align="left" label="固定内容" width="200">
+                                    </el-table-column>
+                                    <el-table-column prop="应用包名" align="left" label="应用包名" width="200">
+                                    </el-table-column>
+                                    <el-table-column prop="通知文本" label="通知文本" align="left">
+                                    </el-table-column>
+                                    <el-table-column prop="通知数" label="通知数" align="left" width="100">
+                                    </el-table-column>
+                                    <el-table-column prop="通知摘要" label="通知摘要" align="left">
+                                    </el-table-column>
+                                    <el-table-column prop="通知时间" label="通知时间" align="left" width="300">
+                                    </el-table-column>
+                                </el-table>
+                            </el-row>
                         </div>
                     </el-card>
                 </div>
             </div>
         </el-col>
     </el-row>
-    <el-tabs v-model="previewActiveName" style=" padding-left: 20px;margin-top: 0!important;">
-        <el-tab-pane label="通知监听" name="noticeMessage">
-            <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
-                    <div>通知监听规则名称</div>
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; width: 200px; ">
-                        <el-input placeholder="通知规则名称" v-model="noticeListenerName" class="flex-1"/>
-                    </div>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="saveToDraft">
-                        存为草稿
-                    </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="readForDraft">
-                        从草稿读取
-                    </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="saveToFile">
-                        存为文件
-                    </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="readForFile">
-                        从文件读取
-                    </el-button>
-                    <div class="flex-wrap" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
-                        <span>消息推送渠道：</span>
-                        <el-checkbox-group v-model="messagePushChannel" style="line-height: 32px;height: 32px;">
-                            <el-checkbox label="web">
-                                web网页
-                            </el-checkbox>
-                            <el-checkbox label="app">
-                                app消息
-                            </el-checkbox>
-                        </el-checkbox-group>
-                    </div>
-                    <div class="flex-wrap" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
-                        <span>开启通知监听：</span>
-                        <el-switch v-model="openNoticeMessageListenerFlag" :disabled="!allowOpenNoticeListener" @change="openNoticeMessageListenerChange"/>
-                    </div>
-                </div>
-                <div class="width100 d-flex a-center">
-                    <el-table :data="noticeListenerRules"  border ref="noticeListenerRulesTable"  highlight-current-row style="width: 100%">
-                        <el-table-column prop="matchingPackageName" align="left" label="匹配包名">
-                            <template slot-scope="{ row, $index}">
-                                <el-input type="textarea" v-model="row.matchingPackageName" :rows="3"  placeholder="请输入匹配包名" class="width100">
-                                </el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="matchingText" label="匹配文本" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-input type="textarea" v-model="row.matchingText" :rows="3"  placeholder="请输入匹配文本" class="width100">
-                                </el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="autoClick" label="自动点击" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-switch v-model="row.autoClick"/>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="receiveEmail" label="邮件地址" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-input type="textarea" v-model="row.receiveEmail" :rows="3"  placeholder="请输入邮件地址,为空则不推送" class="width100">
-                                </el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="fixedMessage" label="固定内容" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-input type="textarea" v-model="row.fixedMessage" :rows="3"  placeholder="请输入内容,用于标识信息来源" class="width100">
-                                </el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="pushRange" label="web推送范围" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-radio-group v-model="row.pushRange">
-                                    <el-radio label="onlyLine">
-                                        仅连接
-                                    </el-radio>
-                                    <el-radio label="all">
-                                        全部
-                                    </el-radio>
-                                </el-radio-group>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="executeScript" label="执行代码" align="left">
-                            <template slot-scope="{ row, $index}">
-                                <el-input type="textarea" v-model="row.executeScript" :rows="3" placeholder="请填写执行代码"
-                                          class="width100">
-                                </el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column width="100">
-                            <template slot="header">
-                                <div class="d-flex a-center">
-                                    操作
-                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-left: 5px;" @click.stop="tableAddRow('noticeListenerRules',-1)"/>
-                                </div>
-                            </template>
-                            <template slot-scope="{ row, $index }">
-                                <div class="d-flex j-start a-center">
-                                    <i class="el-icon-circle-plus" style="font-size: 18px;margin-right: 5px;" @click.stop="tableAddRow('noticeListenerRules',$index)"/>
-                                    <i class="el-icon-remove" style="font-size: 18px;color: #E0E0E0;" @click.stop="tableDeleteRow('noticeListenerRules',$index)"/>
-                                </div>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </div>
-            </el-row>
-            <el-row style="padding-left: 0!important;;margin-top:10px;">
-                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
-                    <div>历史通知</div>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="queryNoticeMessage">
-                        查询通知
-                    </el-button>
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                               @click.stop.prevent="clearNoticeMessage">
-                        清理通知
-                    </el-button>
-                </div>
-                <el-table :data="historyNoticeMessageList"  border ref="historyNoticeMessageListTable"
-                          highlight-current-row style="width: 100%">
-                    <el-table-column prop="来源设备" align="left" label="来源设备" width="200">
-                    </el-table-column>
-                    <el-table-column prop="固定内容" align="left" label="固定内容" width="200">
-                    </el-table-column>
-                    <el-table-column prop="应用包名" align="left" label="应用包名" width="200">
-                    </el-table-column>
-                    <el-table-column prop="通知文本" label="通知文本" align="left">
-                    </el-table-column>
-                    <el-table-column prop="通知数" label="通知数" align="left" width="100">
-                    </el-table-column>
-                    <el-table-column prop="通知摘要" label="通知摘要" align="left">
-                    </el-table-column>
-                    <el-table-column prop="通知时间" label="通知时间" align="left" width="300">
-                    </el-table-column>
-                </el-table>
-            </el-row>
-        </el-tab-pane>
-        <el-tab-pane label="脚本管理" name="scriptManage">
-            <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                               @click.stop.prevent="queryScript">
-                        查询脚本
-                    </el-button>
-                </div>
-                <el-table :data="scriptArr" v-loading="scriptLoading" border ref="scriptArrTable"
-                          highlight-current-row style="width: 100%">
-                    <el-table-column prop="id" align="left" label="脚本id" width="200">
-                    </el-table-column>
-                    <el-table-column prop="source" label="脚本路径" align="left">
-                    </el-table-column>
-                    <el-table-column prop="cwd" label="脚本目录" align="left">
-                    </el-table-column>
-                    <el-table-column width="100">
-                        <template slot="header">
-                            <div class="d-flex a-center">
-                                操作
-                            </div>
-                        </template>
-                        <template slot-scope="{ row, $index }">
-                            <div class="d-flex j-start a-center">
-                                <el-link :underline="false" type="primary" @click="stopScript(row)">停止脚本</el-link>
-                            </div>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-row>
-        </el-tab-pane>
-        <el-tab-pane label="定时任务" name="timerTask">
-            <el-row style="padding-left: 0!important;">
-                <div class="width100 d-flex a-center flex-wrap" style="margin-bottom: 5px;">
-                    <el-button type="primary" size="mini" style="margin-left: 10px !important;"
-                               @click.stop.prevent="queryTimerTask">
-                        查询定时任务
-                    </el-button>
-                </div>
-                <el-table :data="timerTaskArr" v-loading="timerTaskLoading" border ref="scriptArrTable"
-                          highlight-current-row style="width: 100%">
-                    <el-table-column prop="id" align="left" label="任务id" width="100px">
-                    </el-table-column>
-                    <el-table-column prop="taskType" label="任务类型" align="left"  width="150px">
-                    </el-table-column>
-                    <el-table-column prop="scriptPath" label="脚本路径" align="left" width="300px">
-                    </el-table-column>
-                    <el-table-column prop="timerParamJson" label="任务参数" align="left">
-                    </el-table-column>
-                    <el-table-column width="100px">
-                        <template slot="header">
-                            <div class="d-flex a-center">
-                                操作
-                            </div>
-                        </template>
-                        <template slot-scope="{ row, $index }">
-                            <div class="d-flex j-start a-center">
-                                <el-link :underline="false" type="primary" @click="stopTimerTask(row)">停止任务</el-link>
-                            </div>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-row>
-            <!--
-            任务参数
-                延迟毫秒
-                间隔毫秒
-                循环次数
-            action
-            category
-            dataType
-            local
-
-            操作
-            -->
-        </el-tab-pane>
-    </el-tabs>
 </div>

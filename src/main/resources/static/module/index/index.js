@@ -499,6 +499,8 @@ window.ZXW_VUE = new Vue({
                 this.$refs.fileManage.init();
                 // 初始化远程脚本自定义模块
                 this.$refs.remoteScript.initCustomScript();
+                // 初始化预览设备数据
+                this.$refs.previewDevice.init();
             })
         },
         // 验证是否已选设备

@@ -29,6 +29,10 @@
                     <!-- 文件管理组件  -->
                     <file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="fileManage" />
                 </el-tab-pane>
+                <el-tab-pane label="预览设备" name="previewDevice">
+                    <!-- 预览设备组件 -->
+                    <preview-device :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="previewDevice" />
+                </el-tab-pane>
                 <el-tab-pane label="图像处理" name="imgHandler">
                     <!-- 图像处理组件 -->
                     <img-handler :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="imgHandler" />
@@ -44,10 +48,6 @@
                 <el-tab-pane label="远程日志" name="remoteLog">
                     <!-- 远程日志组件 -->
                     <remote-log :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteLog" />
-                </el-tab-pane>
-                <el-tab-pane label="预览设备" name="previewDevice">
-                    <!-- 预览设备组件 -->
-                    <preview-device :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="previewDevice" />
                 </el-tab-pane>
                 <el-tab-pane label="页面匹配" name="pageMatching">
                     <!-- 页面匹配组件 -->
