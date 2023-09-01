@@ -95,12 +95,46 @@ export default {
                 return
             }
             let script = `
+            utilsObj.startRequestScreenClickTreadWait = (waitTimes)=>{
+                // 读取其他点击文字数据
+                let otherClickText = commonStorage.get("otherClickText");
+            
+                let textRegExp = new RegExp('(允许|立即开始|同意'+(otherClickText ? '|' + otherClickText : '')+')');
+            
+                // 停止截图点击线程
+                if(utilsObj.requestScreenClickThreadWaitTimes){
+                    utilsObj.requestScreenClickThreadWaitTimes.interrupt();
+                }
+            
+                // 开启点击线程
+                utilsObj.requestScreenClickThreadWaitTimes = threads.start(function () {
+                    while (true) {
+                        let click1 = textMatches(textRegExp).findOne(100);
+                        if(click1){
+                            click1.click();
+                        }
+                        if(utilsObj.requestScreenClickThreadWaitTimes){
+                            // 停止点击线程
+                            utilsObj.requestScreenClickThreadWaitTimes.interrupt();
+                        }
+                    }
+                });
+                // 延迟关闭点击线程
+                setTimeout(()=>{
+                    // 停止截图点击线程
+                    if(utilsObj.requestScreenClickThreadWaitTimes){
+                        utilsObj.requestScreenClickThreadWaitTimes.interrupt();
+                    }
+                },waitTimes)
+            }
             utilsObj.requestScreenCaptureCommonFun = (callback)=>{
                 try {
                     // 获取截图权限参数
                     let screenCaptureOptions = images.getScreenCaptureOptions();
                     // 不为空
                     if(screenCaptureOptions){
+                        // 开启一个延时1秒关闭的点击线程 
+                        utilsObj.startRequestScreenClickTreadWait(1000);
                         if(callback){
                             callback();
                         }
@@ -120,13 +154,13 @@ export default {
                     // 读取其他点击文字数据
                     let otherClickText = commonStorage.get("otherClickText");
             
-                    let textRegExp = new RegExp('(允许|立即开始|同意'+(otherClickText ? '|' + otherClickText : '')+')')
+                    let textRegExp = new RegExp('(允许|立即开始|同意'+(otherClickText ? '|' + otherClickText : '')+')');
             
                     // 停止截图点击线程
                     if(utilsObj.requestScreenClickThread){
                         utilsObj.requestScreenClickThread.interrupt();
                     }
-            
+                    sleep(200);
                     // 开启点击线程
                     utilsObj.requestScreenClickThread = threads.start(function () {
                         while (true) {
@@ -167,20 +201,23 @@ export default {
                     }
                     // 超时不做处理
                 } catch (error) {
-                    if (commonStorage.get('debugModel')) {
-                        console.error("申请截图权限错误", error)
-                    }
+                    console.error("申请截图权限错误,自动重试", error)
                     // 如果出现错误 则先停止截图权限
-                    images.stopScreenCapture()
+                    images.stopScreenCapture();
+                    // 开启一个延时3秒关闭的点击线程 
+                    utilsObj.startRequestScreenClickTreadWait(3000);
                     // 再重新申请截图权限
                     images.requestScreenCapture({orientation:utilsObj.getOrientation()});
+                    // 执行回调
+                    if(callback){
+                        sleep(1000);
+                        callback();
+                    }
                 }
             }
-            // 则先停止截图权限
-            images.stopScreenCapture();
             utilsObj.requestScreenCaptureCommonFun(()=>{
                 toastLog("刷新截图权限完成");
-            });
+            })
             `;
             this.remoteExecuteScript(script);
         },
