@@ -802,7 +802,7 @@ export default {
             if (uiSelectAction) {
                 nodeCode += '.' + uiSelectAction + '()';
             }
-            this.remoteHandler.param5.scriptPreview += nodeCode + "\r\n";
+            this.remoteHandler.param5.scriptPreview += nodeCode + ";\r\n";
         },
     }
 }
