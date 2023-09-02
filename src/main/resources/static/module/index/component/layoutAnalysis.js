@@ -34,6 +34,14 @@ export default {
     },
     data() {
         return {
+            isActive:false,
+            arrowArr:{
+                commonParam:true,
+                otherParam:true,
+                scriptPreview:true,
+                jsonParam:true,
+                otherOperate:true
+            },
             defaultExpandedKeys:[],// 默认展开节点key数组
             layoutLoading:false,
             remoteHandler: {
@@ -726,7 +734,19 @@ export default {
                     // 获取高亮节点
                     let highlightNode = $('.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content');
                     if(highlightNode && highlightNode.length){
-                        highlightNode[0].scrollIntoView();
+                        let highlightNodeDocument = highlightNode[0];
+                        let rect = highlightNodeDocument.getBoundingClientRect();
+                        let windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                        let windowWidth = window.innerWidth || document.documentElement.clientWidth;
+                        if (!(rect.top >= 0 && rect.left >= 0 && rect.bottom <= windowHeight && rect.right <= windowWidth)) {
+                            // 元素不在可视窗口内
+                            highlightNode[0].scrollIntoView();
+                        }
+                        rect = highlightNodeDocument.getBoundingClientRect();
+                        if(rect.top < 100){
+                            let parentDocument =  document.getElementById('layoutScrollParent');
+                            parentDocument.scrollBy(0,-100);
+                        }
                     }
                 });
 

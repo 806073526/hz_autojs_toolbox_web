@@ -1,5 +1,4 @@
 <div>
-
  <!--   <p  style="display: flex;align-items: center;font-size: 15px;margin-left: 20px">
         <img src="../module/index/image/layoutAnalysis.png" style="width: 25px"> 远程布局分析及上传
     </p>-->
@@ -7,6 +6,576 @@
         布局分析
     </p>
     <el-row>
+        <el-col :span="isActive ? 16 : 9" style="position: relative;">
+            <div class="layoutDivContainer d-flex flex-column" id="layoutScrollParent">
+                <div style="background: white;height: 5px;width: calc(100% - 15px);top:1px;position:absolute;z-index: 99;"></div>
+                <div style="position: sticky;top:0px;z-index: 9;background: white;">
+                    <div class="layoutToolsDiv d-flex">
+                        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                            <el-button type="danger"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                       size="mini" @click.stop.prevent="remoteLayoutAnalysisOneKey">
+                                布局分析
+                            </el-button>
+                            <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                       size="mini" @click.stop.prevent="loadNodeJson">
+                                加载布局
+                            </el-button>
+                            <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                       size="mini" @click.stop.prevent="clearNodeJson(true)">
+                                清空布局
+                            </el-button>
+                            <span style="margin-left: 5px; ">分析范围：</span>
+                            <el-radio-group v-model="remoteHandler.param5.layoutAnalysisRange" style="margin-top: 3px;">
+                                <el-radio label="active">
+                                    活跃窗口
+                                </el-radio>
+                                <el-radio label="all">
+                                    全部窗口
+                                </el-radio>
+                            </el-radio-group>
+                            <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                            <el-popover ref="popover1" placement="top-start" width="500" trigger="hover">
+                                <div>
+                                    <b>布局分析:</b>
+                                    <span>一键远程执行布局分析和上传图片操作,可在web查看控件树与层级结构。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>加载布局:</b>
+                                    <span>加载已上传的布局分析和图片。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>清空布局:</b>
+                                    <span>清空显示的布局分析。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>分析范围:</b>
+                                    <span>布局分析范围,活跃窗口与全部窗口切换。(全部窗口包括通知栏、按键区域、悬浮窗等)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>父子不相关联:</b>
+                                    <span>选择父级节点,不自动勾选全部子节点。(相关联时,勾选父节点,自动勾选全部子节点)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>只显示可见控件:</b>
+                                    <span>根据控件可见属性,过滤控件树。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>只显屏幕范围内控件:</b>
+                                    <span>根据控件坐标,过滤控件树,只显示屏幕内控件。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>启用自定义过滤函数:</b>
+                                    <span>打开后,控件树才会根据自定义函数进行过滤数据。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>常见自定义过滤函数:</b>
+                                    <span>内置多种过滤函数,深度、可点击、可长按、可滚动、有文字、有描述。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>执行自定义过滤函数:</b>
+                                    <span>编辑了自定义过滤函数后,点击执行,控件树过滤生效。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>点击自动生成代码:</b>
+                                    <span>开启后,点击控件树或者图片控件框,自动生成控件代码。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>UI选择器:</b>
+                                    <span>生成控件代码时,生效的选择器。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>选择器条件:</b>
+                                    <span>生成控件代码时,生效的选择器条件。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>动作:</b>
+                                    <span>生成控件代码时,生效的动作。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>控件框操作:</b>
+                                    <span>勾选控件树复选框,预览图绘制控件框;点击控件树节点,预览图绘制控件框高亮显示;右键控件框取消勾选控件树复选框。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>控件详情操作:</b>
+                                    <span>点击控件详情内容,上方文本框显示控件属性内容。(本地部署时,自动写入剪切板)</span>
+                                </div>
+                            </el-popover>
+                        </div>
+                    </div>
+                    <div class="width100 d-flex a-center" style="margin-top: 10px;margin-bottom:10px;display: flex;justify-content: flex-start;align-items: center;">
+                        <div>
+                            <el-checkbox style="display: inline-flex;justify-content: flex-end;align-items: center;" v-model="remoteHandler.param5.checkAll" @change="checkAllNode">
+                                全选
+                            </el-checkbox>
+                            <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        父子不相关联
+                                    </span>
+                                <el-switch v-model="remoteHandler.param5.checkStrictly" />
+                            </div>
+                            <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        只显示可见控件
+                                    </span>
+                                <el-switch v-model="remoteHandler.param5.isOnlyShowVisible" @change="onlyShowVisible"
+                                />
+                            </div>
+                            <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        只显示屏幕范围内控件
+                                    </span>
+                                <el-switch v-model="remoteHandler.param5.isOnlyShowInScreen" @change="onlyShowInScreen"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="width100 flex-1">
+                    <div class="width100 d-flex flex-column" style="height: 100%;">
+                        <div class="flex-1 d-flex j-center width100"  v-loading="layoutLoading">
+                            <el-tree style="flex: 4;" :data="rootNodeObjArr" :props="remoteHandler.param5.defaultProps"
+                                     empty-text="请先上传控件或加载控件" default-expand-all :highlight-current="true" ref="nodeTree" :expand-on-click-node ="false"
+                                     :show-checkbox="true" node-key="nodeKey" :check-on-click-node="false" :filter-node-method="filterNode"
+                                     :default-expanded-keys="defaultExpandedKeys" :check-strictly="remoteHandler.param5.checkStrictly" @check="nodeCheckFun"
+                                     @node-click="nodeClickFun" @current-change="currentChangeFun" class="nodeDivCommon2">
+                            </el-tree>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </el-col>
+        <el-col :span="8">
+            <div class="layoutDivContainer" style="margin: 0 10px;display: flex;flex-direction: column;">
+                <div class="layoutToolsDiv">
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                        <el-dropdown trigger="click">
+                            <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                       size="mini">
+                                常见自定义过滤函数
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item v-for="(item,index) in commonCustomFilterFunction" :key="index" @click.native.prevent.stop="generateCommonCustomFilterFunction(item.code)">
+                                    {{ item.name }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                   size="mini" @click.stop.prevent="loadCustomFilterFunction">
+                            执行自定义过滤函数
+                        </el-button>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;white-space: nowrap;">
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        启用自定义过滤函数
+                                    </span>
+                        <el-switch v-model="remoteHandler.param5.openCustomFilterFunction" @change="openCustomFilterFunctionChange" />
+                    </div>
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        绘制背景图片
+                                    </span>
+                        <el-switch v-model="remoteHandler.param5.isShowBgImg" @change="showDrawBgImg"
+                        />
+                    </div>
+                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px">
+                                    <span style="margin-right: 5px;">
+                                        点击自动生成代码
+                                    </span>
+                        <el-switch v-model="remoteHandler.param5.openClickGenerateCode" />
+                    </div>
+                </div>
+                <div style="border: 1px solid #cdc4c4;margin-top: 10px;height: 100%;" v-loading="layoutLoading">
+                    <img id="nodePreviewImg" draggable="false" style="display: none;" />
+                    <canvas v-if="remoteHandler.param5.rootNodeJson" id="nodePreviewCanvas"
+                            style="width: 100%;margin: 0; padding: 0;">
+                    </canvas>
+                    <div v-else style="width: 100%;
+                height: 100%;
+                font-size: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #909399;">
+                        请先上传控件或加载控件
+                    </div>
+                </div>
+            </div>
+            <div class="hamburger" @click.stop="isActive=!isActive">
+                <i class="el-icon-arrow-right" :class="{'rotate': isActive}" />
+            </div>
+        </el-col>
+        <el-col :span="isActive ? 0 : 7">
+            <div class="layoutDivContainer">
+                <div>
+                    <el-card>
+                        <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.commonParam=!arrowArr.commonParam">
+                            <span>常用参数</span>
+                            <i :class="{'el-icon-arrow-down':arrowArr.commonParam,'el-icon-arrow-up':!arrowArr.commonParam}"  style="float: right;"></i>
+                        </div>
+                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.commonParam">
+                            <el-row class="d-flex">
+                                <div class="width100 d-flex a-center flex-wrap">
+                                    <el-form-item label="UI选择器:" class="flex-1">
+                                        <el-checkbox-group v-model="remoteHandler.param5.uiSelect" style="width: 100%;">
+                                            <el-checkbox label="id">
+                                                id
+                                            </el-checkbox>
+                                            <el-checkbox label="text">
+                                                text
+                                            </el-checkbox>
+                                            <el-checkbox label="desc">
+                                                desc
+                                            </el-checkbox>
+                                            <el-checkbox label="className">
+                                                className
+                                            </el-checkbox>
+                                        </el-checkbox-group>
+                                    </el-form-item>
+                                </div>
+                            </el-row>
+                            <el-row class="d-flex">
+                                <el-form-item label="选择器条件:" label-width="100px" class="flex-1">
+                                    <el-select v-model="remoteHandler.param5.uiSelectCondition" placeholder="请选择" style="width: 100%;">
+                                        <el-option
+                                                v-for="item in remoteHandler.param5.uiSelectConditionOption"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="动作:" label-width="50px" class="flex-1">
+                                    <el-select v-model="remoteHandler.param5.uiSelectAction" placeholder="请选择" style="width: 100%;">
+                                        <el-option
+                                                v-for="item in remoteHandler.param5.uiSelectActionOption"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-row>
+                            <el-row class="d-flex">
+                                <el-form-item label="自定义过滤函数:" label-width="100px" class="flex-1">
+                                    <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
+                                              :rows="3" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                            </el-row>
+                        </div>
+                    </el-card>
+                </div>
+                <div style="margin-top: 10px;">
+                    <el-card>
+                        <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.scriptPreview=!arrowArr.scriptPreview">
+                            <span>代码预览</span>
+                            <i :class="{'el-icon-arrow-down':arrowArr.scriptPreview,'el-icon-arrow-up':!arrowArr.scriptPreview}"  style="float: right;"></i>
+                        </div>
+                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.scriptPreview">
+                            <div style="padding:0 5px;">
+                                <el-input type="textarea" v-model="remoteHandler.param5.scriptPreview"
+                                          :rows="5" placeholder="请点击控件后生成代码" class="width100">
+                                </el-input>
+                            </div>
+                            <div style="margin-top: 5px;">
+                                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                           size="mini" @click.stop.prevent="execNodePreviewScript">
+                                    执行代码
+                                </el-button>
+                                <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+                                           size="mini" @click.stop.prevent="clearNodePreviewScript">
+                                    清空代码
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-card>
+                </div>
+                <div style="margin-top: 10px;">
+                    <el-card>
+                        <div slot="header" class="clearfix" style="cursor:pointer;" @click.stop="arrowArr.jsonParam=!arrowArr.jsonParam">
+                            <span>控件详情</span>
+                            <i :class="{'el-icon-arrow-down':arrowArr.jsonParam,'el-icon-arrow-up':!arrowArr.jsonParam}"  style="float: right;"></i>
+                        </div>
+                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.jsonParam" class="nodeDetailDiv">
+                            <div style="padding: 0 5px;">
+                                <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="2"
+                                          placeholder="点击控件信息快速获取文本内容" class="width100">
+                                </el-input>
+                            </div>
+                            <template v-if="remoteHandler.param5.dialogVisible" >
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        className:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.className }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        packageName:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.packageName }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        text:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.text }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        desc:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.desc }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        id:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.id }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        sourceNodeId:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.sourceNodeId }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        bounds:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ '['+remoteHandler.param5.selectNode.boundsInfo.left+','+
+                                        remoteHandler.param5.selectNode.boundsInfo.top+',' +
+                                        remoteHandler.param5.selectNode.boundsInfo.right + ',' +
+                                        remoteHandler.param5.selectNode.boundsInfo.bottom + ']' }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        boundsInParent:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ '['+remoteHandler.param5.selectNode.boundsInParent.left+','+
+                                        remoteHandler.param5.selectNode.boundsInParent.top+',' +
+                                        remoteHandler.param5.selectNode.boundsInParent.right + ',' +
+                                        remoteHandler.param5.selectNode.boundsInParent.bottom + ']' }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        indexInParent:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.indexInParent }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        depth:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.depth }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        checkable:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.checkable }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        checked:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.checked }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        focusable:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.focusable }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        focused:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.focused }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        accessibilityFocused:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.accessibilityFocused }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        selected:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.selected }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        clickable:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.clickable }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        drawingOrder:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.drawingOrder }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        longClickable:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.longClickable }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        enabled:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.enabled }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        password:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.password }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        scrollable:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.scrollable }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        visible:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.visible }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        column:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.column }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        columnCount:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.columnCount }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        columnCount:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.columnCount }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        columnSpan:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.columnSpan }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        row:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.row }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        rowCount:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.rowCount }}
+                                    </div>
+                                </el-row>
+                                <el-row class="nodeDetailRow">
+                                    <div class="labelClass">
+                                        rowSpan:
+                                    </div>
+                                    <div class="contentClass">
+                                        {{ remoteHandler.param5.selectNode.rowSpan }}
+                                    </div>
+                                </el-row>
+                            </template>
+                            <template v-else>
+                                <div style="width: 100%;
+                    height: 100%;
+                    font-size: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: #909399;">
+                                    请点击控件节点或者图中矩形
+                                </div>
+                            </template>
+                        </div>
+                    </el-card>
+                </div>
+            </div>
+        </el-col>
+    </el-row>
+
+
+
+
+    <!--<el-row>
         <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="UI选择器:" class="flex-1">
                 <el-checkbox-group v-model="remoteHandler.param5.uiSelect" style="width: 727px">
@@ -25,24 +594,6 @@
                 </el-checkbox-group>
             </el-form-item>
             <el-form-item label="选择器条件:" class="flex-1">
-                <!--<el-radio-group v-model="remoteHandler.param5.uiSelectCondition">
-                    <el-radio label="findOne">
-                        找到一个(阻塞)findOne
-                    </el-radio>
-                    <el-radio label="findOnce">
-                        找到第N个findOnce
-                    </el-radio>
-                    <el-radio label="untilFind">
-                        找到所有untilFind
-                    </el-radio>
-                    <el-radio label="waitFor">
-                        等待出现waitFor
-                    </el-radio>
-                    <el-radio label="exists">
-                        存在exists
-                    </el-radio>
-                </el-radio-group>-->
-
                 <el-select v-model="remoteHandler.param5.uiSelectCondition" placeholder="请选择">
                     <el-option
                             v-for="item in remoteHandler.param5.uiSelectConditionOption"
@@ -75,33 +626,6 @@
             </el-form-item>
         </div>
     </el-row>
-    <!-- <el-row>
-         <div class="width100 d-flex a-center flex-wrap">
-             <el-form-item label="动作:" class="flex-1">
-                 <el-radio-group v-model="remoteHandler.param5.uiSelectAction">
-                     <el-radio label="click">
-                         点击click
-                     </el-radio>
-                     <el-radio label="clickCenter">
-                         点击中心clickCenter
-                     </el-radio>
-                     <el-radio label="longClick">
-                         长按longClick
-                     </el-radio>
-                 </el-radio-group>
-             </el-form-item>
-             <el-form-item label="布局分析范围:" label-width="140px" class="flex-1">
-                 <el-radio-group v-model="remoteHandler.param5.layoutAnalysisRange">
-                     <el-radio label="active">
-                         活跃窗口
-                     </el-radio>
-                     <el-radio label="all">
-                         全部窗口(限制应用暂不支持)
-                     </el-radio>
-                 </el-radio-group>
-             </el-form-item>
-         </div>
-     </el-row>-->
     <el-row>
         <div class="width100 d-flex a-center flex-wrap">
             <el-form-item label="代码预览:" style="width: 970px">
@@ -109,24 +633,11 @@
                           :rows="5" placeholder="请点击控件后生成代码" class="width95">
                 </el-input>
             </el-form-item>
-            <!-- <el-form-item label="控件信息:" style="flex:4">
-                 <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="5"
-                           placeholder="点击控件信息快速获取文本内容" class="width100">
-                 </el-input>
-             </el-form-item>-->
-
             <el-form-item label="自定义过滤函数:" style="flex:4" class="filterFunction">
                 <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
                           :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width97">
                 </el-input>
             </el-form-item>
-            <!-- <div class="width50 d-flex a-center">
-                 <el-form-item label="自定义过滤函数:" class="width100">
-                     <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
-                               :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
-                     </el-input>
-                 </el-form-item>
-             </div>-->
         </div>
     </el-row>
     <el-row>
@@ -136,22 +647,6 @@
                            size="mini" @click.stop.prevent="remoteLayoutAnalysisOneKey">
                     一键远程布局分析
                 </el-button>
-                <!--<el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
-                           size="mini" @click.stop.prevent="remoteLayoutAnalysis">
-                    远程布局分析
-                </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
-                           size="mini" @click.stop.prevent="remoteLimitLayoutAnalysis">
-                    远程限制应用布局分析
-                </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
-                           size="mini" @click.stop.prevent="uploadAndLoadNodeJson">
-                    上传布局分析并解析
-                </el-button>
-                <el-button type="danger" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
-                           size="mini" @click.stop.prevent="loadNodeJson">
-                    解析布局分析
-                </el-button>-->
                 <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="clearNodeJson(true)">
                     清空布局分析
@@ -175,10 +670,10 @@
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-               <!-- <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
+               &lt;!&ndash; <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="saveCustomFilterFunction">
                     保存自定义过滤函数
-                </el-button>-->
+                </el-button>&ndash;&gt;
                 <el-button type="primary"  style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;margin-bottom: 5px;"
                            size="mini" @click.stop.prevent="loadCustomFilterFunction">
                     执行自定义过滤函数
@@ -188,11 +683,6 @@
     </el-row>
     <el-row>
         <div class="width100 d-flex a-center">
-            <!-- <el-form-item label="自定义过滤函数:" class="width100">
-                 <el-input type="textarea" v-model="remoteHandler.param5.filterFunction"
-                           :rows="5" placeholder="请编写例如：(dataArr)=>{return dataArr;}的自定义处理函数,其中dataArr表示全部的节点数据" class="width100">
-                 </el-input>
-             </el-form-item>-->
             <el-form-item label="控件信息:" style="flex:4">
                 <el-input type="textarea" v-model="remoteHandler.param5.nodeInfo" :rows="1"
                           placeholder="点击控件信息快速获取文本内容" class="width1001">
@@ -535,5 +1025,5 @@
             </div>
 
         </div>
-    </el-row>
+    </el-row>-->
 </div>

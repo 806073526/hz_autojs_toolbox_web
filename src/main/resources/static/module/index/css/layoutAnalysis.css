@@ -1,3 +1,36 @@
+.layoutDivContainer{
+    border: 1px solid #dbd2d2;
+    padding: 5px;
+    border-radius: 5px;
+    height: 1300px;
+    overflow-y: scroll;
+}
+
+.layoutDivContainer::-webkit-scrollbar {
+    width: 4px;
+}
+.layoutDivContainer::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.layoutDivContainer:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.layoutDivContainer::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+
+.layoutToolsDiv{
+    background: #e7f0f5;
+    padding: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+
+
 .nodeDivCommon{
     height: 77vh;
     overflow-y: auto;
@@ -7,13 +40,13 @@
 
 
 .nodeDivCommon2{
-    height: 76vh;
     overflow-y: auto;
     border:  1px solid #cdc4c4;
 }
-.nodeTreeClass{
-    width: 38%;
+.nodeDivCommon2 .el-tree__empty-text{
+    font-size: 30px;
 }
+
 .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
     background-color: #cde1f7 !important;
 }
@@ -42,10 +75,6 @@
 .nodePreviewClass{
     margin-left: 5px;
     width: 38%;
-}
-.nodeDetailDiv{
-    margin-left: 5px;
-    width: 24%;
 }
 .nodeDivCommon::-webkit-scrollbar {
     width: 4px;

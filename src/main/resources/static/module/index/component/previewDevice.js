@@ -288,7 +288,7 @@ export default {
         startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice){
             let remoteScript = ``;
             remoteScript += `
-            let fun()=>{
+            let fun=()=>{
                 let deviceParam = {
                     imgQuality: 100,
                     imgScale: 1,
