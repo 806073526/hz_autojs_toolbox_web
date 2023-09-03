@@ -115,6 +115,8 @@ export default {
                 return
             }
             let script = `
+            // 强制停止截图权限
+            images.stopScreenCapture();
             utilsObj.startRequestScreenClickTreadWait = (waitTimes)=>{
                 // 读取其他点击文字数据
                 let otherClickText = commonStorage.get("otherClickText");
