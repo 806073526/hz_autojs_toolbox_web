@@ -396,10 +396,6 @@ public class AttachmentInfoController extends BaseController {
         String url = "";
         try {
             pathName = pathName.replaceAll("\\\\", Matcher.quoteReplacement(File.separator));
-            File dir = new File(pathName + File.separator);
-            if(!dir.exists()){
-                dir.mkdirs();
-            }
             url = attachmentInfoService.uploadFileToAutoJs(file,pathName + File.separator + file.getOriginalFilename());
             return success(url);
         } catch (BusinessException e) {
