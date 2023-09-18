@@ -286,8 +286,8 @@
                                 <el-link v-show="item.fileType==='js' || item.fileType==='mjs' || item.fileType === 'node.js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
                                 <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
-                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,true)">压缩</el-link>
-                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">子文件压缩</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,true)">压缩(含目录)</el-link>
+                                <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">压缩(不含目录)</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
                                 <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>

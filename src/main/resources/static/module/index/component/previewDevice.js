@@ -147,7 +147,27 @@ export default {
         window.removeEventListener('resize',this.allScreenPreviewChange);
     },
     methods: {
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".previewDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
+            }
+        },
         init(){
+            this.refreshScrollHeight();
             if (this.deviceInfo.deviceUuid) {
                 // 处理宽度缓存
                 this.previewImageWidth = window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_previewImageWidth") || 50;
@@ -835,7 +855,7 @@ export default {
                 });
                 const param = new FormData();
                 param.append('file', scriptFile);
-                param.append('pathName', this.deviceInfo.deviceUuid+"/");
+                param.append('pathName', this.deviceInfo.deviceUuid+"/system/previewDevice/");
                 let _that = this;
                 $.ajax({
                     url: getContext() + "/attachmentInfo/uploadFileSingle",
@@ -867,7 +887,7 @@ export default {
             }
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.noticeListenerName + "?t="+(new Date().getTime()),
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/system/previewDevice/"+this.noticeListenerName + "?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型

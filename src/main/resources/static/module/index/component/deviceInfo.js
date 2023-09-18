@@ -27,7 +27,8 @@ export default {
             systemConfig:{
                 deviceStatusNotice: true,
                 allowOperateFile: false,
-                lastSelectDeviceUuid: ""
+                lastSelectDeviceUuid: "",
+                zoomSize: 100
             },
             systemSettingDialog: false,
             deviceInfo: {// 当前设备信息
@@ -47,9 +48,18 @@ export default {
     computed:{
         allowOperateFile(){
             return this.systemConfig.allowOperateFile;
+        },
+        zoomSize(){
+            return this.systemConfig.zoomSize;
         }
     },
     watch:{
+        zoomSize:{
+            handler(val){
+                window.ZXW_VUE.$EventBus.$emit('refreshScrollHeight');
+            },
+            deep: true // 可以深度检测到  对象的属性值的变化
+        },
         systemConfig:{
             handler(val){
                 window.localStorage.setItem("systemConfig",JSON.stringify(val));

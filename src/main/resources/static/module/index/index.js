@@ -214,6 +214,9 @@ window.ZXW_VUE = new Vue({
             if(window.ZXW_VUE.$EventBus){
                 window.ZXW_VUE.$EventBus.$off('initModule',this.initModule);
                 window.ZXW_VUE.$EventBus.$on('initModule', this.initModule);
+
+                window.ZXW_VUE.$EventBus.$off('refreshScrollHeight',this.refreshScrollHeight);
+                window.ZXW_VUE.$EventBus.$on('refreshScrollHeight', this.refreshScrollHeight);
                 clearInterval(interval);
             }
         },1000);
@@ -242,15 +245,85 @@ window.ZXW_VUE = new Vue({
             changeLogWindow:(value)=>{
                 this.openLogWindow = value;
             },
+            copyToClipboard:(value)=>{
+                this.copyToClipboardFun(value);
+            },
+            readTextFromClipboard:()=>{
+                let result = this.readTextFromClipboardFun();
+                console.log(result);
+                return result;
+            },
             timeSyncOtherPropertyFun: this.timeSyncOtherProperty // 同步其他属性
         }
     },
     methods: {
+        // 复制内容到剪切板
+        copyToClipboardFun(value){
+            $.ajax({
+                url: getContext() + "/addController/copyTextToClipboard",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "text": value
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                window.ZXW_VUE.$notify.success({message: '已复制到剪切板(本地部署模式有效)', duration: '1000'})
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                    console.log(msg)
+                }
+            });
+        },
+        // 从剪切板读取内容
+        readTextFromClipboardFun(){
+            let result = "";
+            $.ajax({
+                url: getContext() + "/addController/readTextFromClipboard",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                result = data.data;
+                            }
+                        }
+                    }
+                },
+                error: function (msg) {
+                    console.log(msg);
+                    result =  "";
+                }
+            });
+            return result;
+        },
         initModule(moduleName){
             this.$nextTick(()=>{
                 // 执行页面组件初始化方法
                 if(this.$refs[moduleName] && this.$refs[moduleName].init){
                     this.$refs[moduleName].init()
+                }
+            })
+        },
+        refreshScrollHeight(){
+            this.$nextTick(()=>{
+                // 执行页面组件初始化方法
+                if(this.$refs['layoutAnalysis'] && this.$refs['layoutAnalysis'].refreshScrollHeight){
+                    this.$refs['layoutAnalysis'].refreshScrollHeight()
+                }
+                if(this.$refs['imgHandler'] && this.$refs['imgHandler'].refreshScrollHeight){
+                    this.$refs['imgHandler'].refreshScrollHeight()
+                }
+                if(this.$refs['previewDevice'] && this.$refs['previewDevice'].refreshScrollHeight){
+                    this.$refs['previewDevice'].refreshScrollHeight()
                 }
             })
         },

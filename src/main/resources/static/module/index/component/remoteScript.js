@@ -443,7 +443,7 @@ export default {
         initCustomScript(){
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/remoteCustomScriptSetting.json?t="+(new Date().getTime()),
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/system/remoteScript/remoteCustomScriptSetting.json?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 success: function (res) {
@@ -475,7 +475,7 @@ export default {
             });
             const param = new FormData();
             param.append('file', scriptFile);
-            param.append('pathName', this.deviceInfo.deviceUuid+"/");
+            param.append('pathName', this.deviceInfo.deviceUuid+"/system/remoteScript/");
             let _that = this;
             $.ajax({
                 url: getContext() + "/attachmentInfo/uploadFileSingle",
@@ -563,7 +563,7 @@ export default {
                 });
                 const param = new FormData();
                 param.append('file', scriptFile);
-                param.append('pathName', this.deviceInfo.deviceUuid+"/");
+                param.append('pathName', this.deviceInfo.deviceUuid+"/system/remoteScript/");
                 let _that = this;
                 $.ajax({
                     url: getContext() + "/attachmentInfo/uploadFileSingle",
@@ -595,7 +595,7 @@ export default {
             }
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.remoteHandler.param4.scriptName + "?t="+(new Date().getTime()),
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/system/remoteScript/"+this.remoteHandler.param4.scriptName + "?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型

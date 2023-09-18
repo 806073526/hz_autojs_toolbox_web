@@ -289,20 +289,31 @@ export default {
         },
         // 远程上传日志
         remoteLogUpload() {
-            let messageStr = '{"functionName":"remoteUploadLogToServer","functionParam":["' + this.remoteHandler.param2.logName + '"]}';
-            this.sendMsgToClient('remoteHandler', messageStr, () => {
-                this.loadPreviewLog()
-            })
+            let remoteScript = `
+            /**
+             * 远程上传日志到服务器
+             * @param {*} logName 日志名称
+             */
+            utilsObj.remoteUploadLogToServer = (logName) => {
+                let localPathName = "/sdcard/autoJsToolsLog/" + logName
+                // 调用远程上传文件方法
+                utilsObj.uploadFileToServer(localPathName, deviceUUID + "/system/remoteLog/" + logName, (remoteImageURL) => {
+                    if (commonStorage.get("debugModel")) {
+                        console.log("远程日志地址：" + remoteImageURL)
+                    }
+                })
+            }
+            utilsObj.remoteUploadLogToServer('${this.remoteHandler.param2.logName}');
+            `;
+            this.remoteExecuteScript(remoteScript);
         },
         // 加载日志
         loadPreviewLog() {
-
-
             if (!this.validSelectDevice()) {
                 return
             }
             this.remoteHandler.param2.previewLog = "";
-            let logUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + this.remoteHandler.param2.logName;
+            let logUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/system/remoteLog/" + this.remoteHandler.param2.logName;
             setTimeout(() => {
                 this.remoteHandler.param2.previewLog = logUrl;
                 this.$nextTick(() => {
@@ -314,15 +325,6 @@ export default {
                     },1500)
                 });
             }, 200);
-        },
-        // 下载日志
-        downLoadLog() {
-            if (!this.validSelectDevice()) {
-                return
-            }
-            if (this.remoteHandler.param2.previewLog) {
-                window.open(this.remoteHandler.param2.previewLog)
-            }
         },
     }
 }

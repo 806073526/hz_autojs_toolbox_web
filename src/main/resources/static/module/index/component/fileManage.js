@@ -280,8 +280,8 @@ export default {
             packageProject:{
                 appName:'',//
                 packageName:'',//
-                versionName:'默认',
-                versionCode:'1.0.0',
+                versionName:'1.0.0',
+                versionCode:'1000',
                 appIcon:'',
                 openNodeJs:false,
                 openImageModule:true,
@@ -2130,7 +2130,7 @@ export default {
             }
             // 创建a标签，通过a标签实现下载
             const dom = document.createElement("a");
-            dom.href = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
+            dom.href = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + "V"+this.packageProject.versionName+ ".apk";
             console.log(dom.href);
             dom.id = "upload-file-dom";
             dom.style.display = "none";
@@ -2180,7 +2180,7 @@ export default {
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             toPath = toPath.substring(0,toPath.length - 1);
             let localFileUrl = this.packageProject.appName + ".apk";
-            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/" + this.packageProject.appName + ".apk";
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/"+ "V"+this.packageProject.versionName+ ".apk";
 
             let message = "安装包下载路径为：/sdcard/"+localFileUrl+",请查看!";
             // 创建目录代码 如果不是/ 则需要创建目录
@@ -2616,9 +2616,9 @@ export default {
         // 手机端压缩文件
         phoneZipFile(row,flag){
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
-            let str = "请输入要压缩到的目录及文件名(根目录是/sdcard/)";
+            let str = "请输入压缩包目标路径(根路径是/sdcard/,zip根目录为所选目录)";
             if(!flag){
-                str = "请输入要压缩到的目录(根目录是/sdcard/),压缩不含父目录"
+                str = "请输入压缩包目录路径(根路径是/sdcard/,zip根目录为所选目录的子目录)"
             }
             window.ZXW_VUE.$prompt(str, '提示', {
                 confirmButtonText: '确定',

@@ -5,110 +5,111 @@
     <el-row>
         <el-col :span="isActive ? 24 : 12">
             <div class="previewDivContainer">
-                <div class="previewToolsDiv">
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                        <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="allScreenPreviewImg"
-                                   @click.stop.prevent="allScreenPreviewImg">
-                            全屏预览
-                        </el-button>
-                        <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="loadPreviewImg"
-                                   @click.stop.prevent="startPreviewDevice(true)">
-                            开始预览
-                        </el-button>
-                        <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="stopPreviewDevice(true)">
-                            停止预览
-                        </el-button>
-                        <span style="margin-left: 5px; ">屏幕方向：</span>
-                        <el-radio-group v-model="screenDirection" style="margin-top: 3px;">
-                            <el-radio label="横屏">
-                                横屏方向
-                            </el-radio>
-                            <el-radio label="竖屏">
-                                竖屏方向
-                            </el-radio>
-                        </el-radio-group>
-                        <div style="margin-left: 10px;">
+                <div style="background: white;height: 5px;width: calc(100% - 15px);top:1px;position:absolute;z-index: 999;"></div>
+                <div style="position: sticky;top:0px;z-index: 999;">
+                    <div class="previewToolsDiv">
+                        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="allScreenPreviewImg"
+                                       @click.stop.prevent="allScreenPreviewImg">
+                                全屏预览
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" id="loadPreviewImg"
+                                       @click.stop.prevent="startPreviewDevice(true)">
+                                开始预览
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="stopPreviewDevice(true)">
+                                停止预览
+                            </el-button>
+                            <span style="margin-left: 5px; ">屏幕方向：</span>
+                            <el-radio-group v-model="screenDirection" style="margin-top: 3px;">
+                                <el-radio label="横屏">
+                                    横屏方向
+                                </el-radio>
+                                <el-radio label="竖屏">
+                                    竖屏方向
+                                </el-radio>
+                            </el-radio-group>
+                            <div style="margin-left: 10px;">
                             <span class="mousePositionX">
                                  x:{{deviceMousePosition.x }}
                             </span>
-                            <span class="mousePositionY">
+                                <span class="mousePositionY">
                                 y:{{deviceMousePosition.y}}
                             </span>
-                        </div>
-                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                            </div>
+                            <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
-                        <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
-                            <div>
-                                <b>全屏预览:</b>
-                                <span>设备操作区域全屏显示。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>开始预览:</b>
-                                <span>发送指令,传输手机端图像显示到界面,可通过右侧常用参数修改刷新率、图片质量等。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>停止预览:</b>
-                                <span>发送指令,停止传输手机端图像。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>屏幕方向:</b>
-                                <span>所选设备的屏幕方向,手机端旋转屏幕时,会自动监听变化。(如果监听失效,可手动修改)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>APP刷新:</b>
-                                <span>预览图像的频率,数值越低刷新频率越高,越占用带宽。(局域网可以设置为30,部署公网带宽低的不建议设置过低)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>预览质量:</b>
-                                <span>预览图像的压缩质量,数值越低图像越模糊,响应速度越快。(最大值为100,默认10,为提高响应速度可设置为6)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>缩放倍数:</b>
-                                <span>预览图像的缩放备注,数值越低图像越模糊,响应速度越快。(默认为1,不缩放,为提高响应速度可设置1以下)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>预览阈值:</b>
-                                <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>文本框序号:</b>
-                                <span>传输文本到设备时,指定输入框序号,为空则发送给所有输入框。(仅支持常规输入框控件)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>传输类型:</b>
-                                <span>传输文本到设备,追加文本或者覆盖文本内容。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>灵敏模式:</b>
-                                <span>常规预览模式,web端绘制完成指令后发送给APP执行,有一定的延迟。灵敏模式,web端实时绘制指令并发送到APP执行,如按下、移动、松开模拟滑动操作。(需要adb权限或者root权限支持)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>开启灰度化:</b>
-                                <span>开启灰度化后,预览设备显示为灰度化效果。(主要用于开发图色脚本时,实时测试灰度化效果)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>开启阈值化:</b>
-                                <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>运行中脚本:</b>
-                                <span>查看APP中正在运行的AutoJs脚本,支持停止脚本。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>定时任务:</b>
-                                <span>查看APP中已开启的定时任务,支持停止定时任务。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>通知监听:</b>
-                                <span>根据规则配置，监听设备的指定包名包含指定内容的通知,符合条件的可以支持推送消息到Web、APP控制面板消息、邮件转发、自定义代码执行等。下方表格还可以查询服务端启动后，监听成功的历史通知。</span>
-                            </div>
-                        </el-popover>
+                            <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
+                                <div>
+                                    <b>全屏预览:</b>
+                                    <span>设备操作区域全屏显示。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>开始预览:</b>
+                                    <span>发送指令,传输手机端图像显示到界面,可通过右侧常用参数修改刷新率、图片质量等。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>停止预览:</b>
+                                    <span>发送指令,停止传输手机端图像。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>屏幕方向:</b>
+                                    <span>所选设备的屏幕方向,手机端旋转屏幕时,会自动监听变化。(如果监听失效,可手动修改)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>APP刷新:</b>
+                                    <span>预览图像的频率,数值越低刷新频率越高,越占用带宽。(局域网可以设置为30,部署公网带宽低的不建议设置过低)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>预览质量:</b>
+                                    <span>预览图像的压缩质量,数值越低图像越模糊,响应速度越快。(最大值为100,默认10,为提高响应速度可设置为6)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>缩放倍数:</b>
+                                    <span>预览图像的缩放备注,数值越低图像越模糊,响应速度越快。(默认为1,不缩放,为提高响应速度可设置1以下)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>预览阈值:</b>
+                                    <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>文本框序号:</b>
+                                    <span>传输文本到设备时,指定输入框序号,为空则发送给所有输入框。(仅支持常规输入框控件)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>传输类型:</b>
+                                    <span>传输文本到设备,追加文本或者覆盖文本内容。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>灵敏模式:</b>
+                                    <span>常规预览模式,web端绘制完成指令后发送给APP执行,有一定的延迟。灵敏模式,web端实时绘制指令并发送到APP执行,如按下、移动、松开模拟滑动操作。(需要adb权限或者root权限支持)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>开启灰度化:</b>
+                                    <span>开启灰度化后,预览设备显示为灰度化效果。(主要用于开发图色脚本时,实时测试灰度化效果)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>开启阈值化:</b>
+                                    <span>开启阈值化后,调整阈值显示。(主要用于开发图色脚本时,实时测试阈值效果)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>运行中脚本:</b>
+                                    <span>查看APP中正在运行的AutoJs脚本,支持停止脚本。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>定时任务:</b>
+                                    <span>查看APP中已开启的定时任务,支持停止定时任务。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>通知监听:</b>
+                                    <span>根据规则配置，监听设备的指定包名包含指定内容的通知,符合条件的可以支持推送消息到Web、APP控制面板消息、邮件转发、自定义代码执行等。下方表格还可以查询服务端启动后，监听成功的历史通知。</span>
+                                </div>
+                            </el-popover>
+                        </div>
                     </div>
-                </div>
-                <div class="width100">
-                    <div class="width100">
-                        <div class="d-flex a-center j-start" style="margin-top: 5px;">
+                    <div style="background: white;padding-top: 10px;">
+                        <div class="d-flex a-center j-start">
                             <el-input type="textarea" v-model="textContent" placeholder="请输入文本内容" clearable class="width100">
                             </el-input>
                             <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="sendTextContent">
@@ -118,6 +119,29 @@
                         <div style="display: flex;width: 100%;">
                             <el-slider style="flex:1;" v-model="previewImageWidth" show-input></el-slider>
                         </div>
+                    </div>
+                    <div style="">
+                        <div class="d-flex flex-column" style="margin-top: 5px;align-items: self-end;float: right;">
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('powerDialog')">
+                                电源
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('quickSettings')">
+                                通知
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('recents')">
+                                任务
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('home')">
+                                主页
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('back')">
+                                返回
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="width100">
+                    <div class="width100">
                         <div style="display: flex;">
                             <div class="d-flex j-center">
                                 <div draggable="false" :style="{width:previewImageWidth+'%'}" style="min-height: 40vh;display: flex;justify-content: center;align-items: center;text-align: center;">
@@ -203,25 +227,6 @@
                             </div>
                             <div class="d-flex a-center j-center" v-show="noPreviewImg" style="font-size: 30px;color: rgba(29,140,128,0.29);width: 100%;">
                                 暂无预览图,请点击【开始预览】
-                            </div>
-                            <div>
-                                <div class="d-flex flex-column" style="margin-top: 5px;align-items: self-end;">
-                                    <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('powerDialog')">
-                                        电源
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('quickSettings')">
-                                        通知
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('recents')">
-                                        任务
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('home')">
-                                        主页
-                                    </el-button>
-                                    <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('back')">
-                                        返回
-                                    </el-button>
-                                </div>
                             </div>
                         </div>
                     </div>

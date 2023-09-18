@@ -11,7 +11,7 @@ $.ajax({
 export default {
     template: template,
     name: 'LayoutAnalysis',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','copyToClipboard'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -128,6 +128,28 @@ export default {
         }
     },
     methods: {
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".layoutDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
+            }
+        },
+        init(){
+          this.refreshScrollHeight();
+        },
         // 开启自定义过滤函数处理开关change
         openCustomFilterFunctionChange(){
             this.remoteHandler.param5.filterRootNodeObj = [];
@@ -294,6 +316,38 @@ export default {
             this.layoutLoading = true;
             this.clearNodeJson();
             let remoteScript = `auto.clearCache();
+            /**
+             * 远程上传根节点json到服务器
+             */
+            utilsObj.remoteUploadRootNodeJsonToServer = () => {
+                let localPathName = "/sdcard/autoJsTools/rootNode.json"
+                // 调用远程上传文件方法
+                utilsObj.uploadFileToServer(localPathName, deviceUUID + "/system/layoutAnalysis/" + "rootNode.json", (remoteRootURL) => {
+                    if (commonStorage.get("debugModel")) {
+                        console.log("远程节点地址：" + remoteRootURL)
+                    }
+                })
+            }
+            /**
+             * 上传节点预览图片
+             */
+            utilsObj.uploadNodePreviewImg = () => {
+                // 唤醒设备
+                device.wakeUpIfNeeded();
+                // 申请 截图权限
+                utilsObj.requestScreenCaptureCommonFun(()=>{
+                    let img = images.captureScreen()
+                    let tempImgPath = '/sdcard/screenImg/nodePreviewImg.jpg'
+                    files.createWithDirs("/sdcard/screenImg/")
+                    // 临时图片路径
+                    files.remove(tempImgPath)
+                    sleep(10)
+                    images.save(img, tempImgPath, "jpg", "100");
+                    utilsObj.uploadFileToServer(tempImgPath, deviceUUID + '/system/layoutAnalysis/nodePreviewImg.jpg', (a) => {
+                    })
+                    img.recycle()
+                })
+            }
             utilsObj.getRootNodeWriteLocal("tree","${this.remoteHandler.param5.layoutAnalysisRange}");
             utilsObj.remoteUploadRootNodeJsonToServer();
             utilsObj.uploadNodePreviewImg();`;
@@ -306,9 +360,9 @@ export default {
             let startFlagImg = false; // 图片开始处理标志
 
             // 节点
-            let relativeFilePath = this.deviceInfo.deviceUuid + "/rootNode.json";
+            let relativeFilePath = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode.json";
             // 图片
-            let relativeFilePathImg = this.deviceInfo.deviceUuid + "/nodePreviewImg.jpg";
+            let relativeFilePathImg = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg.jpg";
 
             // 原始文件信息
             let sourceFileInfo = this.getFileInfoByPath(relativeFilePath);
@@ -327,7 +381,7 @@ export default {
                 if(reConnectCount > 60){
                     reConnectCount = 0;
                     this.layoutLoading = false;
-                    window.ZXW_VUE.$message.warning('一键布局分析超时,请重试或者采用分步操作(远程布局分析-上传布局分析并解析)！');
+                    window.ZXW_VUE.$message.warning('一键布局分析超时,请重试或检查APP后台运行权限！');
                     clearInterval(refreshTimer);
                 }
 
@@ -438,21 +492,8 @@ export default {
         // 节点信息点击
         nodeContentClick(e) {
             this.remoteHandler.param5.nodeInfo = String(e.target.innerHTML).replace(/(^\s*)|(\s*$)/g, "");
-
-            try{
-                $.ajax({
-                    url: getContext() + "/addController/recordeControlInfo",
-                    type: "post",
-                    dataType: "json",
-                    data: {
-                        message:this.remoteHandler.param5.nodeInfo
-                    },success(){
-                        window.ZXW_VUE.$notify.success({message: '已复制到剪切板', duration: '1000'})
-                    }
-                });
-            }catch (e){}
-
-
+            // 复制到剪切板
+            this.copyToClipboard(this.remoteHandler.param5.nodeInfo);
         },
         // 节点左键点击
         nodeClickFun(data, node, component) {
@@ -542,7 +583,7 @@ export default {
             // 设置key数组
             _that.remoteHandler.param5.nodeKeyArr = [];
             $.ajax({
-                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/rootNode.json?"+(new Date().getTime()),
+                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode.json?"+(new Date().getTime()),
                 type: "GET",//请求方式为get
                 dataType: "json", //返回数据格式为json
                 success: function (data) {//请求成功完成后要执行的方法
@@ -552,7 +593,7 @@ export default {
                     // 删除节点信息显示
                     _that.remoteHandler.param5.dialogVisible = false;
                     // 加载控件图片
-                    let imgUrl = getContext() + "/uploadPath/autoJsTools/" + _that.deviceInfo.deviceUuid + "/nodePreviewImg.jpg";
+                    let imgUrl = getContext() + "/uploadPath/autoJsTools/" + _that.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg.jpg";
                     _that.$nextTick(() => {
                         _that.$refs.nodeTree.filter();
                         $("#nodePreviewImg").attr("src", imgUrl + "?t=" + new Date().getTime());

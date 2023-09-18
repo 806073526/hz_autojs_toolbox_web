@@ -1,6 +1,7 @@
 package com.zjh.zxw.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -1601,8 +1602,29 @@ public class AttachmentInfoController extends BaseController {
             }
             // 打包模板路径
             String packageTemplatePath = webProjectRootPath + File.separator + webProjectName;
+
+            String versionName = "";
+            File projectFile = new File(packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + "project.json");
+            if(projectFile.exists()){
+                BufferedReader reader = new BufferedReader(new FileReader(projectFile));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                reader.close();
+                String fileContent = stringBuilder.toString();
+                JSONObject projectJsonObj = JSONObject.parseObject(fileContent);
+                if(StringUtils.isNotBlank(projectJsonObj.getString("versionName"))){
+                    versionName = projectJsonObj.getString("versionName");
+                }
+            }
+            String versionNamePath = packageTemplatePath + (StringUtils.isNotBlank(versionName) ? "V" + versionName : versionName) + ".apk";
+
             // 先删除build文件
             attachmentInfoService.deleteFile(packageTemplatePath + File.separator + "build");
+            // 删除apk版本文件
+            attachmentInfoService.deleteFile(versionNamePath);
             // 删除apk文件
             attachmentInfoService.deleteFile(packageTemplatePath + ".apk");
             // 删除apk.idsig文件
@@ -1612,6 +1634,8 @@ public class AttachmentInfoController extends BaseController {
             if(StrHelper.getObjectValue(result).contains("当前设备未授权")){
                 return fail(result);
             }
+            // 重命名版本号
+            attachmentInfoService.reNameFile(packageTemplatePath + ".apk",versionNamePath);
             return success(result);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());

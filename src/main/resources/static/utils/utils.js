@@ -41,7 +41,7 @@ function getCustomPrompt(){
             });
             const param = new FormData();
             param.append('file', scriptFile);
-            param.append('pathName', '/webCommonPath/');
+            param.append('pathName', 'webCommonPath/');
             $.ajax({
                 url: getContext() + "/attachmentInfo/uploadFileSingle",
                 type: 'post',

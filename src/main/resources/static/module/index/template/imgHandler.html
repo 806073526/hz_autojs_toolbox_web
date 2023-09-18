@@ -5,79 +5,80 @@
     <el-row>
         <el-col :span="isActive ? 20 : 12">
             <div class="imgDivContainer">
-                <div class="imgToolsDiv">
-                    <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                        <el-button type="danger" size="mini" @click.stop.prevent="allCaptureScreen">
-                            全屏截图
-                        </el-button>
-                        <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
-                            图像处理
-                        </el-button>
-                        <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
-                            文字识别
-                        </el-button>
-                        <el-button type="danger" size="mini" @click.stop.prevent="loadPreviewImg">
-                            加载图片
-                        </el-button>
-                        <el-button type="danger" size="mini" @click.stop.prevent="allCaptureScreenScale" :disabled="disabledAllCaptureScreenScale">
-                            全屏裁剪
-                        </el-button>
-                        <span style="margin-left: 5px; ">屏幕方向：</span>
-                        <el-radio-group v-model="screenDirection" style="margin-top: 3px;">
-                            <el-radio label="横屏">
-                                横屏方向
-                            </el-radio>
-                            <el-radio label="竖屏">
-                                竖屏方向
-                            </el-radio>
-                        </el-radio-group>
-                        <span style="margin-left: 10px;font-weight: 600;">{{ remoteHandler.param1.isOpenFastClip ? "裁剪模式" : "预览模式" }}</span>
-                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                <div style="background: white;height: 5px;width: calc(100% - 15px);top:1px;position:absolute;z-index: 999;"></div>
+                <div style="position: sticky;top:0px;z-index: 999;">
+                    <div class="imgToolsDiv">
+                        <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                            <el-button type="danger" size="mini" @click.stop.prevent="allCaptureScreen">
+                                全屏截图
+                            </el-button>
+                            <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdToServer')">
+                                图像处理
+                            </el-button>
+                            <el-button type="danger" size="mini" @click.stop.prevent="sendImgAction('remoteClipGrayscaleAndThresholdAnalysisChartToServer')">
+                                文字识别
+                            </el-button>
+                            <el-button type="danger" size="mini" @click.stop.prevent="loadPreviewImg">
+                                加载图片
+                            </el-button>
+                            <el-button type="danger" size="mini" @click.stop.prevent="allCaptureScreenScale" :disabled="disabledAllCaptureScreenScale">
+                                全屏裁剪
+                            </el-button>
+                            <span style="margin-left: 5px; ">屏幕方向：</span>
+                            <el-radio-group v-model="screenDirection" style="margin-top: 3px;">
+                                <el-radio label="横屏">
+                                    横屏方向
+                                </el-radio>
+                                <el-radio label="竖屏">
+                                    竖屏方向
+                                </el-radio>
+                            </el-radio-group>
+                            <span style="margin-left: 10px;font-weight: 600;">{{ remoteHandler.param1.isOpenFastClip ? "裁剪模式" : "预览模式" }}</span>
+                            <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
-                        <el-popover ref="popover1" placement="top-start" width="500" trigger="hover">
-                            <div>
-                                <b>全屏截图:</b>
-                                <span>默认进行坐标全屏,然后执行图像处理的操作。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>图像处理:</b>
-                                <span>根据右侧的常用参数,远程执行图像处理,支持设置灰度化,阈值化。(处理后图片默认上传web文件目录)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>文字识别:</b>
-                                <span>在图像处理的基础上,基于谷歌MLKitOCR进行文字识别,并显示识别结果。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>加载图片:</b>
-                                <span>根据右侧的图片名称,加载web端的图片。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>全屏裁剪:</b>
-                                <span>请执行全屏截图后,再执行全屏裁剪操作。(以下三种情况不可用:1、没有预览图 2、坐标未全屏 3、预览图不是全屏预览图)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>屏幕方向:</b>
-                                <span>所选设备的屏幕方向,手机端旋转屏幕时,会自动监听变化。(如果监听失效,可手动修改)</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>预览模式:</b>
-                                <span>点击预览图片,自动获取坐标和颜色值</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>裁剪模式:</b>
-                                <span>基于全屏截图,获取全屏的截图,按下鼠标框选需要裁剪的区域,松开鼠标裁剪图片。</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <b>截图异常怎么办:</b>
-                                <span>1、检查app是否授予后台运行权限。2、尝试刷新截图权限(点击右上角刷新截图权限按钮)</span>
-                            </div>
-                        </el-popover>
+                            <el-popover ref="popover1" placement="top-start" width="500" trigger="hover">
+                                <div>
+                                    <b>全屏截图:</b>
+                                    <span>默认进行坐标全屏,然后执行图像处理的操作。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>图像处理:</b>
+                                    <span>根据右侧的常用参数,远程执行图像处理,支持设置灰度化,阈值化。(处理后图片默认上传web文件目录)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>文字识别:</b>
+                                    <span>在图像处理的基础上,基于谷歌MLKitOCR进行文字识别,并显示识别结果。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>加载图片:</b>
+                                    <span>根据右侧的图片名称,加载web端的图片。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>全屏裁剪:</b>
+                                    <span>请执行全屏截图后,再执行全屏裁剪操作。(以下三种情况不可用:1、没有预览图 2、坐标未全屏 3、预览图不是全屏预览图)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>屏幕方向:</b>
+                                    <span>所选设备的屏幕方向,手机端旋转屏幕时,会自动监听变化。(如果监听失效,可手动修改)</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>预览模式:</b>
+                                    <span>点击预览图片,自动获取坐标和颜色值</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>裁剪模式:</b>
+                                    <span>基于全屏截图,获取全屏的截图,按下鼠标框选需要裁剪的区域,松开鼠标裁剪图片。</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <b>截图异常怎么办:</b>
+                                    <span>1、检查app是否授予后台运行权限。2、尝试刷新截图权限(点击右上角刷新截图权限按钮)</span>
+                                </div>
+                            </el-popover>
+                        </div>
                     </div>
-                </div>
-                <div class="width100">
-                    <div class="width100">
-                        <el-row class="d-flex width100" style="margin-top: 5px;">
+                    <div style="background: white;padding-top: 10px;">
+                        <el-row class="d-flex width100">
                             <el-button type="primary" size="mini" @click.stop.prevent="saveImage" v-if="remoteHandler.param1.previewImg">
                                 保存图片到Web
                             </el-button>
@@ -88,6 +89,10 @@
                         <div style="display: flex;width: 100%;" v-if="remoteHandler.param1.previewImg">
                             <el-slider style="flex:1;" v-model="previewImageWidth" show-input></el-slider>
                         </div>
+                    </div>
+                </div>
+                <div class="width100">
+                    <div class="width100">
                         <div class="d-flex j-center width100">
                             <div draggable="false" :style="{width:previewImageWidth+'%'}" v-loading="imgDrawLoading" style="user-select: none;min-height: 40vh;display: flex;justify-content: center;align-items: center;text-align: center;">
                                 <div id="drawArear" class="draw-box" v-if="remoteHandler.param1.previewImg"
@@ -108,7 +113,7 @@
             </div>
         </el-col>
         <el-col :span="4">
-            <div class="imgDivContainer" style="margin: 0 10px;display: flex;flex-direction: column;">
+            <div class="imgDivContainer" style="margin: 0 10px;display: flex;flex-direction: column;position: relative;">
                 <div class="mousePositionDiv">
                     <span class="mousePositionX">
                          x:{{imgMousePosition.x }}
@@ -120,11 +125,39 @@
                         color:{{imgMousePosition.color}}
                     </span>
                 </div>
+                <span v-popover:popover2 class="link-black" style="font-size: 21px; position: absolute;top:0;right: 0; cursor: pointer">
+                          <i class="el-icon-question" />
+                </span>
                 <div class="mousePositionCls">
                     <canvas id="canvasScale">
                     </canvas>
                     <div v-for="(cell,index) in cells" class="cell" :class="{'selectCell':index === 112}"></div>
                 </div>
+                <div style="margin-top: 10px;" class="d-flex">
+                    <el-button type="primary" class="flex-1" size="mini" @click.stop.prevent="setParam1(true)">
+                        全屏坐标
+                    </el-button>
+                    <el-button type="primary" class="flex-1" size="mini" @click.stop.prevent="readPositionList">
+                        读取坐标
+                    </el-button>
+                    <el-button type="primary" class="flex-1" size="mini" @click.stop.prevent="clearPosition">
+                        清空坐标
+                    </el-button>
+                </div>
+                <el-popover ref="popover2" placement="top-start" width="500" trigger="hover">
+                    <div>
+                        <b>全屏坐标:</b>
+                        <span>根据设备屏幕方向,设备尺寸,将全屏坐标写入右侧常用参数坐标中。</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>读取坐标:</b>
+                        <span>读取坐标列表中最后两个坐标,并将其写入右侧常用参数坐标中。</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <b>清空坐标:</b>
+                        <span>清空坐标列表中的全部坐标。</span>
+                    </div>
+                </el-popover>
                 <div style="height: 100%;margin-top: 10px;flex: 1;">
                     <el-input type="textarea" v-model="remoteHandler.param1.positionList" style="height: 100%;"
                               placeholder="点击预览图片,获取点击位置的坐标,坐标列表可以用于解析坐标区域,多点找色等"  class="width100 positionInput">
@@ -240,6 +273,9 @@
                                 <el-form-item label="文字识别:" prop="context" label-width="100px" class="flex-1">
                                     <el-input v-model="remoteHandler.param1.context" placeholder="请输入文字识别内容"
                                               class="width100" />
+                                </el-form-item>
+                                <el-form-item label="多条件匹配:" prop="smallScale" label-width="100px" class="flex-1">
+                                    <el-switch v-model="remoteHandler.param1.openSplit" />
                                 </el-form-item>
                             </el-row>
                         </div>
@@ -415,11 +451,17 @@
                                        </el-dropdown-item>
                                    </el-dropdown-menu>
                                </el-dropdown>
+                               <el-button type="primary" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="readJsonFromClipboard">
+                                   从剪切板读取json
+                               </el-button>
                                <el-button type="primary" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="readParamFromJson">
                                    从json读取参数
                                </el-button>
                                <el-button type="primary" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="generateParamToJson">
                                    参数生成json
+                               </el-button>
+                               <el-button type="primary" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="copyJsonToClipboard">
+                                   json写入剪切板
                                </el-button>
                            </div>
                        </div>

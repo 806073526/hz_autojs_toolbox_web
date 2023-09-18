@@ -869,7 +869,7 @@ eval(pageExecuteScript);
                 });
                 const param = new FormData();
                 param.append('file', pageSettingFile);
-                param.append('pathName', this.deviceInfo.deviceUuid+"/");
+                param.append('pathName', this.deviceInfo.deviceUuid+"/system/pageMatching/");
                 let _that = this;
                 $.ajax({
                     url: getContext() + "/attachmentInfo/uploadFileSingle",
@@ -901,7 +901,7 @@ eval(pageExecuteScript);
             }
             let _that = this;
             $.ajax({
-                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/"+this.pageSettingParam.pageSettingParamName + "?t="+(new Date().getTime()),
+                url: getContext() + "/uploadPath/autoJsTools/"+this.deviceInfo.deviceUuid+"/system/pageMatching/"+this.pageSettingParam.pageSettingParamName + "?t="+(new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型

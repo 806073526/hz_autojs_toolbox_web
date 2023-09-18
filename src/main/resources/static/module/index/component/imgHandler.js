@@ -11,7 +11,7 @@ $.ajax({
 export default {
     template: template,
     name: 'ImgHandler',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun','copyToClipboard','readTextFromClipboard'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -72,7 +72,7 @@ export default {
                     colorThreshold: 26,// 颜色相似度
                     bigScale: 1,
                     smallScale: 1,
-                    localImageName: 'allScreen.png',
+                    localImageName: 'system/imageHandler/allScreen.png',
                     pathName:'',
                     context:'',// 文字内容
                     scriptPreview: '',
@@ -125,8 +125,37 @@ export default {
         }
     },
     methods: {
+        initPhoneImageUploadPath(){
+            let phoneCreateAlreadySystemImageDir = window.localStorage.getItem("phoneCreateAlreadySystemImageDir");
+            if(!phoneCreateAlreadySystemImageDir){
+                let remoteScript = `files.createWithDirs("/sdcard/autoJsLocalImg/system/imageHandler/");`;
+                this.remoteExecuteScript(remoteScript);
+                window.localStorage.setItem("phoneCreateAlreadySystemImageDir","1");
+            }
+        },
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".imgDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
+            }
+        },
         init(){
             this.timeSyncOtherPropertyFun();
+            this.refreshScrollHeight();
+            this.initPhoneImageUploadPath();
         },
         // 多点坐标转换
         multipleConvert() {
@@ -192,6 +221,16 @@ export default {
         clearPosition() {
             this.remoteHandler.param1.positionList = '';
             window.ZXW_VUE.$notify.success({message: '清空坐标成功', duration: '1000'})
+        },
+        // 从剪切板读取json
+        readJsonFromClipboard(){
+            let clipboardText = this.readTextFromClipboard();
+            if(clipboardText){
+                this.remoteHandler.param1.paramJson = clipboardText;
+                window.ZXW_VUE.$notify.success({message: '读取成功', duration: '1000'})
+            } else {
+                window.ZXW_VUE.$message.warning('未读取到内容');
+            }
         },
         // 从json读取参数
         readParamFromJson(){
@@ -262,6 +301,10 @@ export default {
             });
             this.remoteHandler.param1.paramJson = JSON.stringify(pageObj);
             window.ZXW_VUE.$notify.success({message: '生成成功', duration: '1000'})
+        },
+        // 复制json到剪切板
+        copyJsonToClipboard(){
+            this.copyToClipboard(this.remoteHandler.param1.paramJson);
         },
         // 读取坐标
         readPositionList() {
