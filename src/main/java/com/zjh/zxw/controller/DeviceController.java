@@ -127,7 +127,7 @@ public class DeviceController extends BaseController {
     /**
      * 管理员获取设备
      */
-    @ApiOperation(value = "管理员获取设备", notes = "管理员获取设备")
+   /* @ApiOperation(value = "管理员获取设备", notes = "管理员获取设备")
     @PostMapping("/getDeviceByAdmin")
     public R<AutoJsSession> getDeviceByAdmin(@RequestParam("deviceUUID") String deviceUUID,@RequestParam("token") String token) {
         try {
@@ -142,7 +142,7 @@ public class DeviceController extends BaseController {
             log.error(e.getMessage(), e);
             return fail("管理员获取设备失败！请联系管理员");
         }
-    }
+    }*/
 
     /**
      * 获取设备是否需要访问密码

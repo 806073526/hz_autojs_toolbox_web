@@ -101,7 +101,7 @@
     padding-left: 5px
 }
 .mousePositionCls .cell {
-    border: 1px solid black;
+    border: 1px solid #b1a8a8;
     z-index: 9;
 }
 .mousePositionCls .selectCell{

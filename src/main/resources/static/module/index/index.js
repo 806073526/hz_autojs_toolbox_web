@@ -330,6 +330,9 @@ window.ZXW_VUE = new Vue({
         changeShowWindowLog(){
           this.showWindowLog=!this.showWindowLog;
         },
+        clearShowWindowLog(){
+          this.windowLogContent = "";
+        },
         isNumberStr(str) {
             return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
         },
@@ -654,6 +657,10 @@ window.ZXW_VUE = new Vue({
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
+                headers:{
+                  "deviceUuid": this.deviceInfo.deviceUuid,
+                  "devicePassword": this.deviceInfo.devicePassword
+                },
                 data: JSON.stringify(dataParam),
                 success: function (data) {
                     if (data) {

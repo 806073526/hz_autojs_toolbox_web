@@ -253,6 +253,7 @@ export default {
                     }
                 }
             }
+            files.createWithDirs("/sdcard/autoJsLocalImg/system/imageHandler/");
             utilsObj.requestScreenCaptureCommonFun(()=>{
                 toastLog("刷新截图权限完成");
             })
@@ -412,6 +413,9 @@ export default {
                                 if (data.isSuccess) {
                                     // 密码正确
                                     if (data.data) {
+                                        // 设置访问密码
+                                        _that.deviceInfo.devicePassword = value;
+                                        _that.$set(row,'devicePassword',value);
                                         initDevice(row)
                                     } else {
                                         clearSelectRow();

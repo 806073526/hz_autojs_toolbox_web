@@ -126,11 +126,14 @@ export default {
     },
     methods: {
         initPhoneImageUploadPath(){
-            let phoneCreateAlreadySystemImageDir = window.localStorage.getItem("phoneCreateAlreadySystemImageDir");
+            if (!this.validSelectDevice()) {
+                return
+            }
+            let phoneCreateAlreadySystemImageDir = window.localStorage.getItem("phoneCreateAlreadySystemImageDir_"+this.deviceInfo.deviceUuid);
             if(!phoneCreateAlreadySystemImageDir){
                 let remoteScript = `files.createWithDirs("/sdcard/autoJsLocalImg/system/imageHandler/");`;
                 this.remoteExecuteScript(remoteScript);
-                window.localStorage.setItem("phoneCreateAlreadySystemImageDir","1");
+                window.localStorage.setItem("phoneCreateAlreadySystemImageDir_"+this.deviceInfo.deviceUuid,"1");
             }
         },
         refreshScrollHeight(){
@@ -155,7 +158,6 @@ export default {
         init(){
             this.timeSyncOtherPropertyFun();
             this.refreshScrollHeight();
-            this.initPhoneImageUploadPath();
         },
         // 多点坐标转换
         multipleConvert() {
@@ -347,6 +349,7 @@ export default {
             if (!this.validSelectDevice()) {
                 return
             }
+            this.initPhoneImageUploadPath();
             this.remoteHandler.param1.cache_x1 = this.remoteHandler.param1.x1;
             this.remoteHandler.param1.cache_y1 = this.remoteHandler.param1.y1;
             this.remoteHandler.param1.cache_x2 = this.remoteHandler.param1.x2;

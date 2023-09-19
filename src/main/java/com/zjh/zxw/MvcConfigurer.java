@@ -8,11 +8,13 @@
 package com.zjh.zxw;
 
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -35,6 +37,25 @@ public class MvcConfigurer extends WebMvcConfigurationSupport {
      */
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
+
+    @Value("${com.zjh.allowCorsOrigins:''}")
+    private String allowCorsOrigins;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        if(StringUtils.isNotBlank(allowCorsOrigins)){
+            //设置允许跨域的路径
+            registry.addMapping("*")
+                    //设置允许跨域请求的域名
+                    .allowedOrigins(allowCorsOrigins)
+                    //这里：是否允许证书 不再默认开启
+                    .allowCredentials(true)
+                    //设置允许的方法
+                    .allowedMethods("*")
+                    //跨域允许时间
+                    .maxAge(3600);
+        }
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

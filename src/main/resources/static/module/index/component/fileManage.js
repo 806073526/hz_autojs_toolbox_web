@@ -2179,8 +2179,8 @@ export default {
             }
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             toPath = toPath.substring(0,toPath.length - 1);
-            let localFileUrl = this.packageProject.appName + ".apk";
-            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/"+ "V"+this.packageProject.versionName+ ".apk";
+            let localFileUrl = this.packageProject.appName +  "V"+this.packageProject.versionName+ ".apk";
+            let downloadFilUrl = getContext() + "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/" + "apkPackage" + "/"+this.packageProject.appName + "V"+this.packageProject.versionName+ ".apk";
 
             let message = "安装包下载路径为：/sdcard/"+localFileUrl+",请查看!";
             // 创建目录代码 如果不是/ 则需要创建目录
