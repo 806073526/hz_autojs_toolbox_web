@@ -97,7 +97,7 @@ public class AutoJsWsServerEndpoint {
            return false;
         }
         AutoJsSession session = sessionMap.get(deviceUUID);
-        return StrHelper.getObjectValue(session.getPassword()).equals(password);
+        return StrHelper.getObjectValue(session.getPassword()).equals(StrHelper.getObjectValue(password));
     }
 
     public static AutoJsSession getDeviceByAdmin(String deviceUUID){

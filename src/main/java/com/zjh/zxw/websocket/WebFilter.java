@@ -1,6 +1,7 @@
 package com.zjh.zxw.websocket;
 
 
+import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.ValidateInterfaceConfig;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +22,9 @@ public class WebFilter implements Filter {
         // 当是需要校验接口的请求
         if(ValidateInterfaceConfig.needValidateInterface(requestURI)){
             // 读取设备uuid
-            String deviceUuid = req.getHeader("deviceUuid");
+            String deviceUuid = StrHelper.getOrDef(req.getHeader("deviceUuid"),"");
             // 读取设备密码
-            String devicePassword = req.getHeader("devicePassword");
+            String devicePassword = StrHelper.getOrDef(req.getHeader("devicePassword"),"");
 
             if(StringUtils.isBlank(deviceUuid)){
                 throw new BusinessException("未读取到设备uuid");
