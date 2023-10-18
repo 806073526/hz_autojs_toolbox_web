@@ -3952,7 +3952,7 @@ export default {
                 // 可自定义 主要为了app端区分版本
                 let hotUpdateVersion = getResult && getResult.statusCode == 200 ? getResult.body.string() : "热更新";
                 // 下载工具箱js代码 也可以选择将修改后的js代码 替换到web端上传路径下
-                let url = "http://121.4.241.250:9998/uploadPath/autoJsTools/hz_autojs_tools.zip"
+                let url = "http://tool.zjh336.cn/uploadPath/autoJsTools/hz_autojs_tools.zip"
                 // 请求压缩包
                 let r = http.get(url);
                 if (r.statusCode == 200) {

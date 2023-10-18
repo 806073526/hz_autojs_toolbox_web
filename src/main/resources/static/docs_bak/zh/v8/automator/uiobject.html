@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)../automator/uiobject.html -->
+<html lang="zh-CN" data-theme="light" class=" ">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="generator" content="VuePress 2.0.0-beta.51" />
+  <meta name="theme" content="VuePress Theme Hope" />
+  <meta property="og:url" content="index.html">
+  <meta property="og:site_name" content="Auto.js Pro文档">
+  <meta property="og:title" content="入门介绍">
+  <meta property="og:type" content="article">
+  <meta property="og:updated_time" content="2022-10-22T07:36:15.000Z">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:locale:alternate" content="en-US">
+  <meta property="article:modified_time" content="2022-10-22T07:36:15.000Z">
+  <link rel="alternate" hreflang="en-us" href="index.html">
+  <link rel="icon" href="../../../../docs_bak/favicon.ico">
+  <link rel="manifest" href="../../../../docs_bak/manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#46bd87">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>入门介绍 | Auto.js Pro文档</title>
+  <meta name="description" content="支持Node.js的自动化工作流JavaScript IDE">
+  <style>
+    :root {
+      --bg-color: #fff;
+    }
+
+    html[data-theme="dark"] {
+      --bg-color: #1d2025;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-color);
+    }
+  </style>
+  <script>
+    const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+    const systemDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+      document.querySelector("html").setAttribute("data-theme", "dark");
+    }
+  </script>
+  <link rel="stylesheet" href="../../../assets/style.ae9cb182.css">
+  <link rel="modulepreload" href="../../../assets/app.6aa2b576.js">
+  <link rel="modulepreload" href="../../../assets/app.html.004a89b7.js">
+  <link rel="modulepreload" href="../../../assets/_plugin-vue_export-helper.cdc0426e.js">
+  <link rel="modulepreload" href="../../../assets/app.html.79d7bc17.js">
+</head>
+
+<body>
+  <!-- Copyright � 2008. Spidersoft Ltd -->
+  <style>
+    A.applink:hover {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      background-color: #ffff00;
+      color: green;
+      text-decoration: none
+    }
+
+    A.applink {
+      border: 2px dotted #DCE6F4;
+      padding: 2px;
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info {
+      color: #2F5BFF;
+      background: transparent;
+      text-decoration: none
+    }
+
+    A.info:hover {
+      color: green;
+      background: transparent;
+      text-decoration: underline
+    }
+  </style>
+
+
+  <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content"
+      class="skip-link sr-only">Skip to content</a><!--]-->
+    <div class="theme-container has-toc"><!--[--><!--[-->
+      <header class="navbar">
+        <div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span
+              class="icon"></span></button><!----><a href="../../../docs.html" class="brand"><img class="logo"
+              src="../../../logo.png" alt="Auto.js Pro文档"><!----><span class="site-name hide-in-pad">Auto.js
+              Pro文档</span></a><!----></div>
+        <div class="navbar-center"><!---->
+          <nav class="nav-links">
+            <div class="nav-item hide-in-mobile"><a href="../../../docs.html" class="nav-link"
+                aria-label="Auto.js Pro"><span class="icon iconfont icon-home"></span>Auto.js Pro<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../../guide/guide.html" class="nav-link" aria-label="指南"><span
+                  class="icon iconfont icon-creative"></span>指南<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../v8.html" class="nav-link active"
+                aria-label="第一代API文档"><span class="icon iconfont icon-note"></span>第一代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile"><a href="../../v9/v9.html" class="nav-link" aria-label="第二代API文档"><span
+                  class="icon iconfont icon-note"></span>第二代API文档<!----></a></div>
+            <div class="nav-item hide-in-mobile">
+              <div class="dropdown-wrapper"><button class="dropdown-title" type="button" aria-label="官网与相关链接"><span
+                    class="title"><span class="icon iconfont icon-discover"></span>官网与相关链接</span><span
+                    class="arrow"></span>
+                  <ul class="nav-dropdown">
+                    <li class="dropdown-item"><a href="../../../../pro.autojs.html" rel="noopener noreferrer"
+                        target="_blank" aria-label="官网与软件下载" class="nav-link"><!---->官网与软件下载<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+
+                    <li class="dropdown-item"><a href="https://pd.qq.com/s/gosos5" rel="noopener noreferrer"
+                        target="_blank" aria-label="官方频道" class="nav-link"><!---->官方频道<span><svg
+                            class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                            focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                            <path fill="currentColor"
+                              d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                            </path>
+                            <polygon fill="currentColor"
+                              points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                            </polygon>
+                          </svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a>
+                    </li>
+                  </ul>
+                </button></div>
+            </div>
+          </nav><!---->
+        </div>
+        <div class="navbar-right"><!---->
+          <div class="nav-item">
+            <div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button"
+                aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon"
+                  viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon"
+                  style="width:1rem;height:1rem;vertical-align:middle;">
+                  <path
+                    d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z">
+                  </path>
+                </svg><!--]--><span class="arrow"></span>
+                <ul class="nav-dropdown">
+                  <li class="dropdown-item"><a href="https://pro.autojs.org/docs/en/" class="nav-link"
+                      aria-label="English"><!---->English<!----></a></li>
+                  <li class="dropdown-item"><a aria-current="page" href="../automator/uiobject.html"
+                      class="router-link-active router-link-exact-active nav-link active"
+                      aria-label="简体中文"><!---->简体中文<!----></a></li>
+                </ul>
+              </button></div>
+          </div><!---->
+          <div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg"
+                class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon"
+                style="display:block;">
+                <path
+                  d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="dark icon" style="display:none;">
+                <path
+                  d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z">
+                </path>
+              </svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="light icon" style="display:none;">
+                <path
+                  d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z">
+                </path>
+              </svg></button></div>
+          <div class="search-box" role="search" data-v-f3875574=""><input value="" aria-label="Search" class=""
+              placeholder="Search" autocomplete="off" spellcheck="false" data-v-f3875574=""><!----></div><!----><button
+            class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false"
+            aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span
+                class="button-middle"></span><span class="button-bottom"></span></span></button>
+        </div>
+      </header><!----><!--]--><!---->
+      <div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div>
+      <aside class="sidebar"><!--[--><!----><!--]-->
+        <ul class="sidebar-links">
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">指南</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="../" class="nav-link sidebar-link sidebar-page"
+                    aria-label="阅读须知"><!---->阅读须知<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading active"><!----><span class="title">API文档</span><!----></p>
+              <ul class="sidebar-links">
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span
+                        class="title">自动化 - 控件操作</span><span class="arrow down"></span></button>
+                    <ul class="sidebar-links">
+                      <li><a href="../automator/index.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="入门介绍"><!---->入门介绍<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a href="../automator/selector.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="选择器"><!---->选择器<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                      <li><a aria-current="page" href="../automator/uiobject.html"
+                          class="router-link-active router-link-exact-active nav-link sidebar-link sidebar-page active"
+                          aria-label="控件和控件集合"><!---->控件和控件集合<!----></a>
+                        <ul class="sidebar-sub-headers">
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="../automator/uiobject.html#uiobject"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="UiObject"><!---->UiObject<!----></a>
+                            <ul class="sidebar-sub-headers">
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-click"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.click()"><!---->UiObject.click()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-clickcenter"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.clickCenter()"><!---->UiObject.clickCenter()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-longclick"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.longClick()"><!---->UiObject.longClick()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-settext-text"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.setText(text)"><!---->UiObject.setText(text)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-copy"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.copy()"><!---->UiObject.copy()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-cut"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.cut()"><!---->UiObject.cut()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-paste"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.paste()"><!---->UiObject.paste()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-setselection-start-end"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.setSelection(start, end)"><!---->UiObject.setSelection(start,
+                                  end)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrollforward"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollForward()"><!---->UiObject.scrollForward()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrollbackward"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollBackward()"><!---->UiObject.scrollBackward()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-select"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.select()"><!---->UiObject.select()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-collapse"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.collapse()"><!---->UiObject.collapse()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-expand"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.expand()"><!---->UiObject.expand()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-show"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.show()"><!---->UiObject.show()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrollup"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollUp()"><!---->UiObject.scrollUp()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrolldown"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollDown()"><!---->UiObject.scrollDown()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrollleft"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollLeft()"><!---->UiObject.scrollLeft()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-scrollright"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.scrollRight()"><!---->UiObject.scrollRight()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-children"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.children()"><!---->UiObject.children()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-childcount"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.childCount()"><!---->UiObject.childCount()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-child-i"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.child(i)"><!---->UiObject.child(i)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-parent"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.parent()"><!---->UiObject.parent()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-bounds"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.bounds()"><!---->UiObject.bounds()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-boundsinparent"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.boundsInParent()"><!---->UiObject.boundsInParent()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-drawingorder"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.drawingOrder()"><!---->UiObject.drawingOrder()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-id"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.id()"><!---->UiObject.id()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-text"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.text()"><!---->UiObject.text()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-findbytext-str"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.findByText(str)"><!---->UiObject.findByText(str)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-findone-selector"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.findOne(selector)"><!---->UiObject.findOne(selector)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uiobject-find-selector"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiObject.find(selector)"><!---->UiObject.find(selector)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                            </ul>
+                          </li>
+                          <li class="sidebar-sub-header"><a aria-current="page"
+                              href="../automator/uiobject.html#uicollection"
+                              class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                              aria-label="UiCollection"><!---->UiCollection<!----></a>
+                            <ul class="sidebar-sub-headers">
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-size"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.size()"><!---->UiCollection.size()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-get-i"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.get(i)"><!---->UiCollection.get(i)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-each-func"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.each(func)"><!---->UiCollection.each(func)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-empty"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.empty()"><!---->UiCollection.empty()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-nonempty"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.nonEmpty()"><!---->UiCollection.nonEmpty()<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-find-selector"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.find(selector)"><!---->UiCollection.find(selector)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                              <li class="sidebar-sub-header"><a aria-current="page"
+                                  href="../automator/uiobject.html#uicollection-findone-selector"
+                                  class="router-link-active router-link-exact-active nav-link sidebar-link heading"
+                                  aria-label="UiCollection.findOne(selector)"><!---->UiCollection.findOne(selector)<!----></a>
+                                <ul class="sidebar-sub-headers"></ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a href="../automator/api.html" class="nav-link sidebar-link sidebar-page"
+                          aria-label="automator与其他函数"><!---->automator与其他函数<!----></a>
+                        <ul class="sidebar-sub-headers"></ul>
+                      </li>
+                    </ul>
+                  </section>
+                </li>
+                <li><!--[--><a href="../coordinatesBasedAutomation.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="自动化 - 坐标操作"><!---->自动化 - 坐标操作<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../app.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="app - 应用"><!---->app - 应用<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../base64.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="base64"><!---->base64<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../colors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="colors - 颜色"><!---->colors - 颜色<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../canvas.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="canvas - 画布"><!---->canvas - 画布<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../console.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="console - 控制台"><!---->console -
+                    控制台<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../crypto.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="crypto - 加解密与消息摘要"><!---->crypto -
+                    加解密与消息摘要<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../debug.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="debug - 调试工具"><!---->debug - 调试工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../device.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="device - 设备"><!---->device - 设备<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../dialogs.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="dialogs - 对话框"><!---->dialogs -
+                    对话框<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../engines.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="engines - 脚本引擎"><!---->engines -
+                    脚本引擎<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../events.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="events - 事件与监听"><!---->events -
+                    事件与监听<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../floaty.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="floaty - 悬浮窗"><!---->floaty - 悬浮窗<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../files.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="files - 文件系统"><!---->files - 文件系统<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../globals.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="globals - 全局变量与函数"><!---->globals -
+                    全局变量与函数<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../http.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="http - HTTP网络请求"><!---->http -
+                    HTTP网络请求<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../images.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="images - 图片处理"><!---->images -
+                    图片处理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../keys.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="keys - 按键模拟"><!---->keys - 按键模拟<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../media.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="media - 多媒体"><!---->media - 多媒体<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../modules.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="module - 模块"><!---->module - 模块<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../ocr.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="ocr - 文字识别"><!---->ocr - 文字识别<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../plugins.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="plugins - 插件"><!---->plugins - 插件<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../powerManager.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="power_manager - 电源管理"><!---->power_manager -
+                    电源管理<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../sensors.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="sensors - 传感器"><!---->sensors -
+                    传感器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../shell.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="shell - Shell命令"><!---->shell -
+                    Shell命令<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../storages.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="storages - 本地存储"><!---->storages -
+                    本地存储<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../settings.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="settings - 设置"><!---->settings -
+                    设置<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../threads.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="threads - 多线程"><!---->threads -
+                    多线程<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../timers.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="timers - 定时器"><!---->timers - 定时器<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../timedTasks.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="work_manager - 定时与任务"><!---->work_manager -
+                    定时与任务<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li>
+                  <section class="sidebar-group"><button class="sidebar-heading clickable"><!----><span class="title">ui
+                        - 用户界面</span><span class="arrow right"></span></button><!----></section>
+                </li>
+                <li><!--[--><a href="../util.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="util - 工具"><!---->util - 工具<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../webSocket.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="WebSocket"><!---->WebSocket<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+                <li><!--[--><a href="../zip.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="zip - 压缩与解压"><!---->zip - 压缩与解压<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+          <li>
+            <section class="sidebar-group">
+              <p class="sidebar-heading"><!----><span class="title">进阶</span><!----></p>
+              <ul class="sidebar-links">
+                <li><!--[--><a href="../scriptingJava.html" class="nav-link sidebar-link sidebar-page"
+                    aria-label="和Java交互"><!---->和Java交互<!----></a>
+                  <ul class="sidebar-sub-headers"></ul><!--]-->
+                </li>
+              </ul>
+            </section>
+          </li>
+        </ul><!--[--><!----><!--]-->
+      </aside><!--[-->
+      <main class="page" id="main-content"><!---->
+        <nav class="breadcrumb">
+          <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+            <li class="" property="itemListElement" typeof="ListItem"><a href="https://pro.autojs.org/docs/" class=""
+                property="item" typeof="WebPage"><span class="icon iconfont icon-home"></span><span
+                  property="name">Auto.js Pro</span></a>
+              <meta property="position" content="1">
+            </li>
+            <li class="" property="itemListElement" typeof="ListItem"><a href="../" class="" property="item"
+                typeof="WebPage"><!----><span property="name">阅读须知</span></a>
+              <meta property="position" content="2">
+            </li>
+            <li class="" property="itemListElement" typeof="ListItem"><a href="../automator/" class="" property="item"
+                typeof="WebPage"><!----><span property="name">入门介绍</span></a>
+              <meta property="position" content="3">
+            </li>
+            <li class="is-active" property="itemListElement" typeof="ListItem"><a aria-current="page"
+                href="../automator/uiobject.html" class="router-link-active router-link-exact-active" property="item"
+                typeof="WebPage"><!----><span property="name">控件和控件集合</span></a>
+              <meta property="position" content="4">
+            </li>
+          </ol>
+        </nav>
+        <div class="page-title">
+          <h1><!---->控件和控件集合</h1>
+          <div class="page-info"><span class="date-info" aria-label="写作日期📅" data-balloon-pos="down"><svg
+                xmlns="http://www.w3.org/2000/svg" class="icon calendar-icon" viewBox="0 0 1024 1024"
+                fill="currentColor" aria-label="calendar icon">
+                <path
+                  d="M716.4 110.137c0-18.753-14.72-33.473-33.472-33.473-18.753 0-33.473 14.72-33.473 33.473v33.473h66.993v-33.473zm-334.87 0c0-18.753-14.72-33.473-33.473-33.473s-33.52 14.72-33.52 33.473v33.473h66.993v-33.473zm468.81 33.52H716.4v100.465c0 18.753-14.72 33.473-33.472 33.473a33.145 33.145 0 01-33.473-33.473V143.657H381.53v100.465c0 18.753-14.72 33.473-33.473 33.473a33.145 33.145 0 01-33.473-33.473V143.657H180.6A134.314 134.314 0 0046.66 277.595v535.756A134.314 134.314 0 00180.6 947.289h669.74a134.36 134.36 0 00133.94-133.938V277.595a134.314 134.314 0 00-133.94-133.938zm33.473 267.877H147.126a33.145 33.145 0 01-33.473-33.473c0-18.752 14.72-33.473 33.473-33.473h736.687c18.752 0 33.472 14.72 33.472 33.473a33.145 33.145 0 01-33.472 33.473z">
+                </path>
+              </svg><span>2022年10月27日</span>
+              <meta property="datePublished" content="2022-10-27T05:15:37.000Z">
+            </span></div>
+          <hr>
+        </div>
+        <div class="toc-place-holder">
+          <aside id="toc">
+            <div class="toc-header">此页内容</div>
+            <div class="toc-wrapper">
+              <ul class="toc-list">
+                <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject"
+                    class="router-link-active router-link-exact-active toc-link level2">UiObject</a></li>
+                <ul class="toc-list">
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-click"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.click()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-clickcenter"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.clickCenter()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-longclick"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.longClick()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-settext-text"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.setText(text)</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-copy"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.copy()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-cut"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.cut()</a></li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-paste"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.paste()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page"
+                      href="../automator/uiobject.html#uiobject-setselection-start-end"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.setSelection(start,
+                      end)</a></li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrollforward"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollForward()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrollbackward"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollBackward()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-select"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.select()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-collapse"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.collapse()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-expand"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.expand()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-show"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.show()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrollup"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollUp()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrolldown"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollDown()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrollleft"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollLeft()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-scrollright"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.scrollRight()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-children"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.children()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-childcount"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.childCount()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-child-i"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.child(i)</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-parent"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.parent()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-bounds"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.bounds()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-boundsinparent"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.boundsInParent()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-drawingorder"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.drawingOrder()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-id"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.id()</a></li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-text"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.text()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-findbytext-str"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.findByText(str)</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page"
+                      href="../automator/uiobject.html#uiobject-findone-selector"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.findOne(selector)</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uiobject-find-selector"
+                      class="router-link-active router-link-exact-active toc-link level3">UiObject.find(selector)</a>
+                  </li><!---->
+                </ul>
+                <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection"
+                    class="router-link-active router-link-exact-active toc-link level2">UiCollection</a></li>
+                <ul class="toc-list">
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection-size"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.size()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection-get-i"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.get(i)</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection-each-func"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.each(func)</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection-empty"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.empty()</a></li>
+                  <!---->
+                  <li class="toc-item"><a aria-current="page" href="../automator/uiobject.html#uicollection-nonempty"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.nonEmpty()</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page"
+                      href="../automator/uiobject.html#uicollection-find-selector"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.find(selector)</a>
+                  </li><!---->
+                  <li class="toc-item"><a aria-current="page"
+                      href="../automator/uiobject.html#uicollection-findone-selector"
+                      class="router-link-active router-link-exact-active toc-link level3">UiCollection.findOne(selector)</a>
+                  </li><!---->
+                </ul>
+              </ul>
+            </div>
+          </aside>
+        </div><!---->
+        <div class="theme-hope-content">
+          <h1 id="控件和控件集合" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#%E6%8E%A7%E4%BB%B6%E5%92%8C%E6%8E%A7%E4%BB%B6%E9%9B%86%E5%90%88"
+              aria-hidden="true">#</a> 控件和控件集合</h1>
+          <h2 id="uiobject" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject"
+              aria-hidden="true">#</a>
+            UiObject</h2>
+          <p>UiObject表示一个控件，可以通过这个对象获取到控件的属性，也可以对控件进行点击、长按等操作。</p>
+          <p>
+            获取一个UiObject通常通过选择器的<code><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code><span class="token function">findOnce</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>等函数，也可以通过UiCollection来获取，或者通过<code>UiObject<span class="token punctuation">.</span><span class="token function">child</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code>UiObject<span class="token punctuation">.</span><span class="token function">parent</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>等函数来获取一个控件的子控件或父控件。
+          </p>
+          <h3 id="uiobject-click" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-click" aria-hidden="true">#</a>
+            UiObject.click()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>点击该控件，并返回是否点击成功。</p>
+          <p>
+            如果该函数返回false，可能是该控件不可点击(clickable为false)，当前界面无法响应该点击等（这种情况下可以使用<code><span class="token function">clickCenter</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>代替）。
+          </p>
+          <h3 id="uiobject-clickcenter" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-clickcenter" aria-hidden="true">#</a> UiObject.clickCenter()
+          </h3>
+          <p><strong>[<a href="https://pro.autojs.org/" target="_blank" rel="noopener noreferrer">Pro 8.8.17新增<span><svg
+                    class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+                    x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>]</strong></p>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            使用坐标点击该控件的中点，相当于<code><span class="token function">click</span><span class="token punctuation">(</span>uiObj<span class="token punctuation">.</span><span class="token function">bounds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">centerX</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> uiObject<span class="token punctuation">.</span><span class="token function">bounds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">centerY</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code>。
+          </p>
+          <p>返回是否点击成功。</p>
+          <h3 id="uiobject-longclick" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-longclick" aria-hidden="true">#</a> UiObject.longClick()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>长按该控件，并返回是否点击成功。</p>
+          <p>如果该函数返回false，可能是该控件不可点击(longClickable为false)，当前界面无法响应该点击等。</p>
+          <h3 id="uiobject-settext-text" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-settext-text" aria-hidden="true">#</a> UiObject.setText(text)
+          </h3>
+          <ul>
+            <li><code><span class="token property">text</span></code> {string} 文本</li>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>设置输入框控件的文本内容，并返回是否设置成功。</p>
+          <p>该函数只对可编辑的输入框(editable为true)有效。</p>
+          <h3 id="uiobject-copy" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject-copy"
+              aria-hidden="true">#</a>
+            UiObject.copy()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对输入框文本的选中内容进行复制，并返回是否操作成功。</p>
+          <p>
+            该函数只能用于输入框控件，并且当前输入框控件有选中的文本。可以通过<code><span class="token function">setSelection</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>函数来设置输入框选中的内容。
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token keyword">var</span> et <span class="token operator">=</span> <span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"EditText"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//选中前两个字</span>
+et<span class="token punctuation">.</span><span class="token function">setSelection</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//对选中内容进行复制</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>et<span class="token punctuation">.</span><span class="token function">copy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">"复制成功"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+    <span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">"复制失败"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-cut" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject-cut"
+              aria-hidden="true">#</a>
+            UiObject.cut()</h3>
+          <p>对输入框文本的选中内容进行剪切，并返回是否操作成功。</p>
+          <p>
+            该函数只能用于输入框控件，并且当前输入框控件有选中的文本。可以通过<code><span class="token function">setSelection</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>函数来设置输入框选中的内容。
+          </p>
+          <h3 id="uiobject-paste" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-paste" aria-hidden="true">#</a>
+            UiObject.paste()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对输入框控件进行粘贴操作，把剪贴板内容粘贴到输入框中，并返回是否操作成功。</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token comment">//设置剪贴板内容为“你好”</span>
+<span class="token function">setClip</span><span class="token punctuation">(</span><span class="token string">"你好"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> et <span class="token operator">=</span> <span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"EditText"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+et<span class="token punctuation">.</span><span class="token function">paste</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-setselection-start-end" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-setselection-start-end" aria-hidden="true">#</a>
+            UiObject.setSelection(start, end)</h3>
+          <ul>
+            <li><code><span class="token property">start</span></code> {number} 选中内容起始位置</li>
+            <li><code><span class="token property">end</span></code> {number} 选中内容结束位置(不包括)</li>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对输入框控件设置选中的文字内容，并返回是否操作成功。</p>
+          <p>
+            索引是从0开始计算的；并且，选中内容不包含end位置的字符。例如，如果一个输入框内容为"123456789"，要选中"4567"的文字的代码为<code>et<span class="token punctuation">.</span><span class="token function">setSelection</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span></code>。
+          </p>
+          <p>
+            该函数也可以用来设置光标位置，只要参数的end等于start，即可把输入框光标设置在start的位置。例如<code>et<span class="token punctuation">.</span><span class="token function">setSelection</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span></code>会把光标设置在第一个字符的后面。
+          </p>
+          <h3 id="uiobject-scrollforward" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrollforward" aria-hidden="true">#</a> UiObject.scrollForward()
+          </h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对控件执行向前滑动的操作，并返回是否操作成功。</p>
+          <p>
+            向前滑动包括了向右和向下滑动。如果一个控件既可以向右滑动和向下滑动，那么执行<code><span class="token function">scrollForward</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>的行为是未知的(这是因为Android文档没有指出这一点，同时也没有充分的测试可供参考)。
+          </p>
+          <h3 id="uiobject-scrollbackward" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrollbackward" aria-hidden="true">#</a>
+            UiObject.scrollBackward()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对控件执行向后滑动的操作，并返回是否操作成功。</p>
+          <p>
+            向后滑动包括了向右和向下滑动。如果一个控件既可以向右滑动和向下滑动，那么执行<code><span class="token function">scrollForward</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>的行为是未知的(这是因为Android文档没有指出这一点，同时也没有充分的测试可供参考)。
+          </p>
+          <h3 id="uiobject-select" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-select" aria-hidden="true">#</a>
+            UiObject.select()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            对控件执行"选中"操作，并返回是否操作成功。"选中"和<code><span class="token function">isSelected</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>的属性相关，但该操作十分少用。
+          </p>
+          <h3 id="uiobject-collapse" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-collapse" aria-hidden="true">#</a> UiObject.collapse()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对控件执行折叠操作，并返回是否操作成功。</p>
+          <h3 id="uiobject-expand" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-expand" aria-hidden="true">#</a>
+            UiObject.expand()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>对控件执行操作，并返回是否操作成功。</p>
+          <h3 id="uiobject-show" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject-show"
+              aria-hidden="true">#</a>
+            UiObject.show()</h3>
+          <p>执行显示操作，并返回是否全部操作成功。</p>
+          <h3 id="uiobject-scrollup" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrollup" aria-hidden="true">#</a> UiObject.scrollUp()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            执行向上滑的操作，并返回是否全部操作成功。（虽然有些控件看起来可以滑动，但调用<code><span class="token property">scrollUp</span></code>可能无效，可以用<code><span class="token property">scrollBackward</span></code>代替）
+          </p>
+          <h3 id="uiobject-scrolldown" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrolldown" aria-hidden="true">#</a> UiObject.scrollDown()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            执行向下滑的操作，并返回是否全部操作成功。（虽然有些控件看起来可以滑动，但调用<code><span class="token property">scrollDown</span></code>可能无效，可以用<code><span class="token property">scrollForward</span></code>代替）
+          </p>
+          <h3 id="uiobject-scrollleft" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrollleft" aria-hidden="true">#</a> UiObject.scrollLeft()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            执行向左滑的操作，并返回是否全部操作成功。（虽然有些控件看起来可以滑动，但调用<code><span class="token property">scrollLeft</span></code>可能无效，可以用<code><span class="token property">scrollBackward</span></code>代替）
+          </p>
+          <h3 id="uiobject-scrollright" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-scrollright" aria-hidden="true">#</a> UiObject.scrollRight()
+          </h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>
+            执行向右滑的操作，并返回是否全部操作成功。（虽然有些控件看起来可以滑动，但调用<code><span class="token property">scrollRight</span></code>可能无效，可以用<code><span class="token property">scrollForward</span></code>代替）
+          </p>
+          <h3 id="uiobject-children" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-children" aria-hidden="true">#</a> UiObject.children()</h3>
+          <ul>
+            <li>返回 {<a href="../automator/uiobject.html#uicollection">UiCollection</a>}
+            </li>
+          </ul>
+          <p>返回该控件的所有子控件组成的控件集合。可以用于遍历一个控件的子控件，例如：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"AbsListView"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">children</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">child</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">log</span><span class="token punctuation">(</span>child<span class="token punctuation">.</span><span class="token function">className</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-childcount" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-childcount" aria-hidden="true">#</a> UiObject.childCount()</h3>
+          <ul>
+            <li>返回 {number}</li>
+          </ul>
+          <p>返回子控件数目。</p>
+          <h3 id="uiobject-child-i" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-child-i" aria-hidden="true">#</a>
+            UiObject.child(i)</h3>
+          <ul>
+            <li><code><span class="token property">i</span></code> {number} 子控件索引</li>
+            <li>返回 {UiObject}</li>
+          </ul>
+          <p>返回第i+1个子控件。如果i&gt;=控件数目或者小于0，则抛出异常。</p>
+          <p>需要注意的是，由于布局捕捉的问题，该函数可能返回<code><span class="token keyword">null</span></code>，也就是可能获取不到某个子控件。</p>
+          <p>遍历子控件的示例：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token keyword">var</span> list <span class="token operator">=</span> <span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"AbsListView"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> list<span class="token punctuation">.</span><span class="token function">childCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> child <span class="token operator">=</span> list<span class="token punctuation">.</span><span class="token function">child</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">log</span><span class="token punctuation">(</span>child<span class="token punctuation">.</span><span class="token function">className</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-parent" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-parent" aria-hidden="true">#</a>
+            UiObject.parent()</h3>
+          <ul>
+            <li>返回 {UiObject}</li>
+          </ul>
+          <p>返回该控件的父控件。如果该控件没有父控件，返回<code><span class="token keyword">null</span></code>。</p>
+          <h3 id="uiobject-bounds" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-bounds" aria-hidden="true">#</a>
+            UiObject.bounds()</h3>
+          <ul>
+            <li>返回 {<a
+                href="https://hyb1996.github.io/AutoJs-Docs/widgets-based-automation.html#widgets_based_automation_rect"
+                target="_blank" rel="noopener noreferrer">Rect<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>}</li>
+          </ul>
+          <p>返回控件在屏幕上的范围，其值是一个<a
+              href="https://hyb1996.github.io/AutoJs-Docs/widgets-based-automation.html#widgets_based_automation_rect"
+              target="_blank" rel="noopener noreferrer">Rect<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>对象。</p>
+          <p>示例：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token keyword">var</span> b <span class="token operator">=</span> <span class="token function">text</span><span class="token punctuation">(</span><span class="token string">"Auto.js"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">bounds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">toast</span><span class="token punctuation">(</span><span class="token string">"控件在屏幕上的范围为"</span> <span class="token operator">+</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>
+            如果一个控件本身无法通过<code><span class="token function">click</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>点击，那么我们可以利用<code><span class="token function">bounds</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>函数获取其坐标，再利用坐标点击。例如：
+          </p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token keyword">var</span> b <span class="token operator">=</span> <span class="token function">desc</span><span class="token punctuation">(</span><span class="token string">"打开侧拉菜单"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">bounds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">click</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span><span class="token function">centerX</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> b<span class="token punctuation">.</span><span class="token function">centerY</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//如果使用root权限，则用 Tap(b.centerX(), b.centerY());</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-boundsinparent" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-boundsinparent" aria-hidden="true">#</a>
+            UiObject.boundsInParent()</h3>
+          <ul>
+            <li>返回 {<a
+                href="https://hyb1996.github.io/AutoJs-Docs/widgets-based-automation.html#widgets_based_automation_rect"
+                target="_blank" rel="noopener noreferrer">Rect<span><svg class="external-link-icon"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                    viewBox="0 0 100 100" width="15" height="15">
+                    <path fill="currentColor"
+                      d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                    </path>
+                    <polygon fill="currentColor"
+                      points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                    </polygon>
+                  </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>}</li>
+          </ul>
+          <p>返回控件在父控件中的范围，其值是一个<a
+              href="https://hyb1996.github.io/AutoJs-Docs/widgets-based-automation.html#widgets_based_automation_rect"
+              target="_blank" rel="noopener noreferrer">Rect<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>对象。</p>
+          <h3 id="uiobject-drawingorder" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-drawingorder" aria-hidden="true">#</a> UiObject.drawingOrder()
+          </h3>
+          <ul>
+            <li>返回 {number}</li>
+          </ul>
+          <p>返回控件在父控件中的绘制次序。该函数在安卓7.0及以上才有效，7.0以下版本调用会返回0。</p>
+          <h3 id="uiobject-id" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject-id"
+              aria-hidden="true">#</a>
+            UiObject.id()</h3>
+          <ul>
+            <li>返回 {string}</li>
+          </ul>
+          <p>获取控件的id，如果一个控件没有id，则返回<code><span class="token keyword">null</span></code>。</p>
+          <h3 id="uiobject-text" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uiobject-text"
+              aria-hidden="true">#</a>
+            UiObject.text()</h3>
+          <ul>
+            <li>返回 {string}</li>
+          </ul>
+          <p>获取控件的文本，如果控件没有文本，返回<code><span class="token string">""</span></code>。</p>
+          <h3 id="uiobject-findbytext-str" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-findbytext-str" aria-hidden="true">#</a>
+            UiObject.findByText(str)</h3>
+          <ul>
+            <li><code><span class="token property">str</span></code> {string} 文本</li>
+            <li>返回 {<a href="../automator/uiobject.html#uicollection">UiCollection</a>}
+            </li>
+          </ul>
+          <p>根据文本text在子控件中递归地寻找并返回文本或描述(desc)<strong>包含</strong>这段文本str的控件，返回它们组成的集合。</p>
+          <p>该函数会在当前控件的子控件，孙控件，曾孙控件...中搜索text或desc包含str的控件，并返回它们组合的集合。</p>
+          <h3 id="uiobject-findone-selector" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-findone-selector" aria-hidden="true">#</a>
+            UiObject.findOne(selector)</h3>
+          <ul>
+            <li><code><span class="token property">selector</span></code> {<a
+                href="../automator/selector">UiSelector</a>}</li>
+            <li>返回 {<a href="../automator/uiobject.html#widgets_based_automation_uiobject">UiObject</a>}
+            </li>
+          </ul>
+          <p>
+            根据选择器selector在该控件的子控件、孙控件...中搜索符合该选择器条件的控件，并返回找到的第一个控件；如果没有找到符合条件的控件则返回<code><span class="token keyword">null</span></code>。
+          </p>
+          <p>例如，对于酷安动态列表，我们可以遍历他的子控件(每个动态列表项)，并在每个子控件中依次寻找点赞数量和图标，对于点赞数量小于10的点赞：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token comment">//找出动态列表</span>
+<span class="token keyword">var</span> list <span class="token operator">=</span> <span class="token function">id</span><span class="token punctuation">(</span><span class="token string">"recycler_view"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//遍历动态</span>
+list<span class="token punctuation">.</span><span class="token function">children</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">child</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment">//找出点赞图标</span>
+    <span class="token keyword">var</span> like <span class="token operator">=</span> child<span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token function">id</span><span class="token punctuation">(</span><span class="token string">"feed_action_view_like"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//找出点赞数量</span>
+    <span class="token keyword">var</span> likeCount <span class="token operator">=</span> child<span class="token punctuation">.</span><span class="token function">findOne</span><span class="token punctuation">(</span><span class="token function">id</span><span class="token punctuation">(</span><span class="token string">"text_view"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//如果这两个控件没有找到就不继续了</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>like <span class="token operator">==</span> <span class="token keyword">null</span> <span class="token operator">||</span> likeCount <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">//判断点赞数量是否小于10</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">parseInt</span><span class="token punctuation">(</span>likeCount<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token comment">//点赞</span>
+        like<span class="token punctuation">.</span><span class="token function">click</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uiobject-find-selector" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uiobject-find-selector" aria-hidden="true">#</a> UiObject.find(selector)
+          </h3>
+          <ul>
+            <li><code><span class="token property">selector</span></code> {<a
+                href="../automator/selector">UiSelector</a>}</li>
+            <li>返回 {<a href="../automator/uiobject.html#uicollection">UiCollection</a>}
+            </li>
+          </ul>
+          <p>根据选择器selector在该控件的子控件、孙控件...中搜索符合该选择器条件的控件，并返回它们组合的集合。</p>
+          <h2 id="uicollection" tabindex="-1"><a class="header-anchor" href="../automator/uiobject.html#uicollection"
+              aria-hidden="true">#</a>
+            UiCollection</h2>
+          <p>UiCollection, 控件集合,
+            通过选择器的<code><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code><span class="token function">untilFind</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>方法返回的对象。
+          </p>
+          <p>
+            UiCollection"继承"于数组，实际上是一个UiObject的数组，因此可以使用数组的函数和属性，例如使用length属性获取UiCollection的大小，使用forEach函数来遍历UiCollection。
+          </p>
+          <p>例如，采用forEach遍历屏幕上所有的文本控件并打印出文本内容的代码为：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"TextView"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">tv</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>tv<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">log</span><span class="token punctuation">(</span>tv<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>也可以使用传统的数组遍历方式：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code>console<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> uc <span class="token operator">=</span> <span class="token function">className</span><span class="token punctuation">(</span><span class="token string">"TextView"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> uc<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> tv <span class="token operator">=</span> uc<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>tv<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">log</span><span class="token punctuation">(</span>tv<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <p>
+            UiCollection的每一个元素都是UiObject，我们可以取出他的元素进行操作，例如取出第一个UiObject并点击的代码为<code>ui<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">click</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>。如果想要对该集合的所有元素进行操作，可以直接在集合上调用相应的函数，例如<code>uc<span class="token punctuation">.</span><span class="token function">click</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>，该代码会对集合上所有UiObject执行点击操作并返回是否全部点击成功。
+          </p>
+          <p>
+            因此，UiCollection具有所有UiObject对控件操作的函数，包括<code><span class="token function">click</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code><span class="token function">longClick</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>,
+            <code><span class="token function">scrollForward</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>等等，不再赘述。
+          </p>
+          <h3 id="uicollection-size" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-size" aria-hidden="true">#</a> UiCollection.size()</h3>
+          <ul>
+            <li>返回 {number}</li>
+          </ul>
+          <p>返回集合中的控件数。</p>
+          <p>历史遗留函数，相当于属性length。</p>
+          <h3 id="uicollection-get-i" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-get-i" aria-hidden="true">#</a> UiCollection.get(i)</h3>
+          <ul>
+            <li><code><span class="token property">i</span></code> {number} 索引</li>
+            <li>返回 {<a href="../automator/uiobject.html#widgets_based_automation_uiobject">UiObject</a>}
+            </li>
+          </ul>
+          <p>返回集合中第i+1个控件(UiObject)。</p>
+          <p>历史遗留函数，建议直接使用数组下标的方式访问元素。</p>
+          <h3 id="uicollection-each-func" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-each-func" aria-hidden="true">#</a> UiCollection.each(func)
+          </h3>
+          <ul>
+            <li><code><span class="token property">func</span></code> {Function} 遍历函数，参数为UiObject。</li>
+          </ul>
+          <p>遍历集合。</p>
+          <p>历史遗留函数，相当于<code><span class="token property">forEach</span></code>。参考<a
+              href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"
+              target="_blank" rel="noopener noreferrer">forEach<span><svg class="external-link-icon"
+                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px"
+                  viewBox="0 0 100 100" width="15" height="15">
+                  <path fill="currentColor"
+                    d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z">
+                  </path>
+                  <polygon fill="currentColor"
+                    points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9">
+                  </polygon>
+                </svg><span class="external-link-icon-sr-only">open in new window</span></span></a>。</p>
+          <h3 id="uicollection-empty" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-empty" aria-hidden="true">#</a> UiCollection.empty()</h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>返回控件集合是否为空。</p>
+          <h3 id="uicollection-nonempty" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-nonempty" aria-hidden="true">#</a> UiCollection.nonEmpty()
+          </h3>
+          <ul>
+            <li>返回 {boolean}</li>
+          </ul>
+          <p>返回控件集合是否非空。</p>
+          <h3 id="uicollection-find-selector" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-find-selector" aria-hidden="true">#</a>
+            UiCollection.find(selector)</h3>
+          <ul>
+            <li><code><span class="token property">selector</span></code> {<a
+                href="../automator/selector">UiSelector</a>}</li>
+            <li>返回 {<a href="../automator/uiobject.html#uicollection">UiCollection</a>}
+            </li>
+          </ul>
+          <p>根据selector所确定的条件在该控件集合的控件、子控件、孙控件...中找到所有符合条件的控件并返回找到的控件集合。</p>
+          <p>注意这会递归地遍历控件集合里所有的控件以及他们的子控件。和数组的<code><span class="token property">filter</span></code>函数不同。</p>
+          <p>例如：</p>
+          <div class="language-javascript ext-js line-numbers-mode"><button class="copy" aria-label="复制代码"
+              data-copied="已复制" data-balloon-pos="left">
+              <div class="copy-icon"></div>
+            </button>
+            <pre class="language-javascript" copy-code-registered=""><code><span class="token keyword">var</span> names <span class="token operator">=</span> <span class="token function">id</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//在集合</span>
+<span class="token keyword">var</span> clickableNames <span class="token operator">=</span> names<span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token function">clickable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+            <div class="line-numbers" aria-hidden="true">
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+              <div class="line-number"></div>
+            </div>
+          </div>
+          <h3 id="uicollection-findone-selector" tabindex="-1"><a class="header-anchor"
+              href="../automator/uiobject.html#uicollection-findone-selector" aria-hidden="true">#</a>
+            UiCollection.findOne(selector)</h3>
+          <ul>
+            <li><code><span class="token property">selector</span></code> {<a
+                href="../automator/selector">UiSelector</a>}</li>
+            <li>返回 {<a href="../automator/uiobject.html#widgets_based_automation_uiobject">UiObject</a>}
+            </li>
+          </ul>
+          <p>
+            根据选择器selector在该控件集合的控件的子控件、孙控件...中搜索符合该选择器条件的控件，并返回找到的第一个控件；如果没有找到符合条件的控件则返回<code><span class="token keyword">null</span></code>。
+          </p>
+        </div><!---->
+        <footer class="page-meta"><!---->
+          <div class="meta-item update-time"><span class="label">上次编辑于: </span><span class="info">2022/10/27
+              13:15:37</span></div>
+          <div class="meta-item contributors"><span class="label">贡献者: </span><span class="contributor"
+              title="email: 946994919@qq.com">hyb1996</span></div>
+        </footer>
+        <nav class="page-nav"><a href="../automator/selector.html" class="nav-link prev" aria-label="选择器">
+            <div class="hint"><span class="arrow left"></span>上一页</div>
+            <div class="link"><!---->选择器</div>
+          </a><a href="../automator/api.html" class="nav-link next" aria-label="automator与其他函数">
+            <div class="hint">下一页<span class="arrow right"></span></div>
+            <div class="link">automator与其他函数<!----></div>
+          </a></nav><!----><!---->
+      </main><!--]--><!----><!--]-->
+    </div><!--]--><!----><button class="sw-update-popup" tabindex="0">新内容已就绪<span class="icon-wrapper"><svg
+          xmlns="http://www.w3.org/2000/svg" class="icon update-icon" viewBox="0 0 1024 1024" fill="currentColor"
+          aria-label="update icon">
+          <path
+            d="M949.949 146.25v255.826c0 21.981-13.989 35.97-35.97 35.97H658.154c-13.988 0-25.983-7.992-33.973-21.981-5.997-13.989-4-27.977 7.991-39.97l79.942-77.946c-55.954-51.973-121.918-77.955-199.863-77.955-37.975 0-75.95 8.002-113.924 21.99-37.975 15.985-67.948 37.976-91.934 63.957-25.982 23.987-47.973 53.96-63.957 91.934-29.983 73.955-29.983 153.895 0 227.85 15.984 37.976 37.975 67.947 63.957 91.934 23.986 25.982 53.959 47.973 91.934 63.956 37.974 13.989 75.95 21.991 113.924 21.991 45.967 0 87.942-9.998 127.913-29.982 41.976-17.99 75.951-45.967 101.931-83.943 7.993-4 11.994-5.995 13.989-5.995 5.997 0 9.998 1.994 13.988 5.995l77.958 77.946c3.989 4 5.986 7.993 5.986 11.994 0 1.994-1.996 5.995-3.99 11.994-43.973 51.962-93.941 91.934-151.9 117.914-53.958 25.983-115.92 39.972-185.874 39.972-61.961 0-119.921-11.984-169.89-33.973-57.96-25.985-105.923-57.963-139.896-93.943-35.98-33.972-67.958-81.936-93.94-139.897-45.967-101.93-45.967-237.846 0-339.777 25.982-57.96 57.96-105.923 93.94-139.896 33.973-35.98 81.936-67.958 139.896-93.94 49.968-21.99 107.928-33.974 169.89-33.974 55.963 0 109.923 9.988 161.885 29.973 53.97 21.99 101.933 51.963 139.908 89.938l73.954-73.944c9.987-9.998 23.987-13.988 39.971-8.002 13.988 8.002 21.98 19.995 21.98 33.984z">
+          </path>
+        </svg></span></button><!--]-->
+  </div>
+  <script type="module" src="./控件和控件集合 _ Auto.js Pro文档_files/app.486b1949.js.下载" defer=""></script>
+
+
+  <div id="message-container"></div>
+</body>
+<div id="photoShowViewer" class="sb_BingCA photoShow" style="transition: all 0.2s ease-out 0s; opacity: 0;">
+  <div class="photoshow-viewer-shadow" style="transition: all 0.2s ease-out 0s;"></div>
+  <div class="photoshow-img-wrapper">
+    <img>
+    <div class="photoshow-view-mode-switch-tip">a</div>
+  </div>
+  <i class="photoshow-img-size"></i>
+</div>
+
+</html>
