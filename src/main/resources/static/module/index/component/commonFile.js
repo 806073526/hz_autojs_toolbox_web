@@ -328,7 +328,7 @@ export default {
                 }
                 window.ZXW_VUE.$message.warning('未检测到打包插件,请先上传打包插件！');
                 setTimeout(()=>{
-                    window.open("https://sp.zjh336.cn/product/5.html","_blank");
+                    window.open("https://sp2.zjh336.cn?code=YT0yJmI9NQ%3D%3D","_blank");
                 },1000);
             });
         },
