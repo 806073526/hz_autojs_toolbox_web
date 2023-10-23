@@ -2028,7 +2028,7 @@ export default {
             let JAVA_HOME = '';
             let _that = this;
             $.ajax({
-                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + 'JAVA_HOME.json',
+                url: getContext() + '/uploadPath/autoJsTools/' + 'webCommonPath' + '/' + 'apkPackage' + '/' + 'apkTool' + '/' + 'JAVA_HOME.json?t=' + (new Date().getTime()),
                 type: 'get',
                 async: false,
                 dataType:"TEXT", //返回值的类型
