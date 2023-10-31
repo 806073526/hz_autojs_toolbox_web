@@ -1,11 +1,10 @@
 package com.zjh.zxw.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.ChineseCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
@@ -14,6 +13,7 @@ import com.zjh.PackageProjectUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.ArithmeticCaptchaZ;
+import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.exception.BusinessException;
@@ -27,8 +27,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.apache.tools.zip.ZipFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
@@ -47,19 +45,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -86,6 +81,9 @@ public class AttachmentInfoController extends BaseController {
 
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
+
+    @Value("${com.zjh.packageAuthPath:''}")
+    private String packageAuthPath;
 
     // 文件目录 key为deviceUUID value为当前设备的日志目录结构json
     private final static ConcurrentHashMap<String, String> fileDirectoryMap = new ConcurrentHashMap<String,String>();
@@ -901,7 +899,8 @@ public class AttachmentInfoController extends BaseController {
     public R<Boolean> initPackageTemplateNew(
             @RequestParam("webProjectRootPath") String webProjectRootPath,
             @RequestParam("webProjectName") String webProjectName,
-            @RequestParam(value = "resetPackage",required = false) String resetPackage
+            @RequestParam(value = "resetPackage",required = false) String resetPackage,
+            @RequestParam(value = "deviceUuid") String deviceUuid
     ) {
         try {
             // 获取插件资源目录
@@ -912,6 +911,8 @@ public class AttachmentInfoController extends BaseController {
             if(!checkFile.exists()){
                 return fail("未找到打包插件,请先在公共文件模块初始化！");
             }
+
+            checkPackageAuth(deviceUuid);
 
             // 模板资源目录
             String sourcePath = apkSourcePath + File.separator + "apkTemplate" + File.separator + "template";
@@ -976,6 +977,10 @@ public class AttachmentInfoController extends BaseController {
     @PostMapping("/handlerPackageProjectRes")
     public R<String> handlerPackageProjectRes(@RequestBody PackageProjectDTO packageProjectDTO) {
         try {
+            String deviceUuid = packageProjectDTO.getDeviceUuid();
+
+            checkPackageAuth(deviceUuid);
+
             String webProjectRootPath = packageProjectDTO.getWebProjectRootPath();
             String webProjectName = packageProjectDTO.getWebProjectName();
             // 打包模板路径
@@ -1572,11 +1577,14 @@ public class AttachmentInfoController extends BaseController {
                                     @RequestParam(value = "javaHome",required = false) String javaHome,
                                     @RequestParam("webProjectRootPath") String webProjectRootPath,
                                     @RequestParam("webProjectName") String webProjectName,
+                                    @RequestParam("deviceUuid") String deviceUuid,
                                     @RequestParam(value = "keyStoreFile",required = false) String keyStoreFile,
                                     @RequestParam(value = "keyStoreAlias",required = false) String keyStoreAlias,
                                     @RequestParam(value = "keyStorePwd",required = false) String keyStorePwd,
                                     @RequestParam(value = "keyStoreAliasPwd",required = false) String keyStoreAliasPwd) {
         try {
+            checkPackageAuth(deviceUuid);
+
             if(StringUtils.isBlank(javaHome)){
                 javaHome = "JAVA_HOME";
             }
@@ -1675,4 +1683,45 @@ public class AttachmentInfoController extends BaseController {
         return success(result);
     }
 
+
+    private void checkPackageAuth(String deviceUUID) throws IOException {
+        // 未检测到配置路径 直接返回授权通过
+        if(StringUtils.isBlank(packageAuthPath)){
+            return;
+        }
+        File packageAuthFile = new File(packageAuthPath);
+        // 未检测到文件 直接返回授权通过
+        if(!packageAuthFile.exists()){
+            return;
+        }
+        String result = new String(Files.readAllBytes(Paths.get(packageAuthPath)), StandardCharsets.UTF_8);
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        // 未开启授权限制 直接返回授权通过
+        boolean isOpenPackageAuth = jsonObject.containsKey("isOpenPackageAuth") && jsonObject.getBoolean("isOpenPackageAuth");
+        if(!isOpenPackageAuth){
+            return;
+        }
+        // 设备uuid为空
+        if(StringUtils.isBlank(deviceUUID)){
+           throw new BusinessException("设备UUID不能为空");
+        }
+        // 未包含设备 直接返回未授权
+        if(!jsonObject.containsKey(deviceUUID)){
+            throw new BusinessException("设备UUID:"+deviceUUID+",未授权,请联系管理员！");
+        }
+        // 读取配置
+        JSONObject deviceObj = jsonObject.getJSONObject(deviceUUID);
+        // 读取失效时间
+        String expireTime = deviceObj.getString("expireTime");
+        // 转换失效时间
+        LocalDateTime expireDateTime = StringUtils.isBlank(expireTime) ? null : LocalDateTimeUtil.parse(expireTime, DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT));
+        // 失效时间为空 表示不失效
+        if(Objects.isNull(expireDateTime)){
+            return;
+        }
+        // 失效时间在现在之前 表示已失效
+        if(expireDateTime.isBefore(LocalDateTime.now())){
+            throw new BusinessException("设备UUID:"+deviceUUID+",已于"+expireTime+"授权过期,请联系管理员！");
+        }
+    }
 }

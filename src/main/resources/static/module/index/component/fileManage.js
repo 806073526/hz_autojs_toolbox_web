@@ -1815,7 +1815,8 @@ export default {
                 data: {
                     "webProjectRootPath": this.absolutePrePath + this.deviceInfo.deviceUuid + "/" + "apkPackage",
                     "webProjectName": this.packageProject.appName,
-                    "resetPackage": this.oneKeyPackageFlag ? "" : "true"
+                    "resetPackage": this.oneKeyPackageFlag ? "" : "true",
+                    "deviceUuid": this.deviceInfo.deviceUuid
                 },
                 success: function (data) {
                     if (data) {
@@ -1953,7 +1954,8 @@ export default {
                     "customSignAlias":"",
                     "resPathName": this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label || "",
                     "openObfuscator": this.packageProject.openObfuscator,
-                    "obfuscatorIncludePaths": this.packageProject.obfuscatorIncludePaths
+                    "obfuscatorIncludePaths": this.packageProject.obfuscatorIncludePaths,
+                    "deviceUuid": this.deviceInfo.deviceUuid
                 }),
                 success: function (data) {
                     if (data) {
@@ -2089,7 +2091,8 @@ export default {
                     "keyStoreFile": keyStoreObj ? keyStoreObj["keyStoreFile"] : "",
                     "keyStoreAlias":keyStoreObj ? keyStoreObj["keyStoreAlias"] : "",
                     "keyStorePwd":keyStoreObj ? keyStoreObj["keyStorePwd"] : "",
-                    "keyStoreAliasPwd":keyStoreObj ? keyStoreObj["keyStoreAliasPwd"] : ""
+                    "keyStoreAliasPwd":keyStoreObj ? keyStoreObj["keyStoreAliasPwd"] : "",
+                    "deviceUuid": this.deviceInfo.deviceUuid
                 },
                 success: function (data) {
                     if (data) {
