@@ -147,7 +147,7 @@
                         </el-dropdown>
                         <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行当前项目</el-button>
                         <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止全部程序</el-button>
-                        <el-button size="medium" v-if="!phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
+                        <el-button size="medium" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                             <el-button size="medium" type="primary" >
                                 Node相关<i class="el-icon-arrow-down el-icon--right"></i>
