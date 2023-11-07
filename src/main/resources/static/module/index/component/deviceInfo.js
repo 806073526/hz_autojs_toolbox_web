@@ -17,6 +17,9 @@ export default {
     props: {},
     data() {
         return {
+            versionInfo:"V3.1.2",
+            newVersion:"",
+            isExeVersion: false,
             deviceList: [],// 设备列表
             deviceLoading: true,
             editorType:'ace',
@@ -28,6 +31,8 @@ export default {
                 deviceStatusNotice: true,
                 allowOperateFile: false,
                 lastSelectDeviceUuid: "",
+                autoCheckVersionUpdate: true,
+                openNoticeMessage: true,
                 zoomSize: 100
             },
             systemSettingDialog: false,
@@ -51,6 +56,9 @@ export default {
         },
         zoomSize(){
             return this.systemConfig.zoomSize;
+        },
+        newVersionNotice(){
+            return this.versionInfo !== this.newVersion ? "有新版本"  : "";
         }
     },
     watch:{
@@ -74,11 +82,15 @@ export default {
         }
     },
     mounted() {
+        let autoCheckVersionUpdate = true;
+        let openNoticeMessage = true;
         let systemConfigCache = window.localStorage.getItem("systemConfig");
         if(systemConfigCache){
             let systemConfigObj = JSON.parse(systemConfigCache);
             if(systemConfigObj){
                 this.systemConfig = systemConfigObj;
+                autoCheckVersionUpdate = systemConfigObj.autoCheckVersionUpdate;
+                openNoticeMessage = systemConfigObj.openNoticeMessage;
             }
         }
         this.getOnlineDevice();
@@ -104,6 +116,17 @@ export default {
         // 检查设备授权状态
         this.authorizeStatus = this.checkSelfMachineAuthorize();
 
+        this.isExeVersion = this.checkExeOptions();
+        if(this.isExeVersion && autoCheckVersionUpdate){
+            this.checkVersion();
+        }
+        // 获取最新版本
+        this.newVersion = this.getNewVersion();
+
+        if(openNoticeMessage){
+            // 开启公告显示
+            this.openNoticeMessage();
+        }
 
         // 获取当前缓存中最后一次选中的设备
         let lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
@@ -117,8 +140,96 @@ export default {
                 this.autoSelectDevice(lastSelectDeviceUuid);
             });
         }, 500);
+
+
     },
     methods: {
+        // 检查版本更新
+        checkVersion(){
+            if(!this.isExeVersion){
+                window.ZXW_VUE.$message.warning({message:'最新版本为【'+this.newVersion+'】,请注意,只有exe方式部署才支持在线更新', duration: 3000});
+                return;
+            }
+            this.newVersion  = this.getNewVersion();
+            this.$confirm('当前最新版为【'+this.newVersion+'】,是否需要在线更新?', '提示', {
+                confirmButtonText: '更新版本',
+                cancelButtonText: '取消操作',
+                type: 'info'
+            }).then(() => {
+                window.ZXW_VUE.$message.warning({message:'请进入exe目录,等待exe文件更新完成后(刷新目录大小不变化),手动启动服务', duration: 5000});
+                $.ajax({
+                    url: getContext() + "/device/onlineUpdateVersion",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                       console.log(data);
+                    },
+                    error: function (msg) {
+                        console.log(msg);
+                    }
+                });
+            })
+        },
+        // 开启通知消息
+        openNoticeMessage(){
+            let noticeMessage = '';
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/getNoticeMessage",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.isSuccess) {
+                        noticeMessage = data.data;
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            this.$alert(noticeMessage, '公告', {
+                confirmButtonText: '确定',
+                dangerouslyUseHTMLString: true
+            });
+        },
+        // 是否exe方式部署(根据是否存在zxw-aj-tools.vmoptions配置文件判断)
+        checkExeOptions(){
+            let isExe = '';
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/checkExeOptions",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.isSuccess) {
+                        isExe = data.data;
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return isExe;
+        },
+        // 获取最新版本号
+        getNewVersion(){
+            let newVersion = '';
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/getNewVersion",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.isSuccess) {
+                        newVersion = data.data;
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+            return newVersion;
+        },
         // 刷新截图权限
         refreshCaptureScreen(){
             if (!this.validSelectDevice()) {

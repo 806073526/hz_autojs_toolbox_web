@@ -11,7 +11,7 @@
              </span>-->
 
         <span @click.stop="authorizedFun" target="_blank" :style="{'color': authorizeStatus ? '#6b3dff' : '#d13026'}" style="margin-left: 0px;cursor: pointer;">【服务端{{authorizeStatus? '已' : '未'}}授权】</span>
-        <span>【V3.1.1】</span>
+        <span @click.stop="checkVersion" style="cursor: pointer;margin-right: 5px;" title="点击检查更新">{{"【"+ versionInfo +"】"+newVersionNotice }}</span>
         <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
         <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
         <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
@@ -180,6 +180,34 @@
                         <el-popover ref="popover2" placement="top-start" width="260" trigger="hover">
                             <div>
                                 开启编辑后,可以修改删除公共文件中全部文件
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+                <el-form-item label="自动检测版本更新:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.autoCheckVersionUpdate" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover3 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover3" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,exe方式部署的,将会自动检测版本更新
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="开启公告显示" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.openNoticeMessage" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover3 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover3" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,自动显示公告信息
                             </div>
                         </el-popover>
                     </div>

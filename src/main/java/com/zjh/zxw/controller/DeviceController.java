@@ -1,5 +1,6 @@
 package com.zjh.zxw.controller;
 
+import cn.hutool.core.util.RuntimeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.zxw.base.BaseController;
@@ -22,7 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
@@ -106,6 +112,111 @@ public class DeviceController extends BaseController {
             osw.close();
         }
         return autoJsSessionList;
+    }
+
+    /**
+     * 检查exe配置文件
+     */
+    @ApiOperation(value = "检查exe配置文件", notes = "检查exe配置文件")
+    @GetMapping("/checkExeOptions")
+    public R<Boolean> checkExeOptions() {
+        try {
+            File file = new File("zxw-aj-tools.vmoptions");
+            return success(file.exists());
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("检查exe配置文件失败！请联系管理员");
+        }
+    }
+
+
+
+    /**
+     * 获取最新版本
+     */
+    @ApiOperation(value = "获取最新版本", notes = "获取最新版本")
+    @GetMapping("/getNewVersion")
+    public R<String> getNewVersion() {
+        try {
+            URL url = new URL("https://gitee.com/zjh336/zjh336_limit/raw/master/gjx/newVersion/newVersion.txt?t="+(new Date().getTime()));
+            // 打开连接
+            URLConnection connection = url.openConnection();
+            // 设置连接超时时间（可选）
+            connection.setConnectTimeout(5000);
+            // 建立实际连接
+            connection.connect();
+            // 读取页面内容
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder content = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+            reader.close();
+            return success(content.toString());
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("获取最新版本失败！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 获取公告信息
+     */
+    @ApiOperation(value = "获取公告信息", notes = "获取公告信息")
+    @GetMapping("/getNoticeMessage")
+    public R<String> getNoticeMessage() {
+        try {
+            URL url = new URL("https://gitee.com/zjh336/zjh336_limit/raw/master/gjx/newVersion/noticeMessage.txt?t="+(new Date().getTime()));
+            // 打开连接
+            URLConnection connection = url.openConnection();
+            // 设置连接超时时间（可选）
+            connection.setConnectTimeout(5000);
+            // 建立实际连接
+            connection.connect();
+            // 读取页面内容
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder content = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+            reader.close();
+            return success(content.toString());
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("获取公告信息失败！请联系管理员");
+        }
+    }
+
+
+
+
+    /**
+     * 执行在线更新
+     */
+    @ApiOperation(value = "执行在线更新", notes = "执行在线更新")
+    @GetMapping("/onlineUpdateVersion")
+    public R<Boolean> onlineUpdateVersion() {
+        try {
+            String step1 = RuntimeUtil.execForStr("curl -o \"4、在线更新版本.bat\" \"https://gitee.com/zjh336/zjh336_limit/raw/master/gjx/newVersion/4%E3%80%81%E5%9C%A8%E7%BA%BF%E6%9B%B4%E6%96%B0%E7%89%88%E6%9C%AC.bat\"");
+            System.out.println(step1);
+            String step3 = RuntimeUtil.execForStr("4、在线更新版本.bat");
+            System.out.println(step3);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("执行在线更新失败！请联系管理员");
+        }
     }
 
     /**
