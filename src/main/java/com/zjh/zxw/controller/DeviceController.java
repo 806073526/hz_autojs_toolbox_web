@@ -148,7 +148,7 @@ public class DeviceController extends BaseController {
             // 建立实际连接
             connection.connect();
             // 读取页面内容
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             String line;
             StringBuilder content = new StringBuilder();
             while ((line = reader.readLine()) != null) {
@@ -180,7 +180,7 @@ public class DeviceController extends BaseController {
             // 建立实际连接
             connection.connect();
             // 读取页面内容
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             String line;
             StringBuilder content = new StringBuilder();
             while ((line = reader.readLine()) != null) {
