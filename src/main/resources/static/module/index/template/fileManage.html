@@ -4,18 +4,28 @@
     </p>
     <el-row style="margin-top: 10px;">
         <div class="width100 d-flex a-center flex-wrap">
-            <el-form-item label="web端同步路径:" label-width="125px" style="flex:3">
-                <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径" @blur="enterWebPath" @keyup.native.enter="enterWebPath"
-                          class="width100">
-                </el-input>
+            <el-form-item label="web端同步路径:" label-width="125px" style="flex:1">
+                <div class="width100 d-flex">
+                    <el-input type="text" v-model="webSyncPath" placeholder="请设置web端同步路径" @blur="enterWebPath" @keyup.native.enter="enterWebPath"
+                              class="flex-1">
+                    </el-input>
+                    <el-button @click.stop="syncFileToPhone" style="margin-left:5px;margin-bottom: 5px;">
+                        同步到手机端
+                    </el-button>
+                </div>
             </el-form-item>
-            <el-form-item label="手机端同步路径:" label-width="125px"  style="flex:3">
-                <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)" @blur="enterPhonePath" @keyup.native.enter="enterPhonePath"
-                          class="width100">
-                </el-input>
+            <el-form-item label="手机端同步路径:" label-width="125px"  style="flex:1">
+                <div class="width100 d-flex">
+                    <el-input type="text" v-model="phoneSyncPath" placeholder="请设置手机端同步路径(以/sdcard为根路径)" @blur="enterPhonePath" @keyup.native.enter="enterPhonePath"
+                              class="flex-1">
+                    </el-input>
+                    <el-button @click.stop="syncFileToWeb" style="margin-left:5px;margin-bottom: 5px;">
+                        同步到web端
+                    </el-button>
+                </div>
             </el-form-item>
-            <div class="d-flex a-center flex-wrap" style="justify-content: right;margin-bottom:10px;flex:4;">
-                <!--<div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;margin-bottom: 5px;">
+            <!-- <div class="d-flex a-center flex-wrap" style="justify-content: right;margin-bottom:10px;flex:4;">
+                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:0px;margin-right: 10px;margin-bottom: 5px;">
                     <span>
                         自动同步web同步路径：
                     </span>
@@ -26,24 +36,22 @@
                         自动同步手机同步路径：
                     </span>
                     <el-switch v-model="autoSyncPhoneSyncPath"/>
-                </div>-->
-                <el-button @click.stop="syncFileToPhone" style="margin-bottom: 5px;">
-                    同步到手机端
-                </el-button>
-                <el-button @click.stop="syncFileToWeb" style="margin-bottom: 5px;">
-                    同步到web端
-                </el-button>
-            </div>
+                </div>
+            </div>-->
         </div>
     </el-row>
 
-    <el-tabs v-model="fileActiveName" style="padding-left: 20px;margin-top: 0!important;">
-        <el-tab-pane label="web端文件" name="web">
+    <el-row style="padding-left: 20px;margin-top: 0!important;">
+        <el-col  :span="12">
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
-                    <div class="d-flex a-center">
-                        <el-button size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
-                        <el-button size="mini" style="margin-left: 5px;"  type="primary" @click="createFolder">新建文件夹</el-button>
+                    <div class="d-flex">
+                        <el-dropdown>
+                            <el-button size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
+                        </el-dropdown>
+                        <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                            <el-button size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
+                        </el-dropdown>
                     </div>
                     <input ref="input" style="display: none;" type="file" name="file" :multiple="true" :accept="accept" @change="handleChange">
                 </div>
@@ -83,7 +91,7 @@
             <el-row style="padding-left: 0!important;height: 450px;overflow-y: auto;">
                 <div class="fileTableList" v-loading="fileLoading">
                     <div class="fileList-head d-flex a-center flex-wrap">
-                        <div class="d-flex a-center fileName" style="flex:5">
+                        <div class="d-flex a-center fileName" style="flex:4">
                             <el-checkbox v-model="checkAllFile" @change="checkAllFileChange" />
                             <span style="margin-left: 8px">文件名</span>
                         </div>
@@ -103,7 +111,7 @@
                             <el-progress :percentage="item.percentage" :stroke-width="3" />
                         </div>
                         <div v-for="(item,index) in fileList" :key="index" class="fileList-head fileList-body d-flex a-center flex-wrap">
-                            <div class="d-flex a-center fileName" style="flex:5;">
+                            <div class="d-flex a-center fileName" style="flex:4;">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
                                     <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
@@ -115,7 +123,7 @@
                             <div class="d-flex a-center lastUpdateTime" style="flex:2;">
                                 <span>{{ item.lastUpdateTime }}</span>
                             </div>
-                            <div class="operate d-flex a-center j-center flex-wrap" style="flex:2;">
+                            <div class="operate d-flex a-center j-center flex-wrap" style="flex:3;">
                                 <el-link v-show="!item.isDirectory" :underline="false" style="margin-bottom: 5px;" type="info" @click="downloadFile(item)">下载</el-link>
                                 <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
                                 <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
@@ -127,12 +135,12 @@
                     </el-scrollbar>
                 </div>
             </el-row>
-        </el-tab-pane>
-        <el-tab-pane label="手机端文件" name="phone">
+        </el-col>
+        <el-col :span="12">
             <el-row style="padding-left: 0!important;">
                 <div class="d-flex j-sb a-center width100">
                     <div class="d-flex a-center flex-wrap">
-                        <el-button size="medium" type="primary"  style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                        <el-button size="medium" type="primary" style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                             <el-button size="medium" type="primary">
                                 初始化示例<i class="el-icon-arrow-down el-icon--right"></i>
@@ -145,8 +153,8 @@
                                 <el-dropdown-item @click.native.prevent.stop="phoneDownLoadImageExampleScript">初始化图色示例项目</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行当前项目</el-button>
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止全部程序</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行项目</el-button>
+                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止程序</el-button>
                         <el-button size="medium" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
                         <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                             <el-button size="medium" type="primary" >
@@ -160,8 +168,15 @@
                                 <el-dropdown-item @click.native.prevent.stop="termuxInitNode">Termux初始化Node环境</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phonePackageProject">打包项目</el-button>
-                        <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phonePackageProjectTips">打包须知</el-link>
+                        <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                            <el-button size="medium" type="primary" >
+                                更多<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item @click.native.prevent.stop="phonePackageProjectTips">查看打包须知</el-dropdown-item>
+                                <el-dropdown-item @click.native.prevent.stop="phonePackageProject">打包项目</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                         <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
@@ -268,21 +283,21 @@
             <el-row style="padding-left: 0!important;height: 450px;overflow-y: auto;">
                 <div class="fileTableList" v-loading="phoneFileLoading">
                     <div class="fileList-head d-flex a-center flex-wrap">
-                        <div class="d-flex a-center phoneFileName" style="flex:7;">
+                        <div class="d-flex a-center phoneFileName" style="flex:1;">
                             <el-checkbox v-model="phoneCheckAllFile" @change="phoneCheckAllFileChange" />
                             <span style="margin-left: 8px">文件名</span>
                         </div>
-                        <div class="phoneOperate" style="flex:3;">操作</div>
+                        <div class="phoneOperate" style="flex:1;">操作</div>
                     </div>
                     <el-scrollbar class="right-scrollbar-wrap" :key="phoneFileTableRandomKey">
                         <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center flex-wrap">
-                            <div class="d-flex a-center phoneFileName" style="flex:7;">
+                            <div class="d-flex a-center phoneFileName" style="flex:1;">
                                 <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                 <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">
                                     <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                 </div>
                             </div>
-                            <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:3;">
+                            <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:1;">
                                 <el-link v-show="item.fileType==='js' || item.fileType==='mjs' || item.fileType === 'node.js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
                                 <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
                                 <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
@@ -298,8 +313,8 @@
                     </el-scrollbar>
                 </div>
             </el-row>
-        </el-tab-pane>
-    </el-tabs>
+        </el-col>
+    </el-row>
     <el-dialog  :visible.sync="fileEditVisible" :title="navigatePath + '/' + fileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
         <div id="fileEditor" style="height: 83vh;width: 100%;">
         </div>
