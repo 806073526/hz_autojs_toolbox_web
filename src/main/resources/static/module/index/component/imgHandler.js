@@ -141,12 +141,22 @@ export default {
             if (!this.validSelectDevice()) {
                 return
             }
-            let phoneCreateAlreadySystemImageDir = window.localStorage.getItem("phoneCreateAlreadySystemImageDir_"+this.deviceInfo.deviceUuid);
+            let stopScreenScript = "";
+            if(this.autoRefreshScreenCapture){
+                stopScreenScript = 'images.stopScreenCapture();';
+            }
+            let remoteScript = `
+                files.createWithDirs("/sdcard/autoJsLocalImg/${this.remoteHandler.param1.localImageName.substring(0,this.remoteHandler.param1.localImageName.lastIndexOf("/")) + '/'}");
+                ${stopScreenScript}
+            `;
+            this.remoteExecuteScript(remoteScript);
+
+           /* let phoneCreateAlreadySystemImageDir = window.localStorage.getItem("phoneCreateAlreadySystemImageDir_"+this.deviceInfo.deviceUuid);
             if(!phoneCreateAlreadySystemImageDir){
-                let remoteScript = `files.createWithDirs("/sdcard/autoJsLocalImg/system/imageHandler/");`;
+                let remoteScript = `files.createWithDirs("/sdcard/autoJsLocalImg/${this.remoteHandler.param1.localImageName.substring(0,this.remoteHandler.param1.localImageName.lastIndexOf("/"))}");`;
                 this.remoteExecuteScript(remoteScript);
                 window.localStorage.setItem("phoneCreateAlreadySystemImageDir_"+this.deviceInfo.deviceUuid,"1");
-            }
+            }*/
         },
         refreshScrollHeight(){
             let zoomSize = 100;
@@ -368,10 +378,6 @@ export default {
                 return
             }
             this.initPhoneImageUploadPath();
-            if(this.autoRefreshScreenCapture){
-                let remoteExecuteScriptContent = 'images.stopScreenCapture();';
-                this.remoteExecuteScript(remoteExecuteScriptContent);
-            }
 
             this.remoteHandler.param1.cache_x1 = this.remoteHandler.param1.x1;
             this.remoteHandler.param1.cache_y1 = this.remoteHandler.param1.y1;
