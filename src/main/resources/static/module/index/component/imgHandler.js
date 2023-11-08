@@ -1015,7 +1015,7 @@ toastLog(JSON.stringify(contentMlkArr.join('')));`;
             } else if ('regionalAnalysisChartPosition2' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
                     'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
-                    'let result = utils.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"'+this.remoteHandler.param1.context+'",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ');\r\n' +
+                    'let result = utils.regionalAnalysisChartPosition2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"'+this.remoteHandler.param1.context+'",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',' + this.remoteHandler.param1.openSplit + ');\r\n' +
                     'utils.recycleNull(img);\r\n' +
                     'toastLog(JSON.stringify(result));';
                 // 区域模板匹配
@@ -1033,6 +1033,11 @@ toastLog(JSON.stringify(contentMlkArr.join('')));`;
                     'let utils =  utilsObj;//本地项目使用utils需要引入utils.js文件 详情见操作文档\r\n' +
                     'utils.regionalClickText2(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"'+this.remoteHandler.param1.context+'",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
                     'utils.recycleNull(img);'
+                // 区域识字点击3
+            } else if ('regionalClickText3' === codeType) {
+                code = 'let img = captureScreen();\r\n' +
+                    'utilsObj.regionalClickText3(img,' + this.remoteHandler.param1.x1 + ',' + this.remoteHandler.param1.y1 + ',' + this.remoteHandler.param1.x2 + ',' + this.remoteHandler.param1.y2 + ',' + this.remoteHandler.param1.threshold + ',' + this.remoteHandler.param1.maxVal + ',"目标文字",' + this.remoteHandler.param1.isOpenGray + ',' + this.remoteHandler.param1.isOpenThreshold + ',()=>{ toastLog("找到文字") });\r\n' +
+                    'utilsObj.recycleNull(img);';
                 // 区域特征匹配点击
             } else if ('regionalClickFeatures' === codeType) {
                 code = 'let img = captureScreen();\r\n' +
