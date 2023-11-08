@@ -17,6 +17,49 @@ export const getEditorType = ()=> {
     return window.localStorage.getItem("editorType") || 'ace';
 };
 
+function colorToRGB(color) {
+    // 去除颜色值中的#号
+    color = color.replace("#", "");
+
+    // 提取RGB分量的十六进制值
+    let r = parseInt(color.substring(0, 2), 16);
+    let g = parseInt(color.substring(2, 4), 16);
+    let b = parseInt(color.substring(4, 6), 16);
+
+    return [r, g, b];
+}
+
+function rgbToColor(rgb) {
+    // 将RGB分量的十进制值转换为十六进制格式
+    let r = rgb[0].toString(16).padStart(2, "0");
+    let g = rgb[1].toString(16).padStart(2, "0");
+    let b = rgb[2].toString(16).padStart(2, "0");
+
+    // 拼接RGB分量的十六进制值
+    let color = "#" + r + g + b;
+
+    return color;
+}
+
+export const getInverseColor = (color) => {
+    // 将颜色转换为RGB格式
+    let rgb = colorToRGB(color);
+
+    // 计算反色的RGB值
+    let inverseRGB = [];
+    for (let i = 0; i < 3; i++) {
+        inverseRGB[i] = 255 - rgb[i];
+    }
+
+    // 将反色的RGB值转换为十六进制格式
+    let inverseColor = rgbToColor(inverseRGB);
+    return inverseColor;
+};
+
+
+
+
+
 //获取自定义提示内容
 function getCustomPrompt(){
     var json = [];

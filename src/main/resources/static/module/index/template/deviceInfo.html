@@ -148,7 +148,7 @@
     <el-dialog
             title="系统设置"
             :visible.sync="systemSettingDialog"
-            width="40%"
+            width="42%"
             center
             >
         <div style="height: 300px;padding-top: 15px;">
@@ -162,7 +162,9 @@
                        </div>
                    </el-form-item>
                 <el-form-item label="最后一次连接设备:" label-width="130px"  class="flex-1">
-                    {{systemConfig.lastSelectDeviceUuid}}
+                    <div style="white-space: nowrap;">
+                        {{systemConfig.lastSelectDeviceUuid}}
+                    </div>
                 </el-form-item>
                     <el-popover ref="popover1" placement="top-start" width="260" trigger="hover">
                         <div>
@@ -199,15 +201,57 @@
                 </el-form-item>
             </el-row>
             <el-row class="d-flex">
-                <el-form-item label="开启公告显示" label-width="130px"  class="flex-1">
+                <el-form-item label="开启公告显示:" label-width="130px"  class="flex-1">
                     <div class="d-flex a-center j-start" style="height: 40px;">
                         <el-switch  v-model="systemConfig.openNoticeMessage" @change="systemConfigChange" style="margin-right: 5px;"/>
-                        <span v-popover:popover3 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                        <span v-popover:popover4 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
-                        <el-popover ref="popover3" placement="top-start" width="260" trigger="hover">
+                        <el-popover ref="popover4" placement="top-start" width="260" trigger="hover">
                             <div>
                                 开启后,自动显示公告信息
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+                <el-form-item label="自动刷新截图权限:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.autoRefreshScreenCapture" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover5 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover5" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,进行截图相关操作时,自动刷新截图权限
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="图片名称默认值:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-input  v-model="systemConfig.defaultScreenImageName" @change="systemConfigChange" placeholder="请设置图片名称的默认值" style="margin-right: 5px;"/>
+                        <span v-popover:popover6 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover6" placement="top-start" width="400" trigger="hover">
+                            <div>
+                                图像处理,图片名称默认值<br/>
+                                为空时,则取值为【system/imageHandler/allScreen.png】
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+                <el-form-item label="全屏截图自动重置:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.allScreenCaptureAutoRename" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover7 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover7" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,执行全屏截图操作时,会自动重置图片名称为默认值
                             </div>
                         </el-popover>
                     </div>
@@ -217,10 +261,10 @@
                 <el-form-item label="容器高度缩放比例:" label-width="130px"  class="flex-1">
                     <div class="d-flex a-center j-start" style="height: 40px;">
                         <el-slider style="flex:1;" v-model="systemConfig.zoomSize" :min="30" :max="100" show-input></el-slider>
-                        <span v-popover:popover3 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                        <span v-popover:popover8 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
                           <i class="el-icon-question" />
                         </span>
-                        <el-popover ref="popover3" placement="top-start" width="260" trigger="hover">
+                        <el-popover ref="popover8" placement="top-start" width="260" trigger="hover">
                             <div>
                                 【图像处理】、【布局分析】、【预览设备】模块容器滚动条高度缩放比例
                             </div>
@@ -228,7 +272,6 @@
                     </div>
                 </el-form-item>
             </el-row>
-
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button @click="systemSettingDialog = false">关闭</el-button>

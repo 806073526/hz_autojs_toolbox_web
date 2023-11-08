@@ -33,6 +33,9 @@ export default {
                 lastSelectDeviceUuid: "",
                 autoCheckVersionUpdate: true,
                 openNoticeMessage: true,
+                autoRefreshScreenCapture: false,
+                allScreenCaptureAutoRename: false,
+                defaultScreenImageName: 'system/imageHandler/allScreen.png',
                 zoomSize: 100
             },
             systemSettingDialog: false,

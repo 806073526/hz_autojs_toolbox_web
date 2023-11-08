@@ -180,8 +180,13 @@
                             <el-row class="d-flex">
                                 <div class="width100 d-flex a-center flex-wrap">
                                     <el-form-item label="图片名称:" prop="localImageName" label-width="100px" class="flex-1">
-                                        <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
-                                                  class="width100" />
+                                        <div class="width100 d-flex ">
+                                            <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
+                                                      class="flex-1" />
+                                            <el-button type="primary" style="display: flex;margin-left: 5px;" size="mini" @click.stop.prevent="resetImageName">
+                                                重置名称
+                                            </el-button>
+                                        </div>
                                     </el-form-item>
                                 </div>
                             </el-row>

@@ -1,4 +1,4 @@
-import {getContext, rgb2hex} from "./../../../utils/utils.js";
+import {getContext, rgb2hex, getInverseColor} from "./../../../utils/utils.js";
 let template = '<div></div>';
 $.ajax({
     url: "/module/index/template/imgHandler.html",
@@ -34,6 +34,9 @@ export default {
     },
     data() {
         return {
+            autoRefreshScreenCapture: false, // 刷新截图权限
+            allScreenCaptureAutoRename: false, // 全屏截图自动重命名图片
+            defaultImageName: 'system/imageHandler/allScreen.png',// 目录图片名称
             imgMousePosition: {// 图片鼠标坐标
                 x: 0,
                 y: 0,
@@ -125,6 +128,15 @@ export default {
         }
     },
     methods: {
+        resetImageName(){
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    this.remoteHandler.param1.localImageName = systemConfigObj.defaultScreenImageName || this.defaultImageName;
+                }
+            }
+        },
         initPhoneImageUploadPath(){
             if (!this.validSelectDevice()) {
                 return
@@ -143,6 +155,9 @@ export default {
                 let systemConfigObj = JSON.parse(systemConfigCache);
                 if(systemConfigObj){
                     zoomSize = systemConfigObj.zoomSize;
+                    this.autoRefreshScreenCapture = systemConfigObj.autoRefreshScreenCapture;
+                    this.allScreenCaptureAutoRename = systemConfigObj.allScreenCaptureAutoRename;
+                    this.remoteHandler.param1.localImageName = systemConfigObj.defaultScreenImageName || this.defaultImageName;
                 }
                 if(zoomSize<30){
                     zoomSize = 30
@@ -334,6 +349,9 @@ export default {
         },
         // 全屏截图
         allCaptureScreen(){
+            if(this.allScreenCaptureAutoRename){
+                this.resetImageName();
+            }
             // 设置为全屏坐标
             this.setParam1(false);
             // 执行截图操作
@@ -350,6 +368,11 @@ export default {
                 return
             }
             this.initPhoneImageUploadPath();
+            if(this.autoRefreshScreenCapture){
+                let remoteExecuteScriptContent = 'images.stopScreenCapture();';
+                this.remoteExecuteScript(remoteExecuteScriptContent);
+            }
+
             this.remoteHandler.param1.cache_x1 = this.remoteHandler.param1.x1;
             this.remoteHandler.param1.cache_y1 = this.remoteHandler.param1.y1;
             this.remoteHandler.param1.cache_x2 = this.remoteHandler.param1.x2;
@@ -677,7 +700,14 @@ export default {
                 // 获取rgba值
                 let rgba = 'rgba(' + data[0] + ',' + data[1] + ',' + data[2] + ',' + (data[3] / 255) + ')';
                 // 设置小正方形的背景颜色
-                this.imgMousePosition.color = rgb2hex(rgba)
+                this.imgMousePosition.color = rgb2hex(rgba);
+
+
+
+                // 获取反色颜色
+                let inverseColor = getInverseColor(this.imgMousePosition.color);
+                console.log(this.imgMousePosition.color,inverseColor);
+                $('.selectCell').css("border","2px solid "+inverseColor);
             }
 
             if(window.ctxScale){

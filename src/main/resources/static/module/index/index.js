@@ -244,6 +244,10 @@ window.ZXW_VUE = new Vue({
             },
             changeLogWindow:(value)=>{
                 this.openLogWindow = value;
+                // 开启后
+                if(this.openLogWindow){
+                    this.dragBoxFun()
+                }
             },
             copyToClipboard:(value)=>{
                 this.copyToClipboardFun(value);
@@ -257,6 +261,39 @@ window.ZXW_VUE = new Vue({
         }
     },
     methods: {
+        dragBoxFun(){
+            this.$nextTick(()=>{
+                let drag = document.getElementById('windowLogBox');
+                let dragTool = document.getElementById('windowLogBoxTool');
+                if(!drag || !dragTool){
+                    return;
+                }
+                dragTool.onmousedown = (e) => {
+                    let dragX = e.clientX - drag.offsetLeft;
+                    let dragY = e.clientY - drag.offsetTop;
+                    document.onmousemove = function (e) {
+                        let left = e.clientX - dragX;
+                        let top = e.clientY - dragY;
+                        if (left < 0) {
+                            left = 0;
+                        } else if (left > window.innerWidth - dragTool.offsetWidth) {
+                            left = window.innerWidth - dragTool.offsetWidth;
+                        }
+                        if (top < 0) {
+                            top = 0
+                        } else if (top > window.innerHeight - dragTool.offsetHeight) {
+                            top = window.innerHeight - dragTool.offsetHeight;
+                        }
+                        drag.style.top = top + 'px';
+                        drag.style.left = left + 'px';
+                    };
+                    document.onmouseup = function (e) {
+                        this.onmouseup = null;
+                        this.onmousemove = null;
+                    }
+                }
+            });
+        },
         // 复制内容到剪切板
         copyToClipboardFun(value){
             $.ajax({

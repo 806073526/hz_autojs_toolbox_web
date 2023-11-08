@@ -35,6 +35,7 @@ export default {
     },
     data() {
         return {
+            autoRefreshScreenCapture: false, // 刷新截图权限
             devicePreviewParam: { // 设备预览参数
                 imgQuality: 10,
                 imgScale: 1,
@@ -154,6 +155,7 @@ export default {
                 let systemConfigObj = JSON.parse(systemConfigCache);
                 if(systemConfigObj){
                     zoomSize = systemConfigObj.zoomSize;
+                    this.autoRefreshScreenCapture = systemConfigObj.autoRefreshScreenCapture;
                 }
                 if(zoomSize<30){
                     zoomSize = 30
@@ -426,6 +428,10 @@ export default {
         },
         // 开始预览设备
         startPreviewDevice(notice) {
+            if(this.autoRefreshScreenCapture){
+                let remoteExecuteScriptContent = 'images.stopScreenCapture();';
+                this.remoteExecuteScript(remoteExecuteScriptContent);
+            }
             // 获取预览参数
             let messageStr = JSON.stringify(this.devicePreviewParam);
             // 判断预览方式
