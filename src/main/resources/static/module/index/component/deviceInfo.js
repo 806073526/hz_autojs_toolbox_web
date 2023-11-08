@@ -120,11 +120,13 @@ export default {
         this.authorizeStatus = this.checkSelfMachineAuthorize();
 
         this.isExeVersion = this.checkExeOptions();
-        if(this.isExeVersion && autoCheckVersionUpdate){
-            this.checkVersion();
-        }
+
         // 获取最新版本
         this.newVersion = this.getNewVersion();
+
+        if(this.isExeVersion && autoCheckVersionUpdate && this.versionInfo !== this.newVersion){
+            this.checkVersion();
+        }
 
         if(openNoticeMessage){
             // 开启公告显示
