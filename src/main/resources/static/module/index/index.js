@@ -34,12 +34,19 @@ window.ZXW_VUE = new Vue({
     },
     template: template,
     data: {
+        defaultWindowHeight: '800px',
+        defaultWindowWidth: '400px',
+        deviceMousePosition:{
+            x:0,
+            y:0
+        },
         inputPageAccessPassword:'',
         pageAccessLimit: false,
         pageLoadSuccess:false,
         monacoEditorComplete: false,
         webSocket: null,
-        activeTab:'commonFile',
+        activeTab:'fileManage',
+        randomKey: Math.random(),
         otherProperty: {// 其他属性对象 同步app端
             orientation: 1,  // 屏幕方向
             debugModel: true,// 调试模式
@@ -71,9 +78,10 @@ window.ZXW_VUE = new Vue({
         showFileDialogTab:'',
         showTabScrollTop:0,
         screenDirection: '竖屏',
-        openLogWindow:false,
-        showWindowLog:true,
-        windowLogContent:''
+        openLogWindow:false, // 日志悬浮窗显示
+        openScreenWindow:false, // 预览屏幕悬浮窗显示
+        showWindowLog:true, // 最小化日志悬浮窗
+        windowLogContent:'' // 日志内容
     },
     computed: {
     },
@@ -90,11 +98,19 @@ window.ZXW_VUE = new Vue({
             immediate: true, // 立即触发一次
             deep: true // 可以深度检测到  对象的属性值的变化
         },
+        screenDirection(val){
+            // 如果当前悬浮窗是开启的
+            if(this.openScreenWindow){
+                // 刷新悬浮窗状态
+                this.refreshFloatScreenWindowFun();
+            }
+        },
         activeTab(val){
             // 执行页面组件初始化方法
             if(this.$refs[val] && this.$refs[val].init){
                 this.$refs[val].init()
             }
+            window.activeTab = val;
             if(val === 'previewDevice' || val === 'imgHandler' || val === 'layoutAnalysis'){
                 this.timeSyncOtherProperty(()=>{
                     this.screenDirection = this.otherProperty.orientation === 1 ? "竖屏" : "横屏";
@@ -249,6 +265,14 @@ window.ZXW_VUE = new Vue({
                     this.dragBoxFun()
                 }
             },
+            // 提供给子模块调用
+            changeScreenWindow:(value)=>{
+                // 注册事件  用于处理 先开启悬浮窗 再预览的情况
+                window.ZXW_VUE.$EventBus.$off('refreshFloatScreenWindow',this.refreshFloatScreenWindowFun);
+                window.ZXW_VUE.$EventBus.$on('refreshFloatScreenWindow',this.refreshFloatScreenWindowFun);
+                // 处理悬浮窗内容
+                this.changeScreenWindowFun(value);
+            },
             copyToClipboard:(value)=>{
                 this.copyToClipboardFun(value);
             },
@@ -261,6 +285,188 @@ window.ZXW_VUE = new Vue({
         }
     },
     methods: {
+        // 刷新悬浮窗状态(重新开启)
+        refreshFloatScreenWindowFun(){
+            // 先关闭
+            this.changeScreenWindowFun(false);
+            this.$nextTick(()=>{
+                // 再打开
+                this.changeScreenWindowFun(true);
+            });
+        },
+        // 处理悬浮窗内容
+        changeScreenWindowFun(value){
+            // 控制悬浮窗显示 隐藏
+            this.openScreenWindow = value;
+            if(!this.openScreenWindow){
+                // 移除事件注册
+                window.ZXW_VUE.$EventBus.$off('syncScreenContent',this.syncScreenContentFun);
+                return;
+            }
+            // 开启后
+            if(this.openScreenWindow){
+                // 预览屏幕悬浮窗 拖拽事件注册
+                this.dragBoxScreenFun();
+            }
+
+            // 注册同步屏幕方法
+            window.ZXW_VUE.$EventBus.$off('syncScreenContent',this.syncScreenContentFun);
+            window.ZXW_VUE.$EventBus.$on('syncScreenContent', this.syncScreenContentFun);
+
+            // 预览屏幕悬浮窗  操作屏幕 相关事件转发
+            this.$nextTick(()=>{
+                // 获取要转发事件的元素
+                let sourceElement = document.getElementById('windowScreenDiv');
+
+                let targetElement = document.getElementById("devicePreviewImg");
+                window.targetCacheTop = targetElement.getBoundingClientRect().top;
+                window.targetCacheLeft = targetElement.getBoundingClientRect().left;
+
+
+                window.targetCacheClientWidth = targetElement.clientWidth;
+                window.targetCacheClientHeight = targetElement.clientHeight;
+
+                sourceElement.addEventListener("mousemove",this.forwardEventHandler);
+                sourceElement.addEventListener("click",this.forwardEventHandler);
+                sourceElement.addEventListener("mousedown",this.forwardEventHandler);
+                sourceElement.addEventListener("mouseup",this.forwardEventHandler);
+
+                // 预览屏幕悬浮窗 面板默认大小设置
+                let proportion = this.deviceInfo.standardWidth/this.deviceInfo.standardHeight;
+                if(this.screenDirection === '竖屏'){
+                    this.defaultWindowWidth = '400px';
+                    // 动态计算比例
+                    this.defaultWindowHeight = proportion ? ((400/proportion)+25) + 'px' : '800px';
+                } else {
+                    this.defaultWindowWidth = '800px';
+                    // 动态计算比例
+                    this.defaultWindowHeight = proportion ? 800 * proportion + 'px' : '400px';
+                }
+
+                this.$nextTick(()=>{
+                    let drag = document.getElementById('windowScreenBox');
+                    // 预览屏幕悬浮窗 面板大小 读取缓存宽高
+                    let screenWindowSizeCache = window.localStorage.getItem(this.screenDirection+'screenWindowSizeCache');
+                    let screenWindowSizeJson = screenWindowSizeCache || "";
+                    let screenWindowSizeObj = screenWindowSizeJson ? JSON.parse(screenWindowSizeJson) : {"width":"","height":""};
+                    // 如果缓存有宽高 则设置宽高
+                    if(screenWindowSizeObj.width){
+                        drag.style.width =  screenWindowSizeObj.width;
+                    }
+                    if(screenWindowSizeObj.height){
+                        drag.style.height =  screenWindowSizeObj.height;
+                    }
+
+                    // 预览屏幕悬浮窗 缩放面板事件注册
+                    const resizeObserver = new ResizeObserver((entries)=> {
+                        this.windowScreenResizeFun();
+                    });
+                    resizeObserver.disconnect();
+                    resizeObserver.observe(drag);
+
+                    // 预览屏幕 悬浮窗 操作按钮 位置定位计算
+                    let dragToolBox = document.getElementById('floatWindowToolBar');
+
+                    let screenToolWindowPositionCache = window.localStorage.getItem('screenToolWindowPositionCache');
+                    let screenToolWindowPositionJson = screenToolWindowPositionCache || "";
+                    let screenToolWindowPositionObj = screenToolWindowPositionCache ? JSON.parse(screenToolWindowPositionJson) : {"top":"","left":""};
+                    if(screenToolWindowPositionObj.top){
+                        dragToolBox.style.right = null;
+                        dragToolBox.style.top = screenToolWindowPositionObj.top;
+                    }
+                    if(screenToolWindowPositionObj.left){
+                        dragToolBox.style.left = screenToolWindowPositionObj.left;
+                    }
+
+                    let dragWidth = Number((drag.style.width).replace('px',''));
+                    let dragTop = Number((drag.style.top).replace('px',''));
+                    if(!screenToolWindowPositionObj.left){
+                        dragToolBox.style.right = (dragWidth + 10) + 'px';
+                    }
+                    dragToolBox.style.top = dragTop + 'px';
+                });
+            });
+        },
+        // 定义事件处理函数
+        forwardEventHandler(event) {
+            let sourceElement = document.getElementById('windowScreenDiv');
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                let eventObj = {
+                    offsetX:event.offsetX*(window.targetCacheClientWidth /sourceElement.clientWidth),
+                    offsetY:event.offsetY*(window.targetCacheClientHeight /sourceElement.clientHeight)
+                };
+                let eventTypeMap = {
+                    'mousemove':'deviceMouseMove',
+                    'click':'deviceMouseClick',
+                    'mousedown':'deviceMouseDown',
+                    'mouseup':'deviceMouseUp'
+                };
+                let funName = eventTypeMap[event.type];
+                if(previewDevice[funName] && typeof previewDevice[funName] === 'function'){
+                    previewDevice[funName](eventObj);
+                }
+            }
+            if(event.type === 'mousemove'){
+                let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+                if(previewDevice && previewDevice.deviceMousePosition){
+                    this.deviceMousePosition.x = previewDevice.deviceMousePosition.x  || 0;
+                    this.deviceMousePosition.y = previewDevice.deviceMousePosition.y  || 0;
+                }
+            }
+        },
+        // 同步屏幕内容方法
+        syncScreenContentFun(){
+            // 将预览屏幕内容 添加到悬浮窗中
+            let devicePreviewImgParent = document.getElementById('devicePreviewImgParent');
+            let clonedContent = devicePreviewImgParent.cloneNode(true);
+
+            let childrenNodes = clonedContent.childNodes;
+            if(childrenNodes && childrenNodes.length){
+                for (let i = childrenNodes.length -1; i >= 0 ; i--) {
+                    let item = childrenNodes[i];
+                    let curId = item.id || "";
+                    if(curId === 'devicePreviewImg'){
+                        childrenNodes[i].id = curId + "_copy"
+                    } else {
+                        clonedContent.removeChild(item);
+                    }
+                }
+            }
+            clonedContent.id = clonedContent.id + "_copy";
+            // 获取悬浮窗dom
+            let windowScreenDivDom = document.getElementById('windowScreenDiv');
+            let childNodes = windowScreenDivDom.childNodes;
+            // 替换子元素
+            windowScreenDivDom.replaceChild(clonedContent,childNodes[0]);
+        },
+        // 日志悬浮窗变化方法
+        windowLogResizeFun(){
+            let drag = document.getElementById('windowLogBox');
+            if(!drag){
+                return;
+            }
+            let logWindowSizeCache = window.localStorage.getItem('logWindowSizeCache');
+            let logWindowSizeJson = logWindowSizeCache || "";
+            let logWindowSizeObj = logWindowSizeJson ? JSON.parse(logWindowSizeJson) : {"width":"","height":""};
+            logWindowSizeObj.width = drag.clientWidth;
+            logWindowSizeObj.height = drag.clientHeight;
+            window.localStorage.setItem('logWindowSizeCache',JSON.stringify(logWindowSizeObj));
+        },
+        // 预览屏幕悬浮窗变化方法
+        windowScreenResizeFun(){
+            let drag = document.getElementById('windowScreenBox');
+            if(!drag){
+                return;
+            }
+
+            let screenWindowSizeCache = window.localStorage.getItem(this.screenDirection+'screenWindowSizeCache');
+            let screenWindowSizeJson = screenWindowSizeCache || "";
+            let screenWindowSizeObj = screenWindowSizeJson ? JSON.parse(screenWindowSizeJson) : {"width":"","height":""};
+            screenWindowSizeObj.width = drag.style.width;
+            screenWindowSizeObj.height = drag.style.height;
+            window.localStorage.setItem(this.screenDirection+'screenWindowSizeCache',JSON.stringify(screenWindowSizeObj));
+        },
         dragBoxFun(){
             this.$nextTick(()=>{
                 let drag = document.getElementById('windowLogBox');
@@ -268,6 +474,39 @@ window.ZXW_VUE = new Vue({
                 if(!drag || !dragTool){
                     return;
                 }
+                // 获取缓存位置
+                let logWindowPositionCache = window.localStorage.getItem('logWindowPositionCache');
+                let logWindowPositionJson = logWindowPositionCache || "";
+                let logWindowPositionObj = logWindowPositionJson ? JSON.parse(logWindowPositionJson) : {"top":"","left":""};
+                // 如果缓存位置有值 则更新初始位置
+                if(logWindowPositionObj.top){
+                    drag.style.top = logWindowPositionObj.top;
+                }
+                if(logWindowPositionObj.left){
+                    drag.style.left = logWindowPositionObj.left;
+                }
+
+                // 读取缓存宽高
+                let logWindowSizeCache = window.localStorage.getItem('logWindowSizeCache');
+                let logWindowSizeJson = logWindowSizeCache || "";
+                let logWindowSizeObj = logWindowSizeJson ? JSON.parse(logWindowSizeJson) : {"width":"","height":""};
+                // 如果缓存有宽高 则设置宽高
+                if(logWindowSizeObj.width){
+                    drag.style.width =  logWindowSizeObj.width + 'px';
+                }
+                if(logWindowSizeObj.height){
+                    drag.style.height =  logWindowSizeObj.height + 'px';
+                }
+
+                this.$nextTick(()=>{
+                    // 注册监听
+                    const resizeObserver = new ResizeObserver((entries)=> {
+                        this.windowLogResizeFun();
+                    });
+                    resizeObserver.disconnect();
+                    resizeObserver.observe(drag);
+                });
+
                 dragTool.onmousedown = (e) => {
                     let dragX = e.clientX - drag.offsetLeft;
                     let dragY = e.clientY - drag.offsetTop;
@@ -286,6 +525,14 @@ window.ZXW_VUE = new Vue({
                         }
                         drag.style.top = top + 'px';
                         drag.style.left = left + 'px';
+
+                        // 拖动之后缓存位置
+                        let logWindowPositionCache = window.localStorage.getItem('logWindowPositionCache');
+                        let logWindowPositionJson = logWindowPositionCache || "";
+                        let logWindowPositionObj = logWindowPositionJson ? JSON.parse(logWindowPositionJson) : {"top":"","left":""};
+                        logWindowPositionObj.top = drag.style.top;
+                        logWindowPositionObj.left = drag.style.left;
+                        window.localStorage.setItem('logWindowPositionCache',JSON.stringify(logWindowPositionObj));
                     };
                     document.onmouseup = function (e) {
                         this.onmouseup = null;
@@ -293,6 +540,93 @@ window.ZXW_VUE = new Vue({
                     }
                 }
             });
+        },
+        // 预览屏幕悬浮窗 拖拽事件注册
+        dragBoxScreenFun(){
+            this.$nextTick(()=>{
+                let drag = document.getElementById('windowScreenBox');
+                let dragTool = document.getElementById('windowScreenBoxTool');
+                if(!drag || !dragTool){
+                    return;
+                }
+
+                // 获取缓存位置
+                let screenWindowPositionCache = window.localStorage.getItem('screenWindowPositionCache');
+                let screenWindowPositionJson = screenWindowPositionCache || "";
+                let screenWindowPositionObj = screenWindowPositionJson ? JSON.parse(screenWindowPositionJson) : {"top":"","left":""};
+                // 如果缓存位置有值 则更新初始位置
+                if(screenWindowPositionObj.top){
+                    drag.style.top = screenWindowPositionObj.top;
+                }
+                if(screenWindowPositionObj.left){
+                    drag.style.left = screenWindowPositionObj.left;
+                }
+
+                dragTool.onmousedown = (e) => {
+                    let dragX = e.clientX - drag.offsetLeft;
+                    let dragY = e.clientY - drag.offsetTop;
+                    document.onmousemove = function (e) {
+                        let left = e.clientX - dragX;
+                        let top = e.clientY - dragY;
+                        if (left < 0) {
+                            left = 0;
+                        } else if (left > window.innerWidth - dragTool.offsetWidth) {
+                            left = window.innerWidth - dragTool.offsetWidth;
+                        }
+                        if (top < 0) {
+                            top = 0
+                        } else if (top > window.innerHeight - dragTool.offsetHeight) {
+                            top = window.innerHeight - dragTool.offsetHeight;
+                        }
+                        drag.style.top = top + 'px';
+                        drag.style.left = left + 'px';
+
+                        // 拖动之后缓存位置
+                        let screenWindowPositionCache = window.localStorage.getItem('screenWindowPositionCache');
+                        let screenWindowPositionJson = screenWindowPositionCache || "";
+                        let screenWindowPositionObj = screenWindowPositionJson ? JSON.parse(screenWindowPositionJson) :  {"top":"","left":""};
+                        screenWindowPositionObj.top = drag.style.top;
+                        screenWindowPositionObj.left = drag.style.left;
+                        window.localStorage.setItem('screenWindowPositionCache',JSON.stringify(screenWindowPositionObj));
+
+
+                        let dragToolBox = document.getElementById('floatWindowToolBar');
+                        dragToolBox.style.top = top + 'px';
+                        dragToolBox.style.left = (Number(left) - Number(dragToolBox.clientWidth) - 5) + 'px';
+                        dragToolBox.style.right = null;
+
+                        // 拖动之后缓存位置
+                        let screenToolWindowPositionCache = window.localStorage.getItem('screenToolWindowPositionCache');
+                        let screenToolWindowPositionJson = screenToolWindowPositionCache || "";
+                        let screenToolWindowPositionObj = screenToolWindowPositionCache ? JSON.parse(screenToolWindowPositionJson) : {"top":"","left":""};
+                        screenToolWindowPositionObj.top = dragToolBox.style.top;
+                        screenToolWindowPositionObj.left = dragToolBox.style.left;
+                        window.localStorage.setItem('screenToolWindowPositionCache',JSON.stringify(screenToolWindowPositionObj));
+                    };
+                    document.onmouseup = function (e) {
+                        this.onmouseup = null;
+                        this.onmousemove = null;
+                    }
+                }
+            });
+        },
+        // 重连设备
+        reConnect(){
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                if(previewDevice.reConnect && typeof previewDevice.reConnect === 'function'){
+                    previewDevice.reConnect();
+                }
+            }
+        },
+        // 执行固定操作代码
+        fixedOperate(operateCode){
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                if(previewDevice.fixedOperate && typeof previewDevice.fixedOperate === 'function'){
+                    previewDevice.fixedOperate(operateCode);
+                }
+            }
         },
         // 复制内容到剪切板
         copyToClipboardFun(value){
@@ -362,11 +696,19 @@ window.ZXW_VUE = new Vue({
                 if(this.$refs['previewDevice'] && this.$refs['previewDevice'].refreshScrollHeight){
                     this.$refs['previewDevice'].refreshScrollHeight()
                 }
+                if(this.$refs['fileManage'] && this.$refs['fileManage'].refreshScrollHeight){
+                    this.$refs['fileManage'].refreshScrollHeight()
+                }
+                if(this.$refs['remoteScript'] && this.$refs['remoteScript'].refreshScrollHeight){
+                    this.$refs['remoteScript'].refreshScrollHeight()
+                }
             })
         },
+        // 最小化/还原 日志悬浮窗
         changeShowWindowLog(){
           this.showWindowLog=!this.showWindowLog;
         },
+        // 清空日志悬浮窗内容
         clearShowWindowLog(){
           this.windowLogContent = "";
         },

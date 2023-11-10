@@ -30,16 +30,22 @@
                                 </el-radio>
                             </el-radio-group>
                             <div style="margin-left: 10px;">
-                            <span class="mousePositionX">
-                                 x:{{deviceMousePosition.x }}
-                            </span>
+                                <span class="mousePositionX">
+                                     x:{{deviceMousePosition.x }}
+                                </span>
                                 <span class="mousePositionY">
-                                y:{{deviceMousePosition.y}}
-                            </span>
+                                    y:{{deviceMousePosition.y}}
+                                </span>
+                            </div>
+                            <div style="margin-left: 10px;">
+                                <span style="font-size: 12px;">
+                                     悬浮窗预览
+                                </span>
+                                <el-switch v-model="openFloatWindow"/>
                             </div>
                             <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
-                          <i class="el-icon-question" />
-                        </span>
+                                <i class="el-icon-question" />
+                            </span>
                             <el-popover ref="popover1" placement="top-start" width="600" trigger="hover">
                                 <div>
                                     <b>全屏预览:</b>
@@ -122,6 +128,9 @@
                     </div>
                     <div style="">
                         <div class="d-flex flex-column" style="margin-top: 5px;align-items: self-end;float: right;">
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="reConnect">
+                                重连
+                            </el-button>
                             <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('powerDialog')">
                                 电源
                             </el-button>

@@ -229,6 +229,7 @@ export default {
     data() {
         return {
             isInit:false,
+            isActive:false,
             oneKeyPackageFlag:false, // 一键打包标记
             fileEditVisible:false, // 文件编辑器可见
             phoneFileEditVisible:false,
@@ -375,6 +376,7 @@ export default {
             error: function (msg) {
             }
         });
+        this.refreshScrollHeight();
     },
     computed: {
         uploadPrePathName() {
@@ -493,6 +495,26 @@ export default {
                 // 根据同步路径处理
                 this.enterWebPath();
                 this.enterPhonePath();
+            }
+            this.refreshScrollHeight();
+        },
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".fileDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
             }
         },
         // 取消上传

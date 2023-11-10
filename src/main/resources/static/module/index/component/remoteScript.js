@@ -64,8 +64,12 @@ export default {
             return arr.filter(item => item.type === 'other');
         }
     },
+    mounted(){
+        this.refreshScrollHeight();
+    },
     data() {
         return {
+            isActive: false,
             remoteHandler: {
                 param4: {
                     scriptName:'remoteScript.js',
@@ -438,6 +442,26 @@ export default {
             initFileEditor(this,'scriptEditor','scriptTextEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
                 this.remoteHandler.param4.scriptText = value
             });
+            this.refreshScrollHeight();
+        },
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".imgDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
+            }
         },
         // 初始自定义模块
         initCustomScript(){

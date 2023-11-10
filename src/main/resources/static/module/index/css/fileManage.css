@@ -16,6 +16,28 @@
     overflow: initial;
     position: relative;
 }
+.fileDivContainer{
+    border: 1px solid #dbd2d2;
+    padding: 5px;
+    border-radius: 5px;
+    height: 1500px;
+    overflow-y: scroll;
+}
+
+.fileDivContainer::-webkit-scrollbar {
+    width: 4px;
+}
+.fileDivContainer::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+.fileDivContainer:hover::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 53%, 0.4);
+}
+.fileDivContainer::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 53%, 0.1);
+}
+
 
 .breadcrumbWrap .hoverBreadcrumb .el-breadcrumb__inner:hover{
      color: #4BABF6 !important;

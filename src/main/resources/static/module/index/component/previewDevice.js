@@ -12,7 +12,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'changeScreenWindow'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -36,6 +36,7 @@ export default {
     data() {
         return {
             autoRefreshScreenCapture: false, // 刷新截图权限
+            openFloatWindow: false,
             devicePreviewParam: { // 设备预览参数
                 imgQuality: 10,
                 imgScale: 1,
@@ -109,6 +110,9 @@ export default {
       }
     },
     watch:{
+        openFloatWindow(val){
+            this.changeScreenWindow(val);
+        },
         previewImageWidth(val){
             if(this.deviceInfo.deviceUuid){
                 window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_previewImageWidth",val || 50);
@@ -249,6 +253,11 @@ export default {
             $("#devicePreviewImg").attr("src", window.deviceImgUrl);
             this.noPreviewImg = false;
             window.deviceImgUrlBak = window.deviceImgUrl;
+            // 开启了悬浮屏幕
+            if(this.openFloatWindow){
+                // 同步屏幕内容到悬浮窗中
+                window.ZXW_VUE.$EventBus.$emit('syncScreenContent');
+            }
         },
         // 开始预览设备web监听方法
         startPreviewDeviceWebListenerFun(notice){
@@ -440,6 +449,8 @@ export default {
             } else if(this.selectPreviewType === 'imgInterface') {
                 this.startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice)
             }
+            // 处理先开悬浮窗 再开始预览的情况
+            window.ZXW_VUE.$EventBus.$emit('refreshFloatScreenWindow');
         },
         allScreenPreviewImg(){
             // 获取需要全屏展示的div
@@ -1076,6 +1087,15 @@ export default {
             }
             this.remoteExecuteScript(remoteExecuteScript);
         },
+        // 重新预览
+        reConnect(){
+            this.stopPreviewDevice(false, () => {
+                let cacheAutoRefreshScreenCapture = this.autoRefreshScreenCapture;
+                this.autoRefreshScreenCapture = true;
+                this.startPreviewDevice(false);
+                this.autoRefreshScreenCapture = cacheAutoRefreshScreenCapture;
+            })
+        },
         // 自动预览设备
         autoDevicePreview() {
             if (!this.devicePreviewParam.valueUpdateAfterAutoPreview) {
@@ -1345,25 +1365,40 @@ export default {
         // 转换坐标
         convertPosition(x,y){
             let box = document.querySelector('#devicePreviewImg');
+
+            let boxWidth = box.width;
+            let boxHeight = box.height;
+
+            // 当前选中标签 有值 且不是预览设备模式
+            if(window.activeTab && window.activeTab!=='previewDevice'){
+                // 读取缓存值 支持悬浮窗操作设备
+                boxWidth = window.targetCacheClientWidth;
+                boxHeight = window.targetCacheClientHeight;
+            }
             let obj = {
                 x:0,
                 y:0
             };
+
+            if(!boxWidth || !boxHeight){
+                return obj;
+            }
+
             // 竖屏
             if (this.screenDirection === "竖屏") {
-                obj.x = Number(x * (this.deviceInfo.screenWidth / box.width)).toFixed(0);
-                obj.y = Number(y * (this.deviceInfo.screenHeight / box.height)).toFixed(0);
+                obj.x = Number(x * (this.deviceInfo.screenWidth / boxWidth)).toFixed(0);
+                obj.y = Number(y * (this.deviceInfo.screenHeight / boxHeight)).toFixed(0);
                 // 超过范围
-                if(obj.x < 0 || obj.x > (this.deviceInfo.screenWidth / box.width) * box.width || obj.y < 0 || obj.y > (this.deviceInfo.screenHeight / box.height) * box.height){
+                if(obj.x < 0 || obj.x > (this.deviceInfo.screenWidth / boxWidth) * boxWidth || obj.y < 0 || obj.y > (this.deviceInfo.screenHeight / boxHeight) * boxHeight){
                     return null;
                 }
                 // 横屏
             } else if (this.screenDirection === "横屏") {
-                obj.x = Number(x * (this.deviceInfo.screenHeight / box.width)).toFixed(0);
-                obj.y = Number(y * (this.deviceInfo.screenWidth / box.height)).toFixed(0);
+                obj.x = Number(x * (this.deviceInfo.screenHeight / boxWidth)).toFixed(0);
+                obj.y = Number(y * (this.deviceInfo.screenWidth / boxHeight)).toFixed(0);
 
                 // 超过范围
-                if(obj.x < 0 || obj.x > (this.deviceInfo.screenHeight / box.width) * box.width || obj.y < 0 || obj.y > (this.deviceInfo.screenWidth / box.height) * box.height){
+                if(obj.x < 0 || obj.x > (this.deviceInfo.screenHeight / boxWidth) * box.width || obj.y < 0 || obj.y > (this.deviceInfo.screenWidth / boxHeight) * boxHeight){
                     return null;
                 }
             }
