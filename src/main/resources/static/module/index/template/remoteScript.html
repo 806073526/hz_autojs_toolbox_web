@@ -8,15 +8,40 @@
                 <div style="background: white;height: 120px;width: calc(65% - 15px);top:1px;position:absolute;z-index: 999;"></div>
                 <div style="position: sticky;top:0px;z-index: 999;">
                     <el-row class="width100 d-flex a-center flex-wrap" style="margin-bottom: -8px;">
-                        <el-form-item label="脚本名称:"  class="width70" label-width="75px" >
+                        <el-form-item label="脚本名称:"  class="width50" label-width="75px" >
                             <el-input v-model="remoteHandler.param4.scriptName" placeholder="请输入脚本名称" class="width100"/>
                         </el-form-item>
                         <el-form-item label="一键执行:" class="width15" label-width="85px">
                             <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>
                         </el-form-item>
+                        <el-form-item label="独立引擎:" class="width15" label-width="85px">
+                            <el-switch v-model="remoteHandler.param4.isIndependentScript"/>
+                        </el-form-item>
                         <el-form-item label="Node脚本:" class="width15" label-width="85px">
                             <el-switch v-model="remoteHandler.param4.isNodeScript"/>
                         </el-form-item>
+
+                        <span v-popover:popover1 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; margin-bottom:15px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover1" placement="top-start" width="500" trigger="hover">
+                            <div>
+                                <b>一键执行:</b>
+                                <span>点击右侧模块,加载模块脚本内容,并直接执行加载的代码。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>独立引擎:</b>
+                                <span>开启后,启动独立rhino引擎,来运行当前的脚本。测试死循环代码,建议使用独立引擎,停止脚本能够正常使用。非独立引擎,依赖于工具箱,可使用utils.js封装函数。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>Node脚本:</b>
+                                <span>编写node脚本,必须开启此开关,打开后,启动独立的Node引擎来运行脚本。</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <b>自定义模块设置:</b>
+                                <span>右侧除了常用模块、内置模块，还可以自己封装模块。编写自己的脚本后,存为文件,例如remoteScript.js文件。创建自定义模块,编码自行填写,名称为system/remoteScript/remoteScript.js,固定前缀加上对应文件名。</span>
+                            </div>
+                        </el-popover>
                     </el-row>
                     <div class="imgToolsDiv">
                         <div class="d-flex width100">

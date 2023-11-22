@@ -27,6 +27,21 @@ import java.io.*;
 @Slf4j
 public class SpringbootApplication {
 
+
+    public static String port;
+
+    public static int openBrowser = 1;
+
+    @Value("${server.port:9998}")
+    public void setPort(String portParam){
+        port = portParam;
+    }
+
+    @Value("${openBrowser:1}")
+    public void setOpenBrowser(int openBrowserParam){
+        openBrowser = openBrowserParam;
+    }
+
     private static String tempPath = isWindowsSystem() ? "C:"+File.separator+"temp" : File.separator + "temp";
     public static boolean isWindowsSystem(){
         String osName = System.getProperty("os.name");
@@ -69,8 +84,8 @@ public class SpringbootApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpringbootApplication.class, args);
         try {
-            String command = "cmd /c start http://"+ IPUtil.getRealIP() +":9998";
-            if(isWindowsSystem()){
+            String command = "cmd /c start http://"+ IPUtil.getRealIP() +":"+port;
+            if(isWindowsSystem() && openBrowser==1){
                 executeBatScript(command);
             }
             // Runtime.getRuntime().exec(command);//可以指定自己的路径

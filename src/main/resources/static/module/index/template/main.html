@@ -79,6 +79,7 @@
     z-index: 99999999999999999999;">
         <div style="cursor: all-scroll;width:100%;display:inline-flex;font-size: 17px;border-bottom: 1px solid #6d6161;background: #49493e;" id="windowLogBoxTool">
             <span style="padding: 0px 0px 3px 8px;color: #FFFFFF">实时日志</span>
+            <span style="color:white;"><i :class="{'el-icon-caret-top' : !showWindowLog, 'el-icon-caret-bottom':showWindowLog}" style="cursor: pointer" @click.stop="changeShowWindowLog"></i></span>
             <div class="flex-1" style="text-align: right;"><i class="el-icon-delete" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="clearShowWindowLog"></i></div>
         </div>
         <div v-html="windowLogContent" style="height: calc(100% - 25px);overflow-y: scroll;" id="windowLogDiv">

@@ -75,7 +75,8 @@ export default {
                     scriptName:'remoteScript.js',
                     scriptText: '',
                     scriptImmediatelyExec: true,
-                    isNodeScript: false
+                    isNodeScript: false,
+                    isIndependentScript: false
                 }
             },
             //tab页选中
@@ -654,8 +655,18 @@ export default {
         },
         // 远程执行脚本
         remoteExecuteScriptFun(code){
-            if(!this.remoteHandler.param4.isNodeScript){
-                if(code.startsWith('"ui"')){
+            // NODE脚本 先写入手机端再执行文件
+            if(this.remoteHandler.param4.isNodeScript){
+                let remoteScript = `
+                    let remoteScriptPath = '/sdcard/appSync/nodeRemoteScript/remoteScript.node.js'; 
+                    files.createWithDirs(remoteScriptPath)
+                    files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(code))}')));
+                    engines.execScriptFile("/sdcard/appSync/nodeRemoteScript/remoteScript.node.js",{path:["/sdcard/appSync/nodeRemoteScript/"]})
+                `;
+                this.remoteExecuteScript(remoteScript);
+            } else {
+                // ui开头 或者 开启了独立引擎
+                if(code.startsWith('"ui"') || this.remoteHandler.param4.isIndependentScript){
                     let remoteScript = `
                     let remoteScriptPath = '/sdcard/appSync/tempRemoteScript/remoteScript.js'; 
                     files.createWithDirs(remoteScriptPath)
@@ -665,16 +676,8 @@ export default {
                     this.remoteExecuteScript(remoteScript);
                     return;
                 }
+                // 否则直接执行脚本
                 this.remoteExecuteScript(code);
-            // NODE脚本 先写入手机端再执行文件
-            } else {
-                let remoteScript = `
-                    let remoteScriptPath = '/sdcard/appSync/nodeRemoteScript/remoteScript.node.js'; 
-                    files.createWithDirs(remoteScriptPath)
-                    files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(code))}')));
-                    engines.execScriptFile("/sdcard/appSync/nodeRemoteScript/remoteScript.node.js",{path:["/sdcard/appSync/nodeRemoteScript/"]})
-                `;
-                this.remoteExecuteScript(remoteScript);
             }
         },
         // 获取自定义模块远程代码

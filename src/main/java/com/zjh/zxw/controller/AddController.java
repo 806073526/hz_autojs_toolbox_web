@@ -9,6 +9,8 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+/*import org.bytedeco.ffmpeg.global.avcodec;
+import org.bytedeco.javacv.Frame;*/
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +24,58 @@ import static com.zjh.commonUtils.executeBatScript;
 import static com.zjh.zxw.SpringbootApplication.isWindowsSystem;
 import static com.zjh.zxw.base.R.success;
 
+
+/*import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.FFmpegFrameRecorder;*/
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("addController")
 public class AddController {
+
+
+
+
+   /* @ApiOperation(value = "test", notes = "test")
+    @RequestMapping("/test")
+    public R<Boolean> test(String message){
+        String inputFilePath = "E:\\\\11月9日-2.mp4";
+        String outputFilePath = "E:\\\\bbbb.mp4";
+
+        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFilePath);
+        try {
+            grabber.start();
+            FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFilePath, grabber.getImageWidth(), grabber.getImageHeight(), 2);
+            recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
+            recorder.setFrameRate(grabber.getFrameRate());
+            recorder.setAudioBitrate(grabber.getAudioBitrate());
+            recorder.setSampleRate(grabber.getSampleRate());
+            recorder.setAudioCodec(avcodec.AV_CODEC_ID_AAC);
+            //设置零延迟
+            recorder.setVideoOption("tune", "fastdecode");
+            // 快速
+            recorder.setVideoOption("preset", "ultrafast");
+            recorder.setVideoOption("threads", "12");
+            recorder.setVideoOption("vsync", "2");
+
+            recorder.start();
+
+
+            int totalFrames = grabber.getLengthInFrames();
+            Frame frame;
+            while ((frame = grabber.grabFrame()) != null) {
+                recorder.record(frame);
+                System.out.println(grabber.getFrameNumber() +"/" + totalFrames);
+            }
+            recorder.stop();
+            grabber.stop();
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+        return success(true);
+    }
+*/
+
 
     @ApiOperation(value = "控件节点信息记录到系统剪切板", notes = "控件节点信息记录到系统剪切板")
     @RequestMapping("/recordeControlInfo")

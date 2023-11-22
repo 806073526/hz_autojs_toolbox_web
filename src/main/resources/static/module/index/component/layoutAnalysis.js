@@ -196,7 +196,7 @@ export default {
             window.ZXW_VUE.$notify.success({message: '操作成功', duration: '1000'})
         },
         // 保存自定义过滤函数
-        loadCustomFilterFunction(){
+        loadCustomFilterFunction(callback){
             // 获取代码内容
             let scriptContent = "window.customFilterFunction="+this.remoteHandler.param5.filterFunction;
             // 执行代码
@@ -204,8 +204,34 @@ export default {
             setTimeout(()=>{
                 // 触发过滤
                 this.openCustomFilterFunctionChange();
+                // 执行函数
+                if(callback && callback.constructor === Function){
+                    callback();
+                }
             },200);
             window.ZXW_VUE.$notify.success({message: '执行成功', duration: '1000'})
+        },
+        // 根据自定义过滤函数勾选
+        checkByCustomFilterFunction(){
+            let fun = ()=>{
+                // 获取过滤后数据
+                let filterArr = window.customFilterFunction(this.remoteHandler.param5.rootOneNodeArr);
+                // 获取nodeKey数组
+                let nodeKeys = filterArr ? filterArr.map(item=> item.nodeKey) || [] : [];
+                // 选中过滤后的数据
+                this.$refs.nodeTree.setCheckedKeys(nodeKeys);
+                // 获取已选中的节点
+                let checkedNodes = this.$refs.nodeTree.getCheckedNodes();
+                // 重新绘图
+                this.rectNodeToCanvas(checkedNodes);
+            };
+            if(window.customFilterFunction){
+                fun();
+            } else {
+                this.loadCustomFilterFunction(()=>{
+                    fun()
+                });
+            }
         },
 
         // 仅显示可见控件方法

@@ -693,6 +693,8 @@ body:hover::-webkit-scrollbar-track {
 .el-input__inner {
     height: 34px;
     line-height: 34px;
+    padding: 0 0 0 15px !important;
+    min-width: 60px;
 }
 .el-input-number {
     position: relative;

@@ -22,6 +22,9 @@ textarea:hover::-webkit-scrollbar-track {
 .width75 {
     width: 75% !important;
 }
+.width55 {
+    width: 55% !important;
+}
 .width50 {
     width: 50% !important;
 }
