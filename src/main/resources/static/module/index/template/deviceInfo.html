@@ -1,42 +1,30 @@
 <div>
-    <p style="display: flex;font-size: 17px;justify-content: left;align-items: center;flex-wrap: wrap;height:60px;background-color: #F6F6F6FF">
-        <img src="../module/index/image/title.png" style="margin-left:20px;width: 25px">已连接设备列表
-        <!-- <i class="el-icon-refresh-right" style="cursor: pointer;font-weight: 600!important;"
-            @click="getOnlineDevice">
-         </i>-->
-
-        <!-- <span style="margin-left:5px;cursor: pointer;" @click.stop="expandDeviceFun">{{ expandDevice ? '收缩' : '展开'}}</span>-->
-        <!--     <span @click.stop="authorizedFun" target="_blank" style="margin-left: 2px;color: #9a2c25;cursor: pointer;">
-                 【设备{{authorizeStatus? '已' : '未'}}授权】版本【V2.9.0】
-             </span>-->
-
-        <span @click.stop="authorizedFun" target="_blank" :style="{'color': authorizeStatus ? '#6b3dff' : '#d13026'}" style="margin-left: 0px;cursor: pointer;">【服务端{{authorizeStatus? '已' : '未'}}授权】</span>
-        <span @click.stop="checkVersion" style="cursor: pointer;margin-right: 5px;" title="点击检查更新">{{"【"+ versionInfo +"】"+newVersionNotice }}</span>
-        <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
-        <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
-        <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
-        <span style="width: 300px">
-            <span style="margin-left: 10px;color: #419EFDFF;">
-               {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
+    <div  style="margin-bottom:15px;">
+    <p class="d-flex a-center" style="font-size: 17px;height:60px;background-color: #F6F6F6FF;justify-content: space-between;flex-wrap: wrap;" >
+        <span class="d-flex j-center" style="text-align: left;">
+            <img src="../module/index/image/title.png" style="margin-left:20px;width: 25px">已连接设备列表
+            <span @click.stop="authorizedFun" target="_blank" :style="{'color': authorizeStatus ? '#6b3dff' : '#d13026'}" style="margin-left: 0px;cursor: pointer;">【服务端{{authorizeStatus? '已' : '未'}}授权】</span>
+            <span @click.stop="checkVersion" style="cursor: pointer;margin-right: 5px;" title="点击检查更新">{{"【"+ versionInfo +"】"+newVersionNotice }}</span>
+            <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
+            <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
+            <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
+            <span style="width: 300px">
+               <span style="margin-left: 10px;color: #419EFDFF;">
+                       {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
+               </span>
             </span>
         </span>
-        <span class="flex-1" style="text-align: right;">
-            <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/releases" target="_blank"
-               style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">Web端下载</a>
-            <a href="https://gitee.com/zjh336/hz_autojs_toolbox/releases" target="_blank"
-               style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">APP端下载</a>
+        <span class="d-flex" style="text-align: right;">
             <a href="https://sp2.zjh336.cn?code=YT0yJmI9NQ%3D%3D" target="_blank" style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">打包插件下载</a>
             <a href="https://space.bilibili.com/69729485/channel/series" target="_blank"
                style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">视频教程</a>
-            <a href="https://gitee.com/zjh336/hz_autojs_toolbox_web/wikis/pages" target="_blank"
-               style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">Web端文档【必读】</a>
-            <a href="https://www.zjh336.cn/?id=2126" target="_blank" style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">学习指南【必读】</a>
-             <a href="/docs/v8/app.html" target="_blank"
-                style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">AutoJsPro文档</a>
+            <a href="http://doc.zjh336.cn/#/docs/hz_autojs_tools_box" target="_blank"
+               style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">WEB端文档</a>
+            <a href="/docs/v8/app.html" target="_blank"
+               style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">AutoJsPro开发文档</a>
             <a href="https://jq.qq.com/?_wv=1027&k=QGefcWIC" target="_blank" style="color: #909399;text-decoration: none;font-size: 14px">QQ群：806074622</a>
-        </span>
-        <span>
-           <i class="el-icon-setting" @click.stop="showSystemSettingDialog" style="margin: 0 10px;font-size: 20px;"></i>
+            <a href='https://gitee.com/zjh336/hz_autojs_toolbox_web/stargazers'  style="display: inline-block;margin-left: 5px;margin-right: 75px;color: #909399;text-decoration: none;font-size: 14px;position: relative;"><img src='https://gitee.com/zjh336/hz_autojs_toolbox_web/badge/star.svg?theme=dark' alt='star' style="position: absolute; top: 0px;"></img></a>
+            <i class="el-icon-setting" @click.stop="showSystemSettingDialog" style="margin: 0 10px;font-size: 20px;"></i>
         </span>
     </p>
     <el-row v-show="expandDevice">
