@@ -958,7 +958,7 @@ window.ZXW_VUE = new Vue({
                                 windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
                                 if(_that.activeTab === "remoteLog"){
                                     // 更新实时日志
-                                    window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',_that.windowLogContent);
+                                    window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',content);
                                 }
                             });
                         }
