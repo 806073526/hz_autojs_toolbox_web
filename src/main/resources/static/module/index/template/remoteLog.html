@@ -26,18 +26,6 @@
                                            max="5000" class="width100">
                                  </el-input>
                              </el-form-item>-->
-                            <div class="flex-2 d-flex" style="justify-content: flex-end;">
-                                <el-form-item  style="margin-bottom: 0;text-align: left;" label="实时日志类型:"  >
-                                    <el-radio-group v-model="logDirectoryType" >
-                                        <el-radio label="tools">
-                                            工具箱日志
-                                        </el-radio>
-                                        <el-radio label="falsework">
-                                            脚手架日志
-                                        </el-radio>
-                                    </el-radio-group>
-                                </el-form-item>
-                            </div>
                             <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                                 <span>
                                     自动滚动到底部：
@@ -70,6 +58,18 @@
                         <el-input v-model="remoteHandler.param2.logName" placeholder="请输入远程日志名称"
                                   class="width100" />
                     </el-form-item>
+                    <div class="flex-2 d-flex" style="justify-content: flex-end;">
+                        <el-form-item  style="margin-bottom: 0;text-align: left;" label="日志类型:"  >
+                            <el-radio-group v-model="logDirectoryType" >
+                                <el-radio label="tools">
+                                    工具箱日志
+                                </el-radio>
+                                <el-radio label="falsework">
+                                    脚手架日志
+                                </el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </div>
                     <div>
                         <el-button type="danger" style="margin-left:10px" size="mini" @click.stop.prevent="remoteLogUpload">
                             远程日志上传

@@ -23,7 +23,7 @@
             <a href="/docs/v8/app.html" target="_blank"
                style="margin-right: 5px;color: #909399;text-decoration: none;font-size: 14px">AutoJsPro开发文档</a>
             <a href="https://jq.qq.com/?_wv=1027&k=QGefcWIC" target="_blank" style="color: #909399;text-decoration: none;font-size: 14px">QQ群：806074622</a>
-            <a href='https://gitee.com/zjh336/hz_autojs_toolbox_web/stargazers'  style="display: inline-block;margin-left: 5px;margin-right: 75px;color: #909399;text-decoration: none;font-size: 14px;position: relative;"><img src='https://gitee.com/zjh336/hz_autojs_toolbox_web/badge/star.svg?theme=dark' alt='star' style="position: absolute; top: 0px;"></img></a>
+            <a href='https://gitee.com/zjh336/hz_autojs_toolbox_web/stargazers' target="_blank"  style="display: inline-block;margin-left: 5px;margin-right: 75px;color: #909399;text-decoration: none;font-size: 14px;position: relative;"><img src='https://gitee.com/zjh336/hz_autojs_toolbox_web/badge/star.svg?theme=dark' alt='star' style="position: absolute; top: 0px;"></img></a>
             <i class="el-icon-setting" @click.stop="showSystemSettingDialog" style="margin: 0 10px;font-size: 20px;"></i>
         </span>
     </p>
@@ -255,6 +255,19 @@
                         <el-popover ref="popover9" placement="top-start" width="260" trigger="hover">
                             <div>
                                 开启后,连接了设备,会默认启动实时日志功能
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+                <el-form-item label="强制刷新页面缓存:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-button @click.stop="refreshBrowserCache" style="margin-right: 5px;">刷新</el-button>
+                        <span v-popover:popover10 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover10" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                更新版本后,如果发现未变化版本,可以执行此操作
                             </div>
                         </el-popover>
                     </div>

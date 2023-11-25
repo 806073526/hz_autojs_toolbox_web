@@ -149,6 +149,10 @@ export default {
 
     },
     methods: {
+        // 强制刷新
+        refreshBrowserCache(){
+            window.location.reload(true)
+        },
         // 检查版本更新
         checkVersion(){
             if(!this.isExeVersion){

@@ -715,6 +715,19 @@ window.ZXW_VUE = new Vue({
         clearShowWindowLog(){
           this.windowLogContent = "";
         },
+        // 刷新日志悬浮窗
+        refreshShowWindowLog(){
+            // 关闭实时日志悬浮窗
+            if(this.$refs['remoteLog'] && this.$refs['remoteLog'].stopOnLineLog){
+                this.$refs['remoteLog'].stopOnLineLog()
+            }
+            setTimeout(()=>{
+                // 再打开实时日志悬浮窗
+                if(this.$refs['remoteLog'] && this.$refs['remoteLog'].startOnLineLog){
+                    this.$refs['remoteLog'].startOnLineLog()
+                }
+            },500)
+        },
         // 关闭日志悬浮窗
         closeShowWindowLog(){
             this.$nextTick(()=>{

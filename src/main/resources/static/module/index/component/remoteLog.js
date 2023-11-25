@@ -139,8 +139,17 @@ export default {
                 let timerStorage = storages.create("zjh336.cn_timer");
                 timerStorage.remove('stop');
                 let timerFlag = true;
-                files.createWithDirs("/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/")
-                let filePath = "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/";
+                
+                // 读取日志配置
+                let logConfig = console.getGlobalLogConfig();
+                // 完整路径
+                let logFilePath = logConfig && logConfig.file ? logConfig.file : "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/log"+utilsObj.getCurrentTime()+".txt";
+                // 日志目录
+                let filePath = logFilePath.substring(0,logFilePath.lastIndexOf("/")+1);
+                // 日志文件名
+                let fileName = logFilePath.substring(logFilePath.lastIndexOf("/")+1,logFilePath.length);
+                
+                files.createWithDirs(filePath)
                 let charset = "UTF-8"; // 文件编码
                 let lineNum = ${this.onlineLogMaxLen}; // 需要读取的行数
                 // 监听文件变化
@@ -155,7 +164,15 @@ export default {
                     }
                     // 获取当前时间字符串
                     let currenTimes = utilsObj.getCurrentTime()
-                    let fileName = "log" + currenTimes + ".txt";
+                    // 读取日志配置
+                    let logConfig = console.getGlobalLogConfig();
+                    // 完整路径
+                    let logFilePath = logConfig && logConfig.file ? logConfig.file : "/sdcard/${this.logDirectoryType === 'tools' ? 'autoJsToolsLog' : 'autoJsLog'}/log" + currenTimes + ".txt";
+                    // 日志目录
+                    let filePath = logFilePath.substring(0,logFilePath.lastIndexOf("/")+1);
+                    // 日志文件名
+                    let fileName = logFilePath.substring(logFilePath.lastIndexOf("/")+1,logFilePath.length);
+                    
                     let events = key.pollEvents();
                     if (events.size() > 0) {
                         for (var i = 0; i < events.size(); i++) {
