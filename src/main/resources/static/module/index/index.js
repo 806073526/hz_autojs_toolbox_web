@@ -713,6 +713,10 @@ window.ZXW_VUE = new Vue({
         },
         // 清空日志悬浮窗内容
         clearShowWindowLog(){
+          // 读取最后一行日志
+          let logArr = this.windowLogContent.split("<br/>");
+          // 缓存最后一行日志
+          this.lastLogContent = logArr && logArr.length ? logArr[logArr.length-1] : "";
           this.windowLogContent = "";
         },
         // 刷新日志悬浮窗
@@ -721,6 +725,8 @@ window.ZXW_VUE = new Vue({
             if(this.$refs['remoteLog'] && this.$refs['remoteLog'].stopOnLineLog){
                 this.$refs['remoteLog'].stopOnLineLog()
             }
+            this.lastLogContent = "";
+            this.windowLogContent = "";
             setTimeout(()=>{
                 // 再打开实时日志悬浮窗
                 if(this.$refs['remoteLog'] && this.$refs['remoteLog'].startOnLineLog){
@@ -730,6 +736,7 @@ window.ZXW_VUE = new Vue({
         },
         // 关闭日志悬浮窗
         closeShowWindowLog(){
+            this.lastLogContent = "";
             this.$nextTick(()=>{
                 // 关闭实时日志悬浮窗
                 if(this.$refs['remoteLog'] && this.$refs['remoteLog'].stopOnLineLog){
@@ -858,39 +865,109 @@ window.ZXW_VUE = new Vue({
                 if(messageData.message !== this.deviceInfo.deviceUuid){
                     return;
                 }
-                // 调用接口查询日志
-                let _that = this;
-                $.ajax({
-                    url: getContext() + "/attachmentInfo/queryLog",
-                    type: "GET",
-                    dataType: "json",
-                    async: false,
-                    data: {
-                        "key": _that.deviceInfo.deviceUuid
-                    },
-                    success: function (data) {
-                        if (data) {
-                            if (data.isSuccess) {
-                                let content = decodeURI(atob(data.data));
-                                // 更新悬浮窗日志
-                                _that.windowLogContent = content.replace(/\n/g,"<br/>");
-                                _that.$nextTick(()=>{
-                                    // 滚动到底部
-                                    let windowLogDiv = document.getElementById("windowLogDiv");
-                                    windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
-                                    if(_that.activeTab === "remoteLog"){
-                                        // 更新实时日志
-                                        window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',content);
-                                    }
-                                });
-                            }
-                        }
-                    },
-                    error: function (msg) {
-                        console.log(msg)
-                    }
-                });
+                // 查询日志
+                this.queryLogFun();
             }
+        },
+        // 查询日志内容
+        queryLogFun(){
+            // 调用接口查询日志
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryLog",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: {
+                    "key": _that.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let content = decodeURI(atob(data.data));
+                            // 更新悬浮窗日志
+                            let windowLogContentVal= content.replace(/\n/g,"<br/>");
+
+                            // 最后一行有值
+                            if(_that.lastLogContent){
+                                // 目标日志数组
+                                let targetLogArr = [];
+                                // 根据换行符分割
+                                let logArr = windowLogContentVal.split("<br/>") || [];
+                                // 倒序
+                                logArr = logArr.reverse();
+                                // 遍历内容
+                                for(let i=0;i<logArr.length;i++){
+                                    let logLine = logArr[i];
+                                    // 是最后一行时
+                                    if(_that.lastLogContent === logLine){
+                                        break;
+                                    }
+                                    // 添加数据
+                                    targetLogArr.push(logLine);
+                                }
+                                // 倒序
+                                targetLogArr = targetLogArr.reverse();
+                                // 再次倒序 拼接还原
+                                windowLogContentVal = targetLogArr.join('<br/>')
+                            }
+                            // 处理日志颜色
+                            if(windowLogContentVal){
+                                let targetLogArr = windowLogContentVal.split("<br/>") || [];
+                                // 上一行日志级别
+                                let preLineLogLevel = "default";
+                                // 遍历数据
+                                for(let i=0;i<targetLogArr.length;i++){
+                                    let logLine = targetLogArr[i];
+                                    // 正则匹配 "2023-11-25 15:55:43.846/INFO: something else";
+                                    let pattern = /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3})\/(.*?):/;
+                                    let match = logLine.match(pattern);
+                                    if (match) {
+                                        preLineLogLevel = match[2];
+                                    }
+                                    switch (preLineLogLevel) {
+                                        case "TRACE":
+                                            logLine = '<span style="color:#bdbdbd">'+logLine+'</span>';
+                                            break;
+                                        case "INFO":
+                                            logLine = '<span style="color:#1de9b6">'+logLine+'</span>';
+                                            break;
+                                        case "WARN":
+                                            logLine = '<span style="color:#673ab7">'+logLine+'</span>';
+                                            break;
+                                        case "ERROR":
+                                            logLine = '<span style="color:#b71c1c">'+logLine+'</span>';
+                                            break;
+                                        case "DEBUG":
+                                            logLine = '<span style="color:#795548">'+logLine+'</span>';
+                                            break;
+                                        case "default":
+                                        default:
+                                            logLine = '<span style="color:#FFF6F6">'+logLine+'</span>';
+                                            break;
+                                    }
+                                    targetLogArr[i] = logLine;
+                                }
+                                windowLogContentVal = targetLogArr.join('<br/>')
+                            }
+                            // 赋值数据
+                            _that.windowLogContent = windowLogContentVal;
+                            _that.$nextTick(()=>{
+                                // 滚动到底部
+                                let windowLogDiv = document.getElementById("windowLogDiv");
+                                windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
+                                if(_that.activeTab === "remoteLog"){
+                                    // 更新实时日志
+                                    window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',_that.windowLogContent);
+                                }
+                            });
+                        }
+                    }
+                },
+                error: function (msg) {
+                    console.log(msg)
+                }
+            });
         },
         // 发送消息到web设备websocket
         sendMessageToWebDeviceWebSocket(action, messageStr){
