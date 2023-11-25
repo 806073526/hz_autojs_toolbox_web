@@ -81,7 +81,9 @@ window.ZXW_VUE = new Vue({
         openLogWindow:false, // 日志悬浮窗显示
         openScreenWindow:false, // 预览屏幕悬浮窗显示
         showWindowLog:true, // 最小化日志悬浮窗
-        windowLogContent:'' // 日志内容
+        windowLogContent:'', // 日志内容
+        cacheLogWindowHeight: 300,
+        darkTheme: true
     },
     computed: {
     },
@@ -285,6 +287,10 @@ window.ZXW_VUE = new Vue({
         }
     },
     methods: {
+        // 切换黑暗主题
+        changeDarkTheme(){
+          this.darkTheme = !this.darkTheme;
+        },
         // 刷新悬浮窗状态(重新开启)
         refreshFloatScreenWindowFun(){
             // 先关闭
@@ -451,6 +457,9 @@ window.ZXW_VUE = new Vue({
             let logWindowSizeObj = logWindowSizeJson ? JSON.parse(logWindowSizeJson) : {"width":"","height":""};
             logWindowSizeObj.width = drag.clientWidth;
             logWindowSizeObj.height = drag.clientHeight;
+            if(logWindowSizeObj.height > 35){
+                this.cacheLogWindowHeight = logWindowSizeObj.height;
+            }
             window.localStorage.setItem('logWindowSizeCache',JSON.stringify(logWindowSizeObj));
         },
         // 预览屏幕悬浮窗变化方法
@@ -496,7 +505,7 @@ window.ZXW_VUE = new Vue({
                 }
                 if(logWindowSizeObj.height){
                     drag.style.height =  logWindowSizeObj.height + 'px';
-                    if(Number(logWindowSizeObj.height)<=25){
+                    if(Number(logWindowSizeObj.height)<=35){
                         this.showWindowLog = false;
                     }
                 }
@@ -939,11 +948,11 @@ window.ZXW_VUE = new Vue({
                                             logLine = '<span style="color:#b71c1c">'+logLine+'</span>';
                                             break;
                                         case "DEBUG":
-                                            logLine = '<span style="color:#795548">'+logLine+'</span>';
+                                            logLine = '<span style="color:#86a305">'+logLine+'</span>';
                                             break;
                                         case "default":
                                         default:
-                                            logLine = '<span style="color:#FFF6F6">'+logLine+'</span>';
+                                            logLine = '<span style="color:#f796ff">'+logLine+'</span>';
                                             break;
                                     }
                                     targetLogArr[i] = logLine;
