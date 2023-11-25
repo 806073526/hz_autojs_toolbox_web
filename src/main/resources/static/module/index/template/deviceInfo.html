@@ -8,7 +8,7 @@
             <el-button  plain v-if="expandDevice" icon="el-icon-arrow-up" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px; padding: 0px 13px" @click.stop="expandDeviceFun">收缩</el-button>
             <el-button  plain v-if ="!expandDevice" icon="el-icon-arrow-down" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 13px" @click.stop="expandDeviceFun">展开</el-button>
             <el-button  plain class="el-icon-refresh-right" style="cursor: pointer; height: 25px;width: 70px;color:#CC5D5C;font-size: 14px;padding: 0px 0px !important " @click="getOnlineDevice()">刷新</el-button>
-            <span style="width: 300px">
+            <span style="width: 300px;text-wrap: nowrap;">
                <span style="margin-left: 10px;color: #419EFDFF;">
                        {{ deviceInfo.deviceUuid ? (deviceInfo.aliasName ? '【'+deviceInfo.aliasName+'】' : '') + deviceInfo.deviceUuid + '已连接': ''}}
                </span>
