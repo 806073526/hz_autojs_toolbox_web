@@ -139,7 +139,7 @@
             width="42%"
             center
             >
-        <div style="height: 300px;padding-top: 15px;">
+        <div style="height: 320px;padding-top: 15px;">
             <el-row class="d-flex">
                    <el-form-item label="设备状态通知:" label-width="130px"  class="flex-1">
                        <div class="d-flex a-center j-start" style="height: 40px;">
@@ -240,6 +240,21 @@
                         <el-popover ref="popover7" placement="top-start" width="260" trigger="hover">
                             <div>
                                 开启后,执行全屏截图操作时,会自动重置图片名称为默认值
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="自动开启实时日志:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.autoStartOnlineLog" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover9 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover9" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,连接了设备,会默认启动实时日志功能
                             </div>
                         </el-popover>
                     </div>

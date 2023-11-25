@@ -496,6 +496,9 @@ window.ZXW_VUE = new Vue({
                 }
                 if(logWindowSizeObj.height){
                     drag.style.height =  logWindowSizeObj.height + 'px';
+                    if(Number(logWindowSizeObj.height)<=25){
+                        this.showWindowLog = false;
+                    }
                 }
 
                 this.$nextTick(()=>{
@@ -711,6 +714,15 @@ window.ZXW_VUE = new Vue({
         // 清空日志悬浮窗内容
         clearShowWindowLog(){
           this.windowLogContent = "";
+        },
+        // 关闭日志悬浮窗
+        closeShowWindowLog(){
+            this.$nextTick(()=>{
+                // 关闭实时日志悬浮窗
+                if(this.$refs['remoteLog'] && this.$refs['remoteLog'].stopOnLineLog){
+                    this.$refs['remoteLog'].stopOnLineLog()
+                }
+            })
         },
         isNumberStr(str) {
             return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
@@ -975,6 +987,24 @@ window.ZXW_VUE = new Vue({
                 this.$refs.remoteScript.initCustomScript();
                 // 初始化预览设备数据
                 this.$refs.previewDevice.init();
+
+                // 自动开启在线日志
+                let autoStartOnlineLog = false;
+                let systemConfigCache = window.localStorage.getItem("systemConfig");
+                if(systemConfigCache){
+                    let systemConfigObj = JSON.parse(systemConfigCache);
+                    if(systemConfigObj){
+                        autoStartOnlineLog = systemConfigObj.autoStartOnlineLog;
+                    }
+                }
+
+                // 如果开启了参数
+                if(autoStartOnlineLog){
+                    // 自动开启实时日志悬浮窗
+                    if(this.$refs['remoteLog'] && this.$refs['remoteLog'].startOnLineLog){
+                        this.$refs['remoteLog'].startOnLineLog()
+                    }
+                }
             })
         },
         // 验证是否已选设备
