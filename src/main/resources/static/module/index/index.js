@@ -83,6 +83,7 @@ window.ZXW_VUE = new Vue({
         showWindowLog:true, // 最小化日志悬浮窗
         windowLogContent:'', // 日志内容
         cacheLogWindowHeight: 300,
+        fixedLogPosition:false,
         darkTheme: true
     },
     computed: {
@@ -216,6 +217,9 @@ window.ZXW_VUE = new Vue({
         // 初始化同步属性
         this.timeSyncOtherProperty();
 
+        this.darkTheme = (window.localStorage.getItem('darkTheme') || 'true') === 'true';
+        this.fixedLogPosition = (window.localStorage.getItem('fixedLogPosition') || 'false') === 'true';
+
         window.addEventListener('keydown',(e)=>{
             if(!this.fileDialogIsMin){
                 return false;
@@ -290,6 +294,12 @@ window.ZXW_VUE = new Vue({
         // 切换黑暗主题
         changeDarkTheme(){
           this.darkTheme = !this.darkTheme;
+          window.localStorage.setItem('darkTheme',this.darkTheme);
+        },
+        // 切换固定标识
+        changeFixedLogPosition(){
+            this.fixedLogPosition = !this.fixedLogPosition;
+            window.localStorage.setItem('fixedLogPosition',this.fixedLogPosition);
         },
         // 刷新悬浮窗状态(重新开启)
         refreshFloatScreenWindowFun(){
@@ -964,7 +974,9 @@ window.ZXW_VUE = new Vue({
                             _that.$nextTick(()=>{
                                 // 滚动到底部
                                 let windowLogDiv = document.getElementById("windowLogDiv");
-                                windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
+                                if(!_that.fixedLogPosition){
+                                    windowLogDiv.scrollTop = windowLogDiv.scrollHeight;
+                                }
                                 if(_that.activeTab === "remoteLog"){
                                     // 更新实时日志
                                     window.ZXW_VUE.$EventBus.$emit('refreshOnLineRemoteLog',content);

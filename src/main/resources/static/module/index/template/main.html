@@ -78,14 +78,15 @@
     z-index: 99999999999999999999;">
         <div style="cursor: all-scroll;width:100%;display:inline-flex;font-size: 17px;border-bottom: 1px solid #6d6161;background: #49493e;padding-top: 4px;" id="windowLogBoxTool">
             <span style="padding: 0px 0px 3px 8px;color: #FFFFFF">实时日志</span>
-            <span style="color:white;">
-                <i class="el-icon-refresh" style="cursor: pointer;margin-left: 5px;color:white;"  @click.stop="refreshShowWindowLog"></i>
-                <i :class="{'el-icon-moon' : darkTheme, ' el-icon-sunny':!darkTheme}" style="cursor: pointer" @click.stop="changeDarkTheme"></i>
-                <i :class="{'el-icon-caret-top' : !showWindowLog, 'el-icon-caret-bottom':showWindowLog}" style="cursor: pointer" @click.stop="changeShowWindowLog"></i>
+            <span>
+                <i title="刷新日志" class="el-icon-refresh" style="cursor: pointer;margin-left: 5px;color:white;"  @click.stop="refreshShowWindowLog"></i>
+                <i title="切换背景色" :class="{'el-icon-moon' : darkTheme, ' el-icon-sunny':!darkTheme}" style="cursor: pointer;color:white;" @click.stop="changeDarkTheme"></i>
+                <i title="禁止滚动" class="el-icon-aim" :style="{'color':fixedLogPosition ? '#9a9ad3' : 'white'}" style="cursor: pointer;color:white;" @click.stop="changeFixedLogPosition"></i>
+                <i title="展开收缩" :class="{'el-icon-caret-top' : !showWindowLog, 'el-icon-caret-bottom':showWindowLog}" style="cursor: pointer;color:white;" @click.stop="changeShowWindowLog"></i>
             </span>
             <div class="flex-1" style="text-align: right;">
-                <i class="el-icon-delete" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="clearShowWindowLog"></i>
-                <i class="el-icon-close" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="closeShowWindowLog"></i>
+                <i title="清除日志" class="el-icon-delete" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="clearShowWindowLog"></i>
+                <i title="关闭日志" class="el-icon-close" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="closeShowWindowLog"></i>
             </div>
         </div>
         <div v-html="windowLogContent" style="height: calc(100% - 35px);overflow-y: scroll;" id="windowLogDiv">
