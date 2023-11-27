@@ -215,14 +215,14 @@
     >
         <div style="margin-bottom: 12px;text-align: center;">自定义模块设置</div>
         <el-table :data="tempCustomScript"  max-height="300" height="300">
-            <el-table-column  property="key" label="编码">
+            <el-table-column  property="key" label="模块名称">
                 <template v-slot="scope1">
                     <el-input v-model="scope1.row.moduleName" placeholder="请输入模块名称" size="mini" class="input-width" />
                 </template>
             </el-table-column>
-            <el-table-column property="name" label="名称">
+            <el-table-column property="name" label="脚本路径和名称">
                 <template v-slot="scope1">
-                    <el-input v-model="scope1.row.scriptName" placeholder="请输入脚本名称" size="mini" class="input-width" />
+                    <el-input v-model="scope1.row.scriptName" placeholder="请输入脚本路径和名称" size="mini" class="input-width" />
                 </template>
             </el-table-column>
             <el-table-column >

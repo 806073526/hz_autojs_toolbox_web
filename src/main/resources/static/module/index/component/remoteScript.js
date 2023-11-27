@@ -522,7 +522,7 @@ export default {
         },
         // 添加行
         addRow(){
-            this.tempCustomScript.push({ moduleName: '', scriptName: '' })
+            this.tempCustomScript.push({ moduleName: '', scriptName: 'system/remoteScript/修改你的文件名.js' })
         },
         // 删除行
         delRow(index) {

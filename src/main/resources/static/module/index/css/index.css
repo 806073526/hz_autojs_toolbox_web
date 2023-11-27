@@ -150,7 +150,7 @@ table .el-input__inner, table .el-textarea textarea {
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 500px;
+    width: 700px;
     transform: translate(-50%, -50%);
 }
 
