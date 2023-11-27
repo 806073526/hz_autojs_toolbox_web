@@ -784,7 +784,7 @@ export default {
                let filePath = value.substring(0,lastIndex+1);
                console.log(fileName,filePath);
                 let previewImg=document.getElementById("previewImg");
-                let tempCanvas = document.createElement('canvas');
+                let tempCanvas = document.createElement('tempCanvas');
                 tempCanvas.width= previewImg.width;
                 tempCanvas.height = previewImg.height;
                 let ctx = tempCanvas.getContext('2d');
