@@ -38,9 +38,9 @@
                     </div>
                     <div class="imgToolsDiv">
                         <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                            <el-button size="medium" type="primary" style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                            <el-button size="mini" type="primary" style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
                             <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
-                                <el-button size="medium" type="primary">
+                                <el-button size="mini" type="primary">
                                     初始化示例<i class="el-icon-arrow-down el-icon--right"></i>
                                 </el-button>
                                 <el-dropdown-menu slot="dropdown">
@@ -51,11 +51,11 @@
                                     <el-dropdown-item @click.native.prevent.stop="phoneDownLoadImageExampleScript">初始化图色示例项目</el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
-                            <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行项目</el-button>
-                            <el-button size="medium" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止程序</el-button>
-                            <el-button size="medium" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
+                            <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行项目</el-button>
+                            <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止程序</el-button>
+                            <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
                             <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
-                                <el-button size="medium" type="primary" >
+                                <el-button size="mini" type="primary" >
                                     Node相关<i class="el-icon-arrow-down el-icon--right"></i>
                                 </el-button>
                                 <el-dropdown-menu slot="dropdown">
@@ -67,7 +67,7 @@
                                 </el-dropdown-menu>
                             </el-dropdown>
                             <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
-                                <el-button size="medium" type="primary" >
+                                <el-button size="mini" type="primary" >
                                     更多<i class="el-icon-arrow-down el-icon--right"></i>
                                 </el-button>
                                 <el-dropdown-menu slot="dropdown">
@@ -233,8 +233,8 @@
                     </div>
                     <div class="imgToolsDiv">
                         <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                            <el-button style="margin-bottom: 5px;" size="medium" type="primary" @click="uploadFileClick">上传文件</el-button>
-                            <el-button style="margin-left: 5px;margin-bottom: 5px;" size="medium" type="primary" @click="createFolder">新建文件夹</el-button>
+                            <el-button style="margin-bottom: 5px;" size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
+                            <el-button style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
                         </div>
                     </div>
                     <div>
