@@ -194,7 +194,10 @@
                                 <div class="d-flex a-center phoneFileName" style="flex:1;">
                                     <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                     <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">
-                                        <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
+                                        <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">
+                                            <i style="font-size: 16px;" :class="{'el-icon-folder':item.isDirectory,'el-icon-document':!item.isDirectory && !['jpeg','jpg','png'].includes(item.fileType),'el-icon-picture-outline':['jpeg','jpg','png'].includes(item.fileType)}"></i>
+                                            {{ item.fileName }}
+                                            <span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
                                     </div>
                                 </div>
                                 <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:1;">
@@ -289,7 +292,10 @@
                                 <div class="d-flex a-center fileName">
                                     <el-checkbox v-model="item.check" disabled />
                                     <div class="fileNameWrap d-flex a-center flex-1">
-                                        <span class="mr-16 text-fileName mt-0">{{ item.fileName }}</span>
+                                        <span class="mr-16 text-fileName mt-0">
+                                            <i style="font-size: 16px;" :class="{'el-icon-folder':item.isDirectory,'el-icon-document':!item.isDirectory && !['jpeg','jpg','png'].includes(item.fileType),'el-icon-picture-outline':['jpeg','jpg','png'].includes(item.fileType)}"></i>
+                                            {{ item.fileName }}
+                                        </span>
                                     </div>
                                 </div>
                                 <span class="iconfont" @click.stop="cancelUpload(index)" style="cursor: pointer;">取消</span>
@@ -299,7 +305,10 @@
                                 <div class="d-flex a-center fileName" style="flex:4;">
                                     <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
                                     <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="fileNameDbClick(item)" @click="fileClick(item)">
-                                        <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
+                                        <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">
+                                            <i style="font-size: 16px;" :class="{'el-icon-folder':item.isDirectory,'el-icon-document':!item.isDirectory && !['jpeg','jpg','png'].includes(item.fileType),'el-icon-picture-outline':['jpeg','jpg','png'].includes(item.fileType)}"></i>
+                                            {{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="d-flex a-center fileSize" style="flex:2;">
