@@ -1057,7 +1057,7 @@ export default {
                 return previewUrl.replace("uploadPath/autoJsTools/","").replace(/\\\\/g,"/");
             });
             // 转换同步路径
-            let webPathArr = JSON.stringify(webPathSourceArr);
+            let webPathArr = webPathSourceArr;
             // 目标路径
             let phoneTargetPath = phoneSyncPath.startsWith('/') ? phoneSyncPath.replace('/','') : phoneSyncPath;
             phoneTargetPath = phoneTargetPath.endsWith('/') ? phoneTargetPath.slice(0, -1) : phoneTargetPath;

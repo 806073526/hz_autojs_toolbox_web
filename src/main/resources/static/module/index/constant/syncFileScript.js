@@ -1,18 +1,4 @@
 export const getSyncFileScriptContent = (params)=>{
-let serverUrl = params.serverUrl;
-// web端同步目录 从设备uuid开始 开头和结尾都不能有斜杠  ["fb375905dd112762/system]
-let webPathArr = params.webPathArr || [];
-// 手机端同步目录 默认为sdcard目录 开头和结尾都不能有斜杠 "appSync/test"
-let phoneTargetPath = params.phoneTargetPath || "";
-// 显示进度
-let showProcess = params.showProcess || true;
-// 完成消息
-let completeMsg = params.completeMsg || "";
-// 额外的web下载地址
-let downloadFileUrlArr = params.downloadFileUrlArr || [];
-// 额外的手机端存储路径
-let localFileUrlArr = params.localFileUrlArr || [];
-
 let script =
 `importClass(android.widget.Toast);
 importClass(android.view.Gravity);
@@ -42,7 +28,22 @@ importClass(java.lang.ProcessBuilder);
 importClass(android.net.ConnectivityManager);
 importClass(android.net.TrafficStats);
 
-let showProcess = ${showProcess};
+let params = ${JSON.stringify(params)}
+let serverUrl_param = params.serverUrl;
+// web端同步目录 从设备uuid开始 开头和结尾都不能有斜杠  ["fb375905dd112762/system]
+let webPathArr_param = params.webPathArr || [];
+// 手机端同步目录 默认为sdcard目录 开头和结尾都不能有斜杠 "appSync/test"
+let phoneTargetPath_param = params.phoneTargetPath || "";
+// 显示进度
+let showProcess_param = params.showProcess || true;
+// 完成消息
+let completeMsg_param = params.completeMsg || "";
+// 额外的web下载地址
+let downloadFileUrlArr_param = params.downloadFileUrlArr || [];
+// 额外的手机端存储路径
+let localFileUrlArr_param = params.localFileUrlArr || [];
+
+let showProcess = showProcess_param;
 let utilsObj = {};
 let startTimeLong = new Date().getTime();
 let canvasFloat
@@ -172,13 +173,13 @@ utilsObj.request = (url, requestMethod, requestBody, callback) => {
 }
 
 
-let webPathArr = ${webPathArr};
+let webPathArr = webPathArr_param;
 // 手机端目标路径
-let phoneTargetPath = "${phoneTargetPath}";
+let phoneTargetPath = phoneTargetPath_param;
 
 
 // 服务端地址
-let serverPath = "${serverUrl}";
+let serverPath = serverUrl_param;
 // 获取文件接口地址
 let interfacePath = serverPath + "/attachmentInfo/queryAllAttachInfoListByPaths";
 
@@ -218,10 +219,10 @@ let getFileInfo = (files, isDirectory) => {
 let requestCompleted = false;
 
 // web下载地址
-let downloadFileUrlArr = ${JSON.stringify(downloadFileUrlArr)};
+let downloadFileUrlArr = downloadFileUrlArr_param;
 
 // 手机端存储路径
-let localFileUrlArr = ${JSON.stringify(localFileUrlArr)};
+let localFileUrlArr = localFileUrlArr_param;
 
 let requestBody = {
     relativeFilePathList: webPathArr,
@@ -311,7 +312,7 @@ let interval = setInterval(() => {
         // 开始下载
         utilsObj.downLoadFiles(downloadFileUrlArr, localFileUrlArr, () => {
             let endTime1 = new Date().getTime();
-            console.log("${completeMsg}"+"耗时:" + (endTime1 - startTime1) + "ms");
+            console.log(completeMsg_param +"耗时:" + (endTime1 - startTime1) + "ms");
         })
         clearInterval(interval);
     }
