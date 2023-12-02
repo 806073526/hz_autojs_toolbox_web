@@ -7,6 +7,8 @@ import {
     queryCacheData
 } from "./../../../utils/utils.js";
 
+import { getSyncFileScriptContent } from "./../constant/syncFileScript.js"
+
 let template = '<div></div>';
 $.ajax({
     url: "/module/index/template/fileManage.html",
@@ -820,7 +822,7 @@ export default {
                     let fileNames = checkFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     });
-                    window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到手机端,文件夹内部不会递归同步,请输入手机端路径(以/sdcard为根目录的相对路径)!', '提示', {
+                    window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到手机端,请输入手机端路径(以/sdcard为根目录的相对路径)!', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         inputValue: this.phoneSyncPath,
@@ -841,9 +843,16 @@ export default {
                             return true;
                         }
                     }).then(({value}) => {
-                        // 设置同步文件集合  暂不支持同步目录
+                        // 设置同步文件集合
                         let webSyncToPhoneArr = this.fileList.filter(item => item.check);
-                        this.webSyncToPhoneFun(webSyncToPhoneArr,value);
+                        let msgArr = [];
+                        checkFileList.forEach(row=>{
+                            let previewUrl = row.previewUrl;
+                            msgArr.push(previewUrl.replace('uploadPath/autoJsTools/', '').replace(/\\\\/g,"/").replace(this.deviceInfo.deviceUuid+"/",""));
+                        });
+
+                        let completeMsg = "同步web文件(夹)【"+msgArr.join(',')+"】到手机端【/sdcard"+value+"】完成,共";
+                        this.webSyncToPhoneFun(webSyncToPhoneArr,value,completeMsg);
                     }).catch(() => {
                     });
                     break;
@@ -1035,28 +1044,60 @@ export default {
             }).catch(() => {
             });
         },
-        // web端同步到手机公共方法
-        webSyncToPhoneFun(webSyncToPhoneArr,value){
-            let remoteExecuteScriptContent = "";
-            webSyncToPhoneArr.forEach(row=>{
-                let downloadFilUrl = getContext() +"/"+ row.previewUrl;
-                // 如果是目录 则只需要远程创建目录
-                if(row.isDirectory){
-                    // 创建目录代码 如果不是/ 则需要创建目录
-                    let createWithDirsCode = value !=='/' ? "files.createWithDirs('/sdcard"+value + row.fileName+"/');" : "";
-                    // 拼接代码
-                    remoteExecuteScriptContent += createWithDirsCode;
-                } else {
-                    // 如果有值且  是以/开头
-                    let localFileUrl = value  + ((row.isDirectory || !row.fileType) ? row.fileName : (row.fileName + "." + row.fileType));
-                    // 创建目录代码 如果不是/ 则需要创建目录
-                    let createWithDirsCode = value !=='/' ? "files.createWithDirs('/sdcard"+value+"');" : "";
-                    let script = createWithDirsCode + "utilsObj.downLoadFile('"+downloadFilUrl+"','"+localFileUrl+"',()=>{});";
-                    // 拼接代码
-                    remoteExecuteScriptContent += script;
+        /**
+         * web同步文件到手机端公共方法
+         * @param webSyncToPhoneArr web的文件对象数组
+         * @param phoneSyncPath 手机端的同步路径
+         * @param completeMsg 完成消息
+         */
+        webSyncToPhoneFun(webSyncToPhoneArr,phoneSyncPath,completeMsg){
+            // 获取同步路径
+            let webPathSourceArr = webSyncToPhoneArr.filter(item=> item.isDirectory).map(item=>{
+                let previewUrl = item.previewUrl;
+                return previewUrl.replace("uploadPath/autoJsTools/","").replace(/\\\\/g,"/");
+            });
+            // 转换同步路径
+            let webPathArr = JSON.stringify(webPathSourceArr);
+            // 目标路径
+            let phoneTargetPath = phoneSyncPath.startsWith('/') ? phoneSyncPath.replace('/','') : phoneSyncPath;
+            phoneTargetPath = phoneTargetPath.endsWith('/') ? phoneTargetPath.slice(0, -1) : phoneTargetPath;
+
+            let downloadFileUrlArr = [];
+            let localFileUrlArr = [];
+
+            webSyncToPhoneArr.forEach(item=>{
+                if(!item.isDirectory){
+                    let previewUrl = item.previewUrl;
+                    let webPath = previewUrl.replace('uploadPath/autoJsTools/', '').replace(/\\\\/g,"/");
+                    // 拼接下载地址
+                    downloadFileUrlArr.push(getContext()+"/uploadPath/autoJsTools/" + webPath);
+                    // 拼接手机端本地路径
+                    localFileUrlArr.push(phoneTargetPath + webPath.substring(webPath.lastIndexOf('/'), webPath.length));
                 }
             });
-            this.remoteExecuteScript(remoteExecuteScriptContent);
+            // 组装同步文件参数对象
+            let params = {
+                serverUrl:getContext(), // 服务端地址
+                webPathArr:webPathArr, // 需要同步的web目录数组 (主要用于文件夹同步)
+                phoneTargetPath:phoneTargetPath, // 手机端同步路径
+                downloadFileUrlArr:downloadFileUrlArr, // 额外的下载路径 (主要用于文件同步)
+                localFileUrlArr:localFileUrlArr, // 额外的手机端本地路径
+                showProcess:true, // 显示进度
+                completeMsg:completeMsg // 完成后的日志输出
+            };
+            // 获取同步文件代码
+            let syncScript = getSyncFileScriptContent(params);
+
+            let remoteScript = `
+            let remoteScriptPath = '/sdcard/appSync/tempRemoteScript/syncFileScript.js'; 
+            files.createWithDirs(remoteScriptPath);
+            files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(syncScript))}')));
+            engines.execScriptFile("/sdcard/appSync/tempRemoteScript/syncFileScript.js",{path:["/sdcard/appSync/tempRemoteScript/"]});
+            sleep(1000);
+            files.write(remoteScriptPath, "");
+            `;
+            // 执行指令
+            this.remoteExecuteScript(remoteScript);
         },
         // 全选
         checkAllFileChange() {
@@ -1109,7 +1150,8 @@ export default {
                     window.removeEventListener('keydown',this.editorDialogSaveListener);
                     window.addEventListener('keydown',this.editorDialogSaveListener,false);
                     this.fileEditorName = row.fileName + '.' + row.fileType;
-                    this.fileSavePath = row.previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
+                    let previewUrl = row.previewUrl;
+                    this.fileSavePath = previewUrl.replace('uploadPath/autoJsTools','').replace(this.fileEditorName,'');
                     let _that = this;
                     $.ajax({
                         url: getContext() + "/" +row.previewUrl +"?t="+(new Date().getTime()),
@@ -3003,6 +3045,7 @@ export default {
             }).then(() => {
                 let _that = this;
                 let relativeFilePath = this.deviceInfo.deviceUuid + this.webSyncPath;
+
                 $.ajax({
                     url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
                     type: "GET",
@@ -3015,7 +3058,8 @@ export default {
                         if (data) {
                             if (data.isSuccess) {
                                 let webSyncToPhoneArr = data.data;
-                                _that.webSyncToPhoneFun(webSyncToPhoneArr,_that.phoneSyncPath);
+                                // 调用公共方法同步文件到手机端
+                                _that.webSyncToPhoneFun(webSyncToPhoneArr,_that.phoneSyncPath,"同步web目录【"+relativeFilePath+"】到手机端【/sdcard"+_that.phoneSyncPath+"】完成,共");
                             }
                         }
                         setTimeout(() => {
@@ -3190,7 +3234,9 @@ export default {
                 }
             }).then(({value}) => {
                 let webSyncToPhoneArr = [row];
-                this.webSyncToPhoneFun(webSyncToPhoneArr,value);
+                let previewUrl = row.previewUrl;
+                let completeMsg = "同步web文件(夹)【"+previewUrl.replace('uploadPath/autoJsTools/', '').replace(/\\\\/g,"/").replace(this.deviceInfo.deviceUuid+"/","")+"】到手机端【/sdcard"+value+"】完成,共";
+                this.webSyncToPhoneFun(webSyncToPhoneArr,value,completeMsg);
             }).catch(() => {
             });
         },

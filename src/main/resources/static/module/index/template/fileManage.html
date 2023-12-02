@@ -218,7 +218,7 @@
         </el-col>
         <el-col  :span="isActive ? 0 : 12">
             <div class="fileDivContainer" style="margin: 0 0 0 10px;display: flex;flex-direction: column;position: relative;">
-                <div style="background: white;height: 240px;width: calc(50% - 40px);top:1px;position:absolute;z-index: 999;"></div>
+                <div style="background: white;height: 240px;width: calc(100% - 40px);top:1px;position:absolute;z-index: 999;"></div>
                 <div style="position: sticky;top:0px;z-index: 999;padding-left: 0!important;">
                     <div class="width100 d-flex a-center flex-wrap" style="background: white;">
                         <el-form-item label="web端同步路径:" label-width="125px" style="flex:1;margin-bottom: 5px;">
@@ -317,7 +317,7 @@
                                     <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="zipFile(item)">压缩</el-link>
                                     <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="unZipFile(item)">解压</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="reName(item)">重命名</el-link>
-                                    <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToPhoneSingle(item)">同步到手机</el-link>
+                                    <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToPhoneSingle(item)">同步到手机</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="removeFile(item)">删除</el-link>
                                 </div>
                             </div>

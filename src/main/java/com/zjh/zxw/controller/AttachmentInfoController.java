@@ -507,6 +507,29 @@ public class AttachmentInfoController extends BaseController {
         }
     }
 
+
+    /**
+     * 根据相对路径获取子文件以及子目录(递归)多个目录
+     */
+    @ApiOperation(value = "根据相对路径获取子文件以及子目录(递归)多个目录", notes = "根据相对路径获取子文件以及子目录(递归)多个目录")
+    @PostMapping("/queryAllAttachInfoListByPaths")
+    public R<Map<String,List<AttachInfo>>> queryAllAttachInfoListByPaths(@RequestBody SyncFileParamDTO syncFileParamDTO) {
+        try {
+            Map<String,List<AttachInfo>> attachInfoMap = new HashMap<>();
+            List<String> relativeFilePathList = Optional.ofNullable(syncFileParamDTO.getRelativeFilePathList()).orElse(new ArrayList<>());
+            for (String relativeFilePath : relativeFilePathList) {
+                attachInfoMap.put(relativeFilePath,attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath,syncFileParamDTO.getOnlyQueryFolder()));
+            }
+            return success(attachInfoMap);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("查询文件异常！请联系管理员");
+        }
+    }
+
+
     /**
      * 根据相对路径获取文件信息
      */
