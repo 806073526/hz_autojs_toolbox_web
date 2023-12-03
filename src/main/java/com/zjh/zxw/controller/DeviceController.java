@@ -1,6 +1,8 @@
 package com.zjh.zxw.controller;
 
 import cn.hutool.core.util.RuntimeUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.zxw.base.BaseController;
@@ -9,27 +11,29 @@ import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
+import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsSession;
+import com.zjh.zxw.websocket.AutoJsWebWsServerEndpoint;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.bytedeco.javacv.FrameFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.applet.Main;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
 
@@ -55,6 +59,24 @@ public class DeviceController extends BaseController {
 
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
+
+
+    @ApiOperation(value = "同步web文件到手机端(外部接口)", notes = "同步web文件到手机端(外部接口)")
+    @PostMapping("/syncWebFileToPhone")
+    public R<Boolean> syncWebFileToPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestBody SyncFileInterfaceDTO syncFileInterfaceDTO) {
+        try {
+            // 获取独立引擎脚本内容
+            AutoJsWsServerEndpoint.execSyncFileScript(deviceUUID,syncFileInterfaceDTO);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("同步web文件到手机端失败！请联系管理员");
+        }
+    }
+
+
 
 
     @ApiOperation(value = "检查页面访问限制", notes = "检查页面访问限制")

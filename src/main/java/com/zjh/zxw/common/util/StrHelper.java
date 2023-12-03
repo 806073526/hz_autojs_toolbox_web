@@ -31,7 +31,8 @@ public class StrHelper {
 
     public static String encode(String value) {
         try {
-            return URLEncoder.encode(value, "utf-8");
+            String reuslt =  URLEncoder.encode(value, "utf-8");
+            return reuslt.replaceAll("\\+","%20");
         } catch (Exception e) {
             return "";
         }

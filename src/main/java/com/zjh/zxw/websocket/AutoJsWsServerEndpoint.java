@@ -13,6 +13,7 @@ import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.domain.dto.EmailConfig;
+import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
 import com.zjh.zxw.dozer.DozerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,13 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Component;
+import sun.applet.Main;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -312,6 +314,105 @@ public class AutoJsWsServerEndpoint {
             }
         }
     }
+
+
+    /**
+     * 远程执行脚本
+     * @param deviceUUID 设备uuid
+     * @param remoteScript 远程脚本内容
+     * @param openIndependentEngine 是否开启独立引擎执行
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public static void execRemoteScript(String deviceUUID,String remoteScript,Boolean openIndependentEngine,String scriptDirPath,String scriptFilePath) throws Exception {
+        // 转换后代码
+        String afterRemoteScript = remoteScript;
+        // 开启则进行 独立引擎处理
+        if(openIndependentEngine){
+            scriptDirPath = StringUtils.isBlank(scriptDirPath) ?  "/sdcard/appSync/tempRemoteScript/" : scriptDirPath;
+            scriptFilePath = StringUtils.isBlank(scriptFilePath) ?  "/sdcard/appSync/tempRemoteScript/remoteScript.js" : scriptFilePath;
+            // 独立引擎代码 包裹
+            afterRemoteScript =   generateIndependentEngineScript(scriptDirPath,scriptFilePath,remoteScript);
+        }
+        // 编码原始脚本内容
+        String encodedScriptContent = StrHelper.encode(afterRemoteScript);
+        // 拼接远程执行方法 消息体参数
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("functionName", "remoteExecScript"); // 方法名
+        jsonObject.put("functionParam", new String[]{encodedScriptContent}); // 方法参数
+        String messageStr = jsonObject.toString();
+
+        // 编码远程执行方法脚本内容
+        String encodedMessageStr = StrHelper.encode(messageStr);
+        String message = Base64.getEncoder().encodeToString(encodedMessageStr.getBytes("UTF-8"));
+
+        // 创建websocket消息对象
+        AjMessageDTO ajMessageDTO = new AjMessageDTO();
+        ajMessageDTO.setAction("remoteHandler");
+        ajMessageDTO.setDeviceUuid(deviceUUID);
+        ajMessageDTO.setMessage(message);
+
+        // 发送指令
+        sendMessageToClient(ajMessageDTO);
+    }
+
+
+    /**
+     * 生成独立引擎脚本内容
+     * @param scriptDirPath 脚本文件父级路径
+     * @param scriptFilePath 脚本文件路径
+     * @param scriptContent 脚本内容
+     * @return
+     */
+    private static String generateIndependentEngineScript(String scriptDirPath,String scriptFilePath,String scriptContent) throws Exception {
+        String encodedScript = StrHelper.encode(scriptContent);
+        String syncScript = Base64.getEncoder().encodeToString(encodedScript.getBytes("UTF-8"));
+
+        // 独立引擎脚本
+        String remoteScript = "let remoteScriptPath = '"+scriptFilePath+"'; \n" +
+                "files.createWithDirs(remoteScriptPath);\n" +
+                "files.write(remoteScriptPath, decodeURIComponent($base64.decode('"+syncScript+"')));\n" +
+                "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
+                "sleep(1000);\n" +
+                "files.write(remoteScriptPath, \"\");";
+        return remoteScript;
+    }
+
+
+    /**
+     * 以独立引擎模式 执行 同步文件脚本
+     * @return
+     * @throws Exception
+     */
+    public static void execSyncFileScript(String deviceUUID,SyncFileInterfaceDTO syncFileInterfaceDTO) throws Exception {
+        // 根据参数获取同步文件脚本
+        String scriptContent =  getSyncFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO));
+        // 指定脚本文件路径  包装独立引擎
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/syncFileScript.js");
+    }
+
+    /**
+     * 获取同步文件脚本原始内容 并替换参数
+     * @param paramJson
+     * @return
+     * @throws Exception
+     */
+    private static String getSyncFileScriptContent(String paramJson) throws Exception {
+        String sourceJsonStr = "";
+        InputStream inputStream = Main.class.getResourceAsStream("/static/module/index/constant/syncFileScriptByServer.js");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        StringBuilder jsonString = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonString.append(line).append("\n");
+        }
+        reader.close();
+        String jsonStr = jsonString.toString();
+        sourceJsonStr = jsonStr;
+        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
+        return sourceJsonStr;
+    }
+
 
 
     /**
