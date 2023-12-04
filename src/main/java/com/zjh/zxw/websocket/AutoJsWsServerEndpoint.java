@@ -59,6 +59,9 @@ public class AutoJsWsServerEndpoint {
     // key deviceUUID_serviceKey   value:具体值
     private static ConcurrentHashMap<String, String> appMessageMap = new ConcurrentHashMap<String,String>();
 
+    // 同步文件map
+    private static ConcurrentHashMap<String, String> syncFileMap = new ConcurrentHashMap<String,String>();
+
     private static DozerUtils dozerUtils;
 
 
@@ -66,6 +69,23 @@ public class AutoJsWsServerEndpoint {
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     private AutoJsSession autoJsSession;
+
+
+    // 开始同步
+    public static void startSyncFile(String syncFileUUID){
+        syncFileMap.put(syncFileUUID,"start");
+    }
+
+    // 结束同步
+    public static void completeSyncFile(String syncFileUUID){
+        syncFileMap.put(syncFileUUID,"complete");
+    }
+
+    // 获取状态
+    public static String getSyncFileStatus(String syncFileUUID){
+        return syncFileMap.get(syncFileUUID);
+    }
+
 
     // 清除业务key的值
     public static void clearServiceKey(String appMsgServiceKey){
@@ -315,6 +335,120 @@ public class AutoJsWsServerEndpoint {
         }
     }
 
+    /**
+     * 以独立引擎模式 执行 同步文件脚本
+     * @return
+     * @throws Exception
+     */
+    public static void execSyncFileScript(String deviceUUID,SyncFileInterfaceDTO syncFileInterfaceDTO,Runnable syncAfterFun) throws Exception {
+        String syncFileUUID = UUID.randomUUID().toString();
+        // 设置uuid
+        syncFileInterfaceDTO.setSyncFileUUID(syncFileUUID);
+        // 设置同步状态为开始
+        startSyncFile(syncFileUUID);
+        // 根据参数获取同步文件脚本
+        String scriptContent =  getSyncFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO));
+        // 指定脚本文件路径  包装独立引擎
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/syncFileScript.js");
+        // 开启一个线程
+        Thread thread =  new Thread(()->{
+            while (true){
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // 获取状态
+                String syncStatus = getSyncFileStatus(syncFileUUID);
+                // 完成了才执行
+                if("complete".equals(syncStatus)){
+                    System.out.println("完成了");
+                    syncAfterFun.run();
+                    break;
+                }
+            }
+        });
+        thread.start();
+    }
+
+    /**
+     * 运行手机端项目
+     * @param deviceUUID
+     * @param scriptFilePath 脚本文件
+     */
+    public static void execStartProjectByPhone(String deviceUUID,String scriptFilePath) throws Exception{
+        String scriptDirPath = StringUtils.isNotBlank(scriptFilePath) ?  scriptFilePath.substring(0,scriptFilePath.lastIndexOf('/')) : "";
+        String remoteScript =  "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});";
+        // 远程执行脚本 直接运行 不开启独立引擎
+        execRemoteScript(deviceUUID,remoteScript,false,"","");
+    }
+
+    /**
+     * 运行web项目
+     * @param deviceUUID
+     * @param serverUrl
+     * @param webScriptDirPath
+     * @param tempPhoneTargetPath
+     * @param mainScriptPath
+     * @param isSyncProject
+     * @throws Exception
+     */
+    public static void execStartProjectByWeb(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath,String mainScriptPath,Boolean isSyncProject) throws Exception{
+        // 运行手机端临时目录的 项目
+        String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
+        // 项目文件路径
+        String scriptFilePath = tempPhoneTargetPath + projectName + "/" + mainScriptPath;
+        // 项目路径
+        String scriptDirPath = tempPhoneTargetPath + projectName;
+
+        // 运行项目
+        Runnable runnable = ()->{
+            try {
+                String remoteScript = "";
+                remoteScript = "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});";
+                System.out.println(remoteScript);
+                // 执行远程脚本  运行项目
+                execRemoteScript(deviceUUID,remoteScript,false,"","");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+        // 开启了同步
+        if(isSyncProject){
+            List<String> webPathArr = new ArrayList<String>();
+            String webPath = webScriptDirPath.substring(webScriptDirPath.indexOf(deviceUUID),webScriptDirPath.length());
+            webPathArr.add(webPath);
+            // 同步后执行
+            SyncFileInterfaceDTO syncFileInterfaceDTO = new SyncFileInterfaceDTO();
+            syncFileInterfaceDTO.setShowProcess(true);
+            syncFileInterfaceDTO.setWebPathArr(webPathArr);
+            syncFileInterfaceDTO.setPhoneTargetPath(tempPhoneTargetPath.replace("/sdcard/",""));
+            syncFileInterfaceDTO.setServerUrl(serverUrl);
+            // 同步项目
+            execSyncFileScript(deviceUUID,syncFileInterfaceDTO,runnable);
+        } else {
+            runnable.run();
+        }
+
+    }
+
+
+
+    /**
+     * 执行停止项目脚本
+     * @param deviceUUID
+     */
+    public static void execStopProject(String deviceUUID) throws Exception{
+        String remoteScript =  "let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js','/data/user/0/com.zjh336.cn.tools8822/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools8822/files/project/main.js','main.js']\n" +
+                "const all = engines.all()\n" +
+                "all.forEach(item => {\n" +
+                    "if (notCloseSourceArr.indexOf(String(item.source))===-1) {\n" +
+                        "item.forceStop()\n" +
+                     "}\n" +
+                "});";
+        // 远程执行脚本 直接运行 不开启独立引擎
+        execRemoteScript(deviceUUID,remoteScript,false,"","");
+    }
 
     /**
      * 远程执行脚本
@@ -373,22 +507,9 @@ public class AutoJsWsServerEndpoint {
                 "files.createWithDirs(remoteScriptPath);\n" +
                 "files.write(remoteScriptPath, decodeURIComponent($base64.decode('"+syncScript+"')));\n" +
                 "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
-                "sleep(1000);\n" +
-                "files.write(remoteScriptPath, \"\");";
+                "sleep(1000);\n";//+
+                //"files.write(remoteScriptPath, \"\");";
         return remoteScript;
-    }
-
-
-    /**
-     * 以独立引擎模式 执行 同步文件脚本
-     * @return
-     * @throws Exception
-     */
-    public static void execSyncFileScript(String deviceUUID,SyncFileInterfaceDTO syncFileInterfaceDTO) throws Exception {
-        // 根据参数获取同步文件脚本
-        String scriptContent =  getSyncFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO));
-        // 指定脚本文件路径  包装独立引擎
-        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/syncFileScript.js");
     }
 
     /**

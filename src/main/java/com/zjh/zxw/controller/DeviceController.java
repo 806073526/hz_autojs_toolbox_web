@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.FileListener;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
@@ -16,9 +17,13 @@ import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsSession;
 import com.zjh.zxw.websocket.AutoJsWebWsServerEndpoint;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
+import com.zjh.zxw.websocket.IPUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.javacv.FrameFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +38,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.zjh.zxw.base.R.SERVICE_ERROR;
 
@@ -60,19 +69,196 @@ public class DeviceController extends BaseController {
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
 
+    @Value("${server.port:9998}")
+    public String port;
 
-    @ApiOperation(value = "同步web文件到手机端(外部接口)", notes = "同步web文件到手机端(外部接口)")
+    // 监听文件map
+    private static Map<String, FileAlterationMonitor> watchFileMap = new ConcurrentHashMap<>();
+
+    @ApiOperation(value = "完成同步文件", notes = "完成同步文件")
+    @GetMapping("/completeSyncFile")
+    public R<Boolean> completeSyncFile(@RequestParam("syncFileUUID") String syncFileUUID){
+        AutoJsWsServerEndpoint.completeSyncFile(syncFileUUID);
+        return success(true);
+    }
+
+
+
+    @ApiOperation(value = "查询文件监听列表", notes = "查询文件监听列表")
+    @GetMapping("/queryFileListenerList")
+    public R<List<String>> queryFileListenerList(@RequestParam("deviceUUID") String deviceUUID){
+        List<String> keyList = new ArrayList<String>(watchFileMap.keySet());
+        // 过滤以 设备uuid加下划线开头的数据
+        keyList = keyList.stream().filter(s ->  s.startsWith(deviceUUID+"_")).collect(Collectors.toList());
+        return success(keyList);
+    }
+
+
+    @ApiOperation(value = "停止文件变化监听", notes = "停止文件变化监听")
+    @GetMapping("/stopFileChangeListener")
+    public R<Boolean> startListenerFileChangeAndSync(@RequestParam("deviceUUID") String deviceUUID,
+                                                     @RequestParam("webDirPath") String webDirPath) {
+        try {
+            String watchFileKey = deviceUUID + "_" + webDirPath;
+            if(watchFileMap.containsKey(watchFileKey)){
+                FileAlterationMonitor monitor = watchFileMap.get(watchFileKey);
+                monitor.stop();
+                // 移除
+                watchFileMap.remove(watchFileKey);
+            }
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("停止文件变化监听失败！请联系管理员");
+        }
+    }
+
+
+
+    @ApiOperation(value = "开启文件变化监听和增量同步", notes = "开启文件变化监听和增量同步")
+    @GetMapping("/startFileChangeListenerAndSync")
+    public R<Boolean> startListenerFileChangeAndSync(@RequestParam("deviceUUID") String deviceUUID,
+                                                     @RequestParam(value = "serverUrl",required = false) String serverUrl,
+                                                     @RequestParam("webDirPath") String webDirPath,
+                                                     @RequestParam(value = "phoneDirPath",required = false) String phoneDirPath) {
+        try {
+            if(StringUtils.isBlank(serverUrl)){
+                serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
+            }
+            if(StringUtils.isBlank(phoneDirPath)){
+                // 手机端默认 临时目录
+                phoneDirPath = "/sdcard/appSync/tempRemoteScript";
+            }
+
+            File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + webDirPath);
+            if(!webDir.exists()){
+                throw new BusinessException("目录不存在");
+            }
+            String watchFileKey = deviceUUID + "_" + webDirPath;
+            if(watchFileMap.containsKey(watchFileKey)){
+                FileAlterationMonitor monitor = watchFileMap.get(watchFileKey);
+                monitor.stop();
+                // 移除
+                watchFileMap.remove(watchFileKey);
+            }
+            long intervalTime = TimeUnit.SECONDS.toMillis(2);
+            FileAlterationObserver observer = new FileAlterationObserver(webDir.getAbsolutePath());
+            FileListener fileListener = new FileListener();
+            fileListener.setWebDirPath(webDir.getAbsolutePath());
+            fileListener.setDeviceUUID(deviceUUID);
+            fileListener.setPhoneDirPath(phoneDirPath);
+            fileListener.setServerUrl(serverUrl);
+
+            observer.addListener(fileListener);
+            FileAlterationMonitor monitor = new FileAlterationMonitor(intervalTime, observer);
+            monitor.start();
+            watchFileMap.put(watchFileKey,monitor);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("开启文件变化监听和同步失败！请联系管理员");
+        }
+    }
+
+    @ApiOperation(value = "同步web文件到手机端", notes = "同步web文件到手机端")
     @PostMapping("/syncWebFileToPhone")
     public R<Boolean> syncWebFileToPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestBody SyncFileInterfaceDTO syncFileInterfaceDTO) {
         try {
-            // 获取独立引擎脚本内容
-            AutoJsWsServerEndpoint.execSyncFileScript(deviceUUID,syncFileInterfaceDTO);
+            // 独立引擎执行 同步文件脚本
+            AutoJsWsServerEndpoint.execSyncFileScript(deviceUUID,syncFileInterfaceDTO,()->{});
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return fail("同步web文件到手机端失败！请联系管理员");
+        }
+    }
+
+    @ApiOperation(value = "运行手机端脚本", notes = "运行手机端脚本")
+    @GetMapping("/execStartProjectByPhone")
+    public R<Boolean> execStartProjectByPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestParam("scriptFilePath") String scriptFilePath) {
+        try {
+            AutoJsWsServerEndpoint.execStartProjectByPhone(deviceUUID,scriptFilePath);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("运行手机端脚本失败！请联系管理员");
+        }
+    }
+
+    /**
+     *
+     * @param deviceUUID 设备uuid
+     * @param webScriptDirPath   web端脚本目录(自动以project.json的配置读取主运行文件，没有则默认读取main.js)
+     * @param tempPhoneTargetPath 手机端临时同步目录
+     * @param isSyncProject 是否先同步目录 再执行
+     * @return
+     */
+    @ApiOperation(value = "运行WEB端脚本", notes = "运行WEB端脚本")
+    @GetMapping("/execStartWebProject")
+    public R<Boolean> execStartProjectByWeb(@RequestParam("deviceUUID") String deviceUUID,
+                                            @RequestParam("webScriptDirPath") String webScriptDirPath,
+                                            @RequestParam(value = "serverUrl",required = false) String serverUrl,
+                                            @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath,
+                                            @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
+        if(StringUtils.isBlank(tempPhoneTargetPath)){
+            // 手机端默认 临时目录
+            tempPhoneTargetPath = "/sdcard/appSync/tempRemoteScript";
+        }
+        tempPhoneTargetPath = tempPhoneTargetPath.endsWith("/") ? tempPhoneTargetPath.replace("/","") : tempPhoneTargetPath;
+        if(StringUtils.isBlank(serverUrl)){
+            serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
+        }
+        try {
+            String mainScriptPath = "main.js";
+            webScriptDirPath = webScriptDirPath.startsWith("/") ? webScriptDirPath.replace("/","") : webScriptDirPath;
+            webScriptDirPath = webScriptDirPath.endsWith("/") ? webScriptDirPath.replace("/","") : webScriptDirPath;
+            System.out.println(webScriptDirPath);
+            File projectFile = new File(uploadPath + File.separator + webScriptDirPath + File.separator + "project.json");
+            if(projectFile.exists()){
+                System.out.println("文件存在");
+                BufferedReader reader = new BufferedReader(new FileReader(projectFile));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                reader.close();
+                String fileContent = stringBuilder.toString();
+                JSONObject projectJsonObj = JSONObject.parseObject(fileContent);
+                if(StringUtils.isNotBlank(projectJsonObj.getString("main"))){
+                    mainScriptPath = projectJsonObj.getString("main");
+                }
+            }
+
+            AutoJsWsServerEndpoint.execStartProjectByWeb(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,mainScriptPath,isSyncProject);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("运行WEB端脚本失败！请联系管理员");
+        }
+    }
+
+    @ApiOperation(value = "停止手机端全部脚本", notes = "停止手机端全部脚本")
+    @GetMapping("/execStopProject")
+    public R<Boolean> execStopProject(@RequestHeader("deviceUUID") String deviceUUID) {
+        try {
+            AutoJsWsServerEndpoint.execStopProject(deviceUUID);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("停止手机端全部脚本失败！请联系管理员");
         }
     }
 

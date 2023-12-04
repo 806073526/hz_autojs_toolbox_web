@@ -33,13 +33,15 @@ let webPathArr_param = params.webPathArr || [];
 // 手机端同步目录 默认为sdcard目录 开头和结尾都不能有斜杠 "appSync/test"
 let phoneTargetPath_param = params.phoneTargetPath || "";
 // 显示进度
-let showProcess_param = params.showProcess || true;
+let showProcess_param = params.showProcess;
 // 完成消息
 let completeMsg_param = params.completeMsg || "";
 // 额外的web下载地址
 let downloadFileUrlArr_param = params.downloadFileUrlArr || [];
 // 额外的手机端存储路径
 let localFileUrlArr_param = params.localFileUrlArr || [];
+// 获取同步uuid
+let syncFileUUID = params.syncFileUUID || "";
 
 let showProcess = showProcess_param;
 let utilsObj = {};
@@ -94,6 +96,7 @@ utilsObj.downLoadFiles = (downloadFileUrlArr, localFileUrlArr, callback) => {
             let url = new URL(downloadFileUrl);
             let conn = url.openConnection(); //URLConnection
             let inStream = conn.getInputStream(); //InputStream
+            files.ensureDir("/sdcard/" + localFileUrl);
             let fs = new FileOutputStream("/sdcard/" + localFileUrl); //FileOutputStream
             var connLength = conn.getContentLength(); //int
             let startTime = java.lang.System.currentTimeMillis();
@@ -311,7 +314,10 @@ let interval = setInterval(() => {
         utilsObj.downLoadFiles(downloadFileUrlArr, localFileUrlArr, () => {
             let endTime1 = new Date().getTime();
             console.log(completeMsg_param +"耗时:" + (endTime1 - startTime1) + "ms");
-        })
+           // 调用修改完成同步状态接口
+           utilsObj.request(serverPath + "/device/completeSyncFile?syncFileUUID="+syncFileUUID, 'GET', "", (res, error) => {
+           });
+        });
         clearInterval(interval);
     }
-}, 300)
+}, 300);

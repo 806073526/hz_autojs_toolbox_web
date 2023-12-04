@@ -217,8 +217,8 @@
             </div>
         </el-col>
         <el-col  :span="isActive ? 0 : 12">
-            <div class="fileDivContainer" style="margin: 0 0 0 10px;display: flex;flex-direction: column;position: relative;">
-                <div style="background: white;height: 240px;width: calc(100% - 40px);top:1px;position:absolute;z-index: 999;"></div>
+            <div class="fileDivContainer" style="margin: 0 0 0 10px;display: flex;flex-direction: column;position: static;">
+                <div style="background: white;height: 240px;width: calc(50% - 40px);top:1px;position:absolute;z-index: 999;"></div>
                 <div style="position: sticky;top:0px;z-index: 999;padding-left: 0!important;">
                     <div class="width100 d-flex a-center flex-wrap" style="background: white;">
                         <el-form-item label="web端同步路径:" label-width="125px" style="flex:1;margin-bottom: 5px;">
@@ -236,6 +236,9 @@
                         <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                             <el-button style="margin-bottom: 5px;" size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
                             <el-button style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
+                            <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="runWebProject">运行项目</el-button>
+                            <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="stopWebProject">停止项目</el-button>
+                            <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="changeFileListener">{{ changeFileBtnContent }}自动同步</el-button>
                         </div>
                     </div>
                     <div>

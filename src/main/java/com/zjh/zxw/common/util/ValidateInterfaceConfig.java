@@ -10,7 +10,9 @@ public class ValidateInterfaceConfig {
     public static final List<String> LIST = Arrays.asList(
             "/device/sendMessageToClient",
             "/device/sendMessageToMultipleClient",
-            "/device/syncWebFileToPhone"
+            "/device/syncWebFileToPhone",
+            "/device/execStartProject",
+            "/device/execStopProject"
     );
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
 
