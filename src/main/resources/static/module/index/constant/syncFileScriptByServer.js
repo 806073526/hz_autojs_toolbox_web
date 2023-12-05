@@ -42,6 +42,8 @@ let downloadFileUrlArr_param = params.downloadFileUrlArr || [];
 let localFileUrlArr_param = params.localFileUrlArr || [];
 // 获取同步uuid
 let syncFileUUID = params.syncFileUUID || "";
+// 自身脚本名称
+let selfScriptName = params.selfScriptName || "";
 
 let showProcess = showProcess_param;
 let utilsObj = {};
@@ -319,6 +321,10 @@ let interval = setInterval(() => {
             console.log(completeMsg_param +"耗时:" + (endTime1 - startTime1) + "ms");
            // 调用修改完成同步状态接口
            utilsObj.request(serverPath + "/device/completeSyncFile?syncFileUUID="+syncFileUUID, 'GET', "", (res, error) => {
+               // 删除自己
+               if(selfScriptName){
+                    files.remove(files.cwd()+"/" + selfScriptName);
+               }
            });
         });
         clearInterval(interval);

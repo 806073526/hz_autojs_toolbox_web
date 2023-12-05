@@ -424,12 +424,15 @@ public class AutoJsWsServerEndpoint {
         String syncFileUUID = UUID.randomUUID().toString();
         // 设置uuid
         syncFileInterfaceDTO.setSyncFileUUID(syncFileUUID);
+
+        String selfScriptName = "syncFileScript_" + new Date().getTime()+".js";
+        syncFileInterfaceDTO.setSelfScriptName(selfScriptName);
         // 设置同步状态为开始
         startSyncFile(syncFileUUID);
         // 根据参数获取同步文件脚本
         String scriptContent =  getSyncFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO));
         // 指定脚本文件路径  包装独立引擎
-        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/syncFileScript.js");
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
         // 开启一个线程
         Thread thread =  new Thread(()->{
             while (true){
@@ -484,6 +487,7 @@ public class AutoJsWsServerEndpoint {
         // 运行手机端临时目录的 项目
         // String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
 
+        System.out.println("初始化运行bat脚本");
         // 初始化启动脚本
         String sourceStr = "curl %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%s";
         // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO true
@@ -670,9 +674,7 @@ public class AutoJsWsServerEndpoint {
         String remoteScript = "let remoteScriptPath = '"+scriptFilePath+"'; \n" +
                 "files.createWithDirs(remoteScriptPath);\n" +
                 "files.write(remoteScriptPath, decodeURIComponent($base64.decode('"+syncScript+"')));\n" +
-                "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
-                "sleep(1000);\n"+
-                "files.write(remoteScriptPath, \"\");";
+                "engines.execScriptFile(remoteScriptPath,{path:[\""+scriptDirPath+"\"]});\n";
         return remoteScript;
     }
 

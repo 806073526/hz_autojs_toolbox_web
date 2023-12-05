@@ -29,6 +29,9 @@ public class SyncFileInterfaceDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "自身脚本名称")
+    private String selfScriptName;
+
     @ApiModelProperty(value = "同步文件UUID")
     private String syncFileUUID;
 
