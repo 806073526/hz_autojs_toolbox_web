@@ -38,7 +38,7 @@ public class SyncFileInterfaceDTO implements Serializable {
     @ApiModelProperty(value = "需要同步的web目录数组 (主要用于文件夹同步) 例如  [\"fb375905dd112762/system\"] 设备uuid拼接web指定目录  请注意前后不能带斜杠")
     private List<String> webPathArr;
 
-    @ApiModelProperty(value = "手机端同步路径 例如 appSync/test  表示同步到sdcard/appSync/test目录  请注意前后不能带斜杠")
+    @ApiModelProperty(value = "手机端同步路径 例如 appSync/test  表示同步到sdcard/appSync/test目录  请注意前后不能带斜杠 需要带项目路径")
     private String phoneTargetPath;
 
     @ApiModelProperty(value = "额外的下载路径 (主要用于文件同步) 例如 ['fb375905dd112762/system/main.js']")

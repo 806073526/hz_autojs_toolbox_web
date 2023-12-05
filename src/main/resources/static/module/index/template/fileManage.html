@@ -52,7 +52,7 @@
                                 </el-dropdown-menu>
                             </el-dropdown>
                             <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行项目</el-button>
-                            <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止程序</el-button>
+                            <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止项目</el-button>
                             <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
                             <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
                                 <el-button size="mini" type="primary" >
@@ -238,7 +238,14 @@
                             <el-button style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
                             <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="runWebProject">运行项目</el-button>
                             <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="stopWebProject">停止项目</el-button>
-                            <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="changeFileListener">{{ changeFileBtnContent }}自动同步</el-button>
+                            <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="changeFileListener">{{ changeFileBtnContent }}项目文件监听</el-button>
+                            <el-button v-show="webCurPathExitProject && changeFileBtnContent === '关闭'" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="initWebProject">初始化项目</el-button>
+                            <div v-show="webCurPathExitProject" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:5px;margin-bottom: 5px;">
+                                <span>
+                                    自动运行项目：
+                                </span>
+                                <el-switch v-model="checkChangeAutoRestart" :disabled="changeFileBtnContent === '关闭'"/>
+                            </div>
                         </div>
                     </div>
                     <div>

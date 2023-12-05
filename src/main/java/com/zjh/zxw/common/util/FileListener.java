@@ -25,6 +25,17 @@ public class FileListener extends FileAlterationListenerAdaptor {
     // web端服务地址
     private String serverUrl;
 
+    // 检测变化自动重启
+    private Boolean checkChangeAutoRestart=false;
+
+    public void setCheckChangeAutoRestart(Boolean checkChangeAutoRestart) {
+        this.checkChangeAutoRestart = checkChangeAutoRestart;
+    }
+
+    public Boolean getCheckChangeAutoRestart() {
+        return checkChangeAutoRestart;
+    }
+
     public String getWebDirPath() {
         return webDirPath;
     }
@@ -65,8 +76,17 @@ public class FileListener extends FileAlterationListenerAdaptor {
             List<String> downloadFileUrlArr = new ArrayList<String>();
             downloadFileUrlArr.add(downLoadUrl);
 
+            // 转换后的web目录
+            String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf("\\"),webDirPath.length()).replaceAll("\\\\","/");
+
+            // 项目名称
+            String projectName = webDirPathConvert.substring(webDirPathConvert.lastIndexOf("/"),webDirPathConvert.length());
+
+            // 文件路径
+            String scriptFilePath = filePath.replace(webDirPath,"").replaceAll("\\\\","/");
+
             // 本地下载路径
-            String localFileUrl = this.phoneDirPath + filePath.replace(webDirPath,"").replaceAll("\\\\","/");
+            String localFileUrl = this.phoneDirPath + projectName + scriptFilePath;
             List<String> localFileUrlArr = new ArrayList<String>();
             localFileUrlArr.add(localFileUrl);
 
@@ -76,7 +96,26 @@ public class FileListener extends FileAlterationListenerAdaptor {
             syncFileInterfaceDTO.setDownloadFileUrlArr(downloadFileUrlArr);
             syncFileInterfaceDTO.setLocalFileUrlArr(localFileUrlArr);
 
-            AutoJsWsServerEndpoint.execSyncFileScript(this.deviceUUID, syncFileInterfaceDTO,()->{});
+            AutoJsWsServerEndpoint.execSyncFileScript(this.deviceUUID, syncFileInterfaceDTO,()->{
+                // 如果开启了自动重启
+                if(checkChangeAutoRestart){
+                    String remoteScript =  "let notCloseSourceArr = ['/data/user/0/com.zjh336.cn.tools/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools/files/project/main.js','/data/user/0/com.zjh336.cn.tools8822/files/project/runScript.js', '/data/user/0/com.zjh336.cn.tools8822/files/project/main.js','main.js']\n" +
+                            "const all = engines.all()\n" +
+                            "all.forEach(item => {\n" +
+                            "if (notCloseSourceArr.indexOf(String(item.source))===-1) {\n" +
+                            "item.forceStop()\n" +
+                            "}\n" +
+                            "});\n";
+                    try {
+                        String webScriptDirPath = this.webDirPath.replaceAll("\\\\","/");
+                        webScriptDirPath = webScriptDirPath.substring(webScriptDirPath.indexOf(this.deviceUUID),webScriptDirPath.length());
+                        AutoJsWsServerEndpoint.execStartProjectByWeb(this.deviceUUID,this.serverUrl,webScriptDirPath,this.phoneDirPath,false,remoteScript);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            });
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }

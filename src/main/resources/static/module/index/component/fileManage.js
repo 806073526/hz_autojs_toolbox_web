@@ -231,6 +231,7 @@ export default {
     data() {
         return {
             changeFileBtnContent: "开启",
+            checkChangeAutoRestart: false,
             isInit:false,
             isActive:false,
             oneKeyPackageFlag:false, // 一键打包标记
@@ -488,6 +489,11 @@ export default {
                 // 检测是否已完成打包
                 this.alreadyCompletePackageProject = this.checkPackageProject();
             }
+        },
+        // 同步路径修改后
+        webSyncPath(val){
+            // 查询监听状态
+            this.queryFileListenerStatus();
         }
     },
     methods: {
@@ -670,6 +676,31 @@ export default {
                     setTimeout(() => {
                         _that.fileLoading = false
                     }, 200)
+                }
+            });
+        },
+        queryFileListenerStatus(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/queryFileListenerList",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID":this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let arr = data.data.filter(item=>{
+                                let watchFileKey = _that.deviceInfo.deviceUuid + "/" + (_that.webSyncPath.startsWith("/") ? _that.webSyncPath.substring(1,_that.webSyncPath.length) : _that.webSyncPath);
+                                return item.webDirPath.replace(/\\/g,"/").endsWith(watchFileKey);
+                            });
+                            _that.changeFileBtnContent = arr.length > 0 ? "关闭" : "开启";
+                            _that.checkChangeAutoRestart = arr.length > 0 ? arr[0].checkChangeAutoRestart : false;
+                        }
+                    }
+                },
+                error: function (msg) {
                 }
             });
         },
@@ -1084,10 +1115,10 @@ export default {
             // 组装同步文件参数对象
             let params = {
                 serverUrl:getContext(), // 服务端地址
-                webPathArr:webPathArr, // 需要同步的web目录数组 (主要用于文件夹同步)
-                phoneTargetPath:phoneTargetPath, // 手机端同步路径
-                downloadFileUrlArr:downloadFileUrlArr, // 额外的下载路径 (主要用于文件同步)
-                localFileUrlArr:localFileUrlArr, // 额外的手机端本地路径
+                webPathArr:webPathArr, // 需要同步的web目录数组 (主要用于文件夹同步) 例如  ["fb375905dd112762/system"] 设备uuid拼接web指定目录  请注意前后不能带斜杠
+                phoneTargetPath:phoneTargetPath, // 手机端同步路径  例如 appSync/test  表示同步到sdcard/appSync/test目录  请注意前后不能带斜杠 需要带项目路径
+                downloadFileUrlArr:downloadFileUrlArr, // 额外的下载路径 (主要用于文件同步) 例如 ['fb375905dd112762/system/main.js']
+                localFileUrlArr:localFileUrlArr, // 额外的手机端本地路径 例如 ['appSync/test/main.js']"
                 showProcess:true, // 显示进度
                 completeMsg:completeMsg // 完成后的日志输出
             };
@@ -2966,33 +2997,13 @@ export default {
                 let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
                 let tempPath = toPath.replace(this.deviceInfo.deviceUuid, "");
                 this.webSyncPath =  tempPath || "/";
+
                 let deviceUuid = this.deviceInfo.deviceUuid;
                 if(deviceUuid){
                     let webSyncPathCacheKey = deviceUuid + "_webSyncPathCache";
                     window.localStorage.setItem(webSyncPathCacheKey,this.webSyncPath);
                 }
             }
-            let _that = this;
-            $.ajax({
-                url: getContext() + "/device/queryFileListenerList",
-                type: "GET",
-                dataType: "json",
-                data: {
-                    "deviceUUID":this.deviceInfo.deviceUuid
-                },
-                success: function (data) {
-                    if (data) {
-                        if (data.isSuccess) {
-                           let arr = data.data.filter(item=>{
-                               return item === this.deviceInfo.deviceUuid + "_" + this.webSyncPath
-                           });
-                           _that.changeFileBtnContent = arr.length > 0 ? "关闭" : "开启";
-                        }
-                    }
-                },
-                error: function (msg) {
-                }
-            });
         },
         // 面包屑导航
         phoneBreadcrumbChange(item, index){
@@ -3287,6 +3298,65 @@ export default {
             }).catch(() => {
             });
         },
+        // 初始化web运行bat文件
+        initWebRunBat(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            $.ajax({
+                url: getContext() + "/device/initWebProjectBat",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid,
+                    "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath, //  fb375905dd112762/200wLOGO
+                    "serverUrl": getContext(),
+                    "isSyncProject": this.changeFileBtnContent === '开启',
+                    "tempPhoneTargetPath":"" // 为空默认 appSync/tempRemoteScript
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            window.ZXW_VUE.$notify.success({message: '初始化成功', duration: '1000'});
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
+        // 初始化项目
+        initWebProject(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            let _that = this;
+            let projectName =  this.webSyncPath.substring(this.webSyncPath.lastIndexOf("/"),this.webSyncPath.length);
+            let relativeFilePath = this.deviceInfo.deviceUuid + this.webSyncPath;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": relativeFilePath
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let webSyncToPhoneArr = data.data;
+                            // 调用公共方法同步文件到手机端
+                            _that.webSyncToPhoneFun(webSyncToPhoneArr,"appSync/tempRemoteScript" + projectName,"同步web目录【"+relativeFilePath+"】到手机端【/sdcard/appSync/tempRemoteScript" + projectName+"】完成,共");
+                            // 初始化运行项目的bat文件
+                            _that.initWebRunBat()
+                        }
+                    }
+                    setTimeout(() => {
+                    }, 200)
+                },
+                error: function (msg) {
+                }
+            });
+        },
         // 运行项目
         runWebProject(){
             if (!this.validSelectDevice()) {
@@ -3298,10 +3368,10 @@ export default {
                 dataType: "json",
                 data: {
                     "deviceUUID": this.deviceInfo.deviceUuid,
-                    "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath,
+                    "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath, //  fb375905dd112762/200wLOGO
                     "serverUrl": getContext(),
                     "isSyncProject": this.changeFileBtnContent === '开启',
-                    "tempPhoneTargetPath":"" // 为空默认 /sdcard/appSync/tempRemoteScript
+                    "tempPhoneTargetPath":"" // 为空默认 appSync/tempRemoteScript
                 },
                 success: function (data) {
                     if (data) {
@@ -3355,8 +3425,9 @@ export default {
                     data: {
                         "deviceUUID": this.deviceInfo.deviceUuid,
                         "serverUrl" : getContext(),
-                        "webDirPath": this.deviceInfo.deviceUuid + "/"  + this.webSyncPath,
-                        "phoneDirPath": "" // 为空默认 /sdcard/appSync/tempRemoteScript
+                        "webDirPath": this.webSyncPath,
+                        "checkChangeAutoRestart": this.checkChangeAutoRestart,
+                        "phoneDirPath": "" // 为空默认 appSync/tempRemoteScript
                     },
                     success: function (data) {
                         if (data) {
@@ -3377,7 +3448,7 @@ export default {
                     dataType: "json",
                     data: {
                         "deviceUUID": this.deviceInfo.deviceUuid,
-                        "webDirPath": this.deviceInfo.deviceUuid + "/" + this.webSyncPath,
+                        "webDirPath": this.webSyncPath,
                     },
                     success: function (data) {
                         if (data) {

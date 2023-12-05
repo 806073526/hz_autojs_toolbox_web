@@ -28,7 +28,10 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -54,6 +57,46 @@ public class AutoJsWsServerEndpoint {
     private static String SESSION_CODE = "autoJsSession";
 
     private static EmailConfig emailConfig;
+
+
+    // 默认加入监听的项目路径
+    private static String defaultProjectPaths;
+
+    // 项目文件监听变化间隔
+    private static int interval;
+
+    // 默认加入监听项目 是否变化后自动运行 1是 0否
+    private static int checkChangeAutoRestart;
+
+    private static String uploadPath;
+
+    public static String port;
+
+    @Value("${server.port:9998}")
+    public void setPort(String portParam){
+        port = portParam;
+    }
+
+    @Value("${com.zjh.uploadPath}")
+    public void setUploadPath(String uploadPathParam){
+        uploadPath = uploadPathParam;
+    }
+
+    @Value("${com.zjh.webFileListener.defaultProjectPaths:''}")
+    public void setDefaultProjectPaths(String defaultProjectPathsParam){
+        defaultProjectPaths = defaultProjectPathsParam;
+    }
+
+    @Value("${com.zjh.webFileListener.interval:2}")
+    public void setInterval(int intervalParam){
+        interval = intervalParam;
+    }
+
+    @Value("${com.zjh.webFileListener.checkChangeAutoRestart:0}")
+    public void setCheckChangeAutoRestart(int checkChangeAutoRestartPram){
+        checkChangeAutoRestart = checkChangeAutoRestartPram;
+    }
+
 
     // app消息map
     // key deviceUUID_serviceKey   value:具体值
@@ -206,7 +249,7 @@ public class AutoJsWsServerEndpoint {
      * 连接建立成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam("deviceUuid") String deviceUuid, @PathParam("deviceWidth") String deviceWidth, @PathParam("deviceHeight") String deviceHeight) throws IOException {
+    public void onOpen(Session session, @PathParam("deviceUuid") String deviceUuid, @PathParam("deviceWidth") String deviceWidth, @PathParam("deviceHeight") String deviceHeight) throws Exception {
         AutoJsSession autoJsSession = AutoJsSession.builder().lastHeartTime(LocalDateTime.now()).deviceUuid(deviceUuid).session(session).build();
         autoJsSession.setConnectTime(LocalDateTime.now());
         autoJsSession.setScreenWidth(deviceWidth);
@@ -230,6 +273,43 @@ public class AutoJsWsServerEndpoint {
             // 记录
             curConnectMap.put(deviceUuid,LocalDateTime.now());
         }
+        // 设置监听目录不为空
+        if(StringUtils.isNotBlank(defaultProjectPaths)){
+            // 默认项目列表
+            List<String> defaultProjectPathList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(defaultProjectPaths,","));
+
+            // 遍历项目路径
+            for (String projectPath : defaultProjectPathList) {
+                if(!projectPath.startsWith(deviceUuid)){
+                    continue;
+                }
+                // 初始化项目运行bat脚本
+                initWebProjectBat(deviceUuid,"",projectPath,"",true);
+
+                String webDirPath = projectPath.replaceFirst(deviceUuid,"");
+                // 请求开启监听接口
+                String startListenerInterface = "http://localhost:" + port + "/device/startFileChangeListenerAndSync?deviceUUID="+deviceUuid+"&webDirPath="+StrHelper.encode(webDirPath)+"&checkChangeAutoRestart="+(checkChangeAutoRestart == 1);
+                URL url = new URL(startListenerInterface);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                // 设置连接超时时间（可选）
+                connection.setConnectTimeout(5000);
+                // 建立实际连接
+                connection.connect();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                System.out.println(response.toString());
+            }
+
+        }
+
+
         // 发送指令 给所以连接了的web端  推送app连接成功消息
         AjMessageDTO ajMessageDTO = new AjMessageDTO();
         ajMessageDTO.setDeviceUuid(deviceUuid);
@@ -362,7 +442,6 @@ public class AutoJsWsServerEndpoint {
                 String syncStatus = getSyncFileStatus(syncFileUUID);
                 // 完成了才执行
                 if("complete".equals(syncStatus)){
-                    System.out.println("完成了");
                     syncAfterFun.run();
                     break;
                 }
@@ -384,29 +463,114 @@ public class AutoJsWsServerEndpoint {
     }
 
     /**
-     * 运行web项目
+     * 初始化web项目运行脚本
      * @param deviceUUID
      * @param serverUrl
-     * @param webScriptDirPath
-     * @param tempPhoneTargetPath
-     * @param mainScriptPath
-     * @param isSyncProject
+     * @param webScriptDirPath  //  fb375905dd112762/200wLOGO
+     * @param tempPhoneTargetPath // ""
+     * @param isSyncProject // true
      * @throws Exception
      */
-    public static void execStartProjectByWeb(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath,String mainScriptPath,Boolean isSyncProject) throws Exception{
+    public static void initWebProjectBat(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath,Boolean isSyncProject) throws Exception{
+        if(StringUtils.isBlank(tempPhoneTargetPath)){
+            // 手机端默认 临时目录
+            tempPhoneTargetPath = "appSync/tempRemoteScript";
+        }
+        tempPhoneTargetPath = tempPhoneTargetPath.startsWith("/") ? tempPhoneTargetPath.replaceFirst("/","") : tempPhoneTargetPath;
+        tempPhoneTargetPath = tempPhoneTargetPath.endsWith("/") ? tempPhoneTargetPath.substring(0,tempPhoneTargetPath.lastIndexOf("/")) : tempPhoneTargetPath;
+        if(StringUtils.isBlank(serverUrl)){
+            serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
+        }
+        // 运行手机端临时目录的 项目
+        // String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
+
+        // 初始化启动脚本
+        String sourceStr = "curl %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%s";
+        // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO true
+        String startBatContent =  String.format(sourceStr,serverUrl,deviceUUID,(StrHelper.encode(webScriptDirPath.replaceAll("\\\\","/")).replaceAll("%","%%")),isSyncProject);
+        writeBatFile(webScriptDirPath,"start.bat",startBatContent);
+
+        // 初始化停止脚本
+        String sourceStr2 = "curl -H \"deviceUUID:%s\" %s/device/execStopProject";
+        String stopBatContent = String.format(sourceStr2,deviceUUID,serverUrl);
+        writeBatFile(webScriptDirPath,"stop.bat",stopBatContent);
+    }
+
+    private static void writeBatFile(String webScriptDirPath, String fileName,String fileContent){
+        FileWriter fw = null;
+        String location = "";
+        try {
+            String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+            location = tempPath+ File.separator + "autoJsTools" + File.separator + webScriptDirPath + File.separator + fileName;
+            File fileStart = new File(location);
+            if(!fileStart.exists()){
+                fileStart.createNewFile();
+            }
+            //生成bat文件
+            fw = new FileWriter(location);
+            fw.write(fileContent);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 运行web项目
+     * @param deviceUUID 设备UUID
+     * @param serverUrl 服务端地址
+     * @param webScriptDirPath web项目目录
+     * @param tempPhoneTargetPath 手机端同步目录
+     * @param isSyncProject 是否同步项目
+     * @param preScript 前置脚本
+     * @throws Exception
+     */
+    public static void execStartProjectByWeb(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath,Boolean isSyncProject, String preScript) throws Exception{
+        if(StringUtils.isBlank(tempPhoneTargetPath)){
+            // 手机端默认 临时目录
+            tempPhoneTargetPath = "appSync/tempRemoteScript";
+        }
+        tempPhoneTargetPath = tempPhoneTargetPath.startsWith("/") ? tempPhoneTargetPath.replaceFirst("/","") : tempPhoneTargetPath;
+        tempPhoneTargetPath = tempPhoneTargetPath.endsWith("/") ? tempPhoneTargetPath.substring(0,tempPhoneTargetPath.lastIndexOf("/")) : tempPhoneTargetPath;
+        if(StringUtils.isBlank(serverUrl)){
+            serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
+        }
+        String mainScriptPath = "main.js";
+        webScriptDirPath = webScriptDirPath.startsWith("/") ? webScriptDirPath.replaceFirst("/","") : webScriptDirPath;
+        webScriptDirPath = webScriptDirPath.endsWith("/") ? webScriptDirPath.substring(0,webScriptDirPath.lastIndexOf("/")) : webScriptDirPath;
+        File projectFile = new File(uploadPath + File.separator +  "autoJsTools"  + File.separator + webScriptDirPath + File.separator + "project.json");
+        if(projectFile.exists()){
+            BufferedReader reader = new BufferedReader(new FileReader(projectFile));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            reader.close();
+            String fileContent = stringBuilder.toString();
+            JSONObject projectJsonObj = JSONObject.parseObject(fileContent);
+            if(StringUtils.isNotBlank(projectJsonObj.getString("main"))){
+                mainScriptPath = projectJsonObj.getString("main");
+            }
+        }
+
         // 运行手机端临时目录的 项目
         String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
         // 项目文件路径
-        String scriptFilePath = tempPhoneTargetPath + projectName + "/" + mainScriptPath;
+        String scriptFilePath = "/sdcard/" + tempPhoneTargetPath + projectName + "/" + mainScriptPath;
         // 项目路径
-        String scriptDirPath = tempPhoneTargetPath + projectName;
+        String scriptDirPath =  "/sdcard/" + tempPhoneTargetPath + projectName;
 
         // 运行项目
         Runnable runnable = ()->{
             try {
                 String remoteScript = "";
-                remoteScript = "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});";
-                System.out.println(remoteScript);
+                remoteScript += preScript;
+                remoteScript += "if(files.exists(\""+scriptFilePath+"\")){\n" +
+                        "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
+                        "} else {\n" +
+                            "toastLog(\"项目不存在,请先初始化项目\");\n" +
+                        "}";
                 // 执行远程脚本  运行项目
                 execRemoteScript(deviceUUID,remoteScript,false,"","");
             } catch (Exception e) {
@@ -422,7 +586,7 @@ public class AutoJsWsServerEndpoint {
             SyncFileInterfaceDTO syncFileInterfaceDTO = new SyncFileInterfaceDTO();
             syncFileInterfaceDTO.setShowProcess(true);
             syncFileInterfaceDTO.setWebPathArr(webPathArr);
-            syncFileInterfaceDTO.setPhoneTargetPath(tempPhoneTargetPath.replace("/sdcard/",""));
+            syncFileInterfaceDTO.setPhoneTargetPath(tempPhoneTargetPath);
             syncFileInterfaceDTO.setServerUrl(serverUrl);
             // 同步项目
             execSyncFileScript(deviceUUID,syncFileInterfaceDTO,runnable);
@@ -507,8 +671,8 @@ public class AutoJsWsServerEndpoint {
                 "files.createWithDirs(remoteScriptPath);\n" +
                 "files.write(remoteScriptPath, decodeURIComponent($base64.decode('"+syncScript+"')));\n" +
                 "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
-                "sleep(1000);\n";//+
-                //"files.write(remoteScriptPath, \"\");";
+                "sleep(1000);\n"+
+                "files.write(remoteScriptPath, \"\");";
         return remoteScript;
     }
 
@@ -520,16 +684,23 @@ public class AutoJsWsServerEndpoint {
      */
     private static String getSyncFileScriptContent(String paramJson) throws Exception {
         String sourceJsonStr = "";
-        InputStream inputStream = Main.class.getResourceAsStream("/static/module/index/constant/syncFileScriptByServer.js");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        StringBuilder jsonString = new StringBuilder();
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/syncFileScriptByServer.js?t="+(new Date().getTime());
+        URL url = new URL(syncFilePath);
+        // 打开连接
+        URLConnection connection = url.openConnection();
+        // 设置连接超时时间（可选）
+        connection.setConnectTimeout(5000);
+        // 建立实际连接
+        connection.connect();
+        // 读取页面内容
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
         String line;
+        StringBuilder content = new StringBuilder();
         while ((line = reader.readLine()) != null) {
-            jsonString.append(line).append("\n");
+            content.append(line).append("\n");
         }
         reader.close();
-        String jsonStr = jsonString.toString();
-        sourceJsonStr = jsonStr;
+        sourceJsonStr = content.toString();
         sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
         return sourceJsonStr;
     }

@@ -91,6 +91,9 @@ utilsObj.downLoadFiles = (downloadFileUrlArr, localFileUrlArr, callback) => {
     let completeCount = 0;
     for (let i = 0; i < downloadFileUrlArr.length; i++) {
         let downloadFileUrl = downloadFileUrlArr[i];
+        if(downloadFileUrl){
+            downloadFileUrl+="?t="+new Date().getTime();
+        }
         let localFileUrl = localFileUrlArr[i];
         try {
             let url = new URL(downloadFileUrl);

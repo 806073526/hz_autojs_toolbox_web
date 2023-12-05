@@ -1,5 +1,6 @@
 package com.zjh.zxw.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -13,24 +14,19 @@ import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
 import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
-import com.zjh.zxw.service.AttachmentInfoService;
 import com.zjh.zxw.websocket.AutoJsSession;
-import com.zjh.zxw.websocket.AutoJsWebWsServerEndpoint;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import com.zjh.zxw.websocket.IPUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.lang3.StringUtils;
-import org.bytedeco.javacv.FrameFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import sun.applet.Main;
 
 import java.io.*;
@@ -72,8 +68,15 @@ public class DeviceController extends BaseController {
     @Value("${server.port:9998}")
     public String port;
 
-    // 监听文件map
+    @Value("${com.zjh.webFileListener.interval:2}")
+    private static int webFileListenerInterval;
+
+
+    // 监听文件监视器map
     private static Map<String, FileAlterationMonitor> watchFileMap = new ConcurrentHashMap<>();
+
+    // 监听文件map
+    private static Map<String, FileListener> watchFileListenerMap = new ConcurrentHashMap<>();
 
     @ApiOperation(value = "完成同步文件", notes = "完成同步文件")
     @GetMapping("/completeSyncFile")
@@ -86,25 +89,31 @@ public class DeviceController extends BaseController {
 
     @ApiOperation(value = "查询文件监听列表", notes = "查询文件监听列表")
     @GetMapping("/queryFileListenerList")
-    public R<List<String>> queryFileListenerList(@RequestParam("deviceUUID") String deviceUUID){
-        List<String> keyList = new ArrayList<String>(watchFileMap.keySet());
+    public R<List<FileListener>> queryFileListenerList(@RequestParam("deviceUUID") String deviceUUID){
+        List<String> keyList = new ArrayList<String>(watchFileListenerMap.keySet());
         // 过滤以 设备uuid加下划线开头的数据
-        keyList = keyList.stream().filter(s ->  s.startsWith(deviceUUID+"_")).collect(Collectors.toList());
-        return success(keyList);
+        keyList = keyList.stream().filter(s ->  s.startsWith(deviceUUID+"/")).collect(Collectors.toList());
+        // 返回监听数据
+        List<FileListener> listeners = keyList.stream().map(s-> watchFileListenerMap.get(s)).collect(Collectors.toList());
+        return success(listeners);
     }
 
 
     @ApiOperation(value = "停止文件变化监听", notes = "停止文件变化监听")
     @GetMapping("/stopFileChangeListener")
-    public R<Boolean> startListenerFileChangeAndSync(@RequestParam("deviceUUID") String deviceUUID,
-                                                     @RequestParam("webDirPath") String webDirPath) {
+    public R<Boolean> stopFileChangeListener(@RequestParam("deviceUUID") String deviceUUID,
+                                                     @RequestParam("webDirPath") String webDirPath
+                                                     ) {
         try {
-            String watchFileKey = deviceUUID + "_" + webDirPath;
+            // 去除前面的斜杠
+            webDirPath = webDirPath.startsWith("/") ? webDirPath.substring(1,webDirPath.length()) : webDirPath;
+            String watchFileKey = deviceUUID + "/" + webDirPath;
             if(watchFileMap.containsKey(watchFileKey)){
                 FileAlterationMonitor monitor = watchFileMap.get(watchFileKey);
                 monitor.stop();
                 // 移除
                 watchFileMap.remove(watchFileKey);
+                watchFileListenerMap.remove(watchFileKey);
             }
             return success(true);
         } catch (BusinessException e) {
@@ -121,6 +130,7 @@ public class DeviceController extends BaseController {
     @GetMapping("/startFileChangeListenerAndSync")
     public R<Boolean> startListenerFileChangeAndSync(@RequestParam("deviceUUID") String deviceUUID,
                                                      @RequestParam(value = "serverUrl",required = false) String serverUrl,
+                                                     @RequestParam(value = "checkChangeAutoRestart",required = false,defaultValue = "false") Boolean checkChangeAutoRestart,
                                                      @RequestParam("webDirPath") String webDirPath,
                                                      @RequestParam(value = "phoneDirPath",required = false) String phoneDirPath) {
         try {
@@ -129,24 +139,31 @@ public class DeviceController extends BaseController {
             }
             if(StringUtils.isBlank(phoneDirPath)){
                 // 手机端默认 临时目录
-                phoneDirPath = "/sdcard/appSync/tempRemoteScript";
+                phoneDirPath = "appSync/tempRemoteScript";
             }
+            // 处理前后斜杠
+            phoneDirPath = phoneDirPath.startsWith("/") ? phoneDirPath.substring(1,phoneDirPath.length()) : phoneDirPath;
+            phoneDirPath = phoneDirPath.endsWith("/") ? phoneDirPath.substring(0,phoneDirPath.lastIndexOf("/")) : phoneDirPath;
 
-            File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + webDirPath);
+            // 去除前面的斜杠
+            webDirPath = webDirPath.startsWith("/") ? webDirPath.substring(1,webDirPath.length()) : webDirPath;
+            File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + deviceUUID + File.separator +  webDirPath);
             if(!webDir.exists()){
                 throw new BusinessException("目录不存在");
             }
-            String watchFileKey = deviceUUID + "_" + webDirPath;
+            String watchFileKey = deviceUUID + "/" + webDirPath;
             if(watchFileMap.containsKey(watchFileKey)){
                 FileAlterationMonitor monitor = watchFileMap.get(watchFileKey);
                 monitor.stop();
                 // 移除
                 watchFileMap.remove(watchFileKey);
+                watchFileListenerMap.remove(watchFileKey);
             }
-            long intervalTime = TimeUnit.SECONDS.toMillis(2);
+            long intervalTime = TimeUnit.SECONDS.toMillis(webFileListenerInterval);
             FileAlterationObserver observer = new FileAlterationObserver(webDir.getAbsolutePath());
             FileListener fileListener = new FileListener();
             fileListener.setWebDirPath(webDir.getAbsolutePath());
+            fileListener.setCheckChangeAutoRestart(checkChangeAutoRestart);
             fileListener.setDeviceUUID(deviceUUID);
             fileListener.setPhoneDirPath(phoneDirPath);
             fileListener.setServerUrl(serverUrl);
@@ -155,6 +172,7 @@ public class DeviceController extends BaseController {
             FileAlterationMonitor monitor = new FileAlterationMonitor(intervalTime, observer);
             monitor.start();
             watchFileMap.put(watchFileKey,monitor);
+            watchFileListenerMap.put(watchFileKey,fileListener);
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
@@ -196,6 +214,32 @@ public class DeviceController extends BaseController {
     /**
      *
      * @param deviceUUID 设备uuid
+     * @param webScriptDirPath web端脚本目录
+     * @return
+     */
+    @ApiOperation(value = "初始化Web项目脚本", notes = "初始化Web项目脚本")
+    @GetMapping("/initWebProjectBat")
+    public R<Boolean> initWebProjectBat(@RequestParam("deviceUUID") String deviceUUID,
+                                    @RequestParam("webScriptDirPath") String webScriptDirPath,
+                                    @RequestParam(value = "serverUrl",required = false) String serverUrl,
+                                    @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath,
+                                    @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
+
+        try {
+            AutoJsWsServerEndpoint.initWebProjectBat(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,isSyncProject);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("运行WEB端脚本失败！请联系管理员");
+        }
+    }
+
+
+    /**
+     *
+     * @param deviceUUID 设备uuid
      * @param webScriptDirPath   web端脚本目录(自动以project.json的配置读取主运行文件，没有则默认读取main.js)
      * @param tempPhoneTargetPath 手机端临时同步目录
      * @param isSyncProject 是否先同步目录 再执行
@@ -208,37 +252,9 @@ public class DeviceController extends BaseController {
                                             @RequestParam(value = "serverUrl",required = false) String serverUrl,
                                             @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath,
                                             @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
-        if(StringUtils.isBlank(tempPhoneTargetPath)){
-            // 手机端默认 临时目录
-            tempPhoneTargetPath = "/sdcard/appSync/tempRemoteScript";
-        }
-        tempPhoneTargetPath = tempPhoneTargetPath.endsWith("/") ? tempPhoneTargetPath.replace("/","") : tempPhoneTargetPath;
-        if(StringUtils.isBlank(serverUrl)){
-            serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
-        }
-        try {
-            String mainScriptPath = "main.js";
-            webScriptDirPath = webScriptDirPath.startsWith("/") ? webScriptDirPath.replace("/","") : webScriptDirPath;
-            webScriptDirPath = webScriptDirPath.endsWith("/") ? webScriptDirPath.replace("/","") : webScriptDirPath;
-            System.out.println(webScriptDirPath);
-            File projectFile = new File(uploadPath + File.separator + webScriptDirPath + File.separator + "project.json");
-            if(projectFile.exists()){
-                System.out.println("文件存在");
-                BufferedReader reader = new BufferedReader(new FileReader(projectFile));
-                StringBuilder stringBuilder = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line);
-                }
-                reader.close();
-                String fileContent = stringBuilder.toString();
-                JSONObject projectJsonObj = JSONObject.parseObject(fileContent);
-                if(StringUtils.isNotBlank(projectJsonObj.getString("main"))){
-                    mainScriptPath = projectJsonObj.getString("main");
-                }
-            }
 
-            AutoJsWsServerEndpoint.execStartProjectByWeb(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,mainScriptPath,isSyncProject);
+        try {
+            AutoJsWsServerEndpoint.execStartProjectByWeb(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,isSyncProject,"");
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());

@@ -17,7 +17,7 @@ export default {
     props: {},
     data() {
         return {
-            versionInfo:"V3.4.0",
+            versionInfo:"V3.4.5尝鲜版",
             newVersion:"",
             isExeVersion: false,
             deviceList: [],// 设备列表
