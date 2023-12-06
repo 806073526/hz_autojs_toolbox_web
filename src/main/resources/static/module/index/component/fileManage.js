@@ -445,6 +445,11 @@ export default {
             let projectFileArr = this.fileList.filter(item=>item.fileType==='json' && item.fileName === 'project');
             return !(!projectFileArr || projectFileArr.length === 0);
         },
+        // web端当前目录是否存在project文件
+        webCurPathExitSyncIgnore(){
+            let syncignoreFileArr = this.fileList.filter(item=>item.fileType==='syncignore' && item.fileName === '');
+            return !(!syncignoreFileArr || syncignoreFileArr.length === 0);
+        },
         // 手机端当前目录是否存在project.json文件
         phoneCurPathExitProject(){
             let projectFileArr = this.phoneFileList.filter(item=>item.fileType==='json' && item.fileName === 'project');
@@ -1115,7 +1120,7 @@ export default {
             // 组装同步文件参数对象
             let params = {
                 serverUrl:getContext(), // 服务端地址
-                webPathArr:webPathArr, // 需要同步的web目录数组 (主要用于文件夹同步) 例如  ["fb375905dd112762/system"] 设备uuid拼接web指定目录  请注意前后不能带斜杠
+                webPathArr:webPathArr, // 需要同步的web目录数组 (主要用于文件夹同步) 例如  ["fb375905dd112762/system/test"] 设备uuid拼接web指定目录  请注意前后不能带斜杠
                 phoneTargetPath:phoneTargetPath, // 手机端同步路径  例如 appSync/test  表示同步到sdcard/appSync/test目录  请注意前后不能带斜杠 需要带项目路径
                 downloadFileUrlArr:downloadFileUrlArr, // 额外的下载路径 (主要用于文件同步) 例如 ['fb375905dd112762/system/main.js']
                 localFileUrlArr:localFileUrlArr, // 额外的手机端本地路径 例如 ['appSync/test/main.js']"
@@ -1143,18 +1148,6 @@ export default {
                 error: function (msg) {
                 }
             });
-           /* // 获取同步文件代码
-            let syncScript = getSyncFileScriptContent(params);
-            let remoteScript = `
-            let remoteScriptPath = '/sdcard/appSync/tempRemoteScript/syncFileScript.js'; 
-            files.createWithDirs(remoteScriptPath);
-            files.write(remoteScriptPath, decodeURI($base64.decode('${btoa(encodeURI(syncScript))}')));
-            engines.execScriptFile("/sdcard/appSync/tempRemoteScript/syncFileScript.js",{path:["/sdcard/appSync/tempRemoteScript/"]});
-            sleep(1000);
-            files.write(remoteScriptPath, "");
-            `;
-            // 执行指令
-            this.remoteExecuteScript(remoteScript);*/
         },
         // 全选
         checkAllFileChange() {
@@ -3096,32 +3089,32 @@ export default {
             if (!this.validateSyncParam()) {
                 return;
             }
-            window.ZXW_VUE.$confirm('是否确认将web端【根目录'+this.webSyncPath+'】目录文件(文件夹不会递归同步),同步到手机端【' + this.phoneSyncPath + '】下?', '提示', {
+            // 有project.json的 才检测.syncignore文件
+            if(this.webCurPathExitProject && !this.checkSyncIgnoreFile()){
+                return;
+            }
+            window.ZXW_VUE.$confirm('是否确认将web端【根目录'+this.webSyncPath+'】目录文件),同步到手机端【' + this.phoneSyncPath + '】下?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'info'
             }).then(() => {
                 let _that = this;
-                let relativeFilePath = this.deviceInfo.deviceUuid + this.webSyncPath;
-
                 $.ajax({
-                    url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                    url: getContext() + "/device/syncWebProjectToPhone",
                     type: "GET",
                     dataType: "json",
-                    // contentType: "application/json",
                     data: {
-                        "relativeFilePath": relativeFilePath
+                        "deviceUUID":this.deviceInfo.deviceUuid,
+                        "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath,
+                        "serverUrl": getContext(),
+                        "tempPhoneTargetPath": this.phoneSyncPath
                     },
                     success: function (data) {
                         if (data) {
                             if (data.isSuccess) {
-                                let webSyncToPhoneArr = data.data;
-                                // 调用公共方法同步文件到手机端
-                                _that.webSyncToPhoneFun(webSyncToPhoneArr,_that.phoneSyncPath,"同步web目录【"+relativeFilePath+"】到手机端【/sdcard"+_that.phoneSyncPath+"】完成,共");
+                                window.ZXW_VUE.$notify.success({message: '同步成功', duration: '1000'});
                             }
                         }
-                        setTimeout(() => {
-                        }, 200)
                     },
                     error: function (msg) {
                     }
@@ -3325,33 +3318,65 @@ export default {
                 }
             });
         },
+        // 检测同步忽略文件
+        checkSyncIgnoreFile(){
+            if(this.webCurPathExitSyncIgnore){
+               return true;
+            }
+            let _that = this;
+            window.ZXW_VUE.$confirm('未检测到【.syncignore】同步忽略文件,点击生成?', '提示', {
+                confirmButtonText: '确定',
+                type: 'info'
+            }).then(() => {
+                $.ajax({
+                    url: getContext() + "/device/initWebProjectIgnore",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath, //  fb375905dd112762/200wLOGO
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '生成成功', duration: '1000'});
+                                // 刷新列表
+                                _that.breadcrumbChange(_that.breadcrumbList[_that.breadcrumbList.length - 1], (_that.breadcrumbList.length - 1))
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            });
+            return false;
+        },
         // 初始化项目
         initWebProject(){
             if (!this.validSelectDevice()) {
                 return;
             }
+            // 检测.syncignore文件
+            if(!this.checkSyncIgnoreFile()){
+                return;
+            }
             let _that = this;
-            let projectName =  this.webSyncPath.substring(this.webSyncPath.lastIndexOf("/"),this.webSyncPath.length);
-            let relativeFilePath = this.deviceInfo.deviceUuid + this.webSyncPath;
             $.ajax({
-                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                url: getContext() + "/device/syncWebProjectToPhone",
                 type: "GET",
                 dataType: "json",
                 data: {
-                    "relativeFilePath": relativeFilePath
+                    "deviceUUID":this.deviceInfo.deviceUuid,
+                    "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath,
+                    "serverUrl": getContext(),
+                    "tempPhoneTargetPath": "appSync/tempRemoteScript"
                 },
                 success: function (data) {
                     if (data) {
                         if (data.isSuccess) {
-                            let webSyncToPhoneArr = data.data;
-                            // 调用公共方法同步文件到手机端
-                            _that.webSyncToPhoneFun(webSyncToPhoneArr,"appSync/tempRemoteScript" + projectName,"同步web目录【"+relativeFilePath+"】到手机端【/sdcard/appSync/tempRemoteScript" + projectName+"】完成,共");
                             // 初始化运行项目的bat文件
-                            _that.initWebRunBat()
+                            _that.initWebRunBat();
                         }
                     }
-                    setTimeout(() => {
-                    }, 200)
                 },
                 error: function (msg) {
                 }
@@ -3360,6 +3385,10 @@ export default {
         // 运行项目
         runWebProject(){
             if (!this.validSelectDevice()) {
+                return;
+            }
+            // 检测.syncignore文件
+            if(!this.checkSyncIgnoreFile()){
                 return;
             }
             $.ajax({
@@ -3413,6 +3442,10 @@ export default {
         // 切换文件监听和同步
         changeFileListener(){
             if (!this.validSelectDevice()) {
+                return;
+            }
+            // 检测.syncignore文件
+            if(!this.checkSyncIgnoreFile()){
                 return;
             }
             let _that = this;

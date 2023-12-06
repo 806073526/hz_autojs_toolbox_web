@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * 字符串帮助类
@@ -27,6 +29,23 @@ public class StrHelper {
    */
     public static String getObjectValue(Object obj) {
         return obj == null ? "" : obj.toString();
+    }
+
+    // 替换符号
+    public static String replaceSystemSeparator(String source){
+        return source.replaceAll("[\\\\/]", Matcher.quoteReplacement(File.separator));
+    }
+
+    /**
+     * 替换前后字符串
+     * @param source
+     * @param chart
+     * @return
+     */
+    public static String replaceFirstLastChart(String source,String chart){
+        String result = source.startsWith(chart) ? source.substring(chart.length(),source.length()) : source;
+        result = result.endsWith(chart) ? result.substring(0,result.lastIndexOf(chart)) : result;
+        return result;
     }
 
     public static String encode(String value) {

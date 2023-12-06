@@ -1,10 +1,7 @@
 package com.zjh.zxw.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.zjh.zxw.common.util.FileUtil;
-import com.zjh.zxw.common.util.UnZipUtils;
-import com.zjh.zxw.common.util.ZipApacheUtils;
-import com.zjh.zxw.common.util.ZipUtils;
+import com.zjh.zxw.common.util.*;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
@@ -82,7 +79,7 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
     }
 
     @Override
-    public List<AttachInfo> queryAllAttachInfoListByPath(String relativeFilePath, Boolean onlyQueryFolder) {
+    public List<AttachInfo> queryAllAttachInfoListByPath(String rootPath, String relativeFilePath, Boolean onlyQueryFolder,List<String> ignorePathList) {
         List<AttachInfo> attachInfos = new ArrayList<>();
         File file = new File(this.getRootPath() + relativeFilePath);
         // 当前不是一个目录，直接返回空集合
@@ -97,12 +94,26 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
                     continue;
                 }
                 AttachInfo attachInfo = convertAttachInfo(f);
+
+                List<String> stringList = Optional.ofNullable(ignorePathList).orElse(new ArrayList<>());
+
+                long ignoreCount = stringList.stream().filter(str->{
+                    // 忽略全路径
+                    String ignoreFullPath = this.getRootPath() + rootPath + File.separator + StrHelper.replaceFirstLastChart(str,"\\");
+                    ignoreFullPath = StrHelper.replaceSystemSeparator(ignoreFullPath);
+                    // 满足以全路径开头的 统计数量+1
+                    return attachInfo.getAbsolutePathName().startsWith(ignoreFullPath);
+                }).count();
+                // 满足忽略条件 跳过
+                if(ignoreCount>0){
+                    continue;
+                }
                 // 如果文件是一个目录
                 if(f.isDirectory()){
                     // 获取子文件夹的绝对路径
                     String childRelativeFilePath = relativeFilePath + File.separator + f.getName();
                     // 获取子目录的附件信息
-                    List<AttachInfo> childAttachList =  this.queryAllAttachInfoListByPath(childRelativeFilePath,onlyQueryFolder);
+                    List<AttachInfo> childAttachList =  this.queryAllAttachInfoListByPath(rootPath, childRelativeFilePath,onlyQueryFolder, ignorePathList);
                     // 设置children
                     attachInfo.setChildren(childAttachList);
                 }

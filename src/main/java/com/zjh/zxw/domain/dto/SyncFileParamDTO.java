@@ -34,6 +34,9 @@ public class SyncFileParamDTO implements Serializable {
     @ApiModelProperty(value = "相对路径列表")
     private List<String> relativeFilePathList;
 
+    @ApiModelProperty(value = "忽略文件路径")
+    private List<String> ignorePathList;
+
     @ApiModelProperty(value = "是否仅查询目录")
     private Boolean onlyQueryFolder;
 }

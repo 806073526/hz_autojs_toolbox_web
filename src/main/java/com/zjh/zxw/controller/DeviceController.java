@@ -130,9 +130,9 @@ public class DeviceController extends BaseController {
     @GetMapping("/startFileChangeListenerAndSync")
     public R<Boolean> startListenerFileChangeAndSync(@RequestParam("deviceUUID") String deviceUUID,
                                                      @RequestParam(value = "serverUrl",required = false) String serverUrl,
-                                                     @RequestParam(value = "checkChangeAutoRestart",required = false,defaultValue = "false") Boolean checkChangeAutoRestart,
                                                      @RequestParam("webDirPath") String webDirPath,
-                                                     @RequestParam(value = "phoneDirPath",required = false) String phoneDirPath) {
+                                                     @RequestParam(value = "phoneDirPath",required = false) String phoneDirPath,
+                                                     @RequestParam(value = "checkChangeAutoRestart",required = false,defaultValue = "false") Boolean checkChangeAutoRestart) {
         try {
             if(StringUtils.isBlank(serverUrl)){
                 serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
@@ -141,10 +141,7 @@ public class DeviceController extends BaseController {
                 // 手机端默认 临时目录
                 phoneDirPath = "appSync/tempRemoteScript";
             }
-            // 处理前后斜杠
-            phoneDirPath = phoneDirPath.startsWith("/") ? phoneDirPath.substring(1,phoneDirPath.length()) : phoneDirPath;
-            phoneDirPath = phoneDirPath.endsWith("/") ? phoneDirPath.substring(0,phoneDirPath.lastIndexOf("/")) : phoneDirPath;
-
+            phoneDirPath = StrHelper.replaceFirstLastChart(phoneDirPath,"/");
             // 去除前面的斜杠
             webDirPath = webDirPath.startsWith("/") ? webDirPath.substring(1,webDirPath.length()) : webDirPath;
             File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + deviceUUID + File.separator +  webDirPath);
@@ -159,9 +156,25 @@ public class DeviceController extends BaseController {
                 watchFileMap.remove(watchFileKey);
                 watchFileListenerMap.remove(watchFileKey);
             }
+
+            List<String> syncIgnorePaths = new ArrayList<>();
+            File ignoreFile = new File(uploadPath + File.separator +  "autoJsTools"  + File.separator + deviceUUID + File.separator + webDirPath + File.separator + ".syncignore");
+            if(ignoreFile.exists()){
+                BufferedReader reader = new BufferedReader(new FileReader(ignoreFile));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // #表示注释 跳过
+                    if(!line.startsWith("#")){
+                        syncIgnorePaths.add(line);
+                    }
+                }
+                reader.close();
+            }
+
             long intervalTime = TimeUnit.SECONDS.toMillis(webFileListenerInterval);
             FileAlterationObserver observer = new FileAlterationObserver(webDir.getAbsolutePath());
             FileListener fileListener = new FileListener();
+            fileListener.setIgnorePathArr(syncIgnorePaths);
             fileListener.setWebDirPath(webDir.getAbsolutePath());
             fileListener.setCheckChangeAutoRestart(checkChangeAutoRestart);
             fileListener.setDeviceUUID(deviceUUID);
@@ -182,7 +195,7 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "同步web文件到手机端", notes = "同步web文件到手机端")
+    @ApiOperation(value = "同步web文件到手机端(基础方法)", notes = "同步web文件到手机端(基础方法)")
     @PostMapping("/syncWebFileToPhone")
     public R<Boolean> syncWebFileToPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestBody SyncFileInterfaceDTO syncFileInterfaceDTO) {
         try {
@@ -197,19 +210,53 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "运行手机端脚本", notes = "运行手机端脚本")
-    @GetMapping("/execStartProjectByPhone")
-    public R<Boolean> execStartProjectByPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestParam("scriptFilePath") String scriptFilePath) {
+
+    /**
+     *
+     * @param deviceUUID 设备uuid
+     * @param webScriptDirPath   web端脚本目录 例如  fb375905dd112762/200wLOGO
+     * @param tempPhoneTargetPath 手机端临时同步目录
+     * @return
+     */
+    @ApiOperation(value = "同步web项目到手机端", notes = "同步web项目到手机端")
+    @GetMapping("/syncWebProjectToPhone")
+    public R<Boolean> syncWebProjectToPhone(@RequestParam("deviceUUID") String deviceUUID,
+                                            @RequestParam("webScriptDirPath") String webScriptDirPath,
+                                            @RequestParam(value = "serverUrl",required = false) String serverUrl,
+                                            @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath) {
         try {
-            AutoJsWsServerEndpoint.execStartProjectByPhone(deviceUUID,scriptFilePath);
+            AutoJsWsServerEndpoint.syncWebProjectToPhone(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,()->{});
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return fail("运行手机端脚本失败！请联系管理员");
+            return fail("同步web项目到手机端失败！请联系管理员");
         }
     }
+
+
+
+
+    /**
+     * 初始化Web项目同步忽略文件
+     * @param webScriptDirPath web端脚本目录
+     * @return
+     */
+    @ApiOperation(value = "初始化Web项目同步忽略文件", notes = "初始化Web项目同步忽略文件")
+    @GetMapping("/initWebProjectIgnore")
+    public R<Boolean> initWebProjectIgnore(@RequestParam("webScriptDirPath") String webScriptDirPath) {
+        try {
+            AutoJsWsServerEndpoint.initWebProjectIgnore(webScriptDirPath);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("初始化Web项目同步忽略文件失败！请联系管理员");
+        }
+    }
+
 
     /**
      *
@@ -217,14 +264,13 @@ public class DeviceController extends BaseController {
      * @param webScriptDirPath web端脚本目录
      * @return
      */
-    @ApiOperation(value = "初始化Web项目脚本", notes = "初始化Web项目脚本")
+    @ApiOperation(value = "初始化Web项目bat", notes = "初始化Web项目bat")
     @GetMapping("/initWebProjectBat")
     public R<Boolean> initWebProjectBat(@RequestParam("deviceUUID") String deviceUUID,
                                     @RequestParam("webScriptDirPath") String webScriptDirPath,
                                     @RequestParam(value = "serverUrl",required = false) String serverUrl,
                                     @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath,
                                     @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
-
         try {
             AutoJsWsServerEndpoint.initWebProjectBat(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,isSyncProject);
             return success(true);
@@ -232,7 +278,7 @@ public class DeviceController extends BaseController {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return fail("运行WEB端脚本失败！请联系管理员");
+            return fail("初始化WEB端bat失败！请联系管理员");
         }
     }
 
@@ -263,6 +309,22 @@ public class DeviceController extends BaseController {
             return fail("运行WEB端脚本失败！请联系管理员");
         }
     }
+
+    @ApiOperation(value = "运行手机端脚本", notes = "运行手机端脚本")
+    @GetMapping("/execStartProjectByPhone")
+    public R<Boolean> execStartProjectByPhone(@RequestHeader("deviceUUID") String deviceUUID, @RequestParam("scriptFilePath") String scriptFilePath) {
+        try {
+            AutoJsWsServerEndpoint.execStartProjectByPhone(deviceUUID,scriptFilePath);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("运行手机端脚本失败！请联系管理员");
+        }
+    }
+
+
 
     @ApiOperation(value = "停止手机端全部脚本", notes = "停止手机端全部脚本")
     @GetMapping("/execStopProject")

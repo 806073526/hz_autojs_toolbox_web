@@ -22,7 +22,7 @@ public interface AttachmentInfoService {
 
     List<AttachInfo> queryAttachInfoListByPath(String relativeFilePath);
 
-    List<AttachInfo> queryAllAttachInfoListByPath(String relativeFilePath,Boolean onlyQueryFolder);
+    List<AttachInfo> queryAllAttachInfoListByPath(String rootPath,String relativeFilePath,Boolean onlyQueryFolder,List<String> ignorePathList);
 
     AttachInfo uploadFile(MultipartFile multipartFile, String fileName);
 

@@ -29,13 +29,16 @@ public class SyncFileInterfaceDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "自身脚本名称")
+    @ApiModelProperty(value = "自身脚本名称 可选参数 设置后独立引擎脚本执行完成后自行销毁")
     private String selfScriptName;
 
-    @ApiModelProperty(value = "同步文件UUID")
+    @ApiModelProperty(value = "同步文件UUID 可选参数 用于记录同步状态 完成后执行其他逻辑")
     private String syncFileUUID;
 
-    @ApiModelProperty(value = "服务端地址")
+    @ApiModelProperty(value = "同步忽略目录 可选参数 设置后对应目录不进行同步 递归同步的在查询目录时就过滤了、")
+    private List<String> ignorePathArr;
+
+    @ApiModelProperty(value = "服务端地址 必选参数")
     private String serverUrl;
 
     @ApiModelProperty(value = "需要同步的web目录数组 (主要用于文件夹同步) 例如  [\"fb375905dd112762/system\"] 设备uuid拼接web指定目录  请注意前后不能带斜杠")

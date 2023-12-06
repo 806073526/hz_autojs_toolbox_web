@@ -44,6 +44,8 @@ let localFileUrlArr_param = params.localFileUrlArr || [];
 let syncFileUUID = params.syncFileUUID || "";
 // 自身脚本名称
 let selfScriptName = params.selfScriptName || "";
+// 忽略目录
+let ignorePathArr = params.ignorePathArr || [];
 
 let showProcess = showProcess_param;
 let utilsObj = {};
@@ -96,6 +98,9 @@ utilsObj.downLoadFiles = (downloadFileUrlArr, localFileUrlArr, callback) => {
         if(downloadFileUrl){
             downloadFileUrl+="?t="+new Date().getTime();
         }
+       /* ignorePathArr.filter(ignorePath=>{
+            downloadFileUrl.contains("/" + ignorePath +"/")
+        });*/
         let localFileUrl = localFileUrlArr[i];
         try {
             let url = new URL(downloadFileUrl);
@@ -232,6 +237,7 @@ let localFileUrlArr = localFileUrlArr_param;
 
 let requestBody = {
     relativeFilePathList: webPathArr,
+    ignorePathList: ignorePathArr,
     onlyQueryFolder: false
 }
 

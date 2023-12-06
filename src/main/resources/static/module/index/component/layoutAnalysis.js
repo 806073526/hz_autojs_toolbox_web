@@ -34,6 +34,7 @@ export default {
     },
     data() {
         return {
+            autoRefreshScreenCapture: false, // 刷新截图权限
             isActive:false,
             arrowArr:{
                 commonParam:true,
@@ -134,6 +135,7 @@ export default {
             if(systemConfigCache){
                 let systemConfigObj = JSON.parse(systemConfigCache);
                 if(systemConfigObj){
+                    this.autoRefreshScreenCapture = systemConfigObj.autoRefreshScreenCapture;
                     zoomSize = systemConfigObj.zoomSize;
                 }
                 if(zoomSize<30){
@@ -341,7 +343,12 @@ export default {
             }
             this.layoutLoading = true;
             this.clearNodeJson();
+            let stopScreenScript = '';
+            if(this.autoRefreshScreenCapture){
+                stopScreenScript = 'images.stopScreenCapture();';
+            }
             let remoteScript = `auto.clearCache();
+            ${stopScreenScript}
             /**
              * 远程上传根节点json到服务器
              */

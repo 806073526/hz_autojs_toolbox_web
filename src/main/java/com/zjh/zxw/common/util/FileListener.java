@@ -13,6 +13,9 @@ import java.util.List;
 @Slf4j
 public class FileListener extends FileAlterationListenerAdaptor {
 
+    // 同步忽略目录
+    private List<String> ignorePathArr;
+
     // 设备uuid
     private String deviceUUID;
 
@@ -27,6 +30,14 @@ public class FileListener extends FileAlterationListenerAdaptor {
 
     // 检测变化自动重启
     private Boolean checkChangeAutoRestart=false;
+
+    public List<String> getIgnorePathArr() {
+        return ignorePathArr;
+    }
+
+    public void setIgnorePathArr(List<String> ignorePathArr) {
+        this.ignorePathArr = ignorePathArr;
+    }
 
     public void setCheckChangeAutoRestart(Boolean checkChangeAutoRestart) {
         this.checkChangeAutoRestart = checkChangeAutoRestart;
@@ -71,6 +82,16 @@ public class FileListener extends FileAlterationListenerAdaptor {
     private void syncSingleFile(String filePath)  {
         try {
             String path = filePath.substring(filePath.indexOf(this.deviceUUID),filePath.length()).replaceAll("\\\\","/");
+
+            // 满足忽略条件
+            long count = ignorePathArr.stream().filter(ignorePath->{
+                return StrHelper.replaceSystemSeparator(filePath).startsWith(webDirPath + File.separator + StrHelper.replaceSystemSeparator(ignorePath));
+            }).count();
+
+            if(count>0){
+                log.info(path+"所在目录已被忽略,跳过同步");
+                return;
+            }
             // 下载路径
             String downLoadUrl = this.serverUrl + "/uploadPath/autoJsTools/" + path;
             List<String> downloadFileUrlArr = new ArrayList<String>();
@@ -95,6 +116,7 @@ public class FileListener extends FileAlterationListenerAdaptor {
             syncFileInterfaceDTO.setServerUrl(this.serverUrl);
             syncFileInterfaceDTO.setDownloadFileUrlArr(downloadFileUrlArr);
             syncFileInterfaceDTO.setLocalFileUrlArr(localFileUrlArr);
+            syncFileInterfaceDTO.setIgnorePathArr(ignorePathArr);
 
             AutoJsWsServerEndpoint.execSyncFileScript(this.deviceUUID, syncFileInterfaceDTO,()->{
                 // 如果开启了自动重启

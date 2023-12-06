@@ -497,7 +497,7 @@ public class AttachmentInfoController extends BaseController {
     @GetMapping("/queryAllAttachInfoListByPath")
     public R<List<AttachInfo>> queryAllAttachInfoListByPath(@RequestParam("relativeFilePath") String relativeFilePath,@RequestParam("onlyQueryFolder") Boolean onlyQueryFolder) {
         try {
-            List<AttachInfo> attachInfos = attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath,onlyQueryFolder);
+            List<AttachInfo> attachInfos = attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath, relativeFilePath,onlyQueryFolder,null);
             return success(attachInfos);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
@@ -518,7 +518,10 @@ public class AttachmentInfoController extends BaseController {
             Map<String,List<AttachInfo>> attachInfoMap = new HashMap<>();
             List<String> relativeFilePathList = Optional.ofNullable(syncFileParamDTO.getRelativeFilePathList()).orElse(new ArrayList<>());
             for (String relativeFilePath : relativeFilePathList) {
-                attachInfoMap.put(relativeFilePath,attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath,syncFileParamDTO.getOnlyQueryFolder()));
+                // 处理字符串
+                relativeFilePath = StrHelper.replaceFirstLastChart(relativeFilePath,"\\");
+
+                attachInfoMap.put(relativeFilePath,attachmentInfoService.queryAllAttachInfoListByPath(relativeFilePath, relativeFilePath ,syncFileParamDTO.getOnlyQueryFolder(),syncFileParamDTO.getIgnorePathList()));
             }
             return success(attachInfoMap);
         } catch (BusinessException e) {
