@@ -661,7 +661,7 @@ public class AutoJsWsServerEndpoint {
         syncFileInterfaceDTO.setPhoneTargetPath(tempPhoneTargetPath);
         syncFileInterfaceDTO.setServerUrl(serverUrl);
         syncFileInterfaceDTO.setIgnorePathArr(syncIgnorePaths);
-        syncFileInterfaceDTO.setCompleteMsg("同步web目录【"+webScriptDirPath+"】到手机端【/sdcard"+tempPhoneTargetPath+"】完成,共");
+        syncFileInterfaceDTO.setCompleteMsg("同步web目录【"+webScriptDirPath+"】到手机端【/sdcard/"+tempPhoneTargetPath+"】完成,共");
         // 同步项目
         execSyncFileScript(deviceUUID,syncFileInterfaceDTO,runnable);
     }
