@@ -54,7 +54,6 @@ if (selfScriptName && selfScriptName.indexOf('_') !== -1 && selfScriptName.index
     let nowTime = new Date().getTime();
     // 获取当前目录全部文件
     let listFileArr = files.listDir(files.cwd());
-    console.log(listFileArr);
     // 过滤以当前文件名开头的 js文件
     listFileArr = listFileArr.filter(item => item.startsWith(syncFileName + "_") && item.endsWith(".js"));
     // 五分钟
