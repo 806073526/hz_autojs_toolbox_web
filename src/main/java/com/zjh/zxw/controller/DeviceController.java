@@ -144,7 +144,7 @@ public class DeviceController extends BaseController {
             phoneDirPath = StrHelper.replaceFirstLastChart(phoneDirPath,"/");
             // 去除前面的斜杠
             webDirPath = webDirPath.startsWith("/") ? webDirPath.substring(1,webDirPath.length()) : webDirPath;
-            File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + deviceUUID + File.separator +  webDirPath);
+            File webDir = new File(uploadPath + File.separator + "autoJsTools" + File.separator + deviceUUID + File.separator +  StrHelper.replaceSystemSeparator(webDirPath));
             if(!webDir.exists()){
                 throw new BusinessException("目录不存在");
             }

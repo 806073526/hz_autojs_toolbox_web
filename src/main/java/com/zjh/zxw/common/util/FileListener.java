@@ -82,23 +82,13 @@ public class FileListener extends FileAlterationListenerAdaptor {
     private void syncSingleFile(String filePath)  {
         try {
             String path = filePath.substring(filePath.indexOf(this.deviceUUID),filePath.length()).replaceAll("\\\\","/");
-
-            // 满足忽略条件
-            long count = ignorePathArr.stream().filter(ignorePath->{
-                return StrHelper.replaceSystemSeparator(filePath).startsWith(webDirPath + File.separator + StrHelper.replaceSystemSeparator(ignorePath));
-            }).count();
-
-            if(count>0){
-                log.info(path+"所在目录已被忽略,跳过同步");
-                return;
-            }
             // 下载路径
             String downLoadUrl = this.serverUrl + "/uploadPath/autoJsTools/" + path;
             List<String> downloadFileUrlArr = new ArrayList<String>();
             downloadFileUrlArr.add(downLoadUrl);
 
             // 转换后的web目录
-            String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf("\\"),webDirPath.length()).replaceAll("\\\\","/");
+            String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf(File.separator),webDirPath.length()).replaceAll("\\\\","/");
 
             // 项目名称
             String projectName = webDirPathConvert.substring(webDirPathConvert.lastIndexOf("/"),webDirPathConvert.length());
@@ -161,10 +151,21 @@ public class FileListener extends FileAlterationListenerAdaptor {
      */
     @Override
     public void onDirectoryCreate(File directory) {
+        if(checkIsIgnore(directory.getAbsolutePath())){
+            return;
+        }
         log.info("[Create Directory] : {}",directory.getAbsolutePath());
         String filePath = directory.getAbsolutePath();
+
+        // 转换后的web目录
+        String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf(File.separator),webDirPath.length()).replaceAll("\\\\","/");
+
+        // 项目名称
+        String projectName = webDirPathConvert.substring(webDirPathConvert.lastIndexOf("/"),webDirPathConvert.length());
+
+
         // 本地路径
-        String localFileUrl = "/sdcard/"+this.phoneDirPath + filePath.replace(webDirPath,"").replaceAll("\\\\","/" + "/") + "/";
+        String localFileUrl = "/sdcard/"+this.phoneDirPath + "/" + projectName + filePath.replace(webDirPath,"").replaceAll("\\\\","/" + "/") + "/";
         try {
             // 删除目录
             AutoJsWsServerEndpoint.execRemoteScript(this.deviceUUID,"files.createWithDirs(\""+localFileUrl+"\")",false,"","");
@@ -180,6 +181,9 @@ public class FileListener extends FileAlterationListenerAdaptor {
      */
     @Override
     public void onDirectoryChange(File directory) {
+        if(checkIsIgnore(directory.getAbsolutePath())){
+            return;
+        }
         log.info("[Changed Directory] : {}",directory.getAbsolutePath());
     }
 
@@ -190,10 +194,20 @@ public class FileListener extends FileAlterationListenerAdaptor {
      */
     @Override
     public void onDirectoryDelete(File directory) {
+        if(checkIsIgnore(directory.getAbsolutePath())){
+            return;
+        }
         log.info("[Delete Directory] : {}",directory.getAbsolutePath());
         String filePath = directory.getAbsolutePath();
+
+        // 转换后的web目录
+        String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf(File.separator),webDirPath.length()).replaceAll("\\\\","/");
+
+        // 项目名称
+        String projectName = webDirPathConvert.substring(webDirPathConvert.lastIndexOf("/"),webDirPathConvert.length());
+
         // 本地路径
-        String localFileUrl = "/sdcard/"+this.phoneDirPath + filePath.replace(webDirPath,"").replaceAll("\\\\","/" + "/");
+        String localFileUrl = "/sdcard/"+this.phoneDirPath + "/" + projectName +  filePath.replace(webDirPath,"").replaceAll("\\\\","/" + "/");
         try {
             // 删除目录
             AutoJsWsServerEndpoint.execRemoteScript(this.deviceUUID,"files.remove(\""+localFileUrl+"\")",false,"","");
@@ -203,12 +217,40 @@ public class FileListener extends FileAlterationListenerAdaptor {
     }
 
     /**
+     * 返回是否忽略
+     * @param filePath
+     * @return
+     */
+    private boolean checkIsIgnore(String filePath){
+        if(!ignorePathArr.contains("start.bat")){
+            ignorePathArr.add("start.bat");
+        }
+        if(!ignorePathArr.contains("start.sh")){
+            ignorePathArr.add("start.sh");
+        }
+        if(!ignorePathArr.contains("stop.bat")){
+            ignorePathArr.add("stop.bat");
+        }
+        if(!ignorePathArr.contains("stop.sh")){
+            ignorePathArr.add("stop.sh");
+        }
+        // 满足忽略条件
+        long count = ignorePathArr.stream().filter(ignorePath->{
+            return StrHelper.replaceSystemSeparator(filePath).startsWith(webDirPath + File.separator + StrHelper.replaceSystemSeparator(ignorePath));
+        }).count();
+        return count > 0;
+    }
+
+    /**
      * File created Event.
      *
      * @param file The file created (ignored)
      */
     @Override
     public void onFileCreate(File file) {
+        if(checkIsIgnore(file.getAbsolutePath())){
+            return;
+        }
         log.info("[Created File] : {}",file.getAbsolutePath());
         syncSingleFile(file.getAbsolutePath());
     }
@@ -220,6 +262,9 @@ public class FileListener extends FileAlterationListenerAdaptor {
      */
     @Override
     public void onFileChange(File file) {
+        if(checkIsIgnore(file.getAbsolutePath())){
+            return;
+        }
         log.info("[MODIFY File] : {}",file.getAbsolutePath());
         syncSingleFile(file.getAbsolutePath());
     }
@@ -231,10 +276,20 @@ public class FileListener extends FileAlterationListenerAdaptor {
      */
     @Override
     public void onFileDelete(File file) {
+        if(checkIsIgnore(file.getAbsolutePath())){
+           return;
+        }
         log.info("[Deleted File] : {}",file.getAbsolutePath());
         String filePath = file.getAbsolutePath();
+
+        // 转换后的web目录
+        String webDirPathConvert = webDirPath.substring(webDirPath.lastIndexOf(File.separator),webDirPath.length()).replaceAll("\\\\","/");
+
+        // 项目名称
+        String projectName = webDirPathConvert.substring(webDirPathConvert.lastIndexOf("/"),webDirPathConvert.length());
+
         // 本地路径
-        String localFileUrl = "/sdcard/"+this.phoneDirPath + filePath.replace(webDirPath,"").replaceAll("\\\\","/");
+        String localFileUrl = "/sdcard/"+this.phoneDirPath + "/" + projectName + filePath.replace(webDirPath,"").replaceAll("\\\\","/");
         try {
             // 删除文件
             AutoJsWsServerEndpoint.execRemoteScript(this.deviceUUID,"files.remove(\""+localFileUrl+"\")",false,"","");

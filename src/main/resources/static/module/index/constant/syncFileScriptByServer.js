@@ -47,6 +47,33 @@ let selfScriptName = params.selfScriptName || "";
 // 忽略目录
 let ignorePathArr = params.ignorePathArr || [];
 
+if (selfScriptName && selfScriptName.indexOf('_') !== -1 && selfScriptName.indexOf('.') !== -1) {
+    // 文件名称 去除后面的毫秒数
+    let syncFileName = selfScriptName.substring(0, selfScriptName.indexOf('_'));
+    // 当前毫秒数
+    let nowTime = new Date().getTime();
+    // 获取当前目录全部文件
+    let listFileArr = files.listDir(files.cwd());
+    console.log(listFileArr);
+    // 过滤以当前文件名开头的 js文件
+    listFileArr = listFileArr.filter(item => item.startsWith(syncFileName + "_") && item.endsWith(".js"));
+    // 五分钟
+    let fiveBeforeTime = 5 * 60 * 1000;
+    // 过滤5分钟前的数据
+    listFileArr = listFileArr.filter(item => {
+        let dateTime = item.replace(syncFileName + "_", "").replace(".js", "");
+        try {
+            // 删除5分钟前生成的 同步文件
+            if (nowTime - Number(dateTime) >  fiveBeforeTime) {
+                // 删除文件
+                files.remove(files.join(files.cwd(), item));
+            }
+        } catch (e) {
+        }
+    });
+}
+
+
 let showProcess = showProcess_param;
 let utilsObj = {};
 let startTimeLong = new Date().getTime();
@@ -329,10 +356,10 @@ let interval = setInterval(() => {
            utilsObj.request(serverPath + "/device/completeSyncFile?syncFileUUID="+syncFileUUID, 'GET', "", (res, error) => {
                // 删除自己
                if(selfScriptName){
-                    files.remove(files.cwd()+"/" + selfScriptName);
+                    // files.remove(files.cwd()+"/" + selfScriptName);
                }
+               clearInterval(interval);
            });
         });
-        clearInterval(interval);
     }
 }, 300);

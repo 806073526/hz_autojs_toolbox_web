@@ -557,26 +557,44 @@ public class AutoJsWsServerEndpoint {
         // 运行手机端临时目录的 项目
         // String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
 
-        System.out.println("初始化运行bat脚本");
-        // 初始化启动脚本
-        String sourceStr = "@echo off\n" +
-                "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
-                "rem 【同步+运行】 ./start.bat\n" +
-                "rem 【仅运行】 ./start.bat false\n" +
-                "set isSyncProject=%%1\n" +
-                "if \"%%isSyncProject%%\"==\"\" set isSyncProject=true\n" +
-                "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%";
-        // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO
-        String startBatContent =  String.format(sourceStr,deviceUUID,getDevicePassword(deviceUUID),serverUrl,deviceUUID,(StrHelper.encode(webScriptDirPath.replaceAll("\\\\","/")).replaceAll("%","%%")));
-        writeBatFile(webScriptDirPath,"start.bat",startBatContent);
+        if (UploadPathHelper.isWindowsSystem()) {
+            // 初始化启动脚本
+            String sourceStr = "@echo off\n" +
+                    "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
+                    "rem 【同步+运行】 ./start.bat\n" +
+                    "rem 【仅运行】 ./start.bat false\n" +
+                    "set isSyncProject=%%1\n" +
+                    "if \"%%isSyncProject%%\"==\"\" set isSyncProject=true\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%";
+            // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO
+            String startBatContent = String.format(sourceStr, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID, (StrHelper.encode(webScriptDirPath.replaceAll("\\\\", "/")).replaceAll("%", "%%")));
+            writeBatFile(webScriptDirPath, "start.bat", startBatContent);
 
-        // 初始化停止脚本
-        String sourceStr2 = "@echo off\n" +
-                "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
-                "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStopProject";
-        String stopBatContent = String.format(sourceStr2,deviceUUID,getDevicePassword(deviceUUID),serverUrl);
-        writeBatFile(webScriptDirPath,"stop.bat",stopBatContent);
-        System.out.println("初始化完成");
+            // 初始化停止脚本
+            String sourceStr2 = "@echo off\n" +
+                    "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStopProject";
+            String stopBatContent = String.format(sourceStr2, deviceUUID, getDevicePassword(deviceUUID), serverUrl);
+            writeBatFile(webScriptDirPath, "stop.bat", stopBatContent);
+        } else {
+            // 初始化启动脚本
+            String startShContent = "#!/bin/bash\n" +
+                    "# 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65\n" +
+                    "# 【同步+运行】 ./start.sh\n" +
+                    "# 【仅运行】 ./start.sh false\n" +
+                    "isSyncProject=${1:-true}\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\"  \"%s/device/execStartWebProject?deviceUUID=%s&webScriptDirPath=%s&isSyncProject=$isSyncProject\"";
+            // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO
+            String startShContentFormatted = String.format(startShContent, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID, (StrHelper.encode(webScriptDirPath.replaceAll("\\\\", "/"))));
+            writeBatFile(webScriptDirPath, "start.sh", startShContentFormatted);
+
+            // 初始化停止脚本
+            String stopShContent = "#!/bin/bash\n" +
+                    "# 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" \"%s/device/execStopProject\"";
+            String stopShContentFormatted = String.format(stopShContent, deviceUUID, getDevicePassword(deviceUUID), serverUrl);
+            writeBatFile(webScriptDirPath, "stop.sh", stopShContentFormatted);
+        }
     }
 
     private static void writeBatFile(String webScriptDirPath, String fileName,String fileContent){
@@ -584,7 +602,7 @@ public class AutoJsWsServerEndpoint {
         String location = "";
         try {
             String tempPath = UploadPathHelper.getUploadPath(uploadPath);
-            location = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + webScriptDirPath + File.separator + fileName;
+            location = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(webScriptDirPath) + File.separator + fileName;
             File fileStart = new File(location);
             if(!fileStart.exists()){
                 fileStart.createNewFile();

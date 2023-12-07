@@ -1,6 +1,7 @@
 package com.zjh.zxw.websocket;
 
 import com.zjh.zxw.common.util.StrHelper;
+import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,8 +46,42 @@ public class IPUtil {
         }
         return ip;
     }
+    public static String getMacRealIp(){
+        String wlanIp = "";
+        String otherIp = "";
+        try {
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (allNetInterfaces.hasMoreElements()) {
+                NetworkInterface netInterface = allNetInterfaces.nextElement();
+                if (netInterface.isLoopback() || netInterface.isVirtual() || !netInterface.isUp()) {
+                    continue;
+                }
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress ip = addresses.nextElement();
+                    if (ip instanceof Inet4Address) {
+                        if (netInterface.getName().toLowerCase().contains("en")) { // 以en开头的通常是以太网接口
+                            otherIp = ip.getHostAddress();
+                        } else if (netInterface.getName().toLowerCase().contains("wl")) { // 以wl开头的通常是无线网接口
+                            wlanIp = ip.getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return StringUtils.isNotBlank(wlanIp) ? wlanIp : otherIp;
+    }
+
 
     public static String getRealIP() {
+        String result = "";
+        // 兼容非windows系统
+        if(!UploadPathHelper.isWindowsSystem()){
+            result = getMacRealIp();
+            return result;
+        }
         String wlanIp = "";
         String otherIp = "";
         try {
@@ -85,7 +120,8 @@ public class IPUtil {
         } catch (SocketException e) {
             e.getMessage();
         }
-        return StringUtils.isNotBlank(wlanIp) ? wlanIp : otherIp;
+        result = StringUtils.isNotBlank(wlanIp) ? wlanIp : otherIp;
+        return result;
     }
 
 }
