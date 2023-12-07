@@ -532,7 +532,7 @@ public class AutoJsWsServerEndpoint {
         String tempPath = UploadPathHelper.getUploadPath(uploadPath);
         File ignoreFile = new File((tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(webScriptDirPath) + File.separator + fileName);
         if(!ignoreFile.exists()){
-            writeBatFile(webScriptDirPath,fileName,"#请填写需要忽略的目录 可以写多级目录 每个目录占一行 #表示注释不生效 示例如下: \n#node_modules\ngit\nidea\nvscode");
+            writeBatFile(webScriptDirPath,fileName,"#请填写需要忽略的目录 可以写多级目录 每个目录占一行 #表示注释不生效 示例如下: \n#node_modules\n.git\n.idea\n.vscode");
             System.out.println("初始化同步忽略文件完成");
         }
     }
