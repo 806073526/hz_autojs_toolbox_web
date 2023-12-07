@@ -3103,6 +3103,10 @@ export default {
                     url: getContext() + "/device/syncWebProjectToPhone",
                     type: "GET",
                     dataType: "json",
+                    headers: {
+                        "deviceUUID": this.deviceInfo.deviceUuid,
+                        "devicePassword": this.deviceInfo.devicePassword
+                    },
                     data: {
                         "deviceUUID":this.deviceInfo.deviceUuid,
                         "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath,
@@ -3364,6 +3368,10 @@ export default {
                 url: getContext() + "/device/syncWebProjectToPhone",
                 type: "GET",
                 dataType: "json",
+                headers: {
+                    "deviceUUID": this.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
+                },
                 data: {
                     "deviceUUID":this.deviceInfo.deviceUuid,
                     "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath,
@@ -3395,6 +3403,10 @@ export default {
                 url: getContext() + "/device/execStartWebProject",
                 type: "GET",
                 dataType: "json",
+                headers: {
+                    "deviceUUID": this.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
+                },
                 data: {
                     "deviceUUID": this.deviceInfo.deviceUuid,
                     "webScriptDirPath": this.deviceInfo.deviceUuid + this.webSyncPath, //  fb375905dd112762/200wLOGO
@@ -3423,7 +3435,8 @@ export default {
                 type: "GET",
                 dataType: "json",
                 headers: {
-                    "deviceUUID": this.deviceInfo.deviceUuid
+                    "deviceUUID": this.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
                 },
                 data: {
                     "deviceUUID": this.deviceInfo.deviceUuid

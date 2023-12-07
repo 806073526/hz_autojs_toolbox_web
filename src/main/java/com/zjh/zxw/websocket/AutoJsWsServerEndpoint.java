@@ -64,6 +64,13 @@ public class AutoJsWsServerEndpoint {
     // 项目文件监听变化间隔
     private static int interval;
 
+    // 默认项目路径 是否定期刷新 bat文件 1是 0否  如果只要启动时生成一次 设置0即可
+    // ps:定期刷新会同步设备的操作访问到bat中,如果不开定期刷新,且后期修改设备访问密码,则需要手动同步密码到bat中
+    private static int intervalGenerateBat;
+
+    // 默认项目路径 是否自动开启监听 1是 0否
+    private static int autoOpenListener;
+
     // 默认加入监听项目 是否变化后自动运行 1是 0否
     private static int checkChangeAutoRestart;
 
@@ -86,6 +93,17 @@ public class AutoJsWsServerEndpoint {
         defaultProjectPaths = StrHelper.decode(defaultProjectPathsParam);
     }
 
+    @Value("${com.zjh.webFileListener.intervalGenerateBat:1}")
+    public void setIntervalGenerateBat(int intervalGenerateBatParam){
+        intervalGenerateBat = intervalGenerateBatParam;
+    }
+
+    @Value("${com.zjh.webFileListener.autoOpenListener:1}")
+    public void setAutoOpenListener(int autoOpenListenerParam){
+        autoOpenListener = autoOpenListenerParam;
+    }
+
+
     @Value("${com.zjh.webFileListener.interval:2}")
     public void setInterval(int intervalParam){
         interval = intervalParam;
@@ -103,6 +121,12 @@ public class AutoJsWsServerEndpoint {
 
     // 同步文件map
     private static ConcurrentHashMap<String, String> syncFileMap = new ConcurrentHashMap<String,String>();
+
+    // 已生成bat文件的项目路径列表
+    private static List<String> alreadyGenerateBatProjectPathList = new ArrayList<>();
+
+    // 已开启监听的项目路径列表
+    private static List<String> alreadyListenerBatProjectPathList = new ArrayList<>();
 
     private static DozerUtils dozerUtils;
 
@@ -153,6 +177,14 @@ public class AutoJsWsServerEndpoint {
         }
         AutoJsSession session = sessionMap.get(deviceUUID);
         return StringUtils.isNotBlank(session.getPassword());
+    }
+
+    private static String getDevicePassword(String deviceUUID){
+        if(!sessionMap.containsKey(deviceUUID)){
+            return "";
+        }
+        AutoJsSession session = sessionMap.get(deviceUUID);
+        return StrHelper.getObjectValue(session.getPassword());
     }
 
 
@@ -272,47 +304,6 @@ public class AutoJsWsServerEndpoint {
             // 记录
             curConnectMap.put(deviceUuid,LocalDateTime.now());
         }
-        // 设置监听目录不为空
-        if(StringUtils.isNotBlank(defaultProjectPaths)){
-            // 默认项目列表
-            List<String> defaultProjectPathList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(defaultProjectPaths,","));
-
-            // 遍历项目路径
-            for (String projectPath : defaultProjectPathList) {
-                System.out.println("默认启动项目路径："+projectPath);
-                if(!projectPath.startsWith(deviceUuid)){
-                    continue;
-                }
-                // 初始化项目运行bat脚本
-                initWebProjectBat(deviceUuid,"",projectPath,"",true);
-
-                // 初始化同步忽略文件
-                AutoJsWsServerEndpoint.initWebProjectIgnore(projectPath);
-
-                System.out.println("开启文件监听");
-                String webDirPath = projectPath.replaceFirst(deviceUuid,"");
-                // 请求开启监听接口
-                String startListenerInterface = "http://localhost:" + port + "/device/startFileChangeListenerAndSync?deviceUUID="+deviceUuid+"&webDirPath="+StrHelper.encode(webDirPath)+"&checkChangeAutoRestart="+(checkChangeAutoRestart == 1);
-                URL url = new URL(startListenerInterface);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                // 设置连接超时时间（可选）
-                connection.setConnectTimeout(5000);
-                // 建立实际连接
-                connection.connect();
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-                System.out.println("返回结果："+response.toString());
-            }
-
-        }
-
 
         // 发送指令 给所以连接了的web端  推送app连接成功消息
         AjMessageDTO ajMessageDTO = new AjMessageDTO();
@@ -402,6 +393,13 @@ public class AutoJsWsServerEndpoint {
                     this.autoJsSession.setOtherPropertyJson(newOtherPropertyJson);
                     // 设置到本地缓存
                     sessionMap.put(deviceUUID, this.autoJsSession);
+
+                    try {
+                        // 默认项目处理
+                        defaultProjectHandler(deviceUUID);
+                    }catch (Exception e){
+                        log.error("默认项目处理出现异常：",e);
+                    }
                 }
             // 更新业务key
             } else if("updateServiceKey".equals(action)){
@@ -415,6 +413,61 @@ public class AutoJsWsServerEndpoint {
                     // 设置到本地缓存
                     appMessageMap.put(deviceUUID+"_"+serviceKey,serviceValue);
                 }
+            }
+        }
+    }
+
+    /**
+     * 默认项目处理
+     * @param deviceUUID
+     */
+    private static void defaultProjectHandler(String deviceUUID) throws Exception {
+        // 设置监听目录不为空
+        if(StringUtils.isNotBlank(defaultProjectPaths)){
+            // 默认项目列表
+            List<String> defaultProjectPathList = new ArrayList<String>(StrHelper.str2ArrayListBySplit(defaultProjectPaths,","));
+
+            // 遍历项目路径
+            for (String projectPath : defaultProjectPathList) {
+                if(!projectPath.startsWith(deviceUUID)){
+                    continue;
+                }
+                // 开启了定时刷新 或者 项目未执行过的时候
+                if(intervalGenerateBat == 1 || !alreadyGenerateBatProjectPathList.contains(projectPath)) {
+                    // 初始化项目运行bat脚本
+                    initWebProjectBat(deviceUUID,"",projectPath,"");
+                    // 初始化同步忽略文件
+                    AutoJsWsServerEndpoint.initWebProjectIgnore(projectPath);
+                    // 添加到已执行
+                    alreadyGenerateBatProjectPathList.add(projectPath);
+                }
+
+                // 开启了自动监听 且 项目未执行过操作
+                if(autoOpenListener == 1 && !alreadyListenerBatProjectPathList.contains(projectPath)){
+                    System.out.println("开启文件监听");
+                    String webDirPath = projectPath.replaceFirst(deviceUUID,"");
+                    // 请求开启监听接口
+                    String startListenerInterface = "http://localhost:" + port + "/device/startFileChangeListenerAndSync?deviceUUID="+deviceUUID+"&webDirPath="+StrHelper.encode(webDirPath)+"&checkChangeAutoRestart="+(checkChangeAutoRestart == 1);
+                    URL url = new URL(startListenerInterface);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    // 设置连接超时时间（可选）
+                    connection.setConnectTimeout(5000);
+                    // 建立实际连接
+                    connection.connect();
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String inputLine;
+                    StringBuffer response = new StringBuffer();
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    in.close();
+                    System.out.println("返回结果："+response.toString());
+                    // 添加到已执行
+                    alreadyListenerBatProjectPathList.add(projectPath);
+                }
+
             }
         }
     }
@@ -490,10 +543,9 @@ public class AutoJsWsServerEndpoint {
      * @param serverUrl
      * @param webScriptDirPath  //  fb375905dd112762/200wLOGO
      * @param tempPhoneTargetPath // ""
-     * @param isSyncProject // true
      * @throws Exception
      */
-    public static void initWebProjectBat(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath,Boolean isSyncProject) throws Exception{
+    public static void initWebProjectBat(String deviceUUID,String serverUrl,String webScriptDirPath,String tempPhoneTargetPath) throws Exception{
         if(StringUtils.isBlank(tempPhoneTargetPath)){
             // 手机端默认 临时目录
             tempPhoneTargetPath = "appSync/tempRemoteScript";
@@ -513,16 +565,16 @@ public class AutoJsWsServerEndpoint {
                 "rem 【仅运行】 ./start.bat false\n" +
                 "set isSyncProject=%%1\n" +
                 "if \"%%isSyncProject%%\"==\"\" set isSyncProject=true\n" +
-                "curl %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%";
+                "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%";
         // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO
-        String startBatContent =  String.format(sourceStr,serverUrl,deviceUUID,(StrHelper.encode(webScriptDirPath.replaceAll("\\\\","/")).replaceAll("%","%%")));
+        String startBatContent =  String.format(sourceStr,deviceUUID,getDevicePassword(deviceUUID),serverUrl,deviceUUID,(StrHelper.encode(webScriptDirPath.replaceAll("\\\\","/")).replaceAll("%","%%")));
         writeBatFile(webScriptDirPath,"start.bat",startBatContent);
 
         // 初始化停止脚本
         String sourceStr2 = "@echo off\n" +
                 "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
-                "curl -H \"deviceUUID:%s\" %s/device/execStopProject";
-        String stopBatContent = String.format(sourceStr2,deviceUUID,serverUrl);
+                "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStopProject";
+        String stopBatContent = String.format(sourceStr2,deviceUUID,getDevicePassword(deviceUUID),serverUrl);
         writeBatFile(webScriptDirPath,"stop.bat",stopBatContent);
         System.out.println("初始化完成");
     }

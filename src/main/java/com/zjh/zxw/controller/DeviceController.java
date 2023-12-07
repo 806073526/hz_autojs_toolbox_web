@@ -269,10 +269,9 @@ public class DeviceController extends BaseController {
     public R<Boolean> initWebProjectBat(@RequestParam("deviceUUID") String deviceUUID,
                                     @RequestParam("webScriptDirPath") String webScriptDirPath,
                                     @RequestParam(value = "serverUrl",required = false) String serverUrl,
-                                    @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath,
-                                    @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
+                                    @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath) {
         try {
-            AutoJsWsServerEndpoint.initWebProjectBat(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,isSyncProject);
+            AutoJsWsServerEndpoint.initWebProjectBat(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath);
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
