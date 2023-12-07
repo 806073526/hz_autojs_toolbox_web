@@ -530,7 +530,7 @@ public class AutoJsWsServerEndpoint {
     public static void initWebProjectIgnore(String webScriptDirPath) throws Exception{
         String fileName = ".syncignore";
         String tempPath = UploadPathHelper.getUploadPath(uploadPath);
-        File ignoreFile = new File((tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + webScriptDirPath + File.separator + fileName);
+        File ignoreFile = new File((tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(webScriptDirPath) + File.separator + fileName);
         if(!ignoreFile.exists()){
             writeBatFile(webScriptDirPath,fileName,"#请填写需要忽略的目录 可以写多级目录 每个目录占一行 #表示注释不生效 示例如下: \n#node_modules\ngit\nidea\nvscode");
             System.out.println("初始化同步忽略文件完成");
@@ -713,6 +713,7 @@ public class AutoJsWsServerEndpoint {
         String scriptDirPath =  "/sdcard/" + tempPhoneTargetPath + projectName;
 
         // 运行项目
+        String finalMainScriptPath = mainScriptPath;
         Runnable runnable = ()->{
             try {
                 String remoteScript = "";
@@ -720,7 +721,7 @@ public class AutoJsWsServerEndpoint {
                 remoteScript += "if(files.exists(\""+scriptFilePath+"\")){\n" +
                         "engines.execScriptFile(\""+scriptFilePath+"\",{path:[\""+scriptDirPath+"\"]});\n" +
                         "} else {\n" +
-                            "toastLog(\"项目不存在,请先初始化项目\");\n" +
+                            "toastLog(\"项目运行文件"+ finalMainScriptPath +"不存在,请先初始化项目(或者检查project.json的main配置)\");\n" +
                         "}";
                 // 执行远程脚本  运行项目
                 execRemoteScript(deviceUUID,remoteScript,false,"","");
