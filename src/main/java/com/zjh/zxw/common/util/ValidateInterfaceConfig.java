@@ -13,7 +13,9 @@ public class ValidateInterfaceConfig {
             "/device/syncWebFileToPhone", // 同步文件到手机
             "/device/syncWebProjectToPhone", // 同步项目到手机
             "/device/execStartWebProject", // 运行项目
-            "/device/execStopProject" // 停止项目
+            "/device/execStopProject", // 停止项目
+            "/device/startOnlineLog",// 开启实时日志
+            "/device/stopOnlineLog"// 停止实时日志
     );
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
 

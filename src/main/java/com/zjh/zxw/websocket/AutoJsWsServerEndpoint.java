@@ -15,7 +15,6 @@ import com.zjh.zxw.domain.dto.EmailConfig;
 import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
 import com.zjh.zxw.dozer.DozerUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -473,6 +472,22 @@ public class AutoJsWsServerEndpoint {
     }
 
     /**
+     * 开启在线实时日志
+     * @param deviceUUID 设备uuid
+     * @param maxLineCount 最大行数
+     * @param isOnlyStop 仅停止
+     * @throws Exception
+     */
+    public static void execOnlineLogScript(String deviceUUID,int maxLineCount,Boolean isOnlyStop) throws Exception {
+        Map<String,String> params = new HashMap<>();
+        params.put("maxLineCount",StrHelper.getObjectValue(maxLineCount));
+        params.put("onlyStop",isOnlyStop ? "true": "");
+        String remoteScript = getStartOnlineLogScriptContent(JSONObject.toJSONString(params));
+        execRemoteScript(deviceUUID,remoteScript,false,"","");
+    }
+
+
+    /**
      * 以独立引擎模式 执行 同步文件脚本
      * @return
      * @throws Exception
@@ -558,6 +573,30 @@ public class AutoJsWsServerEndpoint {
         // String projectName = webScriptDirPath.substring(webScriptDirPath.lastIndexOf("/"),webScriptDirPath.length());
 
         if (UploadPathHelper.isWindowsSystem()) {
+            String localLogPath = "";
+            String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+            localLogPath = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + deviceUUID + File.separator + "onlineLog.log";
+            File file = new File(localLogPath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+
+            int maxLineCount = 30;
+            // 初始化日志脚本 显示
+            String sourceStr0 = "@echo off\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/startOnlineLog?deviceUUID=%s^&maxLineCount=%s\n"+
+                    ":monitor\n" +
+                    "powershell -Command \"$filePath = '%s'; $lastWriteTime = (Get-Item $filePath).LastWriteTime; while ($true) { $newWriteTime = (Get-Item $filePath).LastWriteTime; if ($newWriteTime -ne $lastWriteTime) { Clear-Host; Get-Content -Path $filePath -Tail %d -Encoding UTF8; $lastWriteTime = $newWriteTime; } Start-Sleep -Seconds 1; }\"\n" +
+                    "goto monitor";
+            String logBatContent = String.format(sourceStr0, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID ,maxLineCount, localLogPath, maxLineCount);
+            writeBatFile(webScriptDirPath, "showLog.bat", logBatContent);
+
+            // 初始化日志脚本 隐藏
+            String sourceStr0_hide = "@echo off\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/stopOnlineLog?deviceUUID=%s";
+            String logBatContent_hide = String.format(sourceStr0_hide, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID ,maxLineCount, localLogPath, maxLineCount);
+            writeBatFile(webScriptDirPath, "hideLog.bat", logBatContent_hide);
+
             // 初始化启动脚本
             String sourceStr = "@echo off\n" +
                     "rem 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65 \n" +
@@ -565,7 +604,8 @@ public class AutoJsWsServerEndpoint {
                     "rem 【仅运行】 ./start.bat false\n" +
                     "set isSyncProject=%%1\n" +
                     "if \"%%isSyncProject%%\"==\"\" set isSyncProject=true\n" +
-                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%";
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/execStartWebProject?deviceUUID=%s^&webScriptDirPath=%s^&isSyncProject=%%isSyncProject%%\n";
+
             // http://localhost:9998  fb375905dd112762  fb375905dd112762/200wLOGO
             String startBatContent = String.format(sourceStr, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID, (StrHelper.encode(webScriptDirPath.replaceAll("\\\\", "/")).replaceAll("%", "%%")));
             writeBatFile(webScriptDirPath, "start.bat", startBatContent);
@@ -577,6 +617,31 @@ public class AutoJsWsServerEndpoint {
             String stopBatContent = String.format(sourceStr2, deviceUUID, getDevicePassword(deviceUUID), serverUrl);
             writeBatFile(webScriptDirPath, "stop.bat", stopBatContent);
         } else {
+            String localLogPath = "";
+            String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+            localLogPath = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + deviceUUID + File.separator + "onlineLog.log";
+            File file = new File(localLogPath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+
+            int maxLineCount = 30;
+            // 初始化日志脚本 显示
+            String sourceStr0 = "@echo off\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/startOnlineLog?deviceUUID=%s^&maxLineCount=%s\n"+
+                    "tail -f -n %d %s";
+            String logBatContent = String.format(sourceStr0, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID ,maxLineCount, maxLineCount, localLogPath);
+            writeBatFile(webScriptDirPath, "showLog.sh", logBatContent);
+
+
+            // 初始化日志脚本 隐藏
+            String sourceStr0_hide = "@echo off\n" +
+                    "curl -H \"deviceUUID:%s\" -H \"devicePassword:%s\" %s/device/stopOnlineLog?deviceUUID=%s^&maxLineCount=%s\n"+
+                    "tail -f -n %d %s";
+            String logBatContent_hide = String.format(sourceStr0_hide, deviceUUID, getDevicePassword(deviceUUID), serverUrl, deviceUUID ,maxLineCount, maxLineCount, localLogPath);
+            writeBatFile(webScriptDirPath, "hideLog.sh", logBatContent_hide);
+
+
             // 初始化启动脚本
             String startShContent = "#!/bin/bash\n" +
                     "# 可以在vscode中设置快捷键 详情见http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box/help/65\n" +
@@ -597,7 +662,7 @@ public class AutoJsWsServerEndpoint {
         }
     }
 
-    private static void writeBatFile(String webScriptDirPath, String fileName,String fileContent){
+    private static void writeBatFile(String webScriptDirPath, String fileName,String fileContent) {
         FileOutputStream fos = null;
         String location = "";
         try {
@@ -611,9 +676,14 @@ public class AutoJsWsServerEndpoint {
             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             osw.write(fileContent);
             osw.close();
-            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -814,6 +884,38 @@ public class AutoJsWsServerEndpoint {
                 "engines.execScriptFile(remoteScriptPath,{path:[\""+scriptDirPath+"\"]});\n";
         return remoteScript;
     }
+
+
+    /**
+     * 获取 实时日志 脚本原始内容 并替换参数
+     * @param paramJson
+     * @return
+     * @throws Exception
+     */
+    private static String getStartOnlineLogScriptContent(String paramJson) throws Exception {
+        String sourceJsonStr = "";
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/startOnlineLogByServer.js?t="+(new Date().getTime());
+        URL url = new URL(syncFilePath);
+        // 打开连接
+        URLConnection connection = url.openConnection();
+        // 设置连接超时时间（可选）
+        connection.setConnectTimeout(5000);
+        // 建立实际连接
+        connection.connect();
+        // 读取页面内容
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder content = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+        sourceJsonStr = content.toString();
+        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
+        return sourceJsonStr;
+    }
+
+
 
     /**
      * 获取同步文件脚本原始内容 并替换参数

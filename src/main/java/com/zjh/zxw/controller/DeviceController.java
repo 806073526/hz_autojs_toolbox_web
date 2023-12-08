@@ -281,6 +281,47 @@ public class DeviceController extends BaseController {
         }
     }
 
+    /**
+     * 开启实时日志
+     * @param deviceUUID 设备uuid
+     * @param maxLineCount 最大行数
+     * @return
+     */
+    @ApiOperation(value = "开启实时日志", notes = "开启实时日志")
+    @GetMapping("/startOnlineLog")
+    public R<Boolean> startOnlineLog(@RequestParam("deviceUUID") String deviceUUID,
+                                        @RequestParam("maxLineCount") int maxLineCount){
+        try {
+            AutoJsWsServerEndpoint.execOnlineLogScript(deviceUUID,maxLineCount,false);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("开启实时日志失败！请联系管理员");
+        }
+    }
+
+    /**
+     * 停止实时日志
+     * @param deviceUUID 设备uuid
+     * @return
+     */
+    @ApiOperation(value = "停止实时日志", notes = "停止实时日志")
+    @GetMapping("/stopOnlineLog")
+    public R<Boolean> stopOnlineLog(@RequestParam("deviceUUID") String deviceUUID){
+        try {
+            AutoJsWsServerEndpoint.execOnlineLogScript(deviceUUID,20,true);
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("停止实时日志失败！请联系管理员");
+        }
+    }
+
+
 
     /**
      *

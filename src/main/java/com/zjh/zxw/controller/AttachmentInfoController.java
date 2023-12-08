@@ -301,6 +301,40 @@ public class AttachmentInfoController extends BaseController {
             ajMessageDTO.setMessage(deviceUUID);
             // 推送消息通知到web端页面
             AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice("","",ajMessageDTO);
+
+            // 写入本地文件
+            Thread thread = new Thread(()->{
+                // 获取日志文件内容
+                String logJson = StrHelper.getObjectValue(mapParam.get("logJson"));
+                String logJsonStr = new String(Base64.getDecoder().decode(logJson.getBytes()));
+                logJsonStr = StrHelper.decode(logJsonStr);
+
+                FileOutputStream fos = null;
+                String location = "";
+                try {
+                    String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+                    location = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator + deviceUUID + File.separator + "onlineLog.log";
+                    File fileStart = new File(location);
+                    if(!fileStart.exists()){
+                        fileStart.createNewFile();
+                    }
+                    fos  = new FileOutputStream(location);
+                    OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+                    // 处理换行符
+                    logJsonStr = logJsonStr.replaceAll("\\\\n","\n");
+                    osw.write(logJsonStr);
+                    osw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        fos.close();
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
         }
 
         return success(true);

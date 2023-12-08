@@ -234,6 +234,18 @@ public class FileListener extends FileAlterationListenerAdaptor {
         if(!ignorePathArr.contains("stop.sh")){
             ignorePathArr.add("stop.sh");
         }
+        if(!ignorePathArr.contains("showLog.bat")){
+            ignorePathArr.add("showLog.bat");
+        }
+        if(!ignorePathArr.contains("showLog.sh")){
+            ignorePathArr.add("showLog.sh");
+        }
+        if(!ignorePathArr.contains("hideLog.bat")){
+            ignorePathArr.add("hideLog.bat");
+        }
+        if(!ignorePathArr.contains("hideLog.sh")){
+            ignorePathArr.add("hideLog.sh");
+        }
         // 满足忽略条件
         long count = ignorePathArr.stream().filter(ignorePath->{
             return StrHelper.replaceSystemSeparator(filePath).startsWith(webDirPath + File.separator + StrHelper.replaceSystemSeparator(ignorePath));

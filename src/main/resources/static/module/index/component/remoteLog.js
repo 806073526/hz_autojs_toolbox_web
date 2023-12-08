@@ -222,7 +222,10 @@ export default {
                         }
                         key.reset();
                     }
-                    watchFun();
+                    // 停止后就不继续监听了
+                    if(timerFlag){
+                        watchFun();
+                    }
                 }
                 watchFun();
             }
