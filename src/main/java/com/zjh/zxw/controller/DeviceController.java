@@ -67,6 +67,9 @@ public class DeviceController extends BaseController {
     @Value("${com.zjh.pageAccessPassword}")
     private String pageAccessPassword;
 
+    @Value("${com.zjh.onlineStatusAccessPwd:}")
+    private String onlineStatusAccessPwd;
+
     @Value("${com.zjh.uploadPath}")
     private String uploadPath;
 
@@ -670,8 +673,11 @@ public class DeviceController extends BaseController {
      */
     @ApiOperation(value = "查询在线状态", notes = "查询在线状态")
     @GetMapping("/queryOnlineStatus")
-    public R<List<Map<String, String>>> queryOnlineStatus() {
+    public R<List<Map<String, String>>> queryOnlineStatus(@RequestParam(value = "accessPwd",required = false) String accessPwd) {
         try {
+            if(!onlineStatusAccessPwd.equals(accessPwd)){
+                return fail("访问密码不正确");
+            }
             // 如果缓存里面没有
             if(MapUtils.isEmpty(onlineMachineMap)){
                 // 从本地文件读取
