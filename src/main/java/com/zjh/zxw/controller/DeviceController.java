@@ -172,7 +172,8 @@ public class DeviceController extends BaseController {
             List<String> syncIgnorePaths = new ArrayList<>();
             File ignoreFile = new File(uploadPath + File.separator +  "autoJsTools"  + File.separator + deviceUUID + File.separator + webDirPath + File.separator + ".syncignore");
             if(ignoreFile.exists()){
-                BufferedReader reader = new BufferedReader(new FileReader(ignoreFile));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ignoreFile), StandardCharsets.UTF_8));
+
                 String line;
                 while ((line = reader.readLine()) != null) {
                     // #表示注释 跳过
@@ -631,7 +632,7 @@ public class DeviceController extends BaseController {
         StringBuilder resultJson = new StringBuilder();
         try {
             if(fileStart.exists()){
-                BufferedReader reader = new BufferedReader(new FileReader(fileStart));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileStart), StandardCharsets.UTF_8));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     resultJson.append(line);

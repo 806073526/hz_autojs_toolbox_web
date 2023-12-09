@@ -1674,7 +1674,7 @@ public class AttachmentInfoController extends BaseController {
             String versionName = "";
             File projectFile = new File(packageTemplatePath + File.separator + "assets" + File.separator + "project" + File.separator + "project.json");
             if(projectFile.exists()){
-                BufferedReader reader = new BufferedReader(new FileReader(projectFile));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(projectFile), StandardCharsets.UTF_8));
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {

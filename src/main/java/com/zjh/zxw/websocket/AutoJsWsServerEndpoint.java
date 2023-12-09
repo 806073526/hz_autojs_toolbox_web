@@ -721,7 +721,7 @@ public class AutoJsWsServerEndpoint {
         List<String> syncIgnorePaths = new ArrayList<>();
         File ignoreFile = new File(uploadPath + File.separator +  "autoJsTools"  + File.separator + webScriptDirPath + File.separator + ".syncignore");
         if(ignoreFile.exists()){
-            BufferedReader reader = new BufferedReader(new FileReader(ignoreFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ignoreFile), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 // #表示注释 跳过
@@ -769,7 +769,7 @@ public class AutoJsWsServerEndpoint {
         String mainScriptPath = "main.js";
         File projectFile = new File(uploadPath + File.separator +  "autoJsTools"  + File.separator + webScriptDirPath + File.separator + "project.json");
         if(projectFile.exists()){
-            BufferedReader reader = new BufferedReader(new FileReader(projectFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(projectFile), StandardCharsets.UTF_8));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
