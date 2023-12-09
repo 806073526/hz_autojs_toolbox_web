@@ -665,9 +665,9 @@ public class DeviceController extends BaseController {
                     return 0;
                 }
                 if(time1.isAfter(time2)){
-                    return 1;
-                } else if(time1.isBefore(time2)){
                     return -1;
+                } else if(time1.isBefore(time2)){
+                    return 1;
                 } else {
                     return 0;
                 }
