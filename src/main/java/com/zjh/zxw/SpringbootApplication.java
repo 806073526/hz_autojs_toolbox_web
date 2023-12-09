@@ -131,7 +131,7 @@ public class SpringbootApplication {
                     }
                 }
             };
-            timer.schedule(task, 0, 1000 * 60);
+            timer.schedule(task, 0, 1000 * 60 * 5);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
