@@ -2,6 +2,7 @@ package com.zjh.zxw;
 
 import com.zjh.commonUtils;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
+import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import com.zjh.zxw.websocket.IPUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,7 +106,8 @@ public class SpringbootApplication {
                         if(!commonUtils.isWindowsSystem()){
                             systemType = commonUtils.isMacSystem() ? "mac" : "linux";
                         }
-                        String interfaceUrl = "http://tool.zjh336.cn/device/recordOnlineStatus?machineCode="+commonUtils.getMachineCode()+ "&systemType="+systemType;
+                        String curVersion = AutoJsWsServerEndpoint.getCurVersion();
+                        String interfaceUrl = "http://tool.zjh336.cn/device/recordOnlineStatus?machineCode="+commonUtils.getMachineCode()+ "&systemType="+systemType + "&curVersion="+curVersion;
                         URL url = new URL(interfaceUrl);
                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");

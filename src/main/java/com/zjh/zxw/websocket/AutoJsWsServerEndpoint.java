@@ -77,6 +77,14 @@ public class AutoJsWsServerEndpoint {
 
     public static String port;
 
+    // 设置版本号
+    public static String curVersion =  "V3.5.0";
+
+    public static String getCurVersion(){
+        return curVersion;
+    }
+
+
     @Value("${server.port:9998}")
     public void setPort(String portParam){
         port = portParam;

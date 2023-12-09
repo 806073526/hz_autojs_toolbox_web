@@ -76,6 +76,7 @@ public class DeviceController extends BaseController {
     private static int webFileListenerInterval;
 
 
+
     // 监听文件监视器map
     private static Map<String, FileAlterationMonitor> watchFileMap = new ConcurrentHashMap<>();
 
@@ -447,6 +448,23 @@ public class DeviceController extends BaseController {
         return autoJsSessionList;
     }
 
+
+    /**
+     * 获取当前版本号
+     */
+    @ApiOperation(value = "获取当前版本号", notes = "获取当前版本号")
+    @GetMapping("/getCursVersion")
+    public R<String> getCursVersion() {
+        try {
+            return success(AutoJsWsServerEndpoint.getCurVersion());
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("获取当前版本号失败！请联系管理员");
+        }
+    }
+
     /**
      * 检查exe配置文件
      */
@@ -669,7 +687,7 @@ public class DeviceController extends BaseController {
      */
     @ApiOperation(value = "记录在线状态", notes = "记录在线状态")
     @GetMapping("/recordOnlineStatus")
-    public R<Boolean> recordOnlineStatus(@RequestParam("machineCode") String machineCode,@RequestParam("systemType") String systemType) {
+    public R<Boolean> recordOnlineStatus(@RequestParam("machineCode") String machineCode,@RequestParam("systemType") String systemType,@RequestParam("curVersion") String curVersion) {
         try {
             Map<String, String> defaultMap = new HashMap<>();
             Map<String, String> onlineMap =  onlineMachineMap.getOrDefault(machineCode,defaultMap);
@@ -677,6 +695,7 @@ public class DeviceController extends BaseController {
             onlineMap.put("machineCode",machineCode);
             onlineMap.put("lastConnectTime",lastConnectTime);
             onlineMap.put("systemType",systemType);
+            onlineMap.put("curVersion",curVersion);
             onlineMachineMap.put(machineCode,onlineMap);
 
             return success(true);

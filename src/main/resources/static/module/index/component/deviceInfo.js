@@ -17,7 +17,7 @@ export default {
     props: {},
     data() {
         return {
-            versionInfo:"V3.5.0",
+            versionInfo:"",
             newVersion:"",
             isExeVersion: false,
             deviceList: [],// 设备列表
@@ -85,6 +85,24 @@ export default {
         }
     },
     mounted() {
+        let _that = this;
+        $.ajax({
+            url: getContext() + "/device/getCursVersion",
+            type: "GET",
+            dataType: "json",
+            async:false,
+            success: function (data) {
+                if (data) {
+                    if (data.isSuccess) {
+                        _that.versionInfo = data.data
+                    }
+                }
+            },
+            error: function (msg) {
+                console.log(msg);
+            }
+        });
+
         let autoCheckVersionUpdate = true;
         let openNoticeMessage = true;
         let systemConfigCache = window.localStorage.getItem("systemConfig");
