@@ -1,6 +1,8 @@
 package com.zjh.zxw;
 
+import com.alibaba.fastjson.JSONArray;
 import com.zjh.commonUtils;
+import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import com.zjh.zxw.websocket.IPUtil;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -107,7 +110,7 @@ public class SpringbootApplication {
                             systemType = commonUtils.isMacSystem() ? "mac" : "linux";
                         }
                         String curVersion = AutoJsWsServerEndpoint.getCurVersion();
-                        String interfaceUrl = "http://tool.zjh336.cn/device/recordOnlineStatus?machineCode="+commonUtils.getMachineCode()+ "&systemType="+systemType + "&curVersion="+curVersion;
+                        String interfaceUrl = "http://tool.zjh336.cn/device/recordOnlineStatus?machineCode="+commonUtils.getMachineCode()+ "&systemType="+systemType + "&curVersion="+ StrHelper.encode(curVersion);
                         URL url = new URL(interfaceUrl);
                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");

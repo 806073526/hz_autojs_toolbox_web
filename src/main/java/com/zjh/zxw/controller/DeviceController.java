@@ -22,6 +22,7 @@ import com.zjh.zxw.websocket.IPUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
@@ -622,7 +623,46 @@ public class DeviceController extends BaseController {
         }
     }
 
+    private String getJsonByLocal(String fileName){
+        File fileStart = new File(fileName);
+        StringBuilder resultJson = new StringBuilder();
+        try {
+            if(fileStart.exists()){
+                BufferedReader reader = new BufferedReader(new FileReader(fileStart));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    resultJson.append(line);
+                }
+                reader.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultJson.toString();
+    }
 
+
+    private void writeLocalJson(String fileName,String fileContent){
+        FileOutputStream fos = null;
+        try {
+            File fileStart = new File(fileName);
+            if(!fileStart.exists()){
+                fileStart.createNewFile();
+            }
+            fos  = new FileOutputStream(fileName);
+            OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+            osw.write(fileContent);
+            osw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+    }
 
 
     /**
@@ -632,7 +672,22 @@ public class DeviceController extends BaseController {
     @GetMapping("/queryOnlineStatus")
     public R<List<Map<String, String>>> queryOnlineStatus() {
         try {
-
+            // 如果缓存里面没有
+            if(MapUtils.isEmpty(onlineMachineMap)){
+                // 从本地文件读取
+                String onlineMachineJson = getJsonByLocal("onlineMachine.json");
+                if(StringUtils.isNotBlank(onlineMachineJson)){
+                    // 写入到缓存中去
+                    JSONArray jsonArray = JSONArray.parseArray(onlineMachineJson);
+                    List<Map> tempList = jsonArray.toJavaList(Map.class);
+                    if(CollectionUtil.isNotEmpty(tempList)){
+                        tempList.forEach(map -> {
+                            String machineCodeParam =  StrHelper.getObjectValue(map.get("machineCode"));
+                            onlineMachineMap.put(machineCodeParam, map);
+                        });
+                    }
+                }
+            }
             List<Map<String,String>> list = new ArrayList<>(onlineMachineMap.values());
             List<String> machineCodeList = list.stream().map(stringStringMap -> stringStringMap.get("machineCode")).collect(Collectors.toList());
             // 获取已授权的机器码
@@ -689,15 +744,37 @@ public class DeviceController extends BaseController {
     @GetMapping("/recordOnlineStatus")
     public R<Boolean> recordOnlineStatus(@RequestParam("machineCode") String machineCode,@RequestParam("systemType") String systemType,@RequestParam("curVersion") String curVersion) {
         try {
+            // 如果缓存里面没有
+            if(MapUtils.isEmpty(onlineMachineMap)){
+                // 从本地文件读取
+                String onlineMachineJson = getJsonByLocal("onlineMachine.json");
+                if(StringUtils.isNotBlank(onlineMachineJson)){
+                    // 写入到缓存中去
+                    JSONArray jsonArray = JSONArray.parseArray(onlineMachineJson);
+                    List<Map> tempList = jsonArray.toJavaList(Map.class);
+                    if(CollectionUtil.isNotEmpty(tempList)){
+                        tempList.forEach(map -> {
+                           String machineCodeParam =  StrHelper.getObjectValue(map.get("machineCode"));
+                            onlineMachineMap.put(machineCodeParam, map);
+                        });
+                    }
+                }
+            }
+
             Map<String, String> defaultMap = new HashMap<>();
             Map<String, String> onlineMap =  onlineMachineMap.getOrDefault(machineCode,defaultMap);
             String lastConnectTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT));
             onlineMap.put("machineCode",machineCode);
             onlineMap.put("lastConnectTime",lastConnectTime);
             onlineMap.put("systemType",systemType);
-            onlineMap.put("curVersion",curVersion);
+            onlineMap.put("curVersion",StrHelper.decode(curVersion));
             onlineMachineMap.put(machineCode,onlineMap);
 
+            if(CollectionUtil.isNotEmpty(onlineMachineMap.values())){
+                // 写入本地文件
+                JSONArray jsonArray = (JSONArray) JSONArray.toJSON(onlineMachineMap.values());
+                writeLocalJson("onlineMachine.json",jsonArray.toJSONString());
+            }
             return success(true);
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
