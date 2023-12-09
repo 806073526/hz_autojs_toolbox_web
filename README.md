@@ -2,19 +2,11 @@
 
 #### 请遵守开源协议
 
-#### 介绍
-《华仔AutoJs工具箱》web端
 
 ### [《全新操作文档》](http://doc.zjh336.cn/#/integrate/hz_autojs_tools_box)
 
 ### [《体验在线版》](http://tool.zjh336.cn)
 
-![输入图片说明](%E5%8D%8E%E4%BB%94AutoJs%E5%B7%A5%E5%85%B7%E7%AE%B1%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B%E9%87%8D%E7%BD%AE%E7%89%88.png)
-
-
-[《华仔AutoJs工具箱》图色(控件)脚本的好帮手](https://www.zjh336.cn/?id=2109)
-
-![输入图片说明](%E8%B5%9E%E8%B5%8F.png)
 
 #### 软件架构
 JAVA8+springboot
