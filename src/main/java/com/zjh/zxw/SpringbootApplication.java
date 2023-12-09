@@ -1,5 +1,6 @@
 package com.zjh.zxw;
 
+import com.zjh.commonUtils;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.websocket.IPUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,10 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -89,6 +94,39 @@ public class SpringbootApplication {
                 executeBatScript(command);
             }
             // Runtime.getRuntime().exec(command);//可以指定自己的路径
+
+
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        String systemType = "windows";
+                        if(!commonUtils.isWindowsSystem()){
+                            systemType = commonUtils.isMacSystem() ? "mac" : "linux";
+                        }
+                        String interfaceUrl = "http://tool.zjh336.cn/device/recordOnlineStatus?machineCode="+commonUtils.getMachineCode()+ "&systemType="+systemType;
+                        URL url = new URL(interfaceUrl);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        // 设置连接超时时间（可选）
+                        connection.setConnectTimeout(5000);
+                        // 建立实际连接
+                        connection.connect();
+
+                        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        String inputLine;
+                        StringBuffer response = new StringBuffer();
+                        while ((inputLine = in.readLine()) != null) {
+                            response.append(inputLine);
+                        }
+                        in.close();
+                    } catch (Exception e) {
+                       // e.printStackTrace();
+                    }
+                }
+            };
+            timer.schedule(task, 0, 1000 * 60);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

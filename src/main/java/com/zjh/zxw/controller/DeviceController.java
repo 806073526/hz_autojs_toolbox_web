@@ -6,8 +6,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.zjh.commonUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
+import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.FileListener;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
@@ -35,6 +37,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +81,9 @@ public class DeviceController extends BaseController {
 
     // 监听文件map
     private static Map<String, FileListener> watchFileListenerMap = new ConcurrentHashMap<>();
+
+    // 在线机器码map
+    private static Map<String, Map<String,String>> onlineMachineMap = new ConcurrentHashMap<>();
 
     @ApiOperation(value = "完成同步文件", notes = "完成同步文件")
     @GetMapping("/completeSyncFile")
@@ -596,6 +603,91 @@ public class DeviceController extends BaseController {
             return fail("获取设备是否需要访问密码失败！请联系管理员");
         }
     }
+
+
+
+
+    /**
+     * 查询在线状态
+     */
+    @ApiOperation(value = "查询在线状态", notes = "查询在线状态")
+    @GetMapping("/queryOnlineStatus")
+    public R<List<Map<String, String>>> queryOnlineStatus() {
+        try {
+
+            List<Map<String,String>> list = new ArrayList<>(onlineMachineMap.values());
+            List<String> machineCodeList = list.stream().map(stringStringMap -> stringStringMap.get("machineCode")).collect(Collectors.toList());
+            // 获取已授权的机器码
+            List<String> authorizes = commonUtils.checkAuthorizeMachineCode(machineCodeList);
+
+
+            Map<String,String> authorizeMap = new HashMap<String, String>();
+            authorizes.forEach(ss -> {
+                List<String> authoriezes = new ArrayList<String>(StrHelper.str2ArrayListBySplit(ss,","));
+                if(authoriezes.size() >= 2){
+                    authorizeMap.put(authoriezes.get(0),authoriezes.get(1));
+                }
+            });
+
+            list.stream().forEach(stringStringMap -> {
+                String curMachineCode = StrHelper.getObjectValue(stringStringMap.get("machineCode"));
+                // 设置授权状态
+                stringStringMap.put("authorize",StrHelper.getObjectValue(authorizeMap.containsKey(curMachineCode)));
+                // 设置授权信息
+                stringStringMap.put("authorizeMsg", authorizeMap.getOrDefault(curMachineCode,""));
+            });
+            // 排序
+            list = list.stream().sorted((o1, o2) -> {
+                String lastConnectTime1 = o1.getOrDefault("lastConnectTime","");
+                String lastConnectTime2 = o2.getOrDefault("lastConnectTime","");
+
+                LocalDateTime time1 = DateUtils.parseToLocalDateTime(lastConnectTime1,DateUtils.DEFAULT_DATE_TIME_FORMAT);
+                LocalDateTime time2 = DateUtils.parseToLocalDateTime(lastConnectTime2,DateUtils.DEFAULT_DATE_TIME_FORMAT);
+                if(Objects.isNull(time1) || Objects.isNull(time2)){
+                    return 0;
+                }
+                if(time1.isAfter(time2)){
+                    return 1;
+                } else if(time1.isBefore(time2)){
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }).collect(Collectors.toList());
+            return success(list);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("查询在线状态失败！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 记录在线状态(写入活跃用户)
+     */
+    @ApiOperation(value = "记录在线状态", notes = "记录在线状态")
+    @GetMapping("/recordOnlineStatus")
+    public R<Boolean> recordOnlineStatus(@RequestParam("machineCode") String machineCode,@RequestParam("systemType") String systemType) {
+        try {
+            Map<String, String> defaultMap = new HashMap<>();
+            Map<String, String> onlineMap =  onlineMachineMap.getOrDefault(machineCode,defaultMap);
+            String lastConnectTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT));
+            onlineMap.put("machineCode",machineCode);
+            onlineMap.put("lastConnectTime",lastConnectTime);
+            onlineMap.put("systemType",systemType);
+            onlineMachineMap.put(machineCode,onlineMap);
+
+            return success(true);
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("记录在线状态失败！请联系管理员");
+        }
+    }
+
 
     /**
      * 验证访问密码
