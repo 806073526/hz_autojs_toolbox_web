@@ -69,10 +69,11 @@ let defaultPageSettingParam = { // 默认页面设置参数
     pageSettingParamName:'pageSetting.json', // 页面设置参数名称
     pageSettingParamArray:[ // 页面设置参数数组
         {
-            pageName:'', // 页面名称
+            pageName:'未命名页面', // 页面名称
             operateScript:'',// 页面操作代码
             joinDebug:true,
             expand:true,
+            scriptExpand: true,
             pageSettingArray:[ // 页面设置数组
                 {
                     'settingKey':'',
@@ -124,6 +125,14 @@ export default {
     },
     data() {
         return {
+            isActive:false,
+            arrowArr:{
+                commonParam:true,
+                jsonParam:true,
+                serviceJsonParam:true,
+                otherOperate:true
+            },
+            activePageName:"pageIndex0",// 页面名
             sourcePathName:'./res/',
             targetPathName:'/sdcard/appSync/',
             // 页面设置参数对象
@@ -144,6 +153,33 @@ export default {
         }
     },
     methods: {
+        refreshScrollHeight(){
+            let zoomSize = 100;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    zoomSize = systemConfigObj.zoomSize;
+                    this.autoRefreshScreenCapture = systemConfigObj.autoRefreshScreenCapture;
+                }
+                if(zoomSize<30){
+                    zoomSize = 30
+                }
+            }
+            let containers = $(".previewDivContainer");
+            if(containers && containers.length){
+                for(let i=0;i<containers.length;i++){
+                    $(containers[i]).css("height",1500 * zoomSize / 100);
+                }
+            }
+        },
+        init(){
+            this.refreshScrollHeight();
+        },
+        //tab页切换
+        handleClick(tab, event) {
+            console.log(tab, event);
+        },
         // 远程页面匹配
         remotePageMatching(){
             if (!this.validSelectDevice()) {
@@ -688,6 +724,7 @@ eval(pageExecuteScript);
         // 添加页面
         addPage(pageIndex){
             let obj = JSON.parse(JSON.stringify(defaultPageSettingParam.pageSettingParamArray[0]));
+            obj.pageName = "未命名页面";
             obj.pageSettingArray.forEach(setting=>{
                 setting.analysisChartKey = Math.random();
                 setting.multipleColorKey = Math.random();

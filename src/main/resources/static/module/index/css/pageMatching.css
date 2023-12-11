@@ -15,6 +15,12 @@
 .el-icon-remove,.el-icon-circle-plus,.el-icon-setting{
     cursor: pointer;
 }
+.pageMatchingTabs .el-tabs__item{
+    padding: 0px;
+}
+.pageOperateScriptCls .el-card__body{
+    padding: 10px !important;
+}
 .tableTitle{
     margin-top: 10px;
     font-size: 14px;
