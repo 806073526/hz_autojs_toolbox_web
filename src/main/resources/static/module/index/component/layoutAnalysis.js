@@ -45,8 +45,10 @@ export default {
             },
             defaultExpandedKeys:[],// 默认展开节点key数组
             layoutLoading:false,
+            selectNodeArrays:[],// 可选择节点数组
             remoteHandler: {
                 param5: {
+                    rootNodeName: "Default", // 默认名称
                     rootNodeJson: '',
                     rootNodeObj: [],
                     filterRootNodeObj:[],// 条件过滤数据
@@ -151,6 +153,44 @@ export default {
         },
         init(){
           this.refreshScrollHeight();
+        },
+        // 显示节点名
+        showSelectNodeName(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/system/layoutAnalysis"
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let arr = data.data.filter(item=> ["json"].includes(item.fileType));
+                            _that.selectNodeArrays = arr.map(item=> item.fileName.replace("rootNode",""));
+                        }
+                    }
+                    if(callback){
+                        callback();
+                    }
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                },
+                error: function (msg) {
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                }
+            });
+        },
+        // 选择布局
+        selectNodeName(nodeName){
+            // 设置名称
+            this.remoteHandler.param5.rootNodeName = nodeName;
+            // 加载图片
+            this.loadNodeJson();
         },
         // 开启自定义过滤函数处理开关change
         openCustomFilterFunctionChange(){
@@ -355,7 +395,7 @@ export default {
             utilsObj.remoteUploadRootNodeJsonToServer = () => {
                 let localPathName = "/sdcard/autoJsTools/rootNode.json"
                 // 调用远程上传文件方法
-                utilsObj.uploadFileToServer(localPathName, deviceUUID + "/system/layoutAnalysis/" + "rootNode.json", (remoteRootURL) => {
+                utilsObj.uploadFileToServer(localPathName, deviceUUID + "/system/layoutAnalysis/" + "rootNode${this.remoteHandler.param5.rootNodeName}.json", (remoteRootURL) => {
                     if (commonStorage.get("debugModel")) {
                         console.log("远程节点地址：" + remoteRootURL)
                     }
@@ -376,7 +416,7 @@ export default {
                     files.remove(tempImgPath)
                     sleep(10)
                     images.save(img, tempImgPath, "jpg", "100");
-                    utilsObj.uploadFileToServer(tempImgPath, deviceUUID + '/system/layoutAnalysis/nodePreviewImg.jpg', (a) => {
+                    utilsObj.uploadFileToServer(tempImgPath, deviceUUID + '/system/layoutAnalysis/nodePreviewImg${this.remoteHandler.param5.rootNodeName}.jpg', (a) => {
                     })
                     img.recycle()
                 })
@@ -393,9 +433,9 @@ export default {
             let startFlagImg = false; // 图片开始处理标志
 
             // 节点
-            let relativeFilePath = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode.json";
+            let relativeFilePath = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode"+this.remoteHandler.param5.rootNodeName+".json";
             // 图片
-            let relativeFilePathImg = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg.jpg";
+            let relativeFilePathImg = this.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg"+this.remoteHandler.param5.rootNodeName+".jpg";
 
             // 原始文件信息
             let sourceFileInfo = this.getFileInfoByPath(relativeFilePath);
@@ -616,7 +656,7 @@ export default {
             // 设置key数组
             _that.remoteHandler.param5.nodeKeyArr = [];
             $.ajax({
-                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode.json?"+(new Date().getTime()),
+                url: "/uploadPath/autoJsTools/" + this.deviceInfo.deviceUuid + "/system/layoutAnalysis/rootNode"+this.remoteHandler.param5.rootNodeName+".json?"+(new Date().getTime()),
                 type: "GET",//请求方式为get
                 dataType: "json", //返回数据格式为json
                 success: function (data) {//请求成功完成后要执行的方法
@@ -626,7 +666,7 @@ export default {
                     // 删除节点信息显示
                     _that.remoteHandler.param5.dialogVisible = false;
                     // 加载控件图片
-                    let imgUrl = getContext() + "/uploadPath/autoJsTools/" + _that.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg.jpg";
+                    let imgUrl = getContext() + "/uploadPath/autoJsTools/" + _that.deviceInfo.deviceUuid + "/system/layoutAnalysis/nodePreviewImg"+_that.remoteHandler.param5.rootNodeName+".jpg";
                     _that.$nextTick(() => {
                         _that.$refs.nodeTree.filter();
                         $("#nodePreviewImg").attr("src", imgUrl + "?t=" + new Date().getTime());

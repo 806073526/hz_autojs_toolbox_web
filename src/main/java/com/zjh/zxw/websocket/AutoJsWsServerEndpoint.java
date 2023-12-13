@@ -78,7 +78,7 @@ public class AutoJsWsServerEndpoint {
     public static String port;
 
     // 设置版本号
-    public static String curVersion =  "V3.6.0开发版";
+    public static String curVersion =  "V3.6.0";
 
     public static String getCurVersion(){
         return curVersion;

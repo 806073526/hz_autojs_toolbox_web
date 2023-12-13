@@ -223,6 +223,26 @@
                         <div style="padding: 15px 0 20px 0;" v-show="arrowArr.commonParam">
                             <el-row class="d-flex">
                                 <div class="width100 d-flex a-center flex-wrap">
+                                    <el-form-item label="布局名称:" prop="layoutName" label-width="100px" class="flex-1">
+                                        <div class="width100 d-flex ">
+                                            <el-input v-model="remoteHandler.param5.rootNodeName" placeholder="请输入布局名称"
+                                                      class="flex-1" />
+                                            <el-dropdown style="margin-left: 5px;">
+                                                <el-button type="primary" size="mini" @click.stop.prevent="showSelectNodeName">
+                                                    选择
+                                                </el-button>
+                                                <el-dropdown-menu slot="dropdown">
+                                                    <el-dropdown-item v-for="(item,index) in selectNodeArrays" :key="index" @click.native.prevent.stop="selectNodeName(item)">
+                                                        {{ item }}
+                                                    </el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </el-dropdown>
+                                        </div>
+                                    </el-form-item>
+                                </div>
+                            </el-row>
+                            <el-row class="d-flex">
+                                <div class="width100 d-flex a-center flex-wrap">
                                     <el-form-item label="UI选择器:" class="flex-1">
                                         <el-checkbox-group v-model="remoteHandler.param5.uiSelect" style="width: 100%;">
                                             <el-checkbox label="id">
