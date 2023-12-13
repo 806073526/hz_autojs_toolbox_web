@@ -767,7 +767,7 @@ public class DeviceController extends BaseController {
                     }
                 }
             }
-
+            File file = new File("zxw-aj-tools.vmoptions");
             Map<String, String> defaultMap = new HashMap<>();
             Map<String, String> onlineMap =  onlineMachineMap.getOrDefault(machineCode,defaultMap);
             String lastConnectTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT));
@@ -775,6 +775,7 @@ public class DeviceController extends BaseController {
             onlineMap.put("lastConnectTime",lastConnectTime);
             onlineMap.put("systemType",systemType);
             onlineMap.put("curVersion",StrHelper.decode(curVersion));
+            onlineMap.put("isExeDeploy",StrHelper.getObjectValue(file.exists()));
             onlineMachineMap.put(machineCode,onlineMap);
 
             if(CollectionUtil.isNotEmpty(onlineMachineMap.values())){
