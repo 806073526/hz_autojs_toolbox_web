@@ -34,6 +34,7 @@ export default {
     },
     data() {
         return {
+            selectImageArrays:[], // 可选图片列表
             autoRefreshScreenCapture: false, // 刷新截图权限
             allScreenCaptureAutoRename: false, // 全屏截图自动重命名图片
             defaultImageName: 'system/imageHandler/allScreen.png',// 目录图片名称
@@ -128,6 +129,44 @@ export default {
         }
     },
     methods: {
+        // 显示图片名
+        showSelectImageName(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/system/imageHandler"
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let arr = data.data.filter(item=> ["png","jpg","jpeg"].includes(item.fileType));
+                            _that.selectImageArrays = arr.map(item=> item.fileName + "." + item.fileType);
+                        }
+                    }
+                    if(callback){
+                        callback();
+                    }
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                },
+                error: function (msg) {
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                }
+            });
+        },
+        // 选择图片
+        selectImageName(imageName){
+            // 设置图片名称
+            this.remoteHandler.param1.localImageName = "system/imageHandler/" + imageName;
+            // 加载图片
+            this.loadPreviewImg();
+        },
         resetImageName(){
             let systemConfigCache = window.localStorage.getItem("systemConfig");
             if(systemConfigCache){

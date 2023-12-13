@@ -183,9 +183,21 @@
                                         <div class="width100 d-flex ">
                                             <el-input v-model="remoteHandler.param1.localImageName" placeholder="请输入图片名称"
                                                       class="flex-1" />
-                                            <el-button type="primary" style="display: flex;margin-left: 5px;" size="mini" @click.stop.prevent="resetImageName">
-                                                重置名称
-                                            </el-button>
+                                            <el-dropdown style="margin-left: 5px;margin-right: 5px;">
+                                                <el-button type="primary" size="mini" @click.stop.prevent="resetImageName">
+                                                    重置
+                                                </el-button>
+                                            </el-dropdown>
+                                            <el-dropdown>
+                                                <el-button type="primary" size="mini" @click.stop.prevent="showSelectImageName">
+                                                    选择
+                                                </el-button>
+                                                <el-dropdown-menu slot="dropdown">
+                                                    <el-dropdown-item v-for="(item,index) in selectImageArrays" :key="index" @click.native.prevent.stop="selectImageName(item)">
+                                                        {{ item }}
+                                                    </el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </el-dropdown>
                                         </div>
                                     </el-form-item>
                                 </div>
