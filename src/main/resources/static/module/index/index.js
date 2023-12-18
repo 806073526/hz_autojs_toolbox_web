@@ -251,6 +251,7 @@ window.ZXW_VUE = new Vue({
             validSelectDevice: this.validSelectDevice, // 检验设备选择情况
             sendMsgToClient: this.sendMsgToClient, // 发送websocket消息到app
             remoteExecuteScript: this.remoteExecuteScript, // app端远程执行代码
+            remoteExecuteScriptByServer: this.remoteExecuteScriptByServer, // 服务端远程执行代码
             getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete },
             updateFileDialogIsMin: (value)=>{
                 this.fileDialogIsMin = value;
@@ -1216,6 +1217,48 @@ window.ZXW_VUE = new Vue({
                     callback()
                 }
             })
+        },
+        // 服务端远程执行代码
+        remoteExecuteScriptByServer(extendParams = {manualComplete:false,openIndependentEngine:true},scriptContent,preCallBack,completeCallBack,finishCallBack){
+            // 组装脚本参数对象
+            let params = {
+                serverUrl:getContext(), // 服务端地址
+                scriptContent: btoa(encodeURI(scriptContent)),
+                manualComplete: extendParams ? extendParams.manualComplete : false,
+                openIndependentEngine:extendParams ? extendParams.openIndependentEngine: true // 是否开启独立引擎执行
+            };
+            let _that = this;
+            if(preCallBack){
+                preCallBack();
+            }
+            $.ajax({
+                url: getContext() + "/device/phoneExecScript",
+                type: 'POST',
+                data: JSON.stringify(params),
+                dataType: "json",
+                contentType: "application/json",
+                headers:{
+                    "deviceUuid": this.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(completeCallBack){
+                                completeCallBack();
+                            }
+                        }
+                    }
+                    if(finishCallBack){
+                        finishCallBack();
+                    }
+                },
+                error: function (msg) {
+                    if(finishCallBack){
+                        finishCallBack();
+                    }
+                }
+            });
         },
         // 编辑器最大化
         phoneMaxFileEditorDialog(){

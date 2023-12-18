@@ -14,6 +14,9 @@ public class ValidateInterfaceConfig {
             "/device/syncWebProjectToPhone", // 同步项目到手机
             "/device/execStartWebProject", // 运行项目
             "/device/execStopProject", // 停止项目
+            "/device/phoneCopyFiles", // 手机端复制文件
+            "/device/phoneMoveFiles", // 手机端移动文件
+            "/device/phoneExecScript", // 手机端执行脚本
             "/device/startOnlineLog",// 开启实时日志
             "/device/stopOnlineLog"// 停止实时日志
     );

@@ -15,6 +15,8 @@ import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AjMessageDTO;
+import com.zjh.zxw.domain.dto.CommonExecScriptInterfaceDTO;
+import com.zjh.zxw.domain.dto.CopyFileInterfaceDTO;
 import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
 import com.zjh.zxw.websocket.AutoJsSession;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
@@ -90,14 +92,52 @@ public class DeviceController extends BaseController {
     // 在线机器码map
     private static Map<String, Map<String,String>> onlineMachineMap = new ConcurrentHashMap<>();
 
-    @ApiOperation(value = "完成同步文件", notes = "完成同步文件")
+    @ApiOperation(value = "完成同步文件(或其他操作)", notes = "完成同步文件(或其他操作)")
     @GetMapping("/completeSyncFile")
     public R<Boolean> completeSyncFile(@RequestParam("syncFileUUID") String syncFileUUID){
         AutoJsWsServerEndpoint.completeSyncFile(syncFileUUID);
         return success(true);
     }
 
+    @ApiOperation(value = "手机端复制文件", notes = "手机端复制文件")
+    @PostMapping("/phoneCopyFiles")
+    public R<Boolean> phoneCopyFiles(@RequestHeader("deviceUuid") String deviceUUID,@RequestBody CopyFileInterfaceDTO copyFileInterfaceDTO){
+        try {
+            return success(AutoJsWsServerEndpoint.execCopyFileScript(deviceUUID,copyFileInterfaceDTO));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("手机端复制文件失败！请联系管理员");
+        }
+    }
 
+    @ApiOperation(value = "手机端移动文件", notes = "手机端移动文件")
+    @PostMapping("/phoneMoveFiles")
+    public R<Boolean> phoneMoveFiles(@RequestHeader("deviceUuid") String deviceUUID,@RequestBody CopyFileInterfaceDTO copyFileInterfaceDTO){
+        try {
+            return success(AutoJsWsServerEndpoint.execMoveFileScript(deviceUUID,copyFileInterfaceDTO));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("手机端移动文件失败！请联系管理员");
+        }
+    }
+
+
+    @ApiOperation(value = "手机端执行脚本", notes = "手机端移动文件")
+    @PostMapping("/phoneExecScript")
+    public R<Boolean> phoneExecScript(@RequestHeader("deviceUuid") String deviceUUID,@RequestBody CommonExecScriptInterfaceDTO interfaceDTO){
+        try {
+            return success(AutoJsWsServerEndpoint.phoneExecScript(deviceUUID,interfaceDTO));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("手机端移动文件失败！请联系管理员");
+        }
+    }
 
     @ApiOperation(value = "查询文件监听列表", notes = "查询文件监听列表")
     @GetMapping("/queryFileListenerList")

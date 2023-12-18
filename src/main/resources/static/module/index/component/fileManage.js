@@ -207,7 +207,7 @@ let defaultProjectJSON = {
 export default {
     template: template,
     name: 'FileManage',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete', 'updateFileDialogIsMin'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'remoteExecuteScriptByServer', 'getMonacoEditorComplete', 'updateFileDialogIsMin'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -913,19 +913,53 @@ export default {
                     break;
                 }
                 case 'paste': {
-                    // TODO 手机端复制不支持文件夹
                     let fileNames = this.phoneCopyFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label;
                     let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
-                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '复制到' + toName + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认将' + this.phoneCopyFileList.length + '个文件(夹)复制到' + toName + '?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
                     }).then(() => {
                         let sourcePathList = this.phoneCopyFileList.map(item => item);
-                        let remoteScript = '';
+                        // 组装同步文件参数对象
+                        let params = {
+                            serverUrl:getContext(), // 服务端地址
+                            sourcePathArr:sourcePathList.map(item=>item.pathName) || [],
+                            targetPath:toPath,
+                            showProcess:true // 显示进度
+                        };
+                        let _that = this;
+                        _that.phoneFileLoading = false;
+                        $.ajax({
+                            url: getContext() + "/device/phoneCopyFiles",
+                            type: 'POST',
+                            data: JSON.stringify(params),
+                            dataType: "json",
+                            contentType: "application/json",
+                            headers:{
+                                "deviceUuid": this.deviceInfo.deviceUuid,
+                                "devicePassword": this.deviceInfo.devicePassword
+                            },
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '复制成功', duration: '1000'});
+                                        // 清空文件列表
+                                        _that.phoneCopyFileList = [];
+                                        // 刷新手机目录
+                                        _that.refreshPhoneDir();
+                                    }
+                                }
+                                _that.phoneFileLoading = false;
+                            },
+                            error: function (msg) {
+                                _that.phoneFileLoading = false;
+                            }
+                        });
+                        /*let remoteScript = '';
                         sourcePathList.forEach(item=>{
                             remoteScript += `files.copy('${item.pathName}', '${toPath}'+'${(item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType)}');`;
                         });
@@ -935,7 +969,7 @@ export default {
                             this.phoneCopyFileList = [];
                             // 刷新手机目录
                             this.refreshPhoneDir();
-                        },500);
+                        },500);*/
                     });
                     break;
                 }
@@ -961,13 +995,48 @@ export default {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
 
-                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '移动到' + toName + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认将' + this.phoneAllowMoveFileList.length + '个文件(夹),移动到' + toName + '?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
                     }).then(() => {
                         let sourcePathList = this.phoneAllowMoveFileList;
-                        let remoteScript = '';
+                        // 组装同步文件参数对象
+                        let params = {
+                            serverUrl:getContext(), // 服务端地址
+                            sourcePathArr:sourcePathList.map(item=>item.pathName) || [],
+                            targetPath:toPath,
+                            showProcess:true // 显示进度
+                        };
+                        let _that = this;
+                        _that.phoneFileLoading = false;
+                        $.ajax({
+                            url: getContext() + "/device/phoneMoveFiles",
+                            type: 'POST',
+                            data: JSON.stringify(params),
+                            dataType: "json",
+                            contentType: "application/json",
+                            headers:{
+                                "deviceUuid": this.deviceInfo.deviceUuid,
+                                "devicePassword": this.deviceInfo.devicePassword
+                            },
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '移动成功', duration: '1000'});
+                                        // 清空文件列表
+                                        _that.phoneMoveFileList = [];
+                                        // 刷新手机目录
+                                        _that.refreshPhoneDir();
+                                    }
+                                }
+                                _that.phoneFileLoading = false;
+                            },
+                            error: function (msg) {
+                                _that.phoneFileLoading = false;
+                            }
+                        });
+                        /*let remoteScript = '';
                         sourcePathList.forEach(item=>{
                             remoteScript += `files.move('${item.pathName}', '${toPath}'+'${(item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)}');`;
                         });
@@ -976,7 +1045,7 @@ export default {
                             this.phoneMoveFileList = [];
                             // 刷新手机目录
                             this.refreshPhoneDir();
-                        },500);
+                        },500);*/
                     });
                     break;
                 }
@@ -986,7 +1055,7 @@ export default {
                     let fileNames = checkFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
-                    window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认删除' + this.phoneFileList.length + '个文件吗?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
@@ -996,11 +1065,16 @@ export default {
                         filePathList.forEach(item=>{
                             remoteScript += `files.removeDir('${item}');`;
                         });
-                        this.remoteExecuteScript(remoteScript);
-                        setTimeout(()=>{
+                        // 远程执行代码
+                        this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                            this.phoneFileLoading = true;
+                        },()=>{
+                            window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
                             // 刷新手机目录
                             this.refreshPhoneDir();
-                        },500);
+                        },()=>{
+                            this.phoneFileLoading = false;
+                        });
                     });
                     break;
                 }
@@ -2750,11 +2824,16 @@ export default {
                 }
             }).then(({value}) => {
                 let remoteScript = `$zip.zipDir('${row.pathName}', '${value}',{includeRootFolder:${flag}})`;
-                this.remoteExecuteScript(remoteScript);
-                setTimeout(()=>{
+                // 远程执行代码
+                this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                    this.phoneFileLoading = true;
+                },()=>{
+                    window.ZXW_VUE.$notify.success({message: '压缩成功', duration: '1000'});
                     // 刷新手机目录
                     this.refreshPhoneDir();
-                },500);
+                },()=>{
+                    this.phoneFileLoading = false;
+                });
             }).catch(() => {
             });
         },
@@ -2817,11 +2896,16 @@ export default {
                 }
             }).then(({value}) => {
                 let remoteScript = `$zip.unzip('${row.pathName}', '${value}')`;
-                this.remoteExecuteScript(remoteScript);
-                setTimeout(()=>{
+                // 远程执行代码
+                this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                    this.phoneFileLoading = true;
+                },()=>{
+                    window.ZXW_VUE.$notify.success({message: '解压成功', duration: '1000'});
                     // 刷新手机目录
                     this.refreshPhoneDir();
-                },500);
+                },()=>{
+                    this.phoneFileLoading = false;
+                });
             }).catch(() => {
             });
         },
@@ -3260,9 +3344,16 @@ export default {
                 type: 'info'
             }).then(() => {
                 let remoteScript = row.isDirectory ? `files.removeDir('${row.pathName}')` : `files.remove('${row.pathName}')`;
-                this.remoteExecuteScript(remoteScript);
-                // 刷新手机目录
-                this.refreshPhoneDir();
+                // 远程执行代码
+                this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                    this.phoneFileLoading = true;
+                },()=>{
+                    window.ZXW_VUE.$notify.success({message: '删除成功', duration: '1000'});
+                    // 刷新手机目录
+                    this.refreshPhoneDir();
+                },()=>{
+                    this.phoneFileLoading = false;
+                });
             });
         },
         // 单个文件同步到手机
@@ -3569,30 +3660,37 @@ export default {
                 let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
                 let remoteScript = '';
                     remoteScript += `files.createWithDirs('${toPath}'+'${value}')`;
-                this.remoteExecuteScript(remoteScript);
-                setTimeout(()=>{
+                // 远程执行代码
+                this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                    this.phoneFileLoading = true;
+                },()=>{
+                    this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                     // 刷新手机目录
                     this.refreshPhoneDir();
-                },500);
+                },()=>{
+                    this.phoneFileLoading = false;
+                });
             }).catch(() => {
             });
         },
         // 手机端初始化同步目录
         phoneInitSyncDir(){
             let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");toastLog("初始化同步目录完成");`;
-            this.remoteExecuteScript(remoteScript);
-            this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
-            setTimeout(()=>{
+            // 远程执行代码
+            this.remoteExecuteScriptByServer(null,remoteScript,()=>{
+                this.phoneFileLoading = true;
+            },()=>{
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
-            },500);
+            },()=>{
+                this.phoneFileLoading = false;
+            });
+
         },
         // 初始官方示例
         phoneInitOfficialExample(){
-            this.phoneFileLoading = true;
-            // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
-            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedExample",()=>{
-                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
+            let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/AutoJsPro官方示例.zip","/appSync/AutoJsPro官方示例.zip",()=>{
                     $zip.unzip('/sdcard/appSync/AutoJsPro官方示例.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
@@ -3602,18 +3700,49 @@ export default {
                     }
                     events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
                     toastLog("初始化AutoJsPro官方示例完成");
+                     if(completeFun){
+                        completeFun();
+                    }
                 })`;
-                this.remoteExecuteScript(downLoadGameScript);
+            // 远程执行代码
+            this.remoteExecuteScriptByServer({manualComplete:true,openIndependentEngine:false},remoteScript,()=>{
+                this.phoneFileLoading = true;
             },()=>{
-                this.phoneFileLoading = false;
                 this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
+            },()=>{
+                this.phoneFileLoading = false;
             });
         },
 		// 初始化官方商店示例
 		phoneInitOfficalShopExample(){
-			 this.phoneFileLoading = true;
+            let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
+                utilsObj.downLoadFile("${getContext()}/AutoJsPro商店示例脚本.zip","/appSync/AutoJsPro商店示例脚本.zip",()=>{
+                    $zip.unzip('/sdcard/appSync/AutoJsPro商店示例脚本.zip', '/sdcard/appSync/');
+                    let finishMsgObj = {
+                        "deviceUUID":"${this.deviceInfo.deviceUuid}",
+                        "serviceKey":"unzipFinishedShopExample",
+                        "serviceValue":"true"
+                    }
+                    events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
+                    toastLog("初始化AutoJsPro商店示例脚本完成");
+                     if(completeFun){
+                        completeFun();
+                    }
+                })`;
+            // 远程执行代码
+            this.remoteExecuteScriptByServer({manualComplete:true,openIndependentEngine:false},remoteScript,()=>{
+                this.phoneFileLoading = true;
+            },()=>{
+                this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
+                // 刷新手机目录
+                this.refreshPhoneDir();
+            },()=>{
+                this.phoneFileLoading = false;
+            });
+
+			/* this.phoneFileLoading = true;
             // 手机端下载官方示例 并且zip解压完成后 web端刷新手机目录
             handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinishedShopExample",()=>{
                 let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
@@ -3633,14 +3762,11 @@ export default {
                 this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
-            });
+            });*/
 		},
         // 手机端下载脚手架项目
         phoneDownLoadGameScript(){
-            this.phoneFileLoading = true;
-            // 手机端下载脚手架项目 并且zip解压完成后 web端刷新手机目录
-            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished",()=>{
-                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
+            let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/hz_autojs_game_script.zip","/appSync/hz_autojs_game_script.zip",()=>{
                     $zip.unzip('/sdcard/appSync/hz_autojs_game_script.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
@@ -3650,21 +3776,24 @@ export default {
                     }
                     events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
                     toastLog("初始化脚手架项目完成");
+                    if(completeFun){
+                        completeFun();
+                    }
                 })`;
-                this.remoteExecuteScript(downLoadGameScript);
+            // 远程执行代码
+            this.remoteExecuteScriptByServer({manualComplete:true,openIndependentEngine:false},remoteScript,()=>{
+                this.phoneFileLoading = true;
             },()=>{
-                this.phoneFileLoading = false;
                 this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
+            },()=>{
+                this.phoneFileLoading = false;
             });
         },
         // 初始化图色示例项目
         phoneDownLoadImageExampleScript(){
-            this.phoneFileLoading = true;
-            // 手机端下载图色示例项目 并且zip解压完成后 web端刷新手机目录
-            handlerAppByCacheChange(this.deviceInfo.deviceUuid+"_"+"unzipFinished_example",()=>{
-                let downLoadGameScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
+            let remoteScript = `if(files.isFile("/sdcard/appSync")){files.remove("/sdcard/appSync")}; files.createWithDirs("/sdcard/appSync/");
                 utilsObj.downLoadFile("${getContext()}/hz_autojs_example_project.zip","/appSync/hz_autojs_example_project.zip",()=>{
                     $zip.unzip('/sdcard/appSync/hz_autojs_example_project.zip', '/sdcard/appSync/');
                     let finishMsgObj = {
@@ -3674,13 +3803,19 @@ export default {
                     }
                     events.broadcast.emit("sendMsgToWebUpdateServiceKey", JSON.stringify(finishMsgObj));
                     toastLog("初始化图色示例项目完成");
+                    if(completeFun){
+                        completeFun();
+                    }
                 })`;
-                this.remoteExecuteScript(downLoadGameScript);
+            // 远程执行代码
+            this.remoteExecuteScriptByServer({manualComplete:true,openIndependentEngine:false},remoteScript,()=>{
+                this.phoneFileLoading = true;
             },()=>{
-                this.phoneFileLoading = false;
                 this.phoneBreadcrumbList = [{label: '根目录', value: '/sdcard/'},{label: 'appSync', value: '/sdcard/appSync/'}];
                 // 刷新手机目录
                 this.refreshPhoneDir();
+            },()=>{
+                this.phoneFileLoading = false;
             });
         },
         // 手机端初始化运行文件

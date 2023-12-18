@@ -10,9 +10,7 @@ import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.email.EmailSender;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
-import com.zjh.zxw.domain.dto.AjMessageDTO;
-import com.zjh.zxw.domain.dto.EmailConfig;
-import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
+import com.zjh.zxw.domain.dto.*;
 import com.zjh.zxw.dozer.DozerUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -126,7 +124,7 @@ public class AutoJsWsServerEndpoint {
     // key deviceUUID_serviceKey   value:具体值
     private static ConcurrentHashMap<String, String> appMessageMap = new ConcurrentHashMap<String,String>();
 
-    // 同步文件map
+    // 同步文件(或其他操作)map
     private static ConcurrentHashMap<String, String> syncFileMap = new ConcurrentHashMap<String,String>();
 
     // 已生成bat文件的项目路径列表
@@ -496,6 +494,105 @@ public class AutoJsWsServerEndpoint {
 
 
     /**
+     * 以独立引擎模式 执行 复制文件脚本
+     * @param deviceUUID
+     * @param copyFileInterfaceDTO
+     */
+    public static boolean execCopyFileScript(String deviceUUID, CopyFileInterfaceDTO copyFileInterfaceDTO) throws Exception {
+        String syncFileUUID = UUID.randomUUID().toString();
+        // 设置uuid
+        copyFileInterfaceDTO.setSyncFileUUID(syncFileUUID);
+
+        String selfScriptName = "copyFileScript_" + new Date().getTime()+".js";
+        copyFileInterfaceDTO.setSelfScriptName(selfScriptName);
+
+        // 设置同步状态为开始
+        startSyncFile(syncFileUUID);
+
+        // 根据参数获取复制文件脚本
+        String scriptContent =  getCopyFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO));
+        // 指定脚本文件路径  包装独立引擎
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
+
+        boolean running = true;
+        while(running){
+            String status = getSyncFileStatus(syncFileUUID);
+            if("complete".equals(status)){
+                running = false;
+            }
+            Thread.sleep(200);
+        }
+        return true;
+    }
+
+
+
+    /**
+     * 以独立引擎模式 执行 通用脚本
+     * @param deviceUUID
+     * @param interfaceDTO
+     */
+    public static boolean phoneExecScript(String deviceUUID, CommonExecScriptInterfaceDTO interfaceDTO) throws Exception {
+        String syncFileUUID = UUID.randomUUID().toString();
+        // 设置uuid
+        interfaceDTO.setSyncFileUUID(syncFileUUID);
+
+        String selfScriptName = "commonScript_" + new Date().getTime()+".js";
+        interfaceDTO.setSelfScriptName(selfScriptName);
+
+        // 设置同步状态为开始
+        startSyncFile(syncFileUUID);
+
+        // 解析脚本内容
+        String scriptContent =  getCommonScriptContent(JSONObject.toJSONString(interfaceDTO));
+        // 指定脚本文件路径
+        execRemoteScript(deviceUUID,scriptContent,interfaceDTO.getOpenIndependentEngine(),"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
+
+        boolean running = true;
+        while(running){
+            String status = getSyncFileStatus(syncFileUUID);
+            if("complete".equals(status)){
+                running = false;
+            }
+            Thread.sleep(200);
+        }
+        return true;
+    }
+
+
+    /**
+     * 以独立引擎模式 执行 移动文件脚本
+     * @param deviceUUID
+     * @param copyFileInterfaceDTO
+     */
+    public static boolean execMoveFileScript(String deviceUUID, CopyFileInterfaceDTO copyFileInterfaceDTO) throws Exception {
+        String syncFileUUID = UUID.randomUUID().toString();
+        // 设置uuid
+        copyFileInterfaceDTO.setSyncFileUUID(syncFileUUID);
+
+        String selfScriptName = "moveFileScript_" + new Date().getTime()+".js";
+        copyFileInterfaceDTO.setSelfScriptName(selfScriptName);
+
+        // 设置同步状态为开始
+        startSyncFile(syncFileUUID);
+
+        // 根据参数获取复制文件脚本
+        String scriptContent =  getMoveFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO));
+        // 指定脚本文件路径  包装独立引擎
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
+
+        boolean running = true;
+        while(running){
+            String status = getSyncFileStatus(syncFileUUID);
+            if("complete".equals(status)){
+                running = false;
+            }
+            Thread.sleep(200);
+        }
+        return true;
+    }
+
+    /**
      * 以独立引擎模式 执行 同步文件脚本
      * @return
      * @throws Exception
@@ -845,7 +942,7 @@ public class AutoJsWsServerEndpoint {
         // 转换后代码
         String afterRemoteScript = remoteScript;
         // 开启则进行 独立引擎处理
-        if(openIndependentEngine){
+        if(Objects.nonNull(openIndependentEngine) && openIndependentEngine){
             scriptDirPath = StringUtils.isBlank(scriptDirPath) ?  "/sdcard/appSync/tempRemoteScript/" : scriptDirPath;
             scriptFilePath = StringUtils.isBlank(scriptFilePath) ?  "/sdcard/appSync/tempRemoteScript/remoteScript.js" : scriptFilePath;
             // 独立引擎代码 包裹
@@ -954,6 +1051,93 @@ public class AutoJsWsServerEndpoint {
         return sourceJsonStr;
     }
 
+    /**
+     * 获取复制文件脚本原始内容 并替换参数
+     * @param paramJson
+     * @return
+     * @throws Exception
+     */
+    private static String getCopyFileScriptContent(String paramJson) throws Exception {
+        String sourceJsonStr = "";
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/copyFileScriptByServer.js?t="+(new Date().getTime());
+        URL url = new URL(syncFilePath);
+        // 打开连接
+        URLConnection connection = url.openConnection();
+        // 设置连接超时时间（可选）
+        connection.setConnectTimeout(5000);
+        // 建立实际连接
+        connection.connect();
+        // 读取页面内容
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder content = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+        sourceJsonStr = content.toString();
+        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
+        return sourceJsonStr;
+    }
+
+    /**
+     * 获取通用脚本原始内容 并替换参数
+     * @param paramJson
+     * @return
+     * @throws Exception
+     */
+    private static String getCommonScriptContent(String paramJson) throws Exception {
+        String sourceJsonStr = "";
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/commonScriptByServer.js?t="+(new Date().getTime());
+        URL url = new URL(syncFilePath);
+        // 打开连接
+        URLConnection connection = url.openConnection();
+        // 设置连接超时时间（可选）
+        connection.setConnectTimeout(5000);
+        // 建立实际连接
+        connection.connect();
+        // 读取页面内容
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder content = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+        sourceJsonStr = content.toString();
+        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
+        return sourceJsonStr;
+    }
+
+
+    /**
+     * 获取移动文件脚本原始内容 并替换参数
+     * @param paramJson
+     * @return
+     * @throws Exception
+     */
+    private static String getMoveFileScriptContent(String paramJson) throws Exception {
+        String sourceJsonStr = "";
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/moveFileScriptByServer.js?t="+(new Date().getTime());
+        URL url = new URL(syncFilePath);
+        // 打开连接
+        URLConnection connection = url.openConnection();
+        // 设置连接超时时间（可选）
+        connection.setConnectTimeout(5000);
+        // 建立实际连接
+        connection.connect();
+        // 读取页面内容
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        String line;
+        StringBuilder content = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+        sourceJsonStr = content.toString();
+        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
+        return sourceJsonStr;
+    }
 
 
     /**
