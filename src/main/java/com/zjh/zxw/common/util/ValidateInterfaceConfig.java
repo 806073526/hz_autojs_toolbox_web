@@ -17,6 +17,7 @@ public class ValidateInterfaceConfig {
             "/device/phoneCopyFiles", // 手机端复制文件
             "/device/phoneMoveFiles", // 手机端移动文件
             "/device/phoneExecScript", // 手机端执行脚本
+            "/device/phoneSyncToWebScript",// 手机端同步文件到web
             "/device/startOnlineLog",// 开启实时日志
             "/device/stopOnlineLog"// 停止实时日志
     );
