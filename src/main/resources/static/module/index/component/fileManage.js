@@ -407,7 +407,14 @@ export default {
                 return !curToPath.startsWith(item.pathName) && curToPath !== item.parentPathName
             });
         },
-        phoneAllowMoveFileList() { // 手机端允许移动的文件列表
+        phoneAllowCopyFileList(){ // 手机端允许复制的文件列表(不允许父级复制到自己的子级里面)
+            let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
+            // 当前目录是已选文件子目录的 需要过滤掉  当前目录是已选文件所在的目录是需要过滤掉
+            return this.phoneCopyFileList.filter(item => {
+                return !toPath.startsWith(item.pathName) && toPath !== item.parentPathName
+            });
+        },
+        phoneAllowMoveFileList() { // 手机端允许移动的文件列表(不允许父级移动到自己的子级里面)
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             // 当前目录是已选文件子目录的 需要过滤掉  当前目录是已选文件所在的目录是需要过滤掉
             return this.phoneMoveFileList.filter(item => {
@@ -419,6 +426,9 @@ export default {
         },
         phoneCopyFileNames() {
             return this.phoneCopyFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+        },
+        phoneAllowCopyFileNames() {
+            return this.phoneAllowCopyFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         allowMoveFileNames() {
             return this.allowMoveFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
@@ -913,17 +923,17 @@ export default {
                     break;
                 }
                 case 'paste': {
-                    let fileNames = this.phoneCopyFileList.map(item => {
+                    let fileNames = this.phoneAllowCopyFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toName = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].label;
                     let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
-                    window.ZXW_VUE.$confirm('是否确认将' + this.phoneCopyFileList.length + '个文件(夹)复制到' + toName + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认将' + this.phoneAllowCopyFileList.length + '个文件(夹)复制到' + toName + '?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
                     }).then(() => {
-                        let sourcePathList = this.phoneCopyFileList.map(item => item);
+                        let sourcePathList = this.phoneAllowCopyFileList.map(item => item);
                         // 组装同步文件参数对象
                         let params = {
                             serverUrl:getContext(), // 服务端地址
