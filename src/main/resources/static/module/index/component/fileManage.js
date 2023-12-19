@@ -1065,7 +1065,7 @@ export default {
                     let fileNames = checkFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
-                    window.ZXW_VUE.$confirm('是否确认删除' + this.phoneFileList.length + '个文件吗?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认删除' + checkFileList.length + '个文件吗?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
