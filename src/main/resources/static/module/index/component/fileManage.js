@@ -407,6 +407,16 @@ export default {
                 return !curToPath.startsWith(item.pathName) && curToPath !== item.parentPathName
             });
         },
+        allowCopyFileList(){ // 允许复制的文件列表
+            let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+            let replacePath = toPath.replace(/\//g, "\\");
+            // 当前完整目录
+            let curToPath = this.absolutePrePath + replacePath;
+            // 当前目录是已选文件子目录的 需要过滤掉  当前目录是已选文件所在的目录是需要过滤掉
+            return this.copyFileList.filter(item => {
+                return !curToPath.startsWith(item.pathName) && curToPath !== item.parentPathName
+            });
+        },
         phoneAllowCopyFileList(){ // 手机端允许复制的文件列表(不允许父级复制到自己的子级里面)
             let toPath = this.phoneBreadcrumbList[this.phoneBreadcrumbList.length - 1].value;
             // 当前目录是已选文件子目录的 需要过滤掉  当前目录是已选文件所在的目录是需要过滤掉
@@ -432,6 +442,9 @@ export default {
         },
         allowMoveFileNames() {
             return this.allowMoveFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
+        },
+        allowCopyFileNames() {
+            return this.allowCopyFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
         },
         phoneAllowMoveFileNames() {
             return this.phoneAllowMoveFileList.map(item => (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType)).join(',');
@@ -738,13 +751,13 @@ export default {
                     break;
                 }
                 case 'paste': {
-                    let fileNames = this.copyFileList.map(item => {
+                    let fileNames = this.allowCopyFileList.map(item => {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toName = this.breadcrumbList[this.breadcrumbList.length - 1].label;
                     let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
                     let replacePath = toPath.replace(/\//g, "\\");
-                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '复制到' + toName + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认将' + this.allowCopyFileList.length + '个文件(夹),复制到' + toName + '?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
@@ -801,7 +814,7 @@ export default {
                         return (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
 
-                    window.ZXW_VUE.$confirm('是否确认将' + fileNames + '移动到' + toName + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认将' + this.allowMoveFileList.length + '个文件(夹),移动到' + toName + '?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
@@ -841,7 +854,7 @@ export default {
                         return (item.isDirectory || !item.fileType)? item.fileName : (item.fileName + "." + item.fileType);
                     }).join(',');
                     let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
-                    window.ZXW_VUE.$confirm('是否确认删除' + fileNames + '?', '提示', {
+                    window.ZXW_VUE.$confirm('是否确认删除' + checkFileList.length + '个文件(夹)?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
