@@ -867,7 +867,7 @@ export default {
                     window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到手机端,请输入手机端路径(以/sdcard为根目录的相对路径)!', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        inputValue: this.phoneSyncPath,
+                        inputValue: this.phoneSyncPath.endsWith("/") ? this.phoneSyncPath : this.phoneSyncPath + "/",
                         inputValidator: function(val) {
                             if(val){
                                 if(val.startsWith("/sdcard")){
@@ -1083,10 +1083,10 @@ export default {
                     let fileNames = checkFileList.map(item => {
                         return (item.isDirectory || !item.fileType) ? item.fileName : (item.fileName + "." + item.fileType);
                     });
-                    window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到web端,文件夹内部不会递归同步,请输入web端路径', '提示', {
+                    window.ZXW_VUE.$prompt('是否确认同步'+fileNames.length+'个文件到web端,请输入web端路径', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        inputValue: this.webSyncPath,
+                        inputValue: this.webSyncPath.endsWith("/") ? this.webSyncPath : this.webSyncPath + "/",
                         inputValidator: function(val) {
                             if(val){
                                 if(!val.startsWith("/")){
@@ -1101,20 +1101,39 @@ export default {
                             return true;
                         }
                     }).then(({value}) => {
-                        // 设置同步文件集合  暂不支持同步目录
-                        let remoteScript = `let webPath = utilsObj.getDeviceUUID()+ '${value}';\r\n`;
-                        checkFileList.forEach(item=>{
-                            if(item.isDirectory){
-                                remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="+webPath+'${item.fileName}',"GET",null,()=>{toastLog("同步完成")});\r\n`;
-                            } else {
-                                remoteScript +=`utilsObj.uploadFileToServer('${item.pathName}',webPath + '${item.fileName}' + '.'+ '${item.fileType}',()=>{toastLog("同步完成")});\r\n`;
+                        // 组装同步文件参数对象
+                        let params = {
+                            serverUrl:getContext(), // 服务端地址
+                            phonePaths:checkFileList.map(item=>item.pathName) || [],
+                            webSyncPath:this.deviceInfo.deviceUuid + this.webSyncPath
+                        };
+                        let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+                        let _that = this;
+                        _that.fileLoading = true;
+                        $.ajax({
+                            url: getContext() + "/device/phoneSyncToWebScript",
+                            type: 'POST',
+                            data: JSON.stringify(params),
+                            dataType: "json",
+                            contentType: "application/json",
+                            headers:{
+                                "deviceUuid": this.deviceInfo.deviceUuid,
+                                "devicePassword": this.deviceInfo.devicePassword
+                            },
+                            success: function (data) {
+                                if (data) {
+                                    if (data.isSuccess) {
+                                        window.ZXW_VUE.$notify.success({message: '同步成功', duration: '1000'});
+                                        // 重新加载文件列表
+                                        _that.queryFileList(toPath);
+                                    }
+                                }
+                                _that.fileLoading = false;
+                            },
+                            error: function (msg) {
+                                _that.fileLoading = false;
                             }
                         });
-                        this.remoteExecuteScript(remoteScript);
-                        setTimeout(()=>{
-                            // 刷新web目录
-                            this.refreshWebDir();
-                        },500);
                     }).catch(() => {
                     });
                     break;
@@ -1122,10 +1141,10 @@ export default {
             }
         },
         syncToWebSingle(row){
-            window.ZXW_VUE.$prompt('是否确认同步'+row.pathName+'到web端,文件夹内部不会递归同步,请输入web端路径', '提示', {
+            window.ZXW_VUE.$prompt('是否确认同步'+row.pathName+'到web端,请输入web端路径', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                inputValue: this.webSyncPath,
+                inputValue: this.webSyncPath.endsWith("/") ? this.webSyncPath : this.webSyncPath + "/",
                 inputValidator: function(val) {
                     if(val){
                         if(!val.startsWith("/")){
@@ -1140,22 +1159,38 @@ export default {
                     return true;
                 }
             }).then(({value}) => {
-                this.phoneFileLoading = true;
-                let relativeFilePath = this.deviceInfo.deviceUuid  + value + ((row.isDirectory || !row.fileType) ? row.fileName : row.fileName +'.' + row.fileType);
-                // 文件内容变化后处理函数
-                handlerByFileChange(relativeFilePath,()=>{
-                    // 设置同步文件集合  暂不支持同步目录
-                    let remoteScript = ``;
-                    if(row.isDirectory){
-                        remoteScript +=`utilsObj.request("/attachmentInfo/createFolder?folderName="${relativeFilePath},"GET",null,()=>{toastLog("同步完成")});\r\n`;
-                    } else {
-                        remoteScript +=`utilsObj.uploadFileToServer('${row.pathName}','${relativeFilePath}',()=>{toastLog("同步完成")});\r\n`;
+                // 组装同步文件参数对象
+                let params = {
+                    serverUrl:getContext(), // 服务端地址
+                    phonePaths:[row.pathName],
+                    webSyncPath:this.deviceInfo.deviceUuid + value
+                };
+                let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+                let _that = this;
+                _that.fileLoading = true;
+                $.ajax({
+                    url: getContext() + "/device/phoneSyncToWebScript",
+                    type: 'POST',
+                    data: JSON.stringify(params),
+                    dataType: "json",
+                    contentType: "application/json",
+                    headers:{
+                        "deviceUuid": this.deviceInfo.deviceUuid,
+                        "devicePassword": this.deviceInfo.devicePassword
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '同步成功', duration: '1000'});
+                                // 重新加载文件列表
+                                _that.queryFileList(toPath);
+                            }
+                        }
+                        _that.fileLoading = false;
+                    },
+                    error: function (msg) {
+                        _that.fileLoading = false;
                     }
-                    this.remoteExecuteScript(remoteScript);
-                },()=>{
-                    this.phoneFileLoading = false;
-                    // 刷新web目录
-                    this.refreshWebDir();
                 });
             }).catch(() => {
             });
@@ -3214,32 +3249,44 @@ export default {
             if (!this.validateSyncParam()) {
                 return;
             }
-            window.ZXW_VUE.$confirm('是否确认将手机端【' + this.phoneSyncPath + '】目录文件(文件夹不会递归同步),同步到web端【根目录'+this.webSyncPath+'】下?', '提示', {
+            window.ZXW_VUE.$confirm('是否确认将手机端【' + this.phoneSyncPath + '】目录文件,同步到web端【根目录'+this.webSyncPath+'】下?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'info'
             }).then(() => {
-                // 定义根目录
-                let remoteExecScriptContent = 'let dir = "/sdcard'+ this.phoneSyncPath+'";\r\n';
-                // 定义web端路径
-                remoteExecScriptContent += 'let webPath = utilsObj.getDeviceUUID()+ "'+ this.webSyncPath+'";\r\n';
-                // 读取全部的文件
-                remoteExecScriptContent += 'let allList = files.listDir(dir);\r\n';
-                // 遍历调用上传方法
-                remoteExecScriptContent += 'allList.forEach(name=>{ \r\n';
-                remoteExecScriptContent +=  '  let fileName = webPath+name;\r\n';
-                remoteExecScriptContent +=  '  let localFilePath = dir+name;\r\n';
-                remoteExecScriptContent +=  '  if(files.isDir(localFilePath)){\r\n';
-                remoteExecScriptContent +=  '     utilsObj.request("/attachmentInfo/createFolder?folderName="+fileName,"GET",null,()=>{});\r\n';
-                remoteExecScriptContent +=  '  }else{\r\n';
-                remoteExecScriptContent +=  '     utilsObj.uploadFileToServer(localFilePath,fileName,()=>{console.log(localFilePath+"上传完成")});\r\n';
-                remoteExecScriptContent +=  '  }\r\n';
-                remoteExecScriptContent += '})\r\n';
-                remoteExecScriptContent += 'toastLog("上传完成,一共"+allList.length+"个文件")\r\n';
-                this.remoteExecuteScript(remoteExecScriptContent);
-                setTimeout(()=>{
-                    window.ZXW_VUE.$notify.success({message: '请手动刷新目录', duration: '1000'});
-                },1000)
+                // 组装同步文件参数对象
+                let params = {
+                    serverUrl:getContext(), // 服务端地址
+                    phonePaths:this.phoneFileList.map(item=>item.pathName) || [],
+                    webSyncPath:this.deviceInfo.deviceUuid + this.webSyncPath
+                };
+                let toPath = this.breadcrumbList[this.breadcrumbList.length - 1].value;
+                let _that = this;
+                _that.fileLoading = true;
+                $.ajax({
+                    url: getContext() + "/device/phoneSyncToWebScript",
+                    type: 'POST',
+                    data: JSON.stringify(params),
+                    dataType: "json",
+                    contentType: "application/json",
+                    headers:{
+                        "deviceUuid": this.deviceInfo.deviceUuid,
+                        "devicePassword": this.deviceInfo.devicePassword
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '同步成功', duration: '1000'});
+                                // 重新加载文件列表
+                                _that.queryFileList(toPath);
+                            }
+                        }
+                        _that.fileLoading = false;
+                    },
+                    error: function (msg) {
+                        _that.fileLoading = false;
+                    }
+                });
             });
         },
         // 重命名
@@ -3361,7 +3408,7 @@ export default {
             window.ZXW_VUE.$prompt('请输入手机端路径(以/sdcard为根目录的相对路径)', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                inputValue: this.phoneSyncPath,
+                inputValue: this.phoneSyncPath.endsWith("/") ? this.phoneSyncPath : this.phoneSyncPath + "/",
                 inputValidator: function(val) {
                     if(val){
                         if(val.startsWith("/sdcard")){

@@ -1,11 +1,13 @@
 package com.zjh.zxw.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.zjh.zxw.common.util.*;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
+import com.zjh.zxw.domain.dto.PhoneSyncFileToWebParamDTO;
 import com.zjh.zxw.service.AttachmentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -427,4 +429,58 @@ public class AttachmentInfoServiceImpl implements AttachmentInfoService {
         }
         ZipUtils.zip(targetFilePathName,sourceFolderPathName,zipPathName);
     }
+
+    @Override
+    public Boolean batchSyncFileToWeb(List<PhoneSyncFileToWebParamDTO> paramDTOS) {
+        if(CollectionUtils.isEmpty(paramDTOS)){
+            return false;
+        }
+        for (PhoneSyncFileToWebParamDTO paramDTO : paramDTOS) {
+            syncFileToWeb(paramDTO);
+        }
+        return true;
+    }
+
+    private void syncFileToWeb(PhoneSyncFileToWebParamDTO paramDTO){
+        Boolean isDir = paramDTO.getIsDir();
+        //判断文件保存是否存在
+        File file = new File(this.getRootPath() + paramDTO.getRelativePath());
+        if (file.getParentFile() != null || !Objects.requireNonNull(file.getParentFile()).isDirectory()) {
+            //创建文件
+            file.getParentFile().mkdirs();
+        }
+        // 是目录
+        if(Objects.nonNull(isDir) && isDir){
+            // 创建目录
+            FileUtil.createFolder(this.getRootPath() + paramDTO.getRelativePath());
+            List<PhoneSyncFileToWebParamDTO> children = Optional.ofNullable(paramDTO.getChildren()).orElse(new ArrayList<>());
+            // 子目录不为空
+            if(CollectionUtils.isNotEmpty(children)){
+                for (PhoneSyncFileToWebParamDTO child : children) {
+                    syncFileToWeb(child);
+                }
+            }
+        // 是文件 执行写入操作
+        } else {
+            byte[] fileBytes = paramDTO.getFileBytes();
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(file);
+                fileOutputStream.write(fileBytes);
+            } catch (IOException e) {
+                throw new BusinessException("操作失败" + e.getMessage());
+            } finally {
+                try {
+                    if (fileOutputStream != null) {
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                    }
+                } catch (IOException e) {
+                    throw new BusinessException("操作失败" + e.getMessage());
+                }
+            }
+        }
+
+    }
+
 }

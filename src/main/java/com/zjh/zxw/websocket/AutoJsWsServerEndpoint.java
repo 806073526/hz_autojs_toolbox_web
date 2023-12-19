@@ -488,7 +488,7 @@ public class AutoJsWsServerEndpoint {
         Map<String,String> params = new HashMap<>();
         params.put("maxLineCount",StrHelper.getObjectValue(maxLineCount));
         params.put("onlyStop",isOnlyStop ? "true": "");
-        String remoteScript = getStartOnlineLogScriptContent(JSONObject.toJSONString(params));
+        String remoteScript = getFileScriptContent(JSONObject.toJSONString(params),"startOnlineLogByServer.js");
         execRemoteScript(deviceUUID,remoteScript,false,"","");
     }
 
@@ -510,7 +510,7 @@ public class AutoJsWsServerEndpoint {
         startSyncFile(syncFileUUID);
 
         // 根据参数获取复制文件脚本
-        String scriptContent =  getCopyFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO));
+        String scriptContent =  getFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO),"copyFileScriptByServer.js");
         // 指定脚本文件路径  包装独立引擎
         execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
 
@@ -544,7 +544,7 @@ public class AutoJsWsServerEndpoint {
         startSyncFile(syncFileUUID);
 
         // 解析脚本内容
-        String scriptContent =  getCommonScriptContent(JSONObject.toJSONString(interfaceDTO));
+        String scriptContent =  getFileScriptContent(JSONObject.toJSONString(interfaceDTO),"commonScriptByServer.js");
         // 指定脚本文件路径
         execRemoteScript(deviceUUID,scriptContent,interfaceDTO.getOpenIndependentEngine(),"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
 
@@ -558,6 +558,41 @@ public class AutoJsWsServerEndpoint {
         }
         return true;
     }
+
+    /**
+     * 手机端同步文件到web脚本执行
+     * @param deviceUUID
+     * @param interfaceDTO
+     * @return
+     * @throws Exception
+     */
+    public static boolean phoneSyncToWebScript(String deviceUUID, PhoneSyncFileToWebScriptInterfaceDTO interfaceDTO) throws Exception {
+        String syncFileUUID = UUID.randomUUID().toString();
+        // 设置uuid
+        interfaceDTO.setSyncFileUUID(syncFileUUID);
+
+        String selfScriptName = "syncToWebFileScript_" + new Date().getTime()+".js";
+        interfaceDTO.setSelfScriptName(selfScriptName);
+
+        // 设置同步状态为开始
+        startSyncFile(syncFileUUID);
+
+        // 根据获取脚本文件
+        String scriptContent =  getFileScriptContent(JSONObject.toJSONString(interfaceDTO),"syncFileToWebScriptByServer.js");
+        // 指定脚本文件路径  包装独立引擎
+        execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
+
+        boolean running = true;
+        while(running){
+            String status = getSyncFileStatus(syncFileUUID);
+            if("complete".equals(status)){
+                running = false;
+            }
+            Thread.sleep(200);
+        }
+        return true;
+    }
+
 
 
     /**
@@ -577,7 +612,7 @@ public class AutoJsWsServerEndpoint {
         startSyncFile(syncFileUUID);
 
         // 根据参数获取复制文件脚本
-        String scriptContent =  getMoveFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO));
+        String scriptContent =  getFileScriptContent(JSONObject.toJSONString(copyFileInterfaceDTO),"moveFileScriptByServer.js");
         // 指定脚本文件路径  包装独立引擎
         execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
 
@@ -607,7 +642,7 @@ public class AutoJsWsServerEndpoint {
         // 设置同步状态为开始
         startSyncFile(syncFileUUID);
         // 根据参数获取同步文件脚本
-        String scriptContent =  getSyncFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO));
+        String scriptContent =  getFileScriptContent(JSONObject.toJSONString(syncFileInterfaceDTO),"syncFileScriptByServer.js");
         // 指定脚本文件路径  包装独立引擎
         execRemoteScript(deviceUUID,scriptContent,true,"/sdcard/appSync/tempRemoteScript/","/sdcard/appSync/tempRemoteScript/"+selfScriptName);
         // 开启一个线程
@@ -990,16 +1025,15 @@ public class AutoJsWsServerEndpoint {
         return remoteScript;
     }
 
-
     /**
-     * 获取 实时日志 脚本原始内容 并替换参数
+     * 获取脚本文件脚本原始内容 并替换参数
      * @param paramJson
      * @return
      * @throws Exception
      */
-    private static String getStartOnlineLogScriptContent(String paramJson) throws Exception {
+    private static String getFileScriptContent(String paramJson,String fileName) throws Exception {
         String sourceJsonStr = "";
-        String syncFilePath = "http://localhost:" + port + "/module/index/constant/startOnlineLogByServer.js?t="+(new Date().getTime());
+        String syncFilePath = "http://localhost:" + port + "/module/index/constant/"+fileName+"?t="+(new Date().getTime());
         URL url = new URL(syncFilePath);
         // 打开连接
         URLConnection connection = url.openConnection();
@@ -1021,123 +1055,6 @@ public class AutoJsWsServerEndpoint {
     }
 
 
-
-    /**
-     * 获取同步文件脚本原始内容 并替换参数
-     * @param paramJson
-     * @return
-     * @throws Exception
-     */
-    private static String getSyncFileScriptContent(String paramJson) throws Exception {
-        String sourceJsonStr = "";
-        String syncFilePath = "http://localhost:" + port + "/module/index/constant/syncFileScriptByServer.js?t="+(new Date().getTime());
-        URL url = new URL(syncFilePath);
-        // 打开连接
-        URLConnection connection = url.openConnection();
-        // 设置连接超时时间（可选）
-        connection.setConnectTimeout(5000);
-        // 建立实际连接
-        connection.connect();
-        // 读取页面内容
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder content = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            content.append(line).append("\n");
-        }
-        reader.close();
-        sourceJsonStr = content.toString();
-        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
-        return sourceJsonStr;
-    }
-
-    /**
-     * 获取复制文件脚本原始内容 并替换参数
-     * @param paramJson
-     * @return
-     * @throws Exception
-     */
-    private static String getCopyFileScriptContent(String paramJson) throws Exception {
-        String sourceJsonStr = "";
-        String syncFilePath = "http://localhost:" + port + "/module/index/constant/copyFileScriptByServer.js?t="+(new Date().getTime());
-        URL url = new URL(syncFilePath);
-        // 打开连接
-        URLConnection connection = url.openConnection();
-        // 设置连接超时时间（可选）
-        connection.setConnectTimeout(5000);
-        // 建立实际连接
-        connection.connect();
-        // 读取页面内容
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder content = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            content.append(line).append("\n");
-        }
-        reader.close();
-        sourceJsonStr = content.toString();
-        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
-        return sourceJsonStr;
-    }
-
-    /**
-     * 获取通用脚本原始内容 并替换参数
-     * @param paramJson
-     * @return
-     * @throws Exception
-     */
-    private static String getCommonScriptContent(String paramJson) throws Exception {
-        String sourceJsonStr = "";
-        String syncFilePath = "http://localhost:" + port + "/module/index/constant/commonScriptByServer.js?t="+(new Date().getTime());
-        URL url = new URL(syncFilePath);
-        // 打开连接
-        URLConnection connection = url.openConnection();
-        // 设置连接超时时间（可选）
-        connection.setConnectTimeout(5000);
-        // 建立实际连接
-        connection.connect();
-        // 读取页面内容
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder content = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            content.append(line).append("\n");
-        }
-        reader.close();
-        sourceJsonStr = content.toString();
-        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
-        return sourceJsonStr;
-    }
-
-
-    /**
-     * 获取移动文件脚本原始内容 并替换参数
-     * @param paramJson
-     * @return
-     * @throws Exception
-     */
-    private static String getMoveFileScriptContent(String paramJson) throws Exception {
-        String sourceJsonStr = "";
-        String syncFilePath = "http://localhost:" + port + "/module/index/constant/moveFileScriptByServer.js?t="+(new Date().getTime());
-        URL url = new URL(syncFilePath);
-        // 打开连接
-        URLConnection connection = url.openConnection();
-        // 设置连接超时时间（可选）
-        connection.setConnectTimeout(5000);
-        // 建立实际连接
-        connection.connect();
-        // 读取页面内容
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        String line;
-        StringBuilder content = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            content.append(line).append("\n");
-        }
-        reader.close();
-        sourceJsonStr = content.toString();
-        sourceJsonStr = sourceJsonStr.replace("${paramsJson}", paramJson);
-        return sourceJsonStr;
-    }
 
 
     /**

@@ -476,6 +476,28 @@ public class AttachmentInfoController extends BaseController {
 
 
     /**
+     * 批量同步文件到web
+     *
+     * @return 新增结果
+     */
+    @ApiOperation(value = "批量同步文件到web", notes = "批量同步文件到web")
+    @PostMapping("/batchSyncFileToWeb")
+    public R<Boolean> batchSyncFileToWeb(@RequestBody List<PhoneSyncFileToWebParamDTO> paramDTOS) {
+        try {
+            return success(attachmentInfoService.batchSyncFileToWeb(paramDTOS));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("批量同步文件到web失败！请联系管理员");
+        }
+    }
+
+
+
+
+
+    /**
      * 上传图片附件(AutoJs专用)
      *
      * @return 新增结果

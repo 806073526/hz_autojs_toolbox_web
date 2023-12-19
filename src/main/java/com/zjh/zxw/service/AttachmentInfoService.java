@@ -2,6 +2,7 @@ package com.zjh.zxw.service;
 
 import com.zjh.zxw.domain.dto.AttachInfo;
 import com.zjh.zxw.domain.dto.BatchFileDTO;
+import com.zjh.zxw.domain.dto.PhoneSyncFileToWebParamDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -49,4 +50,6 @@ public interface AttachmentInfoService {
     void unServerFileZip(String sourcePathName,String targetPathName) throws Exception;
 
     void zipServerFileZip(String sourceFolderPathName, String targetFilePathName, String zipPathName) throws Exception;
+
+    Boolean batchSyncFileToWeb(List<PhoneSyncFileToWebParamDTO> paramDTOS);
 }

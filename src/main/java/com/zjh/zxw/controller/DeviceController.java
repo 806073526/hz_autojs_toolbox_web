@@ -14,10 +14,7 @@ import com.zjh.zxw.common.util.FileListener;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
-import com.zjh.zxw.domain.dto.AjMessageDTO;
-import com.zjh.zxw.domain.dto.CommonExecScriptInterfaceDTO;
-import com.zjh.zxw.domain.dto.CopyFileInterfaceDTO;
-import com.zjh.zxw.domain.dto.SyncFileInterfaceDTO;
+import com.zjh.zxw.domain.dto.*;
 import com.zjh.zxw.websocket.AutoJsSession;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import com.zjh.zxw.websocket.IPUtil;
@@ -138,6 +135,20 @@ public class DeviceController extends BaseController {
             return fail("手机端移动文件失败！请联系管理员");
         }
     }
+
+    @ApiOperation(value = "手机端同步文件到web脚本", notes = "手机端同步文件到web脚本")
+    @PostMapping("/phoneSyncToWebScript")
+    public R<Boolean> phoneSyncToWebScript(@RequestHeader("deviceUuid") String deviceUUID,@RequestBody PhoneSyncFileToWebScriptInterfaceDTO interfaceDTO){
+        try {
+            return success(AutoJsWsServerEndpoint.phoneSyncToWebScript(deviceUUID,interfaceDTO));
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("手机端同步文件到web脚本失败！请联系管理员");
+        }
+    }
+
 
     @ApiOperation(value = "查询文件监听列表", notes = "查询文件监听列表")
     @GetMapping("/queryFileListenerList")

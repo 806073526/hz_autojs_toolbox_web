@@ -89,11 +89,11 @@
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <b>同步到手机端:</b>
-                                    <span>将当前web同步路径下的所有内容同步到手机端的同步路径下(文件夹不会递归同步,如有同步项目需求,建议先压缩zip后再同步)</span>
+                                    <span>将当前web同步路径下的所有内容同步到手机端的同步路径下</span>
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <b>同步到web端:</b>
-                                    <span>将当前手机端同步路径下的所有内容同步到web端的同步路径下(文件夹不会递归同步,如有同步项目需求,建议先压缩zip后再同步)</span>
+                                    <span>将当前手机端同步路径下的所有内容同步到web端的同步路径下</span>
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <b>新建文件(夹):</b>
@@ -174,7 +174,6 @@
                                     <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
                                     <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>
                                     <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
-                                    <span v-if="phoneCheckFileCount>0" style="font-size: 12px;margin-left: 5px;margin-bottom: 5px;color: #cf0808">文件夹不支持复制！！！</span>
                                 </div>
                             </div>
                         </el-row>
@@ -206,7 +205,7 @@
                                     <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">压缩(不含目录)</el-link>
                                     <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
-                                    <el-link v-show="!item.isDirectory" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
+                                    <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
                                     <el-link v-show="item.fileName==='package' && item.fileType === 'json'" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="termuxRunNpmInstall(item)">安装npm依赖</el-link>
                                 </div>
