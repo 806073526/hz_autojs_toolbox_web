@@ -1019,7 +1019,7 @@ export default {
                             showProcess:true // 显示进度
                         };
                         let _that = this;
-                        _that.phoneFileLoading = false;
+                        _that.phoneFileLoading = true;
                         $.ajax({
                             url: getContext() + "/device/phoneMoveFiles",
                             type: 'POST',
