@@ -78,9 +78,13 @@ let completeFun = ()=>{
         }
     });
 };
-// 执行传入脚本
-eval(scriptContent);
 
+try{
+    // 执行传入脚本
+   eval(scriptContent);
+}catch(e){
+   console.error(e);
+}
 if(!manualComplete){
     completeFun();
 }
