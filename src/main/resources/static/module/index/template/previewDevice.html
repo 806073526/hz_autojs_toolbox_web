@@ -299,13 +299,27 @@
                                 </el-form-item>
                             </el-row>
                             <el-row>
-                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
+                                    <span>
+                                        开启adb预览(adb或root)：
+                                    </span>
+                                    <el-switch v-model="openAdbPreviewModel" @change="openAdbPreviewModelChange"/>
+                                </div>
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;" v-show="!openAdbPreviewModel">
                                     <span>
                                         开启灵敏模式(adb或root)：
                                     </span>
                                     <el-switch v-model="devicePreviewParam.isOpenFastModel" @change="autoDevicePreview"/>
                                 </div>
-                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;" v-show="!openAdbPreviewModel">
+                                      <span>
+                                        参数变化后自动预览：
+                                      </span>
+                                    <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
+                                </div>
+                            </el-row>
+                            <el-row v-show="!openAdbPreviewModel" style="margin-top: 10px;">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
                                     <span>
                                         开启灰度化：
                                     </span>
@@ -316,12 +330,6 @@
                                         开启阈值化：
                                     </span>
                                     <el-switch v-model="devicePreviewParam.isOpenThreshold" @change="autoDevicePreview"/>
-                                </div>
-                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                                      <span>
-                                        参数变化后自动预览：
-                                      </span>
-                                     <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
                                 </div>
                             </el-row>
                         </div>

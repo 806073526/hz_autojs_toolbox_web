@@ -1,6 +1,9 @@
 package com.zjh.zxw.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.img.Img;
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -11,6 +14,7 @@ import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.FileListener;
+import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
@@ -22,24 +26,22 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sun.applet.Main;
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -88,6 +90,130 @@ public class DeviceController extends BaseController {
 
     // 在线机器码map
     private static Map<String, Map<String,String>> onlineMachineMap = new ConcurrentHashMap<>();
+
+    @ApiOperation(value = "开启无线调试", notes = "开启无线调试")
+    @GetMapping("/pairDevice")
+    public R<String> pairDevice(@RequestParam("ip") String ip,@RequestParam("port") String port,@RequestParam("code") String code){
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return success("QtScrcpy/adb.exe文件不存在");
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe pair "+ip+":"+port+" "+code);
+        return success(result);
+    }
+
+    @ApiOperation(value = "开启adb授权", notes = "开启adb授权")
+    @GetMapping("/grantAdb")
+    public R<String> grantAdb(@RequestParam(value = "packageName",required = false) String packageName){
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return success("QtScrcpy/adb.exe文件不存在");
+        }
+        if(StringUtils.isBlank(packageName)){
+            packageName = "com.zjh336.cn.tools";
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe shell pm grant "+packageName+" android.permission.WRITE_SECURE_SETTINGS");
+        return success(result);
+    }
+
+
+    @ApiOperation(value = "截取手机屏幕", notes = "截取手机屏幕")
+    @GetMapping("/screenCap")
+    public R<String> screenCap(@RequestParam(value = "ip",required = false) String ip,@RequestParam(value = "imagePath",required = false) String imagePath){
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return success("QtScrcpy/adb.exe文件不存在");
+        }
+        LocalDateTime time1 = LocalDateTime.now();
+        Process sh = RuntimeUtil.exec("QtScrcpy/adb.exe -s "+ip+" exec-out screencap -p");
+        LocalDateTime time2 = LocalDateTime.now();
+        System.out.println("获取耗时："+Duration.between(time1,time2).toMillis());
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            BufferedInputStream inputStream = new BufferedInputStream(sh.getInputStream());
+            byte[] data = new byte[1024 * 1024 * 100];
+            int length = 0;
+            while ((length = inputStream.read(data)) != -1){
+                bos.write(data, 0, length);
+            }
+            inputStream.close();
+            byte[] compressedImageData = bos.toByteArray();
+            /*// 把图片读入到内存中
+            BufferedImage bufImg = ImageIO.read(sh.getInputStream());
+            LocalDateTime time3 = LocalDateTime.now();
+            System.out.println("读入内存耗时："+Duration.between(time2,time3).toMillis());
+            // 压缩代码,存储图片文件byte数组
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            //防止图片变红,这一步非常重要
+            BufferedImage bufferedImage = new BufferedImage(bufImg.getWidth(), bufImg.getHeight(), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.createGraphics().drawImage(bufImg,0,0, Color.WHITE,null);
+            //先转成jpg格式来压缩,然后在通过OSS来修改成源文件本来的后缀格式
+            ImageIO.write(bufferedImage,"jpg",bos);
+            LocalDateTime time4 = LocalDateTime.now();
+            */
+            LocalDateTime time4 = LocalDateTime.now();
+            System.out.println("读入内存耗时："+Duration.between(time2,time4).toMillis());
+
+            if (imagePath != null && !imagePath.isEmpty()) {
+                // 写入本地文件
+                File file = new File(imagePath);
+                File parentDir = file.getParentFile();
+                if (parentDir != null && !parentDir.exists()) {
+                    parentDir.mkdirs(); // 创建目录
+                }
+                try (OutputStream outputStream = new FileOutputStream(file)) {
+                    outputStream.write(compressedImageData);
+                }
+                LocalDateTime time5 = LocalDateTime.now();
+                System.out.println("写入文件耗时："+Duration.between(time4,time5).toMillis());
+                return success("截取并保存手机屏幕成功！");
+            } else {
+                // 返回 base64
+                String base64String = Base64.getEncoder().encodeToString(compressedImageData);
+                LocalDateTime time5 = LocalDateTime.now();
+                System.out.println("转换base64耗时："+Duration.between(time4,time5).toMillis());
+                return success(base64String);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("截取手机屏幕失败！请联系管理员");
+        }
+    }
+
+    @ApiOperation(value = "连接adb", notes = "连接adb")
+    @GetMapping("/connectDevice")
+    public R<String> connectDevice(@RequestParam("ip") String ip,@RequestParam("port") String port,@RequestParam(value = "openQtScrcpy",required = false) String QtScrcpy) throws InterruptedException {
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return success("QtScrcpy/adb.exe文件不存在");
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe connect "+ip+":"+port);
+        if(StringUtils.isNotBlank(QtScrcpy)){
+            File QtScrcpyFile = new File("QtScrcpy/QtScrcpy.exe");
+            if(QtScrcpyFile.exists()){
+                RuntimeUtil.exec("taskkill /f /im QtScrcpy.exe");
+                Thread.sleep(1000);
+                RuntimeUtil.exec("QtScrcpy/QtScrcpy.exe");
+            } else {
+                result +="QtScrcpy/QtScrcpy.exe文件不存在,请先初始化";
+            }
+        }
+        return success(result);
+    }
+
+
+    @ApiOperation(value = "断连全部adb", notes = "断连全部adb")
+    @GetMapping("/disconnectDevice")
+    public R<String> disconnectDevice(){
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return success("QtScrcpy/adb.exe文件不存在");
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe disconnect");
+        return success(result);
+    }
+
+
 
     @ApiOperation(value = "完成同步文件(或其他操作)", notes = "完成同步文件(或其他操作)")
     @GetMapping("/completeSyncFile")

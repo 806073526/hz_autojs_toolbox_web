@@ -37,6 +37,7 @@ export default {
         return {
             autoRefreshScreenCapture: false, // 刷新截图权限
             openFloatWindow: false,
+            openAdbPreviewModel: false, // 是否开启adb预览模式
             devicePreviewParam: { // 设备预览参数
                 imgQuality: 10,
                 imgScale: 1,
@@ -429,6 +430,102 @@ export default {
                 fun();
             }
             `;
+            // 如果开启了adb预览模式
+            if(this.openAdbPreviewModel){
+                remoteScript = `
+                let deviceParam = {
+                    imgQuality: 100,
+                    imgScale: 1,
+                    isOpenGray: 0,
+                    isOpenThreshold: 0,
+                    imgThreshold: 60,
+                    appSpace:500
+                }
+                // 唤醒设备
+                device.wakeUpIfNeeded();
+                // json字符串转换js对象
+                let operateObj = JSON.parse('${messageStr}')
+            
+                deviceParam.imgQuality = operateObj.imgQuality || 100
+                deviceParam.imgScale = operateObj.imgScale || 1
+            
+                deviceParam.isOpenGray = operateObj.isOpenGray ? 1 : 0
+                deviceParam.isOpenThreshold = operateObj.isOpenThreshold ? 1 : 0
+                deviceParam.imgThreshold = operateObj.imgThreshold || 60
+                deviceParam.appSpace = operateObj.appSpace || 500
+               
+                if(!utilsObj.hasAdb){
+                    utilsObj.hasAdb =  $shell.checkAccess("adb") ? 1 : 2;
+                }
+                if (!utilsObj.hasRoot) {
+                    utilsObj.hasRoot =  $shell.checkAccess("root") ? 1 : 2;  
+                }
+                
+                if(utilsObj.deviceThread){
+                    console.log("关闭预览线程")
+                    utilsObj.deviceThread.interrupt()
+                }
+                utilsObj.deviceThread = threads.start(() => {
+                    files.createWithDirs("/sdcard/screenImg/")
+                    sleep(500)
+                    toastLog("开始预览")
+                    let lastImageBase = "";
+                    while (true) {
+                        try {
+                            let options = {}
+                            if(utilsObj.hasRoot === 1){
+                               options.root = true;
+                            }else if(utilsObj.hasAdb === 1){
+                               options.adb = true;
+                            }
+                            try{
+                                let result = shell("screencap /sdcard/screenImg/adbScreen.png", options);
+                                if(result.code !== 0){
+                                    console.log("没有adb和root权限");
+                                    utilsObj.deviceThread.interrupt();
+                                }
+                            }catch(e){
+                                console.log("没有adb和root权限,已终止预览");
+                                utilsObj.deviceThread.interrupt();
+                            }
+                            let img = images.read("/sdcard/screenImg/adbScreen.png");
+                            let afterImg = images.scale(img, deviceParam.imgScale, deviceParam.imgScale)
+                             if (deviceParam.isOpenGray === 1) {
+                                let afterImg1 = images.grayscale(afterImg)
+                                afterImg.recycle()
+                                afterImg = afterImg1
+                            }
+                            if (deviceParam.isOpenThreshold === 1) {
+                                let afterImg2 = images.threshold(afterImg, deviceParam.imgThreshold, 255, 'BINARY');
+                                afterImg.recycle()
+                                afterImg = afterImg2
+                            } 
+                            let tempImgPath = '/sdcard/screenImg/tempImg.jpg'
+                            
+                            let curImageBase = images.toBase64(afterImg, "jpg", deviceParam.imgQuality);
+                            if(curImageBase !== lastImageBase){
+                                http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998)  +'/attachmentInfo/updateFileMap', {
+                                    headers: {
+                                        "deviceUUID": commonStorage.get('deviceUUID')
+                                    },
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    body: JSON.stringify({ 'dirPathKey': commonStorage.get('deviceUUID') + '_' + tempImgPath, 'fileJson': curImageBase })
+                                }, (e) => { 
+                                    lastImageBase = curImageBase;
+                                });
+                            }
+                            afterImg.recycle()
+                            img.recycle()
+                            sleep(deviceParam.appSpace) 
+                        } catch (error) {
+                            console.error("预览错误",error)
+                        }
+                    }
+                })
+                `;
+            }
+
             // 直接执行 以图片接口上传缓存的方式 上传图片数据
             this.remoteExecuteScript(remoteScript,()=>{
                 // 发送成功后执行 web端的监听方法
@@ -547,6 +644,26 @@ export default {
                 }
             }
             `;
+            // 如果开启了adb预览模式
+            if(this.openAdbPreviewModel){
+                remoteScript = `
+                // 唤醒设备
+                device.wakeUpIfNeeded();
+                if(utilsObj.raObj){
+                    try{
+                      utilsObj.raObj.flush();
+                      utilsObj.raObj.exit(true);
+                      utilsObj.raObj = null;
+                    }catch(e){
+                       utilsObj.raObj = null;
+                    }
+                }
+                if(utilsObj.deviceThread){
+                    toastLog("停止预览");
+                    utilsObj.deviceThread.interrupt();
+                }`;
+            }
+
             this.remoteExecuteScript(remoteScript,()=>{
                 this.stopPreviewWebHandler(notice,callback);
             })
@@ -1095,6 +1212,10 @@ export default {
                 this.startPreviewDevice(false);
                 this.autoRefreshScreenCapture = cacheAutoRefreshScreenCapture;
             })
+        },
+        // 开启adb预览
+        openAdbPreviewModelChange(){
+
         },
         // 自动预览设备
         autoDevicePreview() {
