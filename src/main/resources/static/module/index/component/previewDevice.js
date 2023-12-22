@@ -433,6 +433,105 @@ export default {
             // 如果开启了adb预览模式
             if(this.openAdbPreviewModel){
                 remoteScript = `
+
+let screenCapturePort = 12345;
+// 获取图片
+let getImageFun = (sleepTime) => {
+    let getImageByHttp = () => {
+        try {
+            let startTime = new Date().getTime();
+            let r = http.get("localhost:"+screenCapturePort+"/screenshot?format=jpeg");
+            if (r.statusCode === 200) {
+                let imageResult = images.fromBytes(r.body.bytes());
+                // console.log("获取图片耗时:" + ((new Date().getTime()) - startTime));
+                return imageResult;
+            } else {
+                return null;
+            }
+        } catch (e) {
+            return null;
+        }
+    }
+
+
+    // 非运行状态
+    if (!utilsObj.screenCaptureRunning) {
+        // 保证apk依赖存在
+        syncDroidCastApk(() => {
+            // 开启截屏线程
+            changeScreenCaptureThread(true);
+        })
+    }
+    // 当前等待时间        
+    let waitTime = 0;
+    // 等待标记
+    let waitFlag = true;
+    // 图片结果
+    let imageResult = null;
+    while (waitFlag) {
+        // 获取图片
+        imageResult = getImageByHttp();
+        // 获取到了或者 超过等待时间了直接返回
+        if (imageResult || waitTime >= sleepTime) {
+            waitFlag = false;
+        } else {
+            // 未获取到 累计等待时间
+            sleep(50);
+            waitTime += 50;
+        }
+    }
+    return imageResult;
+}
+
+// 同步apk
+let syncDroidCastApk = (execFun) => {
+    let apkFilePath = "/sdcard/appSync/DroidCast-debug-1.2.0.apk";
+    // 如果不存在
+    if (!files.exists(apkFilePath)) {
+        console.log("开始下载apk依赖");
+        // 执行下载
+        utilsObj.downLoadFile("${getContext()}/DroidCast-debug-1.2.0.apk", "appSync/DroidCast-debug-1.2.0.apk", () => {
+            console.log("下载apk依赖完成");
+            if (execFun) {
+                execFun();
+            }
+        });
+    } else {
+        console.log("已有apk依赖");
+        if (execFun) {
+            execFun();
+        }
+    }
+}
+
+// 切换截屏线程状态
+let changeScreenCaptureThread = (flag) => {
+    if (flag) {
+        if (utilsObj.startScreenCaptureThread) {
+            utilsObj.startScreenCaptureThread.interrupt();
+        }
+         // 开始截屏线程
+        utilsObj.startScreenCaptureThread = threads.start(() => {
+            utilsObj.screenCaptureRunning = true;
+            try {
+                console.log("启动截屏线程");
+                let command = \`adb shell
+                export CLASSPATH=/sdcard/appSync/DroidCast-debug-1.2.0.apk
+                exec app_process /system/bin com.rayworks.droidcast.Main --port=\$\{screenCapturePort\} '$@'\`;
+                let result = shell(command, {
+                    adb: true
+                });
+            } catch (e) {
+                utilsObj.screenCaptureRunning = false;
+            }
+        });
+    } else {
+        if (utilsObj.startScreenCaptureThread) {
+            utilsObj.startScreenCaptureThread.interrupt();
+        }
+        utilsObj.screenCaptureRunning = false;
+    }
+}
                 let deviceParam = {
                     imgQuality: 100,
                     imgScale: 1,
@@ -478,17 +577,11 @@ export default {
                             }else if(utilsObj.hasAdb === 1){
                                options.adb = true;
                             }
-                            try{
-                                let result = shell("screencap /sdcard/screenImg/adbScreen.png", options);
-                                if(result.code !== 0){
-                                    console.log("没有adb和root权限");
-                                    utilsObj.deviceThread.interrupt();
-                                }
-                            }catch(e){
+                            let img = getImageFun(5000);
+                            if(!img){
                                 console.log("没有adb和root权限,已终止预览");
                                 utilsObj.deviceThread.interrupt();
                             }
-                            let img = images.read("/sdcard/screenImg/adbScreen.png");
                             let afterImg = images.scale(img, deviceParam.imgScale, deviceParam.imgScale)
                              if (deviceParam.isOpenGray === 1) {
                                 let afterImg1 = images.grayscale(afterImg)
@@ -658,6 +751,13 @@ export default {
                        utilsObj.raObj = null;
                     }
                 }
+                // 停止线程
+                if (utilsObj.startScreenCaptureThread) {
+                    utilsObj.startScreenCaptureThread.interrupt();
+                }
+                // 重置运行状态
+                utilsObj.screenCaptureRunning = false;
+                
                 if(utilsObj.deviceThread){
                     toastLog("停止预览");
                     utilsObj.deviceThread.interrupt();
