@@ -208,6 +208,108 @@ export default {
         controlPanelOpenChange(){
           this.controlPanelOpen = !this.controlPanelOpen;
         },
+        // 启动QtScrcpy
+        startQtScrcpyFun(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/startQtScrcpy",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            window.ZXW_VUE.$notify.success({
+                                message: '启动完成',
+                                duration: '500'
+                            })
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
+        // 下载和安装shizuku
+        initShizuku(){
+            let remoteScript = `
+            let execFun = ()=>{
+                 // 判断应用是否安装
+                let appName = getAppName("moe.shizuku.privileged.api");
+                
+                // 未安装 则安装apk
+                if(!appName){
+                    app.viewFile("/sdcard/appSync/Shizuku.apk")
+                } else {
+                    toastLog("应用已安装");
+                }
+            }
+            try{
+                let apkFilePath = "/sdcard/appSync/Shizuku.apk";
+                // 如果不存在
+                if(!files.exists(apkFilePath)){
+                    console.log("开始下载apk");
+                    // 执行下载
+                    utilsObj.downLoadFile("${getContext()}/Shizuku.apk","appSync/Shizuku.apk",()=>{
+                        console.log("下载apk完成");
+                        execFun();
+                    });
+                } else {
+                    console.log("已有apk");
+                    execFun();
+                }
+            }catch(e){
+                console.error(e);
+            }
+            `;
+            this.remoteExecuteScript(remoteScript);
+        },
+        startShizuku(){
+            let remoteScript = `
+            // 判断应用是否安装
+            let appName = getAppName("moe.shizuku.privileged.api");
+            if(!appName){
+                toastLog("请先下载和安装Shizuku");
+            } else {
+                app.startActivity({
+                    action: "android.intent.action.MAIN",
+                    packageName: "moe.shizuku.privileged.api",
+                    className: "moe.shizuku.manager.MainActivity"
+                });
+                let shizuku = textContains("Shizuku").findOne(2000);
+                if(shizuku){
+                    let 启动 = text("启动").className("android.widget.Button").findOne(1000);
+                    if(启动){
+                        click("启动");
+                    }
+                }
+            }
+            `;
+            this.remoteExecuteScript(remoteScript);
+        },
+        // 开启无线调试
+        openWirelessDebugFun(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/openWirelessDebugExec",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            window.ZXW_VUE.$message.info({message: '已执行脚本【system/remoteScript/wirelessDebug.js】,如不能适配,请手动修改脚本', duration: 1500});
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
         // 刷新预览设备图片方法
         refreshPreviewImgFun(){
             /*fetch(window.deviceImgUrl).then(msg=>{

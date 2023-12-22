@@ -305,7 +305,7 @@
                                     </span>
                                     <el-switch v-model="openAdbPreviewModel" @change="openAdbPreviewModelChange"/>
                                 </div>
-                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;" v-show="!openAdbPreviewModel">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
                                     <span>
                                         开启灵敏模式(adb或root)：
                                     </span>
@@ -332,6 +332,73 @@
                                     <el-switch v-model="devicePreviewParam.isOpenThreshold" @change="autoDevicePreview"/>
                                 </div>
                             </el-row>
+                        </div>
+                    </el-card>
+                </div>
+                <div style="margin-top: 10px;">
+                    <el-card>
+                        <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.otherOperate=!arrowArr.otherOperate">
+                            <span>其他操作</span>
+                            <i :class="{'el-icon-arrow-down':arrowArr.otherOperate,'el-icon-arrow-up':!arrowArr.otherOperate}"  style="float: right;"></i>
+                        </div>
+                        <div style="padding: 15px 0 20px 0;" v-show="arrowArr.otherOperate">
+                            <div class="d-flex j-start flex-wrap" style="line-height: 35px;text-align: center;">
+                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="initShizuku">
+                                    下载和安装Shizuku(开发者)
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="startShizuku">
+                                    重启Shizuku(授予adb权限)
+                                </el-button>
+                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="startQtScrcpyFun">
+                                    启动QtScrcpy(adb无线投屏)
+                                </el-button>
+                                <el-button type="danger" style="margin-left:10px;margin-bottom: 5px;width: 200px;" size="mini" @click.stop.prevent="openWirelessDebugFun">
+                                    开启无线调试(自动配对+连接)
+                                </el-button>
+                                <span v-popover:popover2 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer;height: 30px;display: flex;justify-content: center;align-items: center;">
+                                 <i class="el-icon-question" />
+                                </span>
+                                <el-popover ref="popover2" placement="top-start" width="600" trigger="hover">
+                                    <div>
+                                        <b>预览模式-无障碍预览:</b>
+                                        <span>默认以无障碍模式预览设备,该模式会导致脚本抢占截图权限,速度较快,支持公网部署使用,预览速度与带宽有较大关系。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>预览模式-adb预览:</b>
+                                        <span>使用adb权限进行截图,该模式不需要截图权限,速度较快,支持公网部署使用，预览速度与带宽有较大关系。可以使用Shizuku给工具箱授权adb。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>预览模式-QtScrcpy投屏:</b>
+                                        <span>使用开源的QtScrcpy工具进行投屏,该工具基于adb投屏,速度极快,基本无延迟,仅支持局域网使用。可以使用USB数据线连接adb，也可以使用无线调试连接adb。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>关于adb的使用:</b>
+                                        <span>使用adb前,手机需要开启开发者模式、USB调试模式、USB调试(安全设置,如果有的话)。安卓11以上可以通过无线调试功能进行连接,就不需连数据线了,否则必须使用数据线连接电脑,使用adb命令进行连接。<br/>
+                                            常见命令：【adb tcpip 端口】【adb pair ip:端口】【adb connect ip:端口】
+                                        </span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>关于Shizuku的使用:</b>
+                                        <span>Shizuku的作用,就是模拟电脑对手机进行adb操作,进行初始化操作后,就不用再连电脑了。拥有无线调试功能的设备使用极其方便。前置条件参考关于adb的使用。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>下载和安装Shizuku:</b>
+                                        <span>工具箱内置Shizuku安装包,支持下载到手机,并执行安装操作。安装完成后,参考指南自行使用。安卓11以上可以使用无线调试进行配对。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>重启Shizuku:</b>
+                                        <span>工具箱内置自动运行代码,打开Shizuku应用,并启动服务。请注意,此操作必须手动开启过一次以后才能使用。主要作用在于重启Shizuk服务,有时依赖adb服务运行的程序卡住了,就需要重启一下shizuku服务。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>启动QtScrcpy:</b>
+                                        <span>打开工具箱web内置的QtScrcpy开源投屏程序。可以选择手动连接,通过adb命令方式连接。也可以选择手动无线调试连接。也可以选择工具箱内置开启无线调试功能，自动化开启。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>开启无线调试:</b>
+                                        <span>工具箱内置自动运行代码。以无障碍的方式,自动打开无线调试,自动进行配对,自动连接adb。省去了手动连接adb的操作。目前默认支持MIUI系统的自动化，如需适配其他系统。可在文件管理中修改此文件【system/remoteScript/wirelessDebug.js】</span>
+                                    </div>
+                                </el-popover>
+                            </div>
                         </div>
                     </el-card>
                 </div>

@@ -1031,7 +1031,7 @@ public class AutoJsWsServerEndpoint {
      * @return
      * @throws Exception
      */
-    private static String getFileScriptContent(String paramJson,String fileName) throws Exception {
+    public static String getFileScriptContent(String paramJson,String fileName) throws Exception {
         String sourceJsonStr = "";
         String syncFilePath = "http://localhost:" + port + "/module/index/constant/"+fileName+"?t="+(new Date().getTime());
         URL url = new URL(syncFilePath);

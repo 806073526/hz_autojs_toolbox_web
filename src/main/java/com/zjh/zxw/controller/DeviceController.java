@@ -5,6 +5,7 @@ import cn.hutool.core.img.Img;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -91,12 +92,38 @@ public class DeviceController extends BaseController {
     // 在线机器码map
     private static Map<String, Map<String,String>> onlineMachineMap = new ConcurrentHashMap<>();
 
+    // 检查QtScrcpy
+    private String checkQtScrcpy(){
+        File QtzipFile = new File("QtScrcpy.zip");
+        if(!QtzipFile.exists()){
+            // 执行下载zip
+            RuntimeUtil.execForStr("curl -o \"QtScrcpy.zip\" \"https://gitee.com/zjh336/hz_autojs_toolbox_web/raw/master/QtScrcpy.zip\"");
+        }
+        File QtFile = new File("QtScrcpy");
+        // 没有文件夹 才进行解压
+        if(!QtFile.exists()){
+            // 解压zip
+            ZipUtil.unzip(QtzipFile,new File(System.getProperty("user.dir")));
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        File adbFile = new File("QtScrcpy/adb.exe");
+        if(!adbFile.exists()){
+            return "QtScrcpy/adb.exe文件不存在";
+        }
+        return "";
+    }
+
+
     @ApiOperation(value = "开启无线调试", notes = "开启无线调试")
     @GetMapping("/pairDevice")
     public R<String> pairDevice(@RequestParam("ip") String ip,@RequestParam("port") String port,@RequestParam("code") String code){
-        File adbFile = new File("QtScrcpy/adb.exe");
-        if(!adbFile.exists()){
-            return success("QtScrcpy/adb.exe文件不存在");
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
         }
         String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe pair "+ip+":"+port+" "+code);
         return success(result);
@@ -105,9 +132,9 @@ public class DeviceController extends BaseController {
     @ApiOperation(value = "开启adb授权", notes = "开启adb授权")
     @GetMapping("/grantAdb")
     public R<String> grantAdb(@RequestParam(value = "packageName",required = false) String packageName){
-        File adbFile = new File("QtScrcpy/adb.exe");
-        if(!adbFile.exists()){
-            return success("QtScrcpy/adb.exe文件不存在");
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
         }
         if(StringUtils.isBlank(packageName)){
             packageName = "com.zjh336.cn.tools";
@@ -120,9 +147,9 @@ public class DeviceController extends BaseController {
     @ApiOperation(value = "截取手机屏幕", notes = "截取手机屏幕")
     @GetMapping("/screenCap")
     public R<String> screenCap(@RequestParam(value = "ip",required = false) String ip,@RequestParam(value = "imagePath",required = false) String imagePath){
-        File adbFile = new File("QtScrcpy/adb.exe");
-        if(!adbFile.exists()){
-            return success("QtScrcpy/adb.exe文件不存在");
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
         }
         LocalDateTime time1 = LocalDateTime.now();
         Process sh = RuntimeUtil.exec("QtScrcpy/adb.exe -s "+ip+" exec-out screencap -p");
@@ -180,24 +207,77 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "连接adb", notes = "连接adb")
-    @GetMapping("/connectDevice")
-    public R<String> connectDevice(@RequestParam("ip") String ip,@RequestParam("port") String port,@RequestParam(value = "openQtScrcpy",required = false) String QtScrcpy) throws InterruptedException {
-        File adbFile = new File("QtScrcpy/adb.exe");
-        if(!adbFile.exists()){
-            return success("QtScrcpy/adb.exe文件不存在");
+    @ApiOperation(value = "启动QtScrcpy", notes = "启动QtScrcpy")
+    @GetMapping("/startQtScrcpy")
+    public R<String> startQtScrcpy() throws InterruptedException {
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
         }
-        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe connect "+ip+":"+port);
-        if(StringUtils.isNotBlank(QtScrcpy)){
-            File QtScrcpyFile = new File("QtScrcpy/QtScrcpy.exe");
-            if(QtScrcpyFile.exists()){
-                RuntimeUtil.exec("taskkill /f /im QtScrcpy.exe");
-                Thread.sleep(1000);
-                RuntimeUtil.exec("QtScrcpy/QtScrcpy.exe");
-            } else {
-                result +="QtScrcpy/QtScrcpy.exe文件不存在,请先初始化";
+        File QtScrcpyFile = new File("QtScrcpy/QtScrcpy.exe");
+        if(QtScrcpyFile.exists()){
+            RuntimeUtil.exec("taskkill /f /im QtScrcpy.exe");
+            Thread.sleep(1000);
+            RuntimeUtil.exec("QtScrcpy/QtScrcpy.exe");
+        }
+        return success("");
+    }
+
+    @ApiOperation(value = "开启无线调试执行代码", notes = "开启无线调试执行代码")
+    @GetMapping("/openWirelessDebugExec")
+    public R<String> openWirelessDebug(@RequestParam("deviceUUID") String deviceUUID) throws Exception {
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
+        }
+        String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+        String wirelessDebugPath = (tempPath.endsWith(File.separator) ? tempPath : (tempPath + File.separator))  + "autoJsTools" + File.separator+ deviceUUID + File.separator + "system" + File.separator + "remoteScript" + File.separator + "wirelessDebug.js";
+        // 远程无线调试代码
+        File remoteScriptFile = new File(wirelessDebugPath);
+        if(!remoteScriptFile.exists()){
+            FileOutputStream fos = null;
+            try {
+                remoteScriptFile.createNewFile();
+                fos  = new FileOutputStream(wirelessDebugPath);
+                OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+                osw.write(AutoJsWsServerEndpoint.getFileScriptContent("","wirelessDebug.js"));
+                osw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    fos.close();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
             }
         }
+
+        File remoteScriptEndFile = new File(wirelessDebugPath);
+        StringBuilder remoteScript = new StringBuilder();
+        try (FileReader reader = new FileReader(remoteScriptEndFile);
+             BufferedReader br = new BufferedReader(reader)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                remoteScript.append(line+"\r\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 远程执行代码
+        AutoJsWsServerEndpoint.execRemoteScript(deviceUUID,remoteScript.toString(),false,"","");
+        return success("");
+    }
+
+
+    @ApiOperation(value = "连接adb", notes = "连接adb")
+    @GetMapping("/connectDevice")
+    public R<String> connectDevice(@RequestParam("ip") String ip,@RequestParam("port") String port) {
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe connect "+ip+":"+port);
         return success(result);
     }
 

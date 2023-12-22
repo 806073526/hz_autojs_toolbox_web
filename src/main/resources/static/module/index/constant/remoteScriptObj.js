@@ -385,8 +385,8 @@ export const remoteScriptObj = {
     },
     openAdbConnectByMIUI:{
       type:'internal',
-      name:'【MIUI】无线调试连接adb并启动QtScrcpy',
-      code: `console.log("本代码仅适配了MIUI系统,其他系统可手动适配,另外请先手动开启开发者模式、USB调试模式、USB调试安全设置,WEB端exe模式需要手动引入QtScrpy到根目录才能使用")
+      name:'【MIUI】无线调试连接adb',
+      code: `console.log("本代码仅适配了MIUI系统,其他系统可手动适配,另外请先手动开启开发者模式、USB调试模式、USB调试安全设置")
 home();
 sleep(100);
 var intent = new Intent();
@@ -472,7 +472,7 @@ http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务
     let url = view.text();
     let ip = url.split(":")[0];
     let port = url.split(":")[1];
-    http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998) + '/device/connectDevice?ip=' + ip + "&port=" + port + "&openQtScrcpy=open", {
+    http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998) + '/device/connectDevice?ip=' + ip + "&port=" + port, {
         headers: {
             "deviceUUID": commonStorage.get('deviceUUID')
         },
