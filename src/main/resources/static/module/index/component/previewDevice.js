@@ -38,6 +38,8 @@ export default {
             autoRefreshScreenCapture: false, // 刷新截图权限
             openFloatWindow: false,
             openAdbPreviewModel: false, // 是否开启adb预览模式
+            adbDirect:"",
+            adbDirectResult: '',
             devicePreviewParam: { // 设备预览参数
                 imgQuality: 10,
                 imgScale: 1,
@@ -208,6 +210,31 @@ export default {
         controlPanelOpenChange(){
           this.controlPanelOpen = !this.controlPanelOpen;
         },
+        // 发送adb指令
+        sendAdbDirect(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/execAdbDirect",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "adbDirect": btoa(encodeURI(this.adbDirect))
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            window.ZXW_VUE.$notify.success({
+                                message: '执行完成',
+                                duration: '500'
+                            });
+                            _that.adbDirectResult += data.data;
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
         // 启动QtScrcpy
         startQtScrcpyFun(){
             let _that = this;
@@ -266,7 +293,61 @@ export default {
             `;
             this.remoteExecuteScript(remoteScript);
         },
-        startShizuku(){
+        adbShizuku(){
+            let remoteScript = `
+            // 判断应用是否安装
+            let appName = getAppName("moe.shizuku.privileged.api");
+            if(!appName){
+                toastLog("请先下载和安装Shizuku");
+            } else {
+                app.startActivity({
+                    action: "android.intent.action.MAIN",
+                    packageName: "moe.shizuku.privileged.api",
+                    className: "moe.shizuku.manager.MainActivity"
+                });
+                let shizuku = textContains("Shizuku").findOne(2000);
+                if(shizuku){
+                    swipe(device.width / 2, device.height * 9 / 10, device.width / 2, device.height * 1 / 10, 500);
+                    
+                    let 查看指令 = text("查看指令").className("android.widget.Button").findOne(1000);
+                    if(查看指令){
+                        click("查看指令");
+                        let 复制 = text("复制").findOne(1500);
+                        if(复制){
+                            sleep(100);
+                            let commonStorage = storages.create("zjh336.cncommon");
+                            let adbDirectText = "";
+                            // adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
+                            let adbDirectNode = textStartsWith("adb shell").className("android.widget.TextView").findOne(500);
+                            if(adbDirectNode){
+                                adbDirectText = adbDirectNode.text();
+                                adbDirectText = adbDirectText.substring(0,adbDirectText.lastIndexOf("start.sh")+8);
+                            }
+                            let adbDirect = $base64.encode(encodeURI(adbDirectText));
+                            // 请求接口 使用adb进行配对
+                            http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998) + '/device/sendAdbDirect?adbDirect'+adbDirect, {
+                                headers: {
+                                    "deviceUUID": commonStorage.get('deviceUUID')
+                                },
+                                method: 'GET',
+                                contentType: 'application/json',
+                                body: null,
+                            }, (res,e) => {
+                                toastLog("执行成功");
+                                let data = res.body.json();
+                                console.log(data);
+                            });
+                        }
+                    }
+                }
+            }
+            `;
+            this.remoteExecuteScript(remoteScript);
+        },
+        openMore(){
+            window.open('https://zhuanlan.zhihu.com/p/596385866?utm_id=0','_blank');
+        },
+        wirelessShizuku(){
             let remoteScript = `
             // 判断应用是否安装
             let appName = getAppName("moe.shizuku.privileged.api");

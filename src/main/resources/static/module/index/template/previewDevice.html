@@ -338,22 +338,25 @@
                 <div style="margin-top: 10px;">
                     <el-card>
                         <div slot="header" class="clearfix" style="cursor: pointer;" @click.stop="arrowArr.otherOperate=!arrowArr.otherOperate">
-                            <span>其他操作</span>
+                            <span>ADB相关操作</span>
                             <i :class="{'el-icon-arrow-down':arrowArr.otherOperate,'el-icon-arrow-up':!arrowArr.otherOperate}"  style="float: right;"></i>
                         </div>
                         <div style="padding: 15px 0 20px 0;" v-show="arrowArr.otherOperate">
                             <div class="d-flex j-start flex-wrap" style="line-height: 35px;text-align: center;">
-                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="initShizuku">
-                                    下载和安装Shizuku(开发者)
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 120px;" @click.stop.prevent="initShizuku">
+                                    初始化Shizuku
                                 </el-button>
-                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="startShizuku">
-                                    重启Shizuku(授予adb权限)
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 120px;" @click.stop.prevent="adbShizuku">
+                                    adb授权Shizuku
                                 </el-button>
-                                <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 200px;" @click.stop.prevent="startQtScrcpyFun">
-                                    启动QtScrcpy(adb无线投屏)
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 120px;" @click.stop.prevent="wirelessShizuku">
+                                    无线授权Shizuku
                                 </el-button>
-                                <el-button type="danger" style="margin-left:10px;margin-bottom: 5px;width: 200px;" size="mini" @click.stop.prevent="openWirelessDebugFun">
-                                    开启无线调试(自动配对+连接)
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 120px;" @click.stop.prevent="startQtScrcpyFun">
+                                    启动QtScrcpy
+                                </el-button>
+                                <el-button type="primary" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="openWirelessDebugFun">
+                                    开启无线调试
                                 </el-button>
                                 <span v-popover:popover2 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer;height: 30px;display: flex;justify-content: center;align-items: center;">
                                  <i class="el-icon-question" />
@@ -365,7 +368,7 @@
                                     </div>
                                     <div style="margin-top: 10px;">
                                         <b>预览模式-adb预览:</b>
-                                        <span>使用adb权限进行截图,该模式不需要截图权限,速度较快,支持公网部署使用，预览速度与带宽有较大关系。可以使用Shizuku给工具箱授权adb。</span>
+                                        <span>使用adb权限进行截图,该模式不需要截图权限,速度较快,支持公网部署使用，预览速度与带宽有较大关系。可以使用Shizuku给工具箱授权adb。(设备画面卡住无变化时,可尝试通过以下快捷操作，重启无线调试【开启无线调试】和重启Shizuku服务【adb授权Shizuku/无线授权Shizuku】)</span>
                                     </div>
                                     <div style="margin-top: 10px;">
                                         <b>预览模式-QtScrcpy投屏:</b>
@@ -374,7 +377,6 @@
                                     <div style="margin-top: 10px;">
                                         <b>关于adb的使用:</b>
                                         <span>使用adb前,手机需要开启开发者模式、USB调试模式、USB调试(安全设置,如果有的话)。安卓11以上可以通过无线调试功能进行连接,就不需连数据线了,否则必须使用数据线连接电脑,使用adb命令进行连接。<br/>
-                                            常见命令：【adb tcpip 端口】【adb pair ip:端口】【adb connect ip:端口】
                                         </span>
                                     </div>
                                     <div style="margin-top: 10px;">
@@ -386,8 +388,12 @@
                                         <span>工具箱内置Shizuku安装包,支持下载到手机,并执行安装操作。安装完成后,参考指南自行使用。安卓11以上可以使用无线调试进行配对。</span>
                                     </div>
                                     <div style="margin-top: 10px;">
-                                        <b>重启Shizuku:</b>
-                                        <span>工具箱内置自动运行代码,打开Shizuku应用,并启动服务。请注意,此操作必须手动开启过一次以后才能使用。主要作用在于重启Shizuk服务,有时依赖adb服务运行的程序卡住了,就需要重启一下shizuku服务。</span>
+                                        <b>adb授权Shizuku:</b>
+                                        <span>工具箱内置自动运行代码,打开Shizuku应用,并通过adb命令执行shell启动shizuku服务。执行之前需要先连接USB数据线,开启开发者模式、USB调试等。</span>
+                                    </div>
+                                    <div style="margin-top: 10px;">
+                                        <b>无线授权Shizuku:</b>
+                                        <span>工具箱内置自动运行代码,打开Shizuku应用,并通过pair命令配对,通过connect命令连接。执行之前需要先开启开发者模式、USB调试等。</span>
                                     </div>
                                     <div style="margin-top: 10px;">
                                         <b>启动QtScrcpy:</b>
@@ -398,6 +404,36 @@
                                         <span>工具箱内置自动运行代码。以无障碍的方式,自动打开无线调试,自动进行配对,自动连接adb。省去了手动连接adb的操作。目前默认支持MIUI系统的自动化，如需适配其他系统。可在文件管理中修改此文件【system/remoteScript/wirelessDebug.js】</span>
                                     </div>
                                 </el-popover>
+                            </div>
+
+                            <div class="d-flex a-center j-start" style="margin-top: 10px;padding: 0 5px;">
+                                <el-input type="textarea" v-model="adbDirect" :rows="5" placeholder="请输入要执行的adb命令" clearable class="width100">
+                                </el-input>
+                            </div>
+                            <div class="d-flex j-start flex-wrap" style="line-height: 35px;text-align: center;margin-top: 5px;">
+                                <el-dropdown style="margin-left: 10px;margin-bottom: 5px;width: 120px;">
+                                    <el-button size="mini" type="primary" >
+                                        常见adb命令<i class="el-icon-arrow-down el-icon--right"></i>
+                                    </el-button>
+                                    <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-item @click.native.prevent.stop="()=>{adbDirect='adb devices'}">查看连接设备</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="()=>{adbDirect='adb devices -l'}">查看设备详细</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="()=>{adbDirect='adb disconnect'}">断开连接</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="()=>{adbDirect='adb shell screencap -p /sdcard/1.png'}">截屏到手机</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="()=>{adbDirect='adb exec-out screencap -p > C://1.png'}">截屏到电脑</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="openMore">更多信息</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </el-dropdown>
+                                <el-button type="danger" style="margin-left:10px;margin-bottom: 5px;width: 120px;" size="mini" @click.stop.prevent="sendAdbDirect">
+                                    发送adb命令
+                                </el-button>
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 120px;" @click.stop.prevent="()=>{adbDirectResult=''}">
+                                    清空命令结果
+                                </el-button>
+                            </div>
+                            <div class="d-flex a-center j-start" style="margin-top: 5px;padding: 0 5px" id="adbMessage">
+                                <el-input type="textarea" v-model="adbDirectResult" :rows="5" placeholder="adb命令响应结果" clearable class="width100">
+                                </el-input>
                             </div>
                         </div>
                     </el-card>

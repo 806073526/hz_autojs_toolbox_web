@@ -255,11 +255,12 @@ public class DeviceController extends BaseController {
 
         File remoteScriptEndFile = new File(wirelessDebugPath);
         StringBuilder remoteScript = new StringBuilder();
-        try (FileReader reader = new FileReader(remoteScriptEndFile);
-             BufferedReader br = new BufferedReader(reader)) {
+        try (FileInputStream fis = new FileInputStream(remoteScriptEndFile);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(isr)) {
             String line;
             while ((line = br.readLine()) != null) {
-                remoteScript.append(line+"\r\n");
+                remoteScript.append(line).append("\r\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -267,6 +268,26 @@ public class DeviceController extends BaseController {
         // 远程执行代码
         AutoJsWsServerEndpoint.execRemoteScript(deviceUUID,remoteScript.toString(),false,"","");
         return success("");
+    }
+
+    @ApiOperation(value = "执行adb指令", notes = "执行adb指令")
+    @GetMapping("/execAdbDirect")
+    public R<String> execAdbDirect(@RequestParam("adbDirect") String adbDirect) {
+        String mess = checkQtScrcpy();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
+        }
+        if(StringUtils.isNotBlank(adbDirect)){
+            // 解码base64 再解URL编码
+            adbDirect = StrHelper.decode(new String(Base64.getDecoder().decode(adbDirect.getBytes())));
+            if(adbDirect.startsWith("adb.exe")){
+                adbDirect = adbDirect.replaceFirst("adb.exe","");
+            } else if(adbDirect.startsWith("adb")){
+                adbDirect = adbDirect.replaceFirst("adb","");
+            }
+        }
+        String result = RuntimeUtil.execForStr("QtScrcpy/adb.exe"+adbDirect);
+        return success(result);
     }
 
 
