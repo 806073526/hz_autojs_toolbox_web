@@ -83,13 +83,13 @@ public class DeviceController extends BaseController {
     public String port;
 
     @Value("${com.zjh.webFileListener.interval:2}")
-    private static int webFileListenerInterval;
+    private int webFileListenerInterval;
 
     /**
      * 禁止打开资源管理器
      */
     @Value("${com.zjh.forbidOpenExplorer:0}")
-    private static int forbidOpenExplorer;
+    private int forbidOpenExplorer;
 
 
     // 监听文件监视器map
