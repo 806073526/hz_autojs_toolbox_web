@@ -38,6 +38,10 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -81,6 +85,11 @@ public class DeviceController extends BaseController {
     @Value("${com.zjh.webFileListener.interval:2}")
     private static int webFileListenerInterval;
 
+    /**
+     * 禁止打开资源管理器
+     */
+    @Value("${com.zjh.forbidOpenExplorer:0}")
+    private static int forbidOpenExplorer;
 
 
     // 监听文件监视器map
@@ -765,6 +774,54 @@ public class DeviceController extends BaseController {
         }
     }
 
+    /**
+     * 创建空项目
+     */
+    @ApiOperation(value = "创建空项目", notes = "创建空项目")
+    @GetMapping("/createEmptyProject")
+    public R<String> createEmptyProject(@RequestParam("openPath") String openPath) {
+        try {
+            String emptyProjectUrl = "http://localhost:" + port + "/emptyProject.zip?t="+(new Date().getTime());
+            URL url = new URL(emptyProjectUrl);
+            InputStream in = url.openStream();
+            Path downloadPath = Paths.get(UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(openPath), "emptyProject.zip");
+            Files.copy(in, downloadPath, StandardCopyOption.REPLACE_EXISTING);
+
+            String emptyProjectPath = UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(openPath) + File.separator + "emptyProject.zip";
+            File emptyProjectFile = new File(emptyProjectPath);
+            // 直接解压
+            ZipUtil.unzip(emptyProjectFile);
+            in.close();
+            return success("");
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("创建空项目失败！请联系管理员");
+        }
+    }
+
+
+    /**
+     * 打开资源管理器
+     */
+    @ApiOperation(value = "打开资源管理器", notes = "打开资源管理器")
+    @GetMapping("/openExplorer")
+    public R<String> openExplorer(@RequestParam("openPath") String openPath) {
+        try {
+            // 设置参数为1 禁止开启
+            if(forbidOpenExplorer == 1){
+                return success("当前系统不支持打开资源管理器");
+            }
+            RuntimeUtil.execForStr("cmd /c start explorer \"" + UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(openPath) +"\"");
+            return success("");
+        } catch (BusinessException e) {
+            return fail(SERVICE_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return fail("打开资源管理器失败！请联系管理员");
+        }
+    }
 
 
     /**

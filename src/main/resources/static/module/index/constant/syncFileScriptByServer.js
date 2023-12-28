@@ -159,7 +159,8 @@ utilsObj.downLoadFiles = (downloadFileUrlArr, localFileUrlArr, callback) => {
                             })
                         }
                         let process = Number(completeCount / downloadFileUrlArr.length) * 100;
-                        if (showProcess) {
+                        let cacheProgress = canvasFloat.progress.getProgress();
+                        if (showProcess && Number(process) >= Number(cacheProgress)) {
                             canvasFloat.progress.setProgress(process.toFixed(2));
                             sleep(50)
                         }

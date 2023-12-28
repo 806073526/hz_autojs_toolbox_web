@@ -237,6 +237,11 @@
                                                     </el-dropdown-item>
                                                 </el-dropdown-menu>
                                             </el-dropdown>
+                                            <el-dropdown style="margin-left: 5px;">
+                                                <el-button type="primary" size="mini" @click.stop.prevent="forwardFileManageFun">
+                                                    跳转文件管理
+                                                </el-button>
+                                            </el-dropdown>
                                         </div>
                                     </el-form-item>
                                 </div>
@@ -256,6 +261,18 @@
                                             </el-checkbox>
                                             <el-checkbox label="className">
                                                 className
+                                            </el-checkbox>
+                                            <el-checkbox label="indexInParent">
+                                                indexInParent
+                                            </el-checkbox>
+                                            <el-checkbox label="depth">
+                                                depth
+                                            </el-checkbox>
+                                            <el-checkbox label="drawingOrder">
+                                                drawingOrder
+                                            </el-checkbox>
+                                            <el-checkbox label="packageName">
+                                                packageName
                                             </el-checkbox>
                                         </el-checkbox-group>
                                     </el-form-item>

@@ -559,6 +559,58 @@ export default {
                 }
             }
         },
+        // 创建空项目
+        createEmptyProject(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/createEmptyProject",
+                type: "get",
+                dataType: "json",
+                data: {
+                    "openPath": this.deviceInfo.deviceUuid + this.webSyncPath,
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            _that.webSyncPath = _that.webSyncPath + "/emptyProject";
+                            _that.enterWebPath();
+                        } else {
+                            window.ZXW_VUE.$message.error({message: data.data, duration: '1000'});
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
+        // 打开资源管理器
+        openExplorer(){
+            let _that = this;
+            _that.fileLoading = true;
+            $.ajax({
+                url: getContext() + "/device/openExplorer",
+                type: "get",
+                dataType: "json",
+                data: {
+                    "openPath": this.deviceInfo.deviceUuid + this.webSyncPath,
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                window.ZXW_VUE.$message.error({message: data.data, duration: '1000'});
+                            } else {
+                                window.ZXW_VUE.$notify.success({message: '请稍候', duration: '1000'});
+                            }
+                        }
+                    }
+                    _that.fileLoading = false;
+                },
+                error: function (msg) {
+                    _that.fileLoading = false;
+                }
+            });
+        },
         // 取消上传
         cancelUpload(i) {
             this.uploadFileList.splice(i, 1);
@@ -1835,13 +1887,43 @@ export default {
             let remoteScript = `let writableTextFile = files.write('${targetPath}',decodeURI($base64.decode('${btoa(encodeURI(JSON.stringify(saveProjectJsonObj,"","\t")))}')));`;
             this.remoteExecuteScript(remoteScript);
         },
+        // 处理版本名称和版本号
+        handlerVersionNameAndCode(){
+            // 自动变更版本
+            let openAutoChangeVersion = false;
+            let systemConfigCache = window.localStorage.getItem("systemConfig");
+            if(systemConfigCache){
+                let systemConfigObj = JSON.parse(systemConfigCache);
+                if(systemConfigObj){
+                    openAutoChangeVersion = systemConfigObj.openAutoChangeVersion || false;
+                }
+            }
+            if(openAutoChangeVersion){
+                try{
+                    let arr = this.projectJsonObj.versionName.split(".");
+                    arr[2] = parseInt(arr[2])+1;
+                    this.packageProject.versionName = arr.join(".");
+                    let tempCode = this.packageProject.versionName.replaceAll(".","");
+                    if(tempCode.length>=4){
+                        this.packageProject.versionCode = tempCode;
+                    }else{
+                        this.packageProject.versionCode = tempCode+"0";
+                    }
+                }catch (e) {
+                    this.packageProject.versionName = this.projectJsonObj.versionName;
+                    this.packageProject.versionCode = String(this.projectJsonObj.versionCode);
+                }
+            } else {
+                this.packageProject.versionName = this.projectJsonObj.versionName;
+                this.packageProject.versionCode = String(this.projectJsonObj.versionCode);
+            }
+        },
         // 初始化配置参数
         initProjectJsonFun(){
             // 初始化配置参数
             this.packageProject.appName = this.projectJsonObj.name;
             this.packageProject.packageName = this.projectJsonObj.packageName;
-            this.packageProject.versionName = this.projectJsonObj.versionName;
-            this.packageProject.versionCode = String(this.projectJsonObj.versionCode);
+            this.handlerVersionNameAndCode();
             this.packageProject.appIcon = this.projectJsonObj.icon;
                 // 开机自启动
             this.packageProject.autoOpen = this.projectJsonObj.autoOpen;

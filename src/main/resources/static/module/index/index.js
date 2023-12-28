@@ -250,6 +250,7 @@ window.ZXW_VUE = new Vue({
         return {
             validSelectDevice: this.validSelectDevice, // 检验设备选择情况
             sendMsgToClient: this.sendMsgToClient, // 发送websocket消息到app
+            forwardFileManage: this.forwardFileManage, // 跳转文件管理模块
             remoteExecuteScript: this.remoteExecuteScript, // app端远程执行代码
             remoteExecuteScriptByServer: this.remoteExecuteScriptByServer, // 服务端远程执行代码
             getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete },
@@ -318,8 +319,14 @@ window.ZXW_VUE = new Vue({
             if(!this.openScreenWindow){
                 // 移除事件注册
                 window.ZXW_VUE.$EventBus.$off('syncScreenContent',this.syncScreenContentFun);
+                // 关闭开关
+                if(this.$refs['previewDevice']){
+                    this.$refs['previewDevice'].openFloatWindow = false;
+                }
                 return;
             }
+
+
             // 开启后
             if(this.openScreenWindow){
                 // 预览屏幕悬浮窗 拖拽事件注册
@@ -640,6 +647,9 @@ window.ZXW_VUE = new Vue({
                 if(previewDevice.reConnect && typeof previewDevice.reConnect === 'function'){
                     previewDevice.reConnect();
                 }
+                setTimeout(()=>{
+                    previewDevice.openFloatWindow = true;
+                },200);
             }
         },
         // 执行固定操作代码
@@ -1206,6 +1216,19 @@ window.ZXW_VUE = new Vue({
                 error: function (msg) {
                 }
             });
+        },
+        // 跳转文件管理
+        forwardFileManage(webFilePath){
+            this.activeTab = 'fileManage';
+            if(webFilePath){
+                this.$nextTick(()=>{
+                    // 执行页面组件初始化方法
+                    if(this.$refs['fileManage'] && this.$refs['fileManage'].enterWebPath){
+                        this.$refs['fileManage'].webSyncPath = webFilePath;
+                        this.$refs['fileManage'].enterWebPath();
+                    }
+                });
+            }
         },
         // 远程执行脚本
         remoteExecuteScript(scriptContent,callback) {

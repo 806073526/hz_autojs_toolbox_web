@@ -76,8 +76,7 @@ utilsObj.checkLogPathChange = ()=>{
 // 大于安卓7  采用监听文件变化并阻塞的方式
 if(android.os.Build.VERSION.SDK_INT > 25){
     utilsObj.timerStartPushLog = () => {
-        // 监测变化 自动重启监听
-        utilsObj.checkLogPathChange();
+
 
         let timerStorage = storages.create("zjh336.cn_timer");
         timerStorage.remove('stop');
@@ -195,8 +194,6 @@ if(android.os.Build.VERSION.SDK_INT > 25){
     // 执行方法
     let execFun = ()=>{
         utilsObj.timerStartPushLog = () => {
-            // 监测变化 自动重启监听
-            utilsObj.checkLogPathChange();
 
             // 读取日志配置
             let logConfig = console.getGlobalLogConfig();
@@ -342,6 +339,8 @@ if(android.os.Build.VERSION.SDK_INT > 25){
 }
 
 
+// 监测变化 自动重启监听
+utilsObj.checkLogPathChange();
 
 finishFun();
 

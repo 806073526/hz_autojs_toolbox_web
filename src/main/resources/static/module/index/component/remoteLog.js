@@ -12,7 +12,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete','changeLogWindow'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete','changeLogWindow','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -208,6 +208,10 @@ export default {
         },
         getText(){
           console.log(this.onlineLogContent)
+        },
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/remoteLog/");
         },
         // 获取最后一次心跳时间字符串
         getLastHeartTimeStr() {

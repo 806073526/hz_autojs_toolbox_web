@@ -14,7 +14,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'getMonacoEditorComplete','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -118,6 +118,10 @@ export default {
                     $(containers[i]).css("height",1500 * zoomSize / 100);
                 }
             }
+        },
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/remoteScript/");
         },
         // 初始自定义模块
         initCustomScript(){

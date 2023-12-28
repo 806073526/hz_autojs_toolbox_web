@@ -100,7 +100,7 @@ let defaultPageSettingParam = { // 默认页面设置参数
 export default {
     template: template,
     name: 'PageMatching',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -153,6 +153,10 @@ export default {
         }
     },
     methods: {
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/pageMatching/");
+        },
         refreshScrollHeight(){
             let zoomSize = 100;
             let systemConfigCache = window.localStorage.getItem("systemConfig");

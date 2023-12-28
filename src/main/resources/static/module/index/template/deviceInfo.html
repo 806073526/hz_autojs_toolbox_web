@@ -139,7 +139,7 @@
             width="42%"
             center
             >
-        <div style="height: 320px;padding-top: 15px;">
+        <div style="height: 360px;padding-top: 15px;">
             <el-row class="d-flex">
                    <el-form-item label="设备状态通知:" label-width="130px"  class="flex-1">
                        <div class="d-flex a-center j-start" style="height: 40px;">
@@ -283,6 +283,21 @@
                         <el-popover ref="popover8" placement="top-start" width="260" trigger="hover">
                             <div>
                                 【图像处理】、【布局分析】、【预览设备】模块容器滚动条高度缩放比例
+                            </div>
+                        </el-popover>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="打包自增版本号:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-switch  v-model="systemConfig.openAutoChangeVersion" @change="systemConfigChange" style="margin-right: 5px;"/>
+                        <span v-popover:popover11 class="link-black" style="display: flex; font-size: 21px; margin-left: 10px; cursor: pointer">
+                          <i class="el-icon-question" />
+                        </span>
+                        <el-popover ref="popover11" placement="top-start" width="260" trigger="hover">
+                            <div>
+                                开启后,每次打开打包界面,版本号自增
                             </div>
                         </el-popover>
                     </div>

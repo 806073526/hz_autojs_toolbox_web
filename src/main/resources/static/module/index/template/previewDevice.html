@@ -531,14 +531,16 @@
                                     <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px; width: 200px; ">
                                         <el-input placeholder="通知规则名称" v-model="noticeListenerName" class="flex-1"/>
                                     </div>
-                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                                               @click.stop.prevent="saveToFile">
-                                        存为文件
-                                    </el-button>
-                                    <el-button type="primary" size="mini" style="margin-left: 10px !important;margin-bottom: 5px;"
-                                               @click.stop.prevent="readForFile">
-                                        从文件读取
-                                    </el-button>
+                                    <el-dropdown trigger="click" style="margin-left:10px;height: 34px;">
+                                        <el-button size="mini" type="primary">
+                                            文件操作<i class="el-icon-arrow-down el-icon--right"></i>
+                                        </el-button>
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item @click.native.prevent.stop="saveToFile">存为文件</el-dropdown-item>
+                                            <el-dropdown-item @click.native.prevent.stop="readForFile">从文件读取</el-dropdown-item>
+                                            <el-dropdown-item @click.native.prevent.stop="forwardFileManageFun">跳转文件管理</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
                                     <div class="flex-wrap" style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;;margin-bottom: 5px;">
                                         <span>消息推送渠道：</span>
                                         <el-checkbox-group v-model="messagePushChannel" style="line-height: 32px;height: 32px;">

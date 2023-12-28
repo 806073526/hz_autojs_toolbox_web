@@ -11,7 +11,7 @@ $.ajax({
 export default {
     template: template,
     name: 'LayoutAnalysis',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','copyToClipboard'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','copyToClipboard','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -68,7 +68,7 @@ export default {
                     openClickGenerateCode: true,// 开启点击生成代码
                     layoutAnalysisRange:'active',// 布局分析范围 active活跃窗口 all全部窗口
                     nodeInfo: '',// 节点信息
-                    uiSelect: ['id', 'text', 'desc', 'className'],// ui选择器
+                    uiSelect: ['id', 'text', 'desc', 'className','packageName'],// ui选择器
                     uiSelectCondition: 'findOnce',// ui选择器条件
                     uiSelectAction: 'clickCenter',// 动作
                     checkStrictly: true,// 父子相关联
@@ -153,6 +153,10 @@ export default {
         },
         init(){
           this.refreshScrollHeight();
+        },
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/layoutAnalysis/");
         },
         // 显示节点名
         showSelectNodeName(){
@@ -910,6 +914,36 @@ export default {
                 }
                 nodeCode += 'className("' + className + '")';
             }
+
+            if (uiSelect.includes("indexInParent") && indexInParent) {
+                if (nodeCode) {
+                    nodeCode += '.';
+                }
+                nodeCode += 'indexInParent("' + indexInParent + '")';
+            }
+            if (uiSelect.includes("depth") && depth) {
+                if (nodeCode) {
+                    nodeCode += '.';
+                }
+                nodeCode += 'depth("' + depth + '")';
+            }
+            if (uiSelect.includes("drawingOrder") && drawingOrder) {
+                if (nodeCode) {
+                    nodeCode += '.';
+                }
+                nodeCode += 'drawingOrder("' + drawingOrder + '")';
+            }
+            if (uiSelect.includes("packageName") && packageName) {
+                if (nodeCode) {
+                    nodeCode += '.';
+                }
+                nodeCode += 'packageName("' + packageName + '")';
+            }
+
+
+
+
+
             if (uiSelectCondition) {
                 nodeCode += '.' + uiSelectCondition + '()';
             }

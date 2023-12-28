@@ -11,7 +11,7 @@ $.ajax({
 export default {
     template: template,
     name: 'ImgHandler',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun','copyToClipboard','readTextFromClipboard'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript','timeSyncOtherPropertyFun','copyToClipboard','readTextFromClipboard','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -282,6 +282,10 @@ export default {
             if (showMessage) {
                 window.ZXW_VUE.$notify.success({message: '操作成功', duration: '1000'});
             }
+        },
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/imageHandler/");
         },
         // 清空坐标
         clearPosition() {

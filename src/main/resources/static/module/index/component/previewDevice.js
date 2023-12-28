@@ -12,7 +12,7 @@ $.ajax({
 export default {
     template: template,
     name: 'RemoteScript',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'changeScreenWindow'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'changeScreenWindow','forwardFileManage'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -207,6 +207,10 @@ export default {
                 $("#devicePreviewImg").css("width","100%");
             }
         },
+        // 跳转文件管理模块
+        forwardFileManageFun(){
+            this.forwardFileManage("/system/previewDevice/");
+        },
         controlPanelOpenChange(){
           this.controlPanelOpen = !this.controlPanelOpen;
         },
@@ -307,38 +311,21 @@ export default {
                 });
                 let shizuku = textContains("Shizuku").findOne(2000);
                 if(shizuku){
-                    swipe(device.width / 2, device.height * 9 / 10, device.width / 2, device.height * 1 / 10, 500);
-                    
-                    let 查看指令 = text("查看指令").className("android.widget.Button").findOne(1000);
-                    if(查看指令){
-                        click("查看指令");
-                        let 复制 = text("复制").findOne(1500);
-                        if(复制){
-                            sleep(100);
-                            let commonStorage = storages.create("zjh336.cncommon");
-                            let adbDirectText = "";
-                            // adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
-                            let adbDirectNode = textStartsWith("adb shell").className("android.widget.TextView").findOne(500);
-                            if(adbDirectNode){
-                                adbDirectText = adbDirectNode.text();
-                                adbDirectText = adbDirectText.substring(0,adbDirectText.lastIndexOf("start.sh")+8);
-                            }
-                            let adbDirect = $base64.encode(encodeURI(adbDirectText));
-                            // 请求接口 使用adb进行配对
-                            http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998) + '/device/sendAdbDirect?adbDirect'+adbDirect, {
-                                headers: {
-                                    "deviceUUID": commonStorage.get('deviceUUID')
-                                },
-                                method: 'GET',
-                                contentType: 'application/json',
-                                body: null,
-                            }, (res,e) => {
-                                toastLog("执行成功");
-                                let data = res.body.json();
-                                console.log(data);
-                            });
-                        }
-                    }
+                    let commonStorage = storages.create("zjh336.cncommon");
+                    let adbDirect = $base64.encode(encodeURI("adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh"));
+                    // 请求接口 使用adb进行配对
+                    http.request(commonStorage.get("服务端IP") + ':' + (commonStorage.get("服务端Port") || 9998) + '/device/sendAdbDirect?adbDirect'+adbDirect, {
+                        headers: {
+                            "deviceUUID": commonStorage.get('deviceUUID')
+                        },
+                        method: 'GET',
+                        contentType: 'application/json',
+                        body: null,
+                    }, (res,e) => {
+                        toastLog("执行成功");
+                        let data = res.body.json();
+                        console.log(data);
+                    });    
                 }
             }
             `;
@@ -363,6 +350,7 @@ export default {
                 if(shizuku){
                     let 启动 = text("启动").className("android.widget.Button").findOne(1000);
                     if(启动){
+                        console.log("首次开启无线调试,需要先手动进行配对,然后再启动");
                         click("启动");
                     }
                 }

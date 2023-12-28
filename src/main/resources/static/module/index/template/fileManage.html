@@ -231,10 +231,19 @@
                             </div>
                         </el-form-item>
                     </div>
-                    <div class="imgToolsDiv">
+                    <div class ="imgToolsDiv">
                         <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                            <el-button style="margin-bottom: 5px;" size="mini" type="primary" @click="uploadFileClick">上传文件</el-button>
-                            <el-button style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="primary" @click="createFolder">新建文件夹</el-button>
+                            <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                                <el-button size="mini" type="primary">
+                                    文件操作<i class="el-icon-arrow-down el-icon--right"></i>
+                                </el-button>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item @click.native.prevent.stop="uploadFileClick">上传文件</el-dropdown-item>
+                                    <el-dropdown-item @click.native.prevent.stop="createFolder">新建文件夹</el-dropdown-item>
+                                    <el-dropdown-item @click.native.prevent.stop="openExplorer">打开资源管理器</el-dropdown-item>
+                                    <el-dropdown-item @click.native.prevent.stop="createEmptyProject">新建空项目</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
                             <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="runWebProject">运行项目</el-button>
                             <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="stopWebProject">停止项目</el-button>
                             <el-button v-show="webCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" size="mini" type="danger" @click="changeFileListener">{{ changeFileBtnContent }}项目文件监听</el-button>

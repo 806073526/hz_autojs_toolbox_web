@@ -247,10 +247,15 @@
                                     <el-switch v-model="remoteHandler.param1.isOpenGray" />
                                 </div>
                                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
-                            <span>
-                                开启阈值化：
-                            </span>
+                                    <span>
+                                        开启阈值化：
+                                    </span>
                                     <el-switch v-model="remoteHandler.param1.isOpenThreshold" />
+                                </div>
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                    <el-button type="primary" size="mini" style="" @click.stop.prevent="forwardFileManageFun">
+                                        跳转文件管理
+                                    </el-button>
                                 </div>
                             </el-row>
                         </div>

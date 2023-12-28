@@ -214,6 +214,34 @@ export default {
         }
     },
     methods: {
+        // 打开资源管理器
+        openExplorer(){
+            let _that = this;
+            _that.fileLoading = true;
+            $.ajax({
+                url: getContext() + "/device/openExplorer",
+                type: "get",
+                dataType: "json",
+                data: {
+                    "openPath": "webCommonPath",
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            if(data.data){
+                                window.ZXW_VUE.$message.error({message: data.data, duration: '1000'});
+                            } else {
+                                window.ZXW_VUE.$notify.success({message: '请稍候', duration: '1000'});
+                            }
+                        }
+                    }
+                    _that.fileLoading = false;
+                },
+                error: function (msg) {
+                    _that.fileLoading = false;
+                }
+            });
+        },
         // 初始化打包插件
         initPackPlugins(){
             this.breadcrumbList = [
