@@ -812,9 +812,10 @@ public class DeviceController extends BaseController {
             // 设置参数为1 禁止开启
             if(forbidOpenExplorer == 1){
                 return success("当前系统不支持打开资源管理器");
+            } else {
+                RuntimeUtil.execForStr("cmd /c start explorer \"" + UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(openPath) +"\"");
+                return success("");
             }
-            RuntimeUtil.execForStr("cmd /c start explorer \"" + UploadPathHelper.getUploadPath(uploadPath) + "autoJsTools" + File.separator + StrHelper.replaceSystemSeparator(openPath) +"\"");
-            return success("");
         } catch (BusinessException e) {
             return fail(SERVICE_ERROR, e.getMessage());
         } catch (Exception e) {
