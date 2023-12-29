@@ -134,32 +134,32 @@ utilsObj.downLoadFiles = (downloadFileUrlArr, localFileUrlArr, callback) => {
             let inStream = conn.getInputStream(); //InputStream
             files.ensureDir("/sdcard/" + localFileUrl);
             let fs = new FileOutputStream("/sdcard/" + localFileUrl); //FileOutputStream
-            var connLength = conn.getContentLength(); //int
+            let connLength = conn.getContentLength(); //int
             let startTime = java.lang.System.currentTimeMillis();
             let buffer = util.java.array('byte', 1024); //byte[]
             let prevTime = java.lang.System.currentTimeMillis();
             let bytePrev = 0; //前一次记录的文件大小
-            var byteSum = 0; //总共读取的文件大小
-            var byteRead; //每次读取的byte数
+            let byteSum = 0; //总共读取的文件大小
+            let byteRead; //每次读取的byte数
 
             let curIndex = i;
             let curLocalFileUrl = localFileUrl;
             threads.start(() => {
                 while (true) {
-                    var 当前写入的文件大小 = byteSum
+                    let 当前写入的文件大小 = byteSum
                     // var 百分比 = parseInt(当前写入的文件大小 / connLength * 100)
                     if (当前写入的文件大小 >= connLength) {
                         completeCount++;
+                        let process = Number(completeCount / downloadFileUrlArr.length) * 100;
+                        let cacheProgress = canvasFloat && canvasFloat.progress ? canvasFloat.progress.getProgress() : 0;
                         if (showProcess) {
                             ui.run(() => {
                                 let totalCount = downloadFileUrlArr.length;
                                 let duration = (new Date().getTime() - startTimeLong);
-                                canvasFloat.syncTitle.attr("text", "同步文件进度【耗时:" + msToTime(duration) + "】" + "【完成:" + (Number(completeCount / downloadFileUrlArr.length) * 100).toFixed(2) + "%】");
+                                canvasFloat.syncTitle.attr("text", "同步文件进度【耗时:" + msToTime(duration) + "】" + "【完成:" + (Number(process) >= Number(cacheProgress) ?  process.toFixed(2) : cacheProgress.toFixed(2))+ "%】");
                                 canvasFloat.progressPath.attr("text", "/sdcard/" + curLocalFileUrl);
                             })
                         }
-                        let process = Number(completeCount / downloadFileUrlArr.length) * 100;
-                        let cacheProgress = canvasFloat.progress.getProgress();
                         if (showProcess && Number(process) >= Number(cacheProgress)) {
                             canvasFloat.progress.setProgress(process.toFixed(2));
                             sleep(50)

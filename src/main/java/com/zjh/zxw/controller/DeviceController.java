@@ -434,6 +434,14 @@ public class DeviceController extends BaseController {
                                                      @RequestParam(value = "checkChangeAutoRestart",required = false,defaultValue = "false") Boolean checkChangeAutoRestart) {
         try {
             if(StringUtils.isBlank(serverUrl)){
+                String serverIp = StrHelper.getObjectValue(request.getServerName());
+                // 不包含本地ip的情况下
+                if(!serverIp.contains("localhost") && !serverIp.contains("127.0.0.1")){
+                    String serverPort = StrHelper.getObjectValue(request.getServerPort());
+                    serverUrl = "http://"+serverIp+":"+serverPort;
+                }
+            }
+            if(StringUtils.isBlank(serverUrl)){
                 serverUrl =  "http://"+ IPUtil.getRealIP() +":"+port;
             }
             if(StringUtils.isBlank(phoneDirPath)){
@@ -525,6 +533,14 @@ public class DeviceController extends BaseController {
                                             @RequestParam(value = "serverUrl",required = false) String serverUrl,
                                             @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath) {
         try {
+            if(StringUtils.isBlank(serverUrl)){
+                String serverIp = StrHelper.getObjectValue(request.getServerName());
+                // 不包含本地ip的情况下
+                if(!serverIp.contains("localhost") && !serverIp.contains("127.0.0.1")){
+                    String serverPort = StrHelper.getObjectValue(request.getServerPort());
+                    serverUrl = "http://"+serverIp+":"+serverPort;
+                }
+            }
             AutoJsWsServerEndpoint.syncWebProjectToPhone(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,()->{});
             return success(true);
         } catch (BusinessException e) {
@@ -571,6 +587,14 @@ public class DeviceController extends BaseController {
                                     @RequestParam(value = "serverUrl",required = false) String serverUrl,
                                     @RequestParam(value = "tempPhoneTargetPath",required = false) String tempPhoneTargetPath) {
         try {
+            if(StringUtils.isBlank(serverUrl)){
+                String serverIp = StrHelper.getObjectValue(request.getServerName());
+                // 不包含本地ip的情况下
+                if(!serverIp.contains("localhost") && !serverIp.contains("127.0.0.1")){
+                    String serverPort = StrHelper.getObjectValue(request.getServerPort());
+                    serverUrl = "http://"+serverIp+":"+serverPort;
+                }
+            }
             AutoJsWsServerEndpoint.initWebProjectBat(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath);
             return success(true);
         } catch (BusinessException e) {
@@ -640,6 +664,14 @@ public class DeviceController extends BaseController {
                                             @RequestParam(value = "isSyncProject", required = false, defaultValue = "true") Boolean isSyncProject) {
 
         try {
+            if(StringUtils.isBlank(serverUrl)){
+                String serverIp = StrHelper.getObjectValue(request.getServerName());
+                // 不包含本地ip的情况下
+                if(!serverIp.contains("localhost") && !serverIp.contains("127.0.0.1")){
+                    String serverPort = StrHelper.getObjectValue(request.getServerPort());
+                    serverUrl = "http://"+serverIp+":"+serverPort;
+                }
+            }
             AutoJsWsServerEndpoint.execStartProjectByWeb(deviceUUID,serverUrl,webScriptDirPath,tempPhoneTargetPath,isSyncProject,"");
             return success(true);
         } catch (BusinessException e) {
