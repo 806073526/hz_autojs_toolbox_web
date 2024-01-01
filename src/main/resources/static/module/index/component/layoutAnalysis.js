@@ -887,7 +887,7 @@ export default {
             let text = selectNode.text;
             let desc = selectNode.desc;
             let className = selectNode.className;
-
+            let indexInParent = selectNode.indexInParent;
             let uiSelect = this.remoteHandler.param5.uiSelect;
             let uiSelectCondition = this.remoteHandler.param5.uiSelectCondition;
             let uiSelectAction = this.remoteHandler.param5.uiSelectAction;
