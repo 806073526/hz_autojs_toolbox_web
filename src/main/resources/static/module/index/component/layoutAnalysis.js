@@ -888,6 +888,10 @@ export default {
             let desc = selectNode.desc;
             let className = selectNode.className;
             let indexInParent = selectNode.indexInParent;
+            let depth = selectNode.depth;
+            let drawingOrder = selectNode.drawingOrder;
+            let packageName = selectNode.packageName;
+
             let uiSelect = this.remoteHandler.param5.uiSelect;
             let uiSelectCondition = this.remoteHandler.param5.uiSelectCondition;
             let uiSelectAction = this.remoteHandler.param5.uiSelectAction;
