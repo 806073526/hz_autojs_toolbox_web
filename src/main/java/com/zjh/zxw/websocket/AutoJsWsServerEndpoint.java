@@ -76,7 +76,7 @@ public class AutoJsWsServerEndpoint {
     public static String port;
 
     // 设置版本号
-    public static String curVersion =  "V3.8.0";
+    public static String curVersion =  "V3.9.0开发版";
 
     public static String getCurVersion(){
         return curVersion;
@@ -490,6 +490,34 @@ public class AutoJsWsServerEndpoint {
         params.put("onlyStop",isOnlyStop ? "true": "");
         String remoteScript = getFileScriptContent(JSONObject.toJSONString(params),"startOnlineLogByServer.js");
         execRemoteScript(deviceUUID,remoteScript,false,"","");
+    }
+
+    /**
+     * 以布局方式开始预览设备
+     * @param deviceUUID
+     * @return
+     */
+    public static boolean startPreviewByLayout(String deviceUUID) throws Exception {
+        // 根据参数获取复制文件脚本
+        String scriptContent =  getFileScriptContent("","previewByLayout.js");
+        // 执行脚本
+        execRemoteScript(deviceUUID,scriptContent,false,"","");
+        return true;
+    }
+
+    /**
+     * 以布局方式停止预览设备
+     * @param deviceUUID
+     * @return
+     */
+    public static boolean stopPreviewByLayout(String deviceUUID) throws Exception {
+        String remoteScript = "if(utilsObj.previewLayoutTimer){\n" +
+                "    clearInterval(utilsObj.previewLayoutTimer);\n" +
+                "    utilsObj.previewLayoutTimer = null;\n" +
+                "}";
+        // 执行脚本
+        execRemoteScript(deviceUUID,remoteScript,false,"","");
+        return true;
     }
 
 

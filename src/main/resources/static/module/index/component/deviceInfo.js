@@ -265,6 +265,74 @@ export default {
             let script = `
             // 强制停止截图权限
             images.stopScreenCapture();
+            if(!utilsObj.hasAdb){
+                utilsObj.hasAdb =  $shell.checkAccess("adb") ? 1 : 2;
+            }
+            if (!utilsObj.hasRoot) {
+                utilsObj.hasRoot =  $shell.checkAccess("root") ? 1 : 2;  
+            }
+            // adb点击
+            utilsObj.clickByAdb = (x,y, randomNum, needConvertXy) => {
+                // 转换坐标
+                let xy = needConvertXy ? utilsObj.convertXY(x, y) : { x: x, y: y }
+                // 转换小于0的随机数
+                randomNum = randomNum < 0 ? 0 : randomNum
+                // 随机数 大于0.5为+ 否则为-
+                let plusNum = random()
+                // 计算随机坐标
+                let x1 = plusNum > 0.5 ? (Number(xy["x"]) + random(0, randomNum)) : Number(xy["x"]) + random(0, randomNum)
+                let y1 = plusNum > 0.5 ? (Number(xy["y"]) + random(0, randomNum)) : Number(xy["y"]) + random(0, randomNum)
+                if (commonStorage.get("debugModel")) {
+                    sleep(200)
+                    console.info("【随机点击了】" + x1 + "," + y1)
+                    console.info("")
+                }
+                let shells="input tap "+x1+" "+y1;
+                shell(shells, { adb: true });
+            }
+            // 查找文字
+            utilsObj.findTextByAdb = (texts,isClick)=>{
+                shell("uiautomator dump /sdcard/ui.xml", { adb: true });  
+                let str = files.read("/sdcard/ui.xml");
+                let start=-1;
+                let textArr = texts.split("|");
+                for(let i=0;i<textArr.length;i++){
+                    let text = textArr[i];
+                    let tempIndex = str.search('text="'+text+'"');
+                    if(tempIndex!==-1){
+                        start = tempIndex;
+                    }
+                }
+                if(start === -1){
+                  return null; 
+                }
+                let end=0;
+                for(let j=start;j<str.length;j++){
+                    if(str[j]=='>'){
+                        end=j;
+                        break;
+                    }
+                }
+                let 节点初始信息=str.substring(start,end);
+                let boundsRegex = /bounds="\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]"/;  
+                let match = boundsRegex.exec(节点初始信息);  
+                if (!match) {
+                    return null; 
+                }
+                let minX = parseInt(match[1]);  
+                let minY = parseInt(match[2]);  
+                let maxX = parseInt(match[3]);  
+                let maxY = parseInt(match[4]);  
+                if(isClick){
+                    utilsObj.clickByAdb((minX+maxX)/2,(minY+maxY)/2,1,false);
+                }
+                return {
+                    x1:minX,
+                    y1:minY,
+                    x2:maxX,
+                    y2:maxY
+                };
+            }
             utilsObj.startRequestScreenClickTreadWait = (waitTimes)=>{
                 // 读取其他点击文字数据
                 let otherClickText = commonStorage.get("otherClickText");
@@ -317,9 +385,9 @@ export default {
                         images.stopScreenCapture();
                         sleep(100);
                     }
-                    // 未开启无障碍服务
-                    if(!auto.service){
-                        console.error("未开启无障碍服务")
+                    
+                    if(!auto.service && utilsObj.hasAdb !== 1){
+                        console.error("请开启无障碍服务、adb权限至少一项")
                         // 直接返回
                         return;
                     }
@@ -340,10 +408,16 @@ export default {
                     // 开启点击线程
                     utilsObj.requestScreenClickThread = threads.start(function () {
                         while (true) {
-                            let click1 = textMatches(textRegExp).findOne(100);
-                            if(click1){
-                                click1.click();
+                            if(auto.service){
+                                let click1 = textMatches(textRegExp).findOne(100);
+                                if(click1){
+                                    click1.click();
+                                }
+                            } else if(utilsObj.hasAdb === 1){
+                                let otherClickText = commonStorage.get("otherClickText");
+                                utilsObj.findTextByAdb("立即开始|允许|同意"+(otherClickText?"|"+otherClickText:""),true);
                             }
+                           
                             let checkScreenCaptureOptions = images.getScreenCaptureOptions();
                             if(checkScreenCaptureOptions){
                                 // 设置标志

@@ -237,6 +237,9 @@
                             <div class="d-flex a-center j-center" v-show="noPreviewImg" style="font-size: 30px;color: rgba(29,140,128,0.29);width: 100%;">
                                 暂无预览图,请点击【开始预览】
                             </div>
+                            <canvas id="layoutPreviewCanvas"
+                                    style="display: none">
+                            </canvas>
                         </div>
                     </div>
                 </div>
@@ -255,6 +258,18 @@
                         </div>
                         <div style="padding: 15px 0 20px 0;" v-show="arrowArr.commonParam">
                             <el-row class="d-flex">
+                                <el-form-item label="预览类型:" prop="textType" class="width100" style="color: whitesmoke">
+                                    <el-radio-group v-model="selectPreviewType">
+                                        <el-radio label="imgInterface">
+                                            图像画面
+                                        </el-radio>
+                                        <el-radio label="layout">
+                                            控件布局
+                                        </el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </el-row>
+                            <el-row class="d-flex" v-if="selectPreviewType === 'imgInterface'">
                                 <el-form-item label="APP刷新:" prop="appSpace" class="flex-1">
                                     <el-input type="number" v-model="devicePreviewParam.appSpace" placeholder=""
                                               oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
@@ -275,7 +290,7 @@
                                 </el-form-item>
                             </el-row>
                             <el-row class="d-flex">
-                                <el-form-item label="预览阈值:" prop="scale" class="flex-1">
+                                <el-form-item label="预览阈值:" prop="scale" class="flex-1" v-if="selectPreviewType === 'imgInterface'">
                                     <el-input type="number" v-model="devicePreviewParam.imgThreshold" placeholder=""
                                               oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="255"
                                               @change="autoDevicePreview" class="width100">
@@ -298,7 +313,7 @@
                                     </el-radio-group>
                                 </el-form-item>
                             </el-row>
-                            <el-row>
+                            <el-row v-if="selectPreviewType === 'imgInterface'">
                                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
                                     <span>
                                         开启adb预览(adb或root)：
@@ -318,7 +333,7 @@
                                     <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
                                 </div>
                             </el-row>
-                            <el-row v-show="!openAdbPreviewModel" style="margin-top: 10px;">
+                            <el-row v-show="!openAdbPreviewModel && selectPreviewType === 'imgInterface'" style="margin-top: 10px;">
                                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
                                     <span>
                                         开启灰度化：

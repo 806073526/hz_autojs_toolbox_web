@@ -65,7 +65,7 @@ export default {
             },
             previewBlobUrl: null,
             // 当前选择的预览方式
-            selectPreviewType:"imgInterface",
+            selectPreviewType:"imgInterface",//
             controlPanelOpen:true,//控制面板是否展开
             textContent: '',// 文本信息传输
             textIndex: null, // 文本传输序号
@@ -115,6 +115,25 @@ export default {
     watch:{
         openFloatWindow(val){
             this.changeScreenWindow(val);
+        },
+        // 监听预览类型变化
+        selectPreviewType(val){
+            // 如果当前在预览状态
+            if(this.deviceInfo.startPreview){
+                let openFloatWindowCache = this.openFloatWindow;
+                if(val === 'imgInterface'){
+                    // 变化为图像 先停止布局预览
+                    this.stopPreviewDeviceByLayoutAppHandler(false)
+                } else if(val === 'layout'){
+                    // 变化为布局 先停止图像预览
+                    this.stopPreviewDeviceByImgInterfaceAppHandler(false);
+                }
+                // 则重置预览
+                this.reConnect(()=>{
+                    // 重设悬浮窗预览状态
+                    this.openFloatWindow = openFloatWindowCache;
+                });
+            }
         },
         previewImageWidth(val){
             if(this.deviceInfo.deviceUuid){
@@ -421,6 +440,29 @@ export default {
                     }
                 });
                 window.deviceImgUrl = 'data:image/png;base64,' + cacheData;
+            // 布局分析模式
+            } else if(this.selectPreviewType === 'layout'){
+                let layoutJson = "";
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/device/queryLayoutJsonByKey",
+                    type: "GET",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        "deviceUUID": _that.deviceInfo.deviceUuid
+                    },
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                layoutJson = data.data;
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+                window.deviceImgUrl = this.drawLayoutPreview(layoutJson);
             }
             $("#devicePreviewImg").attr("src", window.deviceImgUrl);
             this.noPreviewImg = false;
@@ -430,6 +472,59 @@ export default {
                 // 同步屏幕内容到悬浮窗中
                 window.ZXW_VUE.$EventBus.$emit('syncScreenContent');
             }
+        },
+        // 绘制布局分析
+        drawLayoutPreview(layoutJson){
+            // 解码
+            layoutJson = decodeURI(atob(layoutJson));
+
+            let layoutArr = JSON.parse(layoutJson) || [];
+            let canvas = document.getElementById('layoutPreviewCanvas');
+            canvas.width = this.deviceInfo.standardWidth;
+            canvas.height = this.deviceInfo.standardHeight;
+            let ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            // 先清除画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height); //清空这个范围的画布
+
+            // 绘制黑色背景
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, this.deviceInfo.standardWidth, this.deviceInfo.standardHeight);
+
+            let drawTextWithEllipsis = (ctx, text, x, y, maxWidth) => {
+                let ellipsis = '...';
+                let width = ctx.measureText(text).width;
+                if (width <= maxWidth) {
+                    ctx.fillText(text, x, y);
+                } else {
+                    let ellipsisWidth = ctx.measureText(ellipsis).width;
+                    let characters = text.length;
+                    let ellipsisIndex = 0;
+                    for (let i = 0; i < characters; i++) {
+                        let substring = text.substr(0, i);
+                        if (ctx.measureText(substring + ellipsis).width > maxWidth) {
+                            break;
+                        }
+                        ellipsisIndex = i;
+                    }
+                    let trimmedText = text.substr(0, ellipsisIndex) + ellipsis;
+                    ctx.fillText(trimmedText, x, y);
+                }
+            };
+
+            for (let i = 0; i < layoutArr.length; i++) {
+                let obj = layoutArr[i];
+                let rect = obj.boundsInfo;
+                // 绘制白色框
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'white';
+                ctx.strokeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+                ctx.fillStyle = 'white';
+                ctx.font = '35px Arial';
+                drawTextWithEllipsis(ctx, obj.content, rect.left + 5, rect.top + 35, rect.right - rect.left);
+            }
+            ctx.closePath();
+            return canvas.toDataURL("image/png");
         },
         // 开始预览设备web监听方法
         startPreviewDeviceWebListenerFun(notice){
@@ -796,6 +891,29 @@ let changeScreenCaptureThread = (flag) => {
                 this.startPreviewDeviceWebListenerFun(notice);
             });
         },
+        // 以布局方式运行app预览方法
+        startPreviewDeviceByLayoutAppHandler(messageStr,notice){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/startPreviewByLayout",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            // 发送成功后执行 web端的监听方法
+                            _that.startPreviewDeviceWebListenerFun(notice);
+                        }
+
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
         // 开始预览设备
         startPreviewDevice(notice) {
             if(this.autoRefreshScreenCapture){
@@ -809,9 +927,13 @@ let changeScreenCaptureThread = (flag) => {
                 this.startPreviewDeviceByImgFileAppHandler(messageStr,notice)
             } else if(this.selectPreviewType === 'imgInterface') {
                 this.startPreviewDeviceByImgInterfaceAppHandler(messageStr,notice)
+            } else if(this.selectPreviewType === 'layout'){
+                this.startPreviewDeviceByLayoutAppHandler(messageStr,notice)
             }
-            // 处理先开悬浮窗 再开始预览的情况
-            window.ZXW_VUE.$EventBus.$emit('refreshFloatScreenWindow');
+            if(this.openFloatWindow){
+                // 处理先开悬浮窗 再开始预览的情况
+                window.ZXW_VUE.$EventBus.$emit('refreshFloatScreenWindow');
+            }
         },
         allScreenPreviewImg(){
             // 获取需要全屏展示的div
@@ -885,6 +1007,28 @@ let changeScreenCaptureThread = (flag) => {
                 this.stopPreviewWebHandler(notice,callback);
             })
         },
+        // 以布局分析方式运行的 APP停止预览处理方法
+        stopPreviewDeviceByLayoutAppHandler(notice,callback){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/device/stopPreviewByLayout",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "deviceUUID": this.deviceInfo.deviceUuid
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            // 发送成功后执行 web端的监听方法
+                            _that.stopPreviewWebHandler(notice,callback);
+                        }
+                    }
+                },
+                error: function (msg) {
+                }
+            });
+        },
         // 以图片接口方式运行的 APP停止预览处理方法
         stopPreviewDeviceByImgInterfaceAppHandler(notice,callback){
             let remoteScript = `
@@ -946,6 +1090,8 @@ let changeScreenCaptureThread = (flag) => {
                 this.stopPreviewDeviceByImgFileAppHandler(notice,callback)
             } else if(this.selectPreviewType === 'imgInterface') {
                 this.stopPreviewDeviceByImgInterfaceAppHandler(notice,callback)
+            } else if(this.selectPreviewType === 'layout'){
+                this.stopPreviewDeviceByLayoutAppHandler(notice,callback)
             }
         },
         // 表格添加行
@@ -1476,12 +1622,16 @@ let changeScreenCaptureThread = (flag) => {
             this.remoteExecuteScript(remoteExecuteScript);
         },
         // 重新预览
-        reConnect(){
+        reConnect(callback){
             this.stopPreviewDevice(false, () => {
                 let cacheAutoRefreshScreenCapture = this.autoRefreshScreenCapture;
                 this.autoRefreshScreenCapture = true;
                 this.startPreviewDevice(false);
                 this.autoRefreshScreenCapture = cacheAutoRefreshScreenCapture;
+
+                if(callback){
+                    callback();
+                }
             })
         },
         // 开启adb预览

@@ -21,10 +21,12 @@ import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
 import com.zjh.zxw.domain.dto.*;
 import com.zjh.zxw.websocket.AutoJsSession;
+import com.zjh.zxw.websocket.AutoJsWebWsServerEndpoint;
 import com.zjh.zxw.websocket.AutoJsWsServerEndpoint;
 import com.zjh.zxw.websocket.IPUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -101,6 +103,9 @@ public class DeviceController extends BaseController {
     // 在线机器码map
     private static Map<String, Map<String,String>> onlineMachineMap = new ConcurrentHashMap<>();
 
+    // 布局map
+    private static Map<String, String> layoutMap = new ConcurrentHashMap<>();
+
     // 检查QtScrcpy
     private String checkQtScrcpy(){
         File QtzipFile = new File("QtScrcpy.zip");
@@ -124,6 +129,58 @@ public class DeviceController extends BaseController {
             return "QtScrcpy/adb.exe文件不存在";
         }
         return "";
+    }
+
+
+
+    /**
+     * deviceUUID
+     * layoutJSON
+     * @param mapParam
+     * @return
+     */
+    @ApiOperation(value = "写入布局json", notes = "写入布局json")
+    @PostMapping("/writeLayoutJson")
+    public R<Boolean> writeLayoutJson(@RequestBody Map<String,String> mapParam) throws IOException {
+        String deviceUUID = mapParam.get("deviceUUID");
+        String layoutJSON = mapParam.get("layoutJSON");
+        // 获取上次缓存的文件
+        String lastLayoutJson = layoutMap.getOrDefault(deviceUUID,"");
+
+        // 内容发生变化
+        if(!lastLayoutJson.equals(layoutJSON)){
+            // 发送指令 给web端  刷新预览图片
+            AjMessageDTO ajMessageDTO = new AjMessageDTO();
+            ajMessageDTO.setAction("refreshPreviewImg");
+            ajMessageDTO.setMessage(deviceUUID);
+            // 推送消息通知到web端页面
+            AutoJsWebWsServerEndpoint.sendMessageToClientSelectAppDevice(deviceUUID,"",ajMessageDTO);
+        }
+
+        layoutMap.put(deviceUUID,layoutJSON);
+        return success(true);
+    }
+
+    @ApiOperation(value = "查询布局json", notes = "查询布局json")
+    @GetMapping("/queryLayoutJsonByKey")
+    public R<String> queryLayoutJsonByKey(@ApiParam("deviceUUID") @RequestParam(value = "deviceUUID") String deviceUUID){
+        String layoutJSON = layoutMap.get(deviceUUID);
+        return success(layoutJSON);
+    }
+
+
+    @ApiOperation(value = "以布局方式开始预览设备", notes = "以布局方式开始预览设备")
+    @GetMapping("/startPreviewByLayout")
+    public R<Boolean> startPreviewByLayout(@RequestParam("deviceUUID") String deviceUUID) throws Exception {
+        AutoJsWsServerEndpoint.startPreviewByLayout(deviceUUID);
+        return success(true);
+    }
+
+    @ApiOperation(value = "以布局方式停止预览设备", notes = "以布局方式停止预览设备")
+    @GetMapping("/stopPreviewByLayout")
+    public R<Boolean> stopPreviewByLayout(@RequestParam("deviceUUID") String deviceUUID) throws Exception {
+        AutoJsWsServerEndpoint.stopPreviewByLayout(deviceUUID);
+        return success(true);
     }
 
 
