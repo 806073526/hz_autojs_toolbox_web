@@ -131,6 +131,12 @@
                             <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="reConnect">
                                 重连
                             </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="unLock">
+                                解锁
+                            </el-button>
+                            <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="quick">
+                                快捷
+                            </el-button>
                             <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="fixedOperate('powerDialog')">
                                 电源
                             </el-button>
@@ -311,6 +317,16 @@
                                             追加
                                         </el-radio>
                                     </el-radio-group>
+                                </el-form-item>
+                            </el-row>
+                            <el-row class="d-flex" style="margin-top: 10px;">
+                                <el-form-item label="操作代码:" prop="textIndex" class="flex-1">
+                                    <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder="" rows="2"
+                                              class="width80">
+                                    </el-input>
+                                    <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="saveQuickScript">
+                                        保存到快捷代码
+                                    </el-button>
                                 </el-form-item>
                             </el-row>
                             <el-row v-if="selectPreviewType === 'imgInterface'">

@@ -640,6 +640,22 @@ window.ZXW_VUE = new Vue({
                 }
             });
         },
+        unLock(){
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                if(previewDevice.unLock && typeof previewDevice.unLock === 'function'){
+                    previewDevice.unLock();
+                }
+            }
+        },
+        quick(){
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                if(previewDevice.quick && typeof previewDevice.quick === 'function'){
+                    previewDevice.quick();
+                }
+            }
+        },
         // 重连设备
         reConnect(){
             let previewDevice = window.ZXW_VUE.$refs['previewDevice'];

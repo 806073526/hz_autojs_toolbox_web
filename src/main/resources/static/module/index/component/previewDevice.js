@@ -1471,6 +1471,7 @@ let changeScreenCaptureThread = (flag) => {
             } else {
                 remoteScript = 'input(' + param + ')';
             }
+            this.devicePreviewParam.operateRecord = remoteScript;
             this.remoteExecuteScript(remoteScript);
             // 发送完成后置空输入
             this.textContent = "";
@@ -1621,6 +1622,41 @@ let changeScreenCaptureThread = (flag) => {
             }
             this.remoteExecuteScript(remoteExecuteScript);
         },
+        // 保存快捷代码
+        saveQuickScript(){
+            if (!this.validSelectDevice()) {
+                return
+            }
+            window.localStorage.setItem(this.deviceInfo.deviceUuid + "_quickScript",this.devicePreviewParam.operateRecord);
+            window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+        },
+        // 快捷
+        quick(){
+            if (!this.deviceInfo.startPreview) {
+                return
+            }
+            // 从缓存读取快捷脚本
+            let quickScript = window.localStorage.getItem(this.deviceInfo.deviceUuid + "_quickScript") || "";
+            if(!quickScript){
+                window.ZXW_VUE.$message.warning('未设置快捷代码');
+                return;
+            }
+            this.devicePreviewParam.operateRecord = quickScript;
+            this.remoteExecuteScript(quickScript);
+        },
+        // 解锁
+        unLock(){
+            if (!this.deviceInfo.startPreview) {
+                return
+            }
+            let operateCode = `
+            device.wakeUpIfNeeded();
+            sleep(100);
+            swipe(device.width / 2, device.height * 7 / 10, device.width / 2, device.height * 3 / 10, 300);
+            `;
+            this.devicePreviewParam.operateRecord = operateCode.trim();
+            this.remoteExecuteScript(operateCode);
+        },
         // 重新预览
         reConnect(callback){
             this.stopPreviewDevice(false, () => {
@@ -1653,33 +1689,36 @@ let changeScreenCaptureThread = (flag) => {
                 return
             }
             let operateCode = operateName + '()';
-            // this.devicePreviewParam.operateRecord += operateCode + ";";
+            this.devicePreviewParam.operateRecord = operateCode;
             this.remoteExecuteScript(operateCode);
+        },
+        // 重置坐标
+        resetPosition(){
+            // 重置位置
+            window.deviceMouseX1 = 0;
+            window.deviceMouseY1 = 0;
+            window.deviceMouseStartTime = 0;
+            window.deviceMouseX2 = 0;
+            window.deviceMouseY2 = 0;
+            window.deviceMouseEndTime = 0;
+            window.alreadyLongClick = 0;
         },
         // 设备鼠标点击
         deviceMouseClick() {
             if (!this.deviceInfo.startPreview) {
                 return
             }
-            let resetPosition = function () {
-                // 重置位置
-                window.deviceMouseX1 = 0;
-                window.deviceMouseY1 = 0;
-                window.deviceMouseStartTime = 0;
-                window.deviceMouseX2 = 0;
-                window.deviceMouseY2 = 0;
-                window.deviceMouseEndTime = 0;
-            };
+
             let positionVal1 = window.deviceMouseX1 + "," + window.deviceMouseY1;
             let positionVal2 = window.deviceMouseX2 + "," + window.deviceMouseY2;
             // 坐标不相同
-            if (positionVal1 !== positionVal2) {
-                resetPosition();
+            if (positionVal1 !== positionVal2 || window.alreadyLongClick === 1) {
+                this.resetPosition();
                 return;
             }
             let operateCode = 'click(' + this.deviceMousePosition.x + ',' + this.deviceMousePosition.y + ')';
             this.remoteExecuteScript(operateCode);
-            // this.devicePreviewParam.operateRecord += operateCode + ";";
+            this.devicePreviewParam.operateRecord = operateCode;
         },
         // 灵敏模式按下事件
         fastModelDown(eventType){
@@ -1874,14 +1913,14 @@ let changeScreenCaptureThread = (flag) => {
                         let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
                         // 拼接操作代码
                         let operateCode =  `gesture(${duration},${otherPoints})`;
-                        // this.devicePreviewParam.operateRecord += operateCode + ";";
+                        this.devicePreviewParam.operateRecord = operateCode;
                         // 发送滑动指令
                         this.remoteExecuteScript(operateCode);
                         window.deviceGestures = [];
                         return;
                     }
                     let operateCode = 'swipe(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ',' + window.deviceTouchX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceTouchEndTime - window.deviceTouchStartTime) + ')';
-                    // this.devicePreviewParam.operateRecord += operateCode + ";";
+                    this.devicePreviewParam.operateRecord = operateCode;
                     // 发送滑动指令
                     this.remoteExecuteScript(operateCode);
                     // 坐标相同
@@ -1892,13 +1931,13 @@ let changeScreenCaptureThread = (flag) => {
                             return
                         }
                         let operateCode = 'longClick(' + window.deviceTouchX1 + ',' + window.deviceMouseY1 + ')';
-                        // this.devicePreviewParam.operateRecord += operateCode + ";";
+                        this.devicePreviewParam.operateRecord = operateCode;
                         // 发送长按指令
                         this.remoteExecuteScript(operateCode);
                     } else {
                         let operateCode = 'click(' + this.deviceMousePosition.x + ',' + this.deviceMousePosition.y + ')';
                         this.remoteExecuteScript(operateCode);
-                        // this.devicePreviewParam.operateRecord += operateCode + ";";
+                        this.devicePreviewParam.operateRecord = operateCode;
                     }
                 }
             }
@@ -2090,14 +2129,14 @@ let changeScreenCaptureThread = (flag) => {
                     let otherPoints = deviceGestures.map(item=> '['+item.x+','+item.y+']').join(',');
                     // 拼接操作代码
                     let operateCode =  `gesture(${duration},${otherPoints})`;
-                    // this.devicePreviewParam.operateRecord += operateCode + ";";
+                    this.devicePreviewParam.operateRecord = operateCode;
                     // 发送滑动指令
                     this.remoteExecuteScript(operateCode);
                     window.deviceGestures = [];
                     return;
                 }
                 let operateCode = 'swipe(' + window.deviceMouseX1 + ',' + window.deviceMouseY1 + ',' + window.deviceMouseX2 + ',' + window.deviceMouseY2 + ',' + (window.deviceMouseEndTime - window.deviceMouseStartTime) + ')';
-                // this.devicePreviewParam.operateRecord += operateCode + ";";
+                this.devicePreviewParam.operateRecord = operateCode;
                 // 发送滑动指令
                 this.remoteExecuteScript(operateCode);
                 // 坐标相同
@@ -2107,8 +2146,9 @@ let changeScreenCaptureThread = (flag) => {
                     if (!this.deviceInfo.startPreview) {
                         return
                     }
+                    window.alreadyLongClick = 1;
                     let operateCode = 'longClick(' + window.deviceMouseX1 + ',' + window.deviceMouseY1 + ')';
-                    // this.devicePreviewParam.operateRecord += operateCode + ";";
+                    this.devicePreviewParam.operateRecord = operateCode;
                     // 发送长按指令
                     this.remoteExecuteScript(operateCode);
                 }
