@@ -1638,7 +1638,7 @@ let changeScreenCaptureThread = (flag) => {
             // 从缓存读取快捷脚本
             let quickScript = window.localStorage.getItem(this.deviceInfo.deviceUuid + "_quickScript") || "";
             if(!quickScript){
-                window.ZXW_VUE.$message.warning('未设置快捷代码');
+                window.ZXW_VUE.$message.warning('未设置快捷代码,请先进行远程屏幕操作,然后在右侧将操作代码保存到快捷代码中！！！');
                 return;
             }
             this.devicePreviewParam.operateRecord = quickScript;

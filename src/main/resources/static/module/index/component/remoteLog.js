@@ -125,7 +125,8 @@ export default {
                 dataType: "json",
                 async: false,
                 headers: {
-                    "deviceUUID": _that.deviceInfo.deviceUuid
+                    "deviceUUID": _that.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
                 },
                 data: {
                     "deviceUUID": _that.deviceInfo.deviceUuid,
@@ -183,7 +184,8 @@ export default {
                 dataType: "json",
                 async: false,
                 headers: {
-                    "deviceUUID": _that.deviceInfo.deviceUuid
+                    "deviceUUID": _that.deviceInfo.deviceUuid,
+                    "devicePassword": this.deviceInfo.devicePassword
                 },
                 data: {
                     "deviceUUID": _that.deviceInfo.deviceUuid
