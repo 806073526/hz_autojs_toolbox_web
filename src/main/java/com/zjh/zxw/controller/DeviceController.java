@@ -1,21 +1,15 @@
 package com.zjh.zxw.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.img.Img;
-import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.ZipUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zjh.commonUtils;
 import com.zjh.zxw.base.BaseController;
 import com.zjh.zxw.base.R;
 import com.zjh.zxw.common.util.DateUtils;
 import com.zjh.zxw.common.util.FileListener;
-import com.zjh.zxw.common.util.NumberHelper;
 import com.zjh.zxw.common.util.StrHelper;
 import com.zjh.zxw.common.util.exception.BusinessException;
 import com.zjh.zxw.common.util.spring.UploadPathHelper;
@@ -105,6 +99,78 @@ public class DeviceController extends BaseController {
 
     // 布局map
     private static Map<String, String> layoutMap = new ConcurrentHashMap<>();
+
+    public void writeHosts(){
+        String relalIp = IPUtil.getRealIP();
+        if(StringUtils.isBlank(relalIp)){
+            return;
+        }
+        String hostsContent = relalIp+" pro.autojs.org";
+        FileWriter fw = null;
+        String location = "";
+        try {
+            String tempPath = UploadPathHelper.getUploadPath(uploadPath);
+            location = tempPath+ File.separator + "hosts";
+            File fileStart = new File(location);
+            if(!fileStart.exists()){
+                fileStart.createNewFile();
+            }
+            //生成bat文件
+            fw = new FileWriter(location);
+            fw.write(hostsContent);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @ApiOperation(value = "启动ajHttp", notes = "启动ajHttp")
+    @GetMapping("/startAjServer")
+    public R<String> startAjServer(@RequestParam(value = "deviceUUID",required = false) String deviceUUID) throws Exception {
+        String mess = checkAjProServer();
+        if(StringUtils.isNotBlank(mess)){
+            return success(mess);
+        }
+        // 写入hosts文件
+        writeHosts();
+        File AjProServerFile = new File("AjProServer.exe");
+        if(AjProServerFile.exists()){
+            RuntimeUtil.exec("taskkill /f /im AjProServer.exe");
+            Thread.sleep(1000);
+            RuntimeUtil.exec("AjProServer.exe");
+        }
+        if(StringUtils.isNotBlank(deviceUUID)){
+            String remoteScript = "";
+            remoteScript += "files.createWithDirs(\"/sdcard/-0000AutoJsPro/\");" +
+            "utilsObj.downLoadFile(\"http://"+IPUtil.getRealIP()+":"+port+"/uploadPath/hosts\",\"-0000AutoJsPro/hosts\",()=>{" +
+                    "sleep(200);\n" +
+                    "launchPackage(\"com.github.xfalcon.vhosts\");\n" +
+                    "toastLog(\"请选择【/scdcard/-0000AutoJsPro/hosts】文件\");\n" +
+                    "})";
+            // 执行远程代码
+            AutoJsWsServerEndpoint.execRemoteScript(deviceUUID, remoteScript,false,"","");
+        }
+        return success("");
+    }
+
+
+    @ApiOperation(value = "停止ajHttp", notes = "停止ajHttp")
+    @GetMapping("/stopAjServer")
+    public R<String> stopAjServer() throws Exception {
+        RuntimeUtil.exec("taskkill /f /im AjProServer.exe");
+        return success("");
+    }
+
+    // 检查AjProServer
+    private String checkAjProServer(){
+        File ajProServer = new File("AjProServer.exe");
+        if(!ajProServer.exists()){
+            // 执行下载zip
+            RuntimeUtil.execForStr("curl -o \"AjProServer.exe\" \"https://gitee.com/zjh336/hz_autojs_toolbox_web/raw/master/AjProServer.exe\"");
+        }
+        return "";
+    }
+
 
     // 检查QtScrcpy
     private String checkQtScrcpy(){
