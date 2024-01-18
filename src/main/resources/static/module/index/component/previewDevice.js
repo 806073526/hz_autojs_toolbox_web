@@ -1657,6 +1657,17 @@ let changeScreenCaptureThread = (flag) => {
             this.devicePreviewParam.operateRecord = operateCode.trim();
             this.remoteExecuteScript(operateCode);
         },
+        // 锁屏
+        lockScreen(){
+            if (!this.deviceInfo.startPreview) {
+                return
+            }
+            let operateCode = `
+            runtime.accessibilityBridge.getService().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN);
+            `;
+            this.devicePreviewParam.operateRecord = operateCode.trim();
+            this.remoteExecuteScript(operateCode);
+        },
         // 重新预览
         reConnect(callback){
             this.stopPreviewDevice(false, () => {

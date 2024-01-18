@@ -347,9 +347,14 @@ export default {
                 // 开启点击线程
                 utilsObj.requestScreenClickThreadWaitTimes = threads.start(function () {
                     while (true) {
-                        let click1 = textMatches(textRegExp).findOne(100);
-                        if(click1){
-                            click1.click();
+                        if(auto.service){
+                            let click1 = textMatches(textRegExp).findOne(100);
+                            if(click1){
+                                click1.click();
+                            }
+                        } else if(utilsObj.hasAdb === 1){
+                            let otherClickText = commonStorage.get("otherClickText");
+                            utilsObj.findTextByAdb("立即开始|允许|同意"+(otherClickText?"|"+otherClickText:""),true);
                         }
                         if(utilsObj.requestScreenClickThreadWaitTimes){
                             // 停止点击线程
@@ -367,6 +372,11 @@ export default {
             }
             utilsObj.requestScreenCaptureCommonFun = (callback)=>{
                 try {
+                   if(!auto.service && utilsObj.hasAdb !== 1){
+                        console.error("请开启无障碍服务、adb权限至少一项")
+                        // 直接返回
+                        return;
+                    }
                     // 获取截图权限参数
                     let screenCaptureOptions = images.getScreenCaptureOptions();
                     // 不为空
@@ -386,12 +396,6 @@ export default {
                         sleep(100);
                     }
                     
-                    if(!auto.service && utilsObj.hasAdb !== 1){
-                        console.error("请开启无障碍服务、adb权限至少一项")
-                        // 直接返回
-                        return;
-                    }
-            
                     // 是否存在截图权限
                     let exitsScreenCaputreOptions = false;
             

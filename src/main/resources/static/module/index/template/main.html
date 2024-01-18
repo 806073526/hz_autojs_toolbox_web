@@ -85,7 +85,7 @@
                 <i title="展开收缩" :class="{'el-icon-caret-top' : !showWindowLog, 'el-icon-caret-bottom':showWindowLog}" style="cursor: pointer;color:white;" @click.stop="changeShowWindowLog"></i>
             </span>
             <div class="flex-1" style="text-align: right;">
-                <i title="清除日志" class="el-icon-delete" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="clearShowWindowLog"></i>
+                <i title="清除日志" class="requestScreenCaptureCommonFunel-icon-delete" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="clearShowWindowLog"></i>
                 <i title="关闭日志" class="el-icon-close" style="cursor: pointer;margin-right: 5px;color:white;"  @click.stop="closeShowWindowLog"></i>
             </div>
         </div>
@@ -97,6 +97,9 @@
     <div v-if="openScreenWindow" :key="randomKey+'_screen_tool'" id="floatWindowToolBar" class="d-flex flex-column" style="position: fixed;top:5px;right:410px;align-items: self-end;z-index: 99999999999999999999;"">
         <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="reConnect">
             重连
+        </el-button>
+        <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="lockScreen">
+            锁屏
         </el-button>
         <el-button type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="unLock">
             亮屏
