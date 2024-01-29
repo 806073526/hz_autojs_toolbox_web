@@ -146,9 +146,6 @@ export default {
                             _that.selectImageArrays = arr.map(item=> item.fileName + "." + item.fileType);
                         }
                     }
-                    if(callback){
-                        callback();
-                    }
                     setTimeout(() => {
                         _that.fileLoading = false
                     }, 200)

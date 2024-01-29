@@ -9,7 +9,17 @@
                 <div style="position: sticky;top:0px;z-index: 999;">
                     <el-row class="width100 d-flex a-center flex-wrap" style="margin-bottom: -8px;">
                         <el-form-item label="脚本名称:"  class="width50" label-width="75px" >
-                            <el-input v-model="remoteHandler.param4.scriptName" placeholder="请输入脚本名称" class="width100"/>
+                            <el-input v-model="remoteHandler.param4.scriptName" placeholder="请输入脚本名称" class="width80"/>
+                            <el-dropdown>
+                                <el-button type="primary" size="mini" @click.stop.prevent="showSelectScriptName">
+                                    选择
+                                </el-button>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item v-for="(item,index) in selectScriptArrays" :key="index" @click.native.prevent.stop="selectScriptName(item)">
+                                        {{ item }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
                         </el-form-item>
                         <el-form-item label="一键执行:" class="width15" label-width="85px">
                             <el-switch v-model="remoteHandler.param4.scriptImmediatelyExec"/>

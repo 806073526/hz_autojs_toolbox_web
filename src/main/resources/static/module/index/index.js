@@ -648,6 +648,14 @@ window.ZXW_VUE = new Vue({
                 }
             }
         },
+        lockScreen(){
+            let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
+            if(previewDevice){
+                if(previewDevice.lockScreen && typeof previewDevice.lockScreen === 'function'){
+                    previewDevice.lockScreen();
+                }
+            }
+        },
         quick(){
             let previewDevice = window.ZXW_VUE.$refs['previewDevice'];
             if(previewDevice){

@@ -67,10 +67,14 @@ export default {
     },
     mounted(){
         this.refreshScrollHeight();
+        window.removeEventListener('keydown',this.editorSaveListener);
+        window.addEventListener('keydown',this.editorSaveListener,false);
     },
     data() {
         return {
             isActive: false,
+            selectScriptArrays:[],
+            firstLoadFile: false,
             remoteHandler: {
                 param4: {
                     scriptName: 'remoteScript.js',
@@ -92,13 +96,61 @@ export default {
         //tab页切换
         handleClick(tab, event) {
         },
+        // 文件编辑器保存监听
+        editorSaveListener(e){
+            let isEditorContainer = false;
+            if(document.activeElement && document.activeElement.parentElement){
+                isEditorContainer = document.activeElement.parentElement.id === 'scriptTextEditor';
+            }
+            if(e.ctrlKey && e.keyCode === 83 && this.getMonacoEditorComplete && this.deviceInfo.deviceUuid && this.remoteHandler.param4.scriptName && isEditorContainer){
+                e.stopPropagation();
+                e.preventDefault();
+                window.localStorage.setItem("remoteScriptText_"+this.remoteHandler.param4.scriptName,this.scriptEditor.getValue());
+                let scriptFile = new File([this.scriptEditor.getValue()], this.remoteHandler.param4.scriptName, {
+                    type: "text/plain",
+                });
+                const param = new FormData();
+                param.append('file', scriptFile);
+                param.append('pathName', this.deviceInfo.deviceUuid+"/system/remoteScript/");
+                let _that = this;
+                $.ajax({
+                    url: getContext() + "/attachmentInfo/uploadFileSingle",
+                    type: 'post',
+                    data: param,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data) {
+                            if (data.isSuccess) {
+                                window.ZXW_VUE.$notify.success({message: '保存成功', duration: '1000'});
+                            }
+                        }
+                    },
+                    error: function (msg) {
+                    }
+                });
+            }
+        },
         init(){
             let fileContent = this.remoteHandler.param4.scriptText ? this.remoteHandler.param4.scriptText : "";
             // 初始化文件编辑器
             initFileEditor(this,'scriptEditor','scriptTextEditor',this.getMonacoEditorComplete,fileContent,'javascript','vs-dark',(e,value)=>{
-                this.remoteHandler.param4.scriptText = value
+                this.remoteHandler.param4.scriptText = value;
+
+                // 自动保存草稿
+                if(this.remoteHandler.param4.scriptName){
+                    window.localStorage.setItem("remoteScriptText_"+this.remoteHandler.param4.scriptName,this.scriptEditor.getValue());
+                }
             });
             this.refreshScrollHeight();
+            if(!this.firstLoadFile){
+                this.$nextTick(()=>{
+                    // 从文件读取
+                    this.readForFile();
+                    this.firstLoadFile = true;
+                });
+            }
         },
         refreshScrollHeight(){
             let zoomSize = 100;
@@ -118,6 +170,41 @@ export default {
                     $(containers[i]).css("height",1500 * zoomSize / 100);
                 }
             }
+        },
+        // 显示脚本名字
+        showSelectScriptName(){
+            let _that = this;
+            $.ajax({
+                url: getContext() + "/attachmentInfo/queryAttachInfoListByPath",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "relativeFilePath": this.deviceInfo.deviceUuid + "/system/remoteScript"
+                },
+                success: function (data) {
+                    if (data) {
+                        if (data.isSuccess) {
+                            let arr = data.data.filter(item=> ["js"].includes(item.fileType));
+                            _that.selectScriptArrays = arr.map(item=> item.fileName + "." + item.fileType);
+                        }
+                    }
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                },
+                error: function (msg) {
+                    setTimeout(() => {
+                        _that.fileLoading = false
+                    }, 200)
+                }
+            });
+        },
+        // 选择脚本
+        selectScriptName(scriptName){
+            // 设置脚本名称
+            this.remoteHandler.param4.scriptName = scriptName;
+            // 从文件读取
+            this.readForFile();
         },
         // 跳转文件管理模块
         forwardFileManageFun(){
