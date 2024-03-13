@@ -331,6 +331,11 @@ window.ZXW_VUE = new Vue({
             if(this.openScreenWindow){
                 // 预览屏幕悬浮窗 拖拽事件注册
                 this.dragBoxScreenFun();
+
+                // 打开开关
+                if(this.$refs['previewDevice']){
+                    this.$refs['previewDevice'].openFloatWindow = true;
+                }
             }
 
             // 注册同步屏幕方法
