@@ -204,6 +204,7 @@
                                     <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,true)">压缩(含目录)</el-link>
                                     <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">压缩(不含目录)</el-link>
                                     <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
+                                    <el-link v-show="item.fileType==='js'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="showAddTimerTask(item)">添加到定时任务</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>
                                     <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
@@ -610,4 +611,90 @@
 
         </span>
     </el-dialog>
+
+
+    <el-dialog
+            title="添加定时任务"
+            :visible.sync="addTimerTaskDialog"
+            width="45%"
+            center
+    >
+        <div style="height: 360px;padding-top: 15px;">
+            <el-row class="d-flex">
+                <el-form-item label="运行脚本路径:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-input v-model="timerTask.path" :disabled="true"></el-input>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="定时任务类型:" label-width="130px"  class="flex-1">
+                    <div class="d-flex a-center j-start" style="height: 40px;">
+                        <el-radio-group v-model="timerTask.taskType">
+                            <el-radio label="disposable">一次性</el-radio>
+                            <el-radio label="daily">每日一次</el-radio>
+                            <el-radio label="weekly">按星期运行</el-radio>
+                            <el-radio label="intent">广播</el-radio>
+                        </el-radio-group>
+                    </div>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item v-if="timerTask.taskType !== 'intent'" label="定时任务时间:" label-width="130px"  class="flex-1">
+                    <!-- 一次性 指定日期 -->
+                    <el-date-picker class="customFilePicker" style="width:100%;" v-if="timerTask.taskType==='disposable'" v-model="timerTask.time" type="datetime" value-format="timestamp" placeholder="选择日期时间"></el-date-picker>
+                    <!-- 每日一次/按星期运行 指定时间 -->
+                    <el-time-picker class="customFilePicker" style="width:100%;" v-if="['daily','weekly'].includes(timerTask.taskType)" v-model="timerTask.time" value-format="timestamp" placeholder="请选择时间"></el-time-picker>
+                </el-form-item>
+                <el-form-item v-if="timerTask.taskType === 'intent'" label="广播事件:" label-width="130px"  class="flex-1">
+                    <el-select style="width:100%;" v-model="timerTask.action" placeholder="请选择">
+                        <el-option :key="0" label="开机时" value="Intent.ACTION_BOOT_COMPLETED"></el-option>
+                        <el-option :key="1" label="熄屏时" value="Intent.ACTION_SCREEN_OFF"></el-option>
+                        <el-option :key="2" label="亮屏时" value="Intent.ACTION_SCREEN_ON"></el-option>
+                        <el-option :key="3" label="屏幕解锁时" value="Intent.ACTION_USER_PRESENT"></el-option>
+                        <el-option :key="4" label="电量变化时" value="Intent.ACTION_BATTERY_CHANGED"></el-option>
+                        <el-option :key="5" label="电源连接时" value="Intent.ACTION_POWER_CONNECTED"></el-option>
+                        <el-option :key="6" label="电源断开时" value="Intent.ACTION_POWER_DISCONNECTED"></el-option>
+                        <el-option :key="7" label="网络连接变化时" value="ConnectivityManager.CONNECTIVITY_ACTION"></el-option>
+                        <el-option :key="8" label="新应用安装时" value="Intent.ACTION_PACKAGE_ADDED"></el-option>
+                        <el-option :key="9" label="应用卸载时" value="Intent.ACTION_PACKAGE_REMOVED"></el-option>
+                        <el-option :key="10" label="应用更新时" value="Intent.ACTION_PACKAGE_REPLACED"></el-option>
+                        <el-option :key="11" label="耳机拔插时" value="Intent.ACTION_HEADSET_PLUG"></el-option>
+                        <el-option :key="12" label="某些设置更改时" value="Intent.ACTION_CONFIGURATION_CHANGED"></el-option>
+                        <el-option :key="13" label="每分钟一次" value="Intent.ACTION_TIME_TICK"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex" v-if="timerTask.taskType === 'weekly'">
+                <el-form-item label="定时任务天:" label-width="130px"  class="flex-1">
+                    <el-checkbox-group v-model="timerTask.daysOfWeek">
+                        <el-checkbox label="一">星期一</el-checkbox>
+                        <el-checkbox label="二">星期二</el-checkbox>
+                        <el-checkbox label="三">星期三</el-checkbox>
+                        <el-checkbox label="四">星期四</el-checkbox>
+                        <el-checkbox label="五">星期五</el-checkbox>
+                        <el-checkbox label="六">星期六</el-checkbox>
+                        <el-checkbox label="日">星期日</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="任务延迟(毫秒):" label-width="130px"  class="flex-1">
+                    <el-input v-model="timerTask.delay" type="number" placeholder="任务开始前的延迟，单位毫秒"></el-input>
+                </el-form-item>
+                <el-form-item label="循环次数:" label-width="130px"  class="flex-1">
+                    <el-input v-model="timerTask.loopTimes" type="number" placeholder="任务循环次数"></el-input>
+                </el-form-item>
+            </el-row>
+            <el-row class="d-flex">
+                <el-form-item label="循环间隔(毫秒):" label-width="130px"  class="flex-1">
+                    <el-input v-model="timerTask.interval" type="number" placeholder="任务循环间隔，单位毫秒"></el-input>
+                </el-form-item>
+            </el-row>
+        </div>
+        <span slot="footer" class="dialog-footer">
+                <el-button @click="addTimerTaskFun">添加</el-button>
+        </span>
+    </el-dialog>
+
 </div>

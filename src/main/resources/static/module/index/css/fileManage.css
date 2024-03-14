@@ -156,3 +156,7 @@
 .fileNameArr .fileNameSelectItem{
    border: 1px solid #5c6bcd !important;
 }
+
+.customFilePicker.el-input--prefix .el-input__inner {
+    padding-left: 30px !important;
+}

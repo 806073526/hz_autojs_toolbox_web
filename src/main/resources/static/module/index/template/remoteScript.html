@@ -69,6 +69,10 @@
                                     停止脚本
                                 </el-button>
                                 <el-button type="primary" size="mini" style="margin-left: 10px !important;"
+                                           @click.stop.prevent="importUtils">
+                                    引入utils.js
+                                </el-button>
+                                <el-button type="primary" size="mini" style="margin-left: 10px !important;"
                                            @click.stop.prevent="customScriptSetting">
                                     自定义模块设置
                                 </el-button>

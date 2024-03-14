@@ -294,6 +294,18 @@ export default {
             });`;
             this.remoteExecuteScript(remoteScript);
         },
+        // 引入utils.js
+        importUtils(){
+            let scriptText = this.scriptEditor.getValue();
+            // 不存在utils.js的时候
+            if(scriptText.indexOf("let utilsObj = require(context.getFilesDir()+\"/project/common/\"+\"utils.js\")")===-1){
+                scriptText =
+`/* 引入utils.js模块  */
+let utilsObj = require(context.getFilesDir()+"/project/common/"+"utils.js");
+`+scriptText;
+                this.scriptEditor.setValue(scriptText);
+            }
+        },
         // 保存到草稿
         saveToDraft(){
             if(!this.remoteHandler.param4.scriptName){

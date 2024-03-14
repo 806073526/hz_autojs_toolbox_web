@@ -251,6 +251,7 @@ window.ZXW_VUE = new Vue({
             validSelectDevice: this.validSelectDevice, // 检验设备选择情况
             sendMsgToClient: this.sendMsgToClient, // 发送websocket消息到app
             forwardFileManage: this.forwardFileManage, // 跳转文件管理模块
+            changeActiveTab: this.changeActiveTab,// 切换tab
             remoteExecuteScript: this.remoteExecuteScript, // app端远程执行代码
             remoteExecuteScriptByServer: this.remoteExecuteScriptByServer, // 服务端远程执行代码
             getMonacoEditorComplete: ()=>{ return this.monacoEditorComplete },
@@ -1245,6 +1246,10 @@ window.ZXW_VUE = new Vue({
                 error: function (msg) {
                 }
             });
+        },
+        // 切换tab
+        changeActiveTab(activeTab){
+            this.activeTab = activeTab;
         },
         // 跳转文件管理
         forwardFileManage(webFilePath){

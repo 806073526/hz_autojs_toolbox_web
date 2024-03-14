@@ -207,7 +207,7 @@ let defaultProjectJSON = {
 export default {
     template: template,
     name: 'FileManage',
-    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'remoteExecuteScriptByServer', 'getMonacoEditorComplete', 'updateFileDialogIsMin'],
+    inject: ['validSelectDevice', 'sendMsgToClient', 'remoteExecuteScript', 'remoteExecuteScriptByServer', 'getMonacoEditorComplete', 'updateFileDialogIsMin', 'changeActiveTab'],
     props: {
         deviceInfo: { // 设备信息
             type: Object,
@@ -361,6 +361,17 @@ export default {
             alreadyCompletePackageProject:false,// 是否已完成打包项目
             packageProjectMessage:'',// 打包日志信息
             phoneFileEditorLoading:false, // 手机端文件编辑器loading
+            addTimerTaskDialog: false, // 是否显示添加定时任务界面
+            timerTask:{
+                taskType: "disposable",// 定时任务类型  disposable一次性 daily每日一次  weekly按星期运行 intent广播
+                path:"",// {string} 需要运行的脚本的绝对路径
+                action: "",// {string} 需要监听的事件的广播的Action名称
+                time:0, //{string} | {Date} 此定时任务每天运行的时间，支持时间戳、字符串和Date对象
+                daysOfWeek: [],// {string[]} 每周几运行，参数包括：['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] 或 ['一', '二', '三', '四', '五', '六', '日']
+                delay: 0, // {number} 任务开始前的延迟，单位毫秒，默认为0；如果延时较长，则此参数并不可靠，建议勿用此参数控制大于30s的延迟
+                loopTimes: 1,//  {number} 任务循环次数，默认为1
+                interval: 0, //  {number} 任务循环间隔，单位毫秒，默认为0；如果间隔较长，则此参数并不可靠，建议勿用此参数控制大于30s的间隔
+            }
         }
     },
     mounted() {
@@ -2976,6 +2987,63 @@ export default {
                 });
             }).catch(() => {
             });
+        },
+        // 显示添加定时任务界面
+        showAddTimerTask(row){
+            this.timerTask.path = row.pathName;
+            this.timerTask.taskType = "disposable"; // 默认设置为运行一次
+            this.timerTask.time = new Date().getTime(); // 默认当前时间
+            this.timerTask.delay = 0;// 延时0
+            this.timerTask.loopTimes  = 1;// 循环一次
+            this.timerTask.interval   = 0;// 间隔0
+            this.addTimerTaskDialog  = true;
+        },
+        // 添加定时任务
+        addTimerTaskFun(){
+            if (!this.validSelectDevice()) {
+                return;
+            }
+            // 一次性/每日一次/按星期
+            if(['disposable','daily','weekly'].includes(this.timerTask.taskType)){
+                if(!this.timerTask.time){
+                    window.ZXW_VUE.$message.warning('请选择定时任务时间');
+                    return;
+                }
+            }
+            // 按星期
+            if(['weekly'].includes(this.timerTask.taskType)){
+                if(!this.timerTask.daysOfWeek.length){
+                    window.ZXW_VUE.$message.warning('请选择定时任务天');
+                    return;
+                }
+            }
+            // 广播
+            if('intent' === this.timerTask.taskType){
+                if(!this.timerTask.action){
+                    window.ZXW_VUE.$message.warning('请选择广播类型');
+                    return;
+                }
+            }
+            let timerTaskScript = "";
+            switch(this.timerTask.taskType){
+                case "disposable":
+                    timerTaskScript =`$work_manager.addDisposableTask(${JSON.stringify(this.timerTask)})`;
+                    break;
+                case "daily":
+                    timerTaskScript =`$work_manager.addDailyTask(${JSON.stringify(this.timerTask)})`;
+                    break;
+                case "weekly":
+                    timerTaskScript =`$work_manager.addWeeklyTask(${JSON.stringify(this.timerTask)})`;
+                    break;
+                case "intent":
+                    timerTaskScript =`$work_manager.addIntentTask(${JSON.stringify(this.timerTask)})`;
+                    break;
+                default:
+            }
+            this.remoteExecuteScript(timerTaskScript);
+            this.addTimerTaskDialog  = false;
+            // 切换到设备预览模块
+            this.changeActiveTab('previewDevice');
         },
         // 解压文件
         unZipFile(row){
