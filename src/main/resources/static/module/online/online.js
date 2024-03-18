@@ -34,7 +34,7 @@ window.ZXW_VUE = new Vue({
             let todayDate = formatDate(new Date());
             let count = this.serverList.filter(value => {
                 let lastConnectTime = value.lastConnectTime || "";
-                return lastConnectTime.length >=11 && todayDate === lastConnectTime.substring(0,11);
+                return lastConnectTime.length >=11 && todayDate === lastConnectTime.substring(0,10);
             }).length;
             return count;
         },
@@ -56,7 +56,7 @@ window.ZXW_VUE = new Vue({
                     let todayDate = formatDate(new Date());
                     resultList = this.serverList.filter(value => {
                         let lastConnectTime = value.lastConnectTime || "";
-                        return lastConnectTime.length >=11 && todayDate === lastConnectTime.substring(0,11);
+                        return lastConnectTime.length >=11 && todayDate === lastConnectTime.substring(0,10);
                     });
                     break;
                 case "newVersion":// 最新版本
