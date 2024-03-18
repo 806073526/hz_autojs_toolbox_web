@@ -15,7 +15,8 @@ window.ZXW_VUE = new Vue({
     data: {
         serverList:[],
         serverLoading:false,
-        newVersion:""
+        newVersion:"",
+        showType:"all"
     },
     mounted() {
         let accessPwd = urlParam("accessPwd") || "";
@@ -25,6 +26,10 @@ window.ZXW_VUE = new Vue({
         this.newVersion = this.getNewVersion();
     },
     computed:{
+        allCount(){ // 全部数量
+            let count = this.serverList.length;
+            return count;
+        },
         todayOnlineCount(){ // 今日在线数量
             let todayDate = formatDate(new Date());
             let count = this.serverList.filter(value => {
@@ -41,11 +46,39 @@ window.ZXW_VUE = new Vue({
             return count;
         },
         authorizeCount(){// 授权数量
-            let count = this.serverList.filter(value => value.authorize).length;
+            let count = this.serverList.filter(value => value.authorize === "true").length;
             return count;
-        }
+        },
+        showServerList(){
+            let resultList = [];
+            switch (this.showType) {
+                case "todayOnline": // 今日在线
+                    let todayDate = formatDate(new Date());
+                    resultList = this.serverList.filter(value => {
+                        let lastConnectTime = value.lastConnectTime || "";
+                        return lastConnectTime.length >=11 && todayDate === lastConnectTime.substring(0,11);
+                    });
+                    break;
+                case "newVersion":// 最新版本
+                    resultList = this.serverList.filter(value => {
+                        let curVersion = value.curVersion || "";
+                        return curVersion === this.newVersion;
+                    });
+                    break;
+                case "authorize": // 授权
+                    resultList = this.serverList.filter(value => value.authorize === "true");
+                    break;
+                case "all":
+                default:
+                    resultList = this.serverList;
+            }
+            return resultList;
+        },
     },
     methods: {
+        clickShowType(showType){
+            this.showType = showType;
+        },
         // 获取最新版本号
         getNewVersion(){
             let newVersion = '';

@@ -7,26 +7,33 @@
                 </span>
             </p>
             <el-row style="margin-bottom: 10px;">
-                <el-badge :value="todayOnlineCount" class="item" style="margin-left:5px;margin-right: 10px">
-                    <el-button size="small">今日在线</el-button>
+                <el-badge :value="allCount" class="item" style="margin-left:5px;margin-right: 10px">
+                    <el-button size="small" @click.stop="clickShowType('all')">全部</el-button>
+                </el-badge>
+                <el-badge :value="todayOnlineCount" class="item" style="margin-right: 10px">
+                    <el-button size="small" @click.stop="clickShowType('todayOnline')">今日在线</el-button>
                 </el-badge>
                 <el-badge :value="newVersionCount" class="item" style="margin-right: 10px">
-                    <el-button size="small">最新版本{{newVersion}}</el-button>
+                    <el-button size="small" @click.stop="clickShowType('newVersion')">最新版本{{newVersion}}</el-button>
                 </el-badge>
-                <el-badge :value="authorizeCount" class="item" >
-                    <el-button size="small">已授权</el-button>
+                <el-badge :value="authorizeCount" class="item">
+                    <el-button size="small" @click.stop="clickShowType('authorize')">已授权</el-button>
                 </el-badge>
             </el-row>
             <el-row>
                 <div class="width100 d-flex a-center" style="padding: 0 5px;">
-                    <el-table :data="serverList" v-loading="serverLoading" border ref="serverTable"
+                    <el-table :data="showServerList" v-loading="serverLoading" border ref="serverTable"
                               highlight-current-row  style="width: 100%" :header-cell-style="{'text-align':'center',background:'#F0F2F4',color:'#666E92'}">
                         <el-table-column type="index" label="序号" width="50" align="center" />
                         <el-table-column prop="machineCode" align="left" label="机器码" sortable></el-table-column>
                         <el-table-column prop="lastConnectTime" label="最后一次连接时间" align="left" sortable></el-table-column>
                         <el-table-column prop="systemType" label="系统类型" align="left" sortable></el-table-column>
                         <el-table-column prop="curVersion" label="版本号" align="left" sortable></el-table-column>
-                        <el-table-column prop="authorize" label="是否授权" align="left" sortable></el-table-column>
+                        <el-table-column prop="authorize" label="是否授权" align="left" sortable>
+                            <template v-slot="{ row }">
+                                {{ row.autorize === "true" ? "已授权" : "未授权" }}
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="authorizeMsg" label="授权信息" align="left" sortable></el-table-column>
                     </el-table>
                 </div>
