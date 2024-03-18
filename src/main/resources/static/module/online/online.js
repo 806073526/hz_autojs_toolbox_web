@@ -46,7 +46,7 @@ window.ZXW_VUE = new Vue({
             return count;
         },
         authorizeCount(){// 授权数量
-            let count = this.serverList.filter(value => value.authorize === "true").length;
+            let count = this.serverList.filter(value => String(value.authorize) === "true").length;
             return count;
         },
         showServerList(){
@@ -66,7 +66,7 @@ window.ZXW_VUE = new Vue({
                     });
                     break;
                 case "authorize": // 授权
-                    resultList = this.serverList.filter(value => value.authorize === "true");
+                    resultList = this.serverList.filter(value => String(value.authorize) === "true");
                     break;
                 case "all":
                 default:
