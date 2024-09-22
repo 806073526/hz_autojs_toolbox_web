@@ -1,8 +1,8 @@
-import {getContext} from "./../../../utils/utils.js";
+import {getContext,urlParam} from "./../../../utils/utils.js";
 
 let template = '<div></div>';
 $.ajax({
-    url: "/module/index/template/deviceInfo.html",
+    url: "/module/single/template/singleDeviceInfo.html",
     type:'get',
     async:false,
     success:function(res){
@@ -49,12 +49,13 @@ export default {
                 offsetX: 0,
                 offsetY: 0,
                 debugModel:true,
+                connectStatus:0,
                 debugSleep:1000
             }
         }
     },
     computed:{
-        allowOperateFile(){
+       /* allowOperateFile(){
             return this.systemConfig.allowOperateFile;
         },
         zoomSize(){
@@ -62,117 +63,41 @@ export default {
         },
         newVersionNotice(){
             return this.versionInfo !== this.newVersion ? "有新版本"  : "";
-        }
+        }*/
     },
     watch:{
-        zoomSize:{
-            handler(val){
-                window.ZXW_VUE.$EventBus.$emit('refreshScrollHeight');
-            },
-            deep: true // 可以深度检测到  对象的属性值的变化
-        },
         systemConfig:{
             handler(val){
-                window.localStorage.setItem("systemConfig",JSON.stringify(val));
+                /*window.localStorage.setItem("systemConfig",JSON.stringify(val));
                 // 参数发生变化 重新初始化公共文件模块
                 if(val.allowOperateFile !== window.allowOperateFile){
                     window.ZXW_VUE.$EventBus.$emit('initModule', "commonFile");
                 }
-                window.allowOperateFile = val.allowOperateFile;
+                window.allowOperateFile = val.allowOperateFile;*/
             },
             /*immediate: true, // 立即触发一次*/
             deep: true // 可以深度检测到  对象的属性值的变化
         }
     },
     mounted() {
-        let _that = this;
-        $.ajax({
-            url: getContext() + "/device/getCursVersion",
-            type: "GET",
-            dataType: "json",
-            async:false,
-            success: function (data) {
-                if (data) {
-                    if (data.isSuccess) {
-                        _that.versionInfo = data.data
-                    }
-                }
-            },
-            error: function (msg) {
-                console.log(msg);
-            }
-        });
+        // 获取url参数，传入设备uuid
+        let deviceUuidParam = urlParam("deviceUuid") || '';
+        // 获取编辑器类型
+        this.editorType = window.localStorage.getItem('editorType') || 'ace';
 
-        let autoCheckVersionUpdate = true;
-        let openNoticeMessage = true;
-        let systemConfigCache = window.localStorage.getItem("systemConfig");
-        if(systemConfigCache){
-            let systemConfigObj = JSON.parse(systemConfigCache);
-            if(systemConfigObj){
-                this.systemConfig = systemConfigObj;
-                autoCheckVersionUpdate = systemConfigObj.autoCheckVersionUpdate;
-                openNoticeMessage = systemConfigObj.openNoticeMessage;
-            }
-        }
-        this.getOnlineDevice();
+        this.deviceInfo.deviceUuid = deviceUuidParam;
 
-        // 获取编辑器类型未刷新标记
-        let editorTypeChangeNoRefresh = window.localStorage.getItem('editorTypeChangeNoRefresh');
-        if(editorTypeChangeNoRefresh){
-            window.localStorage.removeItem('editorTypeChangeNoRefresh');
-            // 获取编辑器类型变化值
-            let editorTypeChangeValue = window.localStorage.getItem('editorTypeChangeValue');
-            // 获取编辑器类型
-            let editorType = window.localStorage.getItem('editorType');
-            // 重置当前编辑器类型
-            this.editorType = editorTypeChangeValue ? editorTypeChangeValue : editorType;
-            // 设置到缓存中
-            window.localStorage.setItem('editorType',this.editorType);
-            // 清除变化值
-            window.localStorage.removeItem('editorTypeChangeValue');
-        } else {
-            // 获取编辑器类型
-            this.editorType = window.localStorage.getItem('editorType') || 'ace';
-        }
-        // 检查设备授权状态
-        this.authorizeStatus = this.checkSelfMachineAuthorize();
-
-        this.isExeVersion = this.checkExeOptions();
-
-        // 获取最新版本
-        this.newVersion = this.getNewVersion();
-
-        if(this.isExeVersion && autoCheckVersionUpdate && this.versionInfo !== this.newVersion){
-            this.checkVersion();
-        }
-
-        if(openNoticeMessage){
-            // 开启公告显示
-            this.openNoticeMessage();
-        }
-
-        // 获取当前缓存中最后一次选中的设备
-        let lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
-        // 如果缓存为空 直接返回
-        if(!lastSelectDeviceUuid){
-            return;
-        }
         setTimeout(() => {
             this.$nextTick(() => {
                 // 自动选择设备
-                this.autoSelectDevice(lastSelectDeviceUuid);
+                this.autoSelectDevice(deviceUuidParam);
             });
         }, 500);
-
-
     },
     methods: {
         // 强制刷新
         refreshBrowserCache(){
             window.location.reload(true)
-        },
-        singleControl(row){
-            window.open(window.location.href + "/single.html?deviceUuid="+row.deviceUuid, '_blank')
         },
         // 检查版本更新
         checkVersion(){
@@ -192,7 +117,7 @@ export default {
                     type: "GET",
                     dataType: "json",
                     success: function (data) {
-                       console.log(data);
+                        console.log(data);
                     },
                     error: function (msg) {
                         console.log(msg);
@@ -479,14 +404,6 @@ export default {
             `;
             this.remoteExecuteScript(script);
         },
-        // 显示系统设置弹窗
-        showSystemSettingDialog(){
-          this.systemConfig.lastSelectDeviceUuid = window.localStorage.getItem("lastSelectDeviceUuid");
-          this.systemSettingDialog  = true;
-        },
-        systemConfigChange(){
-            window.ZXW_VUE.$notify.success({message: '修改成功', duration: '1000'});
-        },
         //上线处理
         online(deviceUuid) {
             //已连接无需检测
@@ -528,31 +445,6 @@ export default {
                 this.$set(this.deviceInfo, 'deviceUuid', "");
             }
         },
-        expandDeviceFun(){
-            this.expandDevice = !this.expandDevice;
-        },
-        // 编辑器类型change
-        editorTypeChange(){
-            // 设置编辑器类型变化值
-            window.localStorage.setItem('editorTypeChangeValue',this.editorType);
-            // 设置编辑器类型未刷新标记
-            window.localStorage.setItem('editorTypeChangeNoRefresh','true');
-
-            let cacheEditorType = window.localStorage.getItem('editorType');
-            // 设置需要刷新标记
-            this.editorTypeNeedRefresh = cacheEditorType !== this.editorType;
-            //刷新页面----
-            this.expandDeviceFun();
-        },
-        refreshPage(){
-            window.ZXW_VUE.$confirm('编辑器类型已修改,刷新后才能生效,是否确认刷新页面?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'info'
-            }).then(() => {
-                window.location.reload();
-            });
-        },
         // 自动选择设备
         autoSelectDevice(selectDeviceUuid){
             // 请求查询设备列表接口
@@ -561,7 +453,7 @@ export default {
                 let selectArr =  this.deviceList.filter(item=> item.deviceUuid === selectDeviceUuid);
                 if(selectArr && selectArr.length){
                     // 选中行
-                    this.$refs.deviceTable.setCurrentRow(selectArr[0]);
+                    this.selectRowChange(selectArr[0]);
                 }
             });
         },
@@ -587,6 +479,7 @@ export default {
                 this.$set(this.deviceInfo, 'debugModel', true);
                 this.$set(this.deviceInfo, 'debugSleep', 1000);
                 this.$set(this.deviceInfo, 'aliasName', row.aliasName);
+                this.$set(this.deviceInfo, 'connectStatus', 1);
 
                 let otherPropertyJson = row.otherPropertyJson;
                 if(otherPropertyJson){
@@ -600,10 +493,6 @@ export default {
                     deviceInfo: this.deviceInfo,
                     screenDirection: row.orientation === 1 ? "竖屏" : "横屏"
                 });
-                window.ZXW_VUE.$notify.success({
-                    message: "已选择设备:" + row.deviceUuid,
-                    duration: '3000'
-                })
             };
             // 清空选中行
             let clearSelectRow = () => {

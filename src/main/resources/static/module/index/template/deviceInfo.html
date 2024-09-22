@@ -45,6 +45,14 @@
                 </el-table-column>
                 <el-table-column prop="screenWidth" label="屏幕宽度" align="left">
                 </el-table-column>
+                <el-table-column prop="operate" label="操作" align="center">
+                    <template slot-scope="{ row, $index}">
+                        <div class="flex-1 d-flex a-center j-center"  @click.stop.prevent="singleControl(row)">
+                            <img src="../module/index/image/控制台.png" style="width: 18px;cursor: pointer;">
+                            <el-link :underline="false" type="info" style="margin-right: 10px;" id="allScreenPreviewImg">工作台</el-link>
+                        </div>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
     </el-row>

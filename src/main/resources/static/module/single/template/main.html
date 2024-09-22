@@ -1,0 +1,53 @@
+<div class="container" style="height:100%;padding: 0;">
+    <div v-if="pageAccessLimit" style="display:flex;justify-content: center;align-items: center;font-size: 50px;height: 50vh;">
+        当前没有访问权限,请输入页面访问密码！！！
+    </div>
+
+    <el-form ref="commodityInfo" v-if="!pageAccessLimit" class="commodity mt-10 width100" label-width="100px" style="height:100%;">
+        <!-- 设备信息组件 -->
+        <single-device-info ref="deviceInfo" @deviceSelectRowCallback="deviceSelectRowCallback"/>
+
+        <el-col :span="6">
+            <preview-device :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="previewDevice" />
+        </el-col>
+        <!-- 右侧 -->
+        <el-col :span="18">
+            <remote-log :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteLog" />
+
+            <div class="d-flex a-center j-center">
+                <el-tabs v-model="activeTab"  type="card" class="singleTab">
+                    <el-tab-pane label="远程脚本" name="remoteScript">
+                    </el-tab-pane>
+                    <el-tab-pane label="手机文件" name="phoneFileManage">
+                    </el-tab-pane>
+                </el-tabs>
+            </div>
+
+           <div v-show="activeTab === 'remoteScript'">
+                <remote-script :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="remoteScript" />
+            </div>
+            <div v-show="activeTab === 'phoneFileManage'">
+               <phone-file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="phoneFileManage" />
+           </div>
+
+        </el-col>
+
+
+
+
+        <!-- 文件管理组件  -->
+       <!-- <file-manage :deviceInfo="deviceInfo" :screenDirection="screenDirection" ref="fileManage" />-->
+        <!-- 预览设备组件 -->
+        <!-- 远程脚本组件 -->
+       <!--
+-->
+
+        <el-button v-show="fileDialogIsMin" type="danger" @click.stop.native="phoneMaxFileEditorDialog" style="position: fixed;right: 10px;bottom: 10px;z-index: 999999;">还原文件编辑器</el-button>
+    </el-form>
+
+
+
+
+
+
+</div>

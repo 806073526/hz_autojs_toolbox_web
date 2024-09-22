@@ -1,0 +1,13 @@
+.singleTab.el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
+    border-bottom: none;
+}
+
+.singleTab .el-tabs__item {
+    font-size: 16px;
+    height: 45px;
+    line-height: 45px;
+    padding: 0px 20px;
+}
+.singleTab .el-tabs__header{
+   margin: 5px 0;
+}

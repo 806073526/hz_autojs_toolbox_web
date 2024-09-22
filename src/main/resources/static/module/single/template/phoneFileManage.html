@@ -1,0 +1,379 @@
+<div style="margin-left: 10px;margin-right: 10px;" @drop.prevent="onDrop" @dragover.prevent="onDragover" @dragenter.prevent>
+    <div style="background: #ffffff;">
+        <div style="padding: 5px;">
+            <div style="background: #FBEFF9;display: flex;align-items: center;">
+                <div class="flex-1 d-flex">
+                    <img src="../module/single/image/手机.png" style="width: 18px"> 手机文件
+                </div>
+            </div>
+        </div>
+        <div class="d-flex a-center" style="flex-direction: column;padding: 5px;">
+            <div style="min-height: 630px;display: flex;justify-content: flex-end;align-items: center;width: 100%;">
+                <div class="fileDivContainer" style="height: 630px;width: 100%;">
+                    <div style="background: white;height: 180px;width: calc(70% - 40px);top:562px;position:absolute;z-index: 999;"></div>
+                    <div style="position: sticky;top:0px;z-index: 999;padding-left: 0!important;">
+                        <div class="imgToolsDiv">
+                            <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                <el-button size="mini" type="primary" style="margin-bottom: 5px;" @click="phoneCreateFile">新建文件(夹)</el-button>
+                                <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                                    <el-button size="mini" type="primary">
+                                        初始化示例<i class="el-icon-arrow-down el-icon--right"></i>
+                                    </el-button>
+                                    <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-item @click.native.prevent.stop="phoneInitSyncDir">初始化同步目录</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="phoneInitOfficialExample">初始化官方示例</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="phoneInitOfficalShopExample">初始化商店示例</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="phoneDownLoadGameScript">初始化脚手架项目</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="phoneDownLoadImageExampleScript">初始化图色示例项目</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </el-dropdown>
+                                <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteRunScript()">运行项目</el-button>
+                                <el-button size="mini" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneRemoteStopScript">停止项目</el-button>
+                                <el-button size="mini" v-if="phoneCurPathExitProject" style="margin-left: 5px;margin-bottom: 5px;" type="danger" @click="phoneJs2Dex">js转dex</el-button>
+                                <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                                    <el-button size="mini" type="primary" >
+                                        Node相关<i class="el-icon-arrow-down el-icon--right"></i>
+                                    </el-button>
+                                    <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-item @click.native.prevent.stop="downLoadAndInstallTermux">下载和安装Termux</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="termuxPermSetting">APP调用Termux权限设置</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="termuxStorageSetting">Termux外部存储权限设置</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="termuxChangeRep">Termux切换源</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="termuxInitNode">Termux初始化Node环境</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </el-dropdown>
+                                <el-dropdown style="margin-left: 5px;margin-bottom: 5px;">
+                                    <el-button size="mini" type="primary" >
+                                        更多<i class="el-icon-arrow-down el-icon--right"></i>
+                                    </el-button>
+                                    <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-item @click.native.prevent.stop="phonePackageProjectTips">查看打包须知</el-dropdown-item>
+                                        <el-dropdown-item @click.native.prevent.stop="phonePackageProject">打包项目</el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </el-dropdown>
+                            </div>
+                        </div>
+                        <div>
+                            <el-row style="padding-left: 0!important;">
+                                <div class="d-flex j-sb a-center breadcrumbWrap" style="margin-top: 10px;margin-bottom: 10px;">
+                                    <el-breadcrumb separator="/">
+                                        <el-breadcrumb-item v-for="(item, i) in phoneBreadcrumbList" :key="i" class="pointer textHover" :class="{'endBreadcrumb': i !== 0 && i === phoneBreadcrumbList.length - 1, 'hoverBreadcrumb': phoneBreadcrumbList.length > 1 && i !== phoneBreadcrumbList.length - 1 }">
+                                            <span @click="phoneBreadcrumbChange(item, i)">{{ item.label }}</span>
+                                        </el-breadcrumb-item>
+                                    </el-breadcrumb>
+                                    <span class="primary-text-color font-14 keep-all">共{{ phoneFileList.length }}个</span>
+                                </div>
+                            </el-row>
+                            <el-row style="padding-left: 0!important;padding-right: 0;">
+                                <div class="d-flex a-center fileOperate primary-text-color pl-1 flex-wrap">
+                                    <el-tooltip class="item" v-if="phoneCopyFileList.length>0" effect="dark" :disabled="!phoneAllowCopyFileNames" :content="phoneAllowCopyFileNames" placement="top-start">
+                                        <span class="fileTips" >复制{{ phoneAllowCopyFileList.length }}个文件(夹)</span>
+                                    </el-tooltip>
+                                    <el-tooltip class="item" v-else-if="phoneMoveFileList.length>0" effect="dark" :disabled="!phoneAllowMoveFileNames" :content="phoneAllowMoveFileNames" placement="top-start">
+                                        <span class="fileTips" >移动{{ phoneAllowMoveFileList.length }}个文件(夹)</span>
+                                    </el-tooltip>
+                                    <el-tooltip class="item" v-else="phoneCheckFileCount>0" effect="dark" :disabled="!phoneCheckFileNames" :content="phoneCheckFileNames" placement="top-start">
+                                        <span class="fileTips" >已选{{ phoneCheckFileCount }}个文件(夹)</span>
+                                    </el-tooltip>
+                                    <div class="operate d-flex a-center j-center flex-wrap">
+                                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('copy')">复制</el-link>
+                                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('move')">移动</el-link>
+                                        <el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('remove')">删除</el-link>
+                                        <el-link v-if="phoneCopyFileList.length>0" :underline="false" :disabled="!phoneAllowCopyFileList.length>0" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('paste')">粘贴到</el-link>
+                                        <el-link v-if="phoneMoveFileList.length>0" :underline="false" :disabled="!phoneAllowMoveFileList.length>0" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('moveTo')">移动到</el-link>
+                                        <!--<el-link v-if="phoneCheckFileCount>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('syncToWeb')">同步到web</el-link>-->
+                                        <el-link v-if="phoneCopyFileList.length>0 || phoneMoveFileList.length>0" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOperateFun('cancel')">取消</el-link>
+                                    </div>
+                                </div>
+                            </el-row>
+                            <div class="fileList-head d-flex a-center flex-wrap">
+                                <div class="d-flex a-center phoneFileName" style="flex:1;">
+                                    <el-checkbox v-model="phoneCheckAllFile" @change="phoneCheckAllFileChange" />
+                                    <span style="margin-left: 8px">文件名</span>
+                                </div>
+                                <div class="phoneOperate" style="flex:1;">操作</div>
+                            </div>
+                        </div>
+                    </div>
+                    <el-row style="padding-left: 0!important;">
+                        <div class="fileTableList" v-loading="phoneFileLoading">
+                            <el-scrollbar class="right-scrollbar-wrap" :key="phoneFileTableRandomKey">
+                                <div v-for="(item,index) in phoneFileList" :key="'phone'+index" class="fileList-head fileList-body d-flex a-center flex-wrap">
+                                    <div class="d-flex a-center phoneFileName" style="flex:1;">
+                                        <el-checkbox v-model="item.check" class="mr-5" @dblclick.stop.native />
+                                        <div class="fileNameWrap pointer d-flex a-center flex-1 mr-10" @dblclick="phoneFileNameDbClick(item)">
+                                        <span class="mr-10 white-noWrap ellipsis-1 text-fileName mt-0" :title="item.fileName">
+                                            <i style="font-size: 16px;margin-right: 4px;" :class="{'el-icon-folder':item.isDirectory,'el-icon-document':!item.isDirectory && !['jpeg','jpg','png'].includes(item.fileType),'el-icon-picture-outline':['jpeg','jpg','png'].includes(item.fileType)}"></i>{{ item.fileName }}<span v-show="!item.isDirectory && item.fileType">.{{ item.fileType }}</span></span>
+                                        </div>
+                                    </div>
+                                    <div class="phoneOperate d-flex a-center j-center flex-wrap" style="flex:1;">
+                                        <el-link v-show="item.fileType==='js' || item.fileType==='mjs' || item.fileType === 'node.js'" :underline="false" type="info" style="margin-bottom: 5px;" @click="phoneRunScriptPath(item)">运行</el-link>
+                                        <el-link v-show="item.fileType === 'sh'" :underline="false" type="info" style="margin-bottom: 5px;" @click="termuxRunBashByPath(item)">运行sh</el-link>
+                                        <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneOneKeyDownLoad(item)">下载</el-link>
+                                        <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,true)">压缩(含目录)</el-link>
+                                        <el-link v-show="item.isDirectory" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneZipFile(item,false)">压缩(不含目录)</el-link>
+                                        <el-link v-show="item.fileType==='zip'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="phoneUnZipFile(item)">解压</el-link>
+                                        <el-link v-show="item.fileType==='js'" style="margin-left: 5px;margin-bottom: 5px;" :underline="false" type="info" @click="showAddTimerTask(item)">添加到定时任务</el-link>
+                                        <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneReName(item)">重命名</el-link>
+                                       <!-- <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="syncToWebSingle(item)">同步到web</el-link>-->
+                                        <el-link :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="phoneRemoveFile(item)">删除</el-link>
+                                        <el-link v-show="item.fileName==='package' && item.fileType === 'json'" :underline="false" type="info" style="margin-left: 5px;margin-bottom: 5px;" @click="termuxRunNpmInstall(item)">安装npm依赖</el-link>
+                                    </div>
+                                </div>
+                            </el-scrollbar>
+                        </div>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+    </div>
+    <el-dialog  :visible.sync="phoneFileEditVisible" :title="phoneFileEditorName"  fullscreen center :close-on-click-modal="false" :close-on-press-escape="false" :modal="false" :before-close="confirmClose">
+        <div class="fileNameArr">
+            <div v-for="(item,index) in phoneFileCacheArr" :key="index"  :class="{'fileNameItem': true,'fileNameSelectItem': index === phoneFileSelectIndex}">
+                <el-tooltip class="item"  effect="dark" :disabled="!item.fileSavePath" :content="item.fileSavePath" placement="top-start">
+                    <div @click.stop="phoneFileEditorArrClick(index)">
+                        <span> {{item.sourceFileContent === item.fileContent ? item.fileName : '*'+ item.fileName }}</span>
+                        <span @click.stop="closePhoneEditorArrClick(index)">关闭</span>
+                    </div>
+                </el-tooltip>
+            </div>
+        </div>
+        <div id="phoneFileEditor" style="height: 83vh;width: 100%;" v-loading="phoneFileEditorLoading">
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="info"  @click.stop.native="refreshPhoneEditorArrClick">
+            刷新
+          </el-button>
+          <el-button type="primary"  @click.stop.native="phoneSaveFileEditorContent">
+            保存
+          </el-button>
+          <el-dropdown style="margin-left: 10px;margin-right: 10px;">
+                <el-button type="warning">
+                    运行<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click.native.prevent.stop="phoneRemoteRunScript(true)">当前项目</el-dropdown-item>
+                    <el-dropdown-item @click.native.prevent.stop="phoneRunScriptByDialog">当前文件</el-dropdown-item>
+                </el-dropdown-menu>
+          </el-dropdown>
+          <el-button type="warning"  @click.stop.native="phoneStopAllScript">
+            停止
+          </el-button>
+          <el-button type="info" @click.stop.native="phoneMinFileEditorDialog">
+            最小化
+          </el-button>
+        </span>
+        <el-tooltip style="left: 85px;position: absolute;bottom: 30px;" class="item"  effect="dark" content="【切换tab ctrl+0】【保存 ctrl+s】【运行当前项目ctrl+i】【运行当前文件 ctrl+1】【停止全部 ctrl+2】【最小化 ctrl+3】【最大化 ctrl+4】" placement="top-start">
+            <span>快捷键说明</span>
+        </el-tooltip>
+    </el-dialog>
+    <el-dialog :visible.sync="phoneImagePreviewVisible" :title="phoneFileEditorName" center :close-on-click-modal="false" width="100vw" height="100vh" custom-class="fileEditorDialog">
+        <div style="height: 78vh;width: 100%;display: inline-flex;justify-content: center;align-items: center;">
+            <img id="imagePreview" :src="phoneImageBase64" />
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="info" @click.stop.native="phoneCloseImagePreviewDialog">
+            关闭
+          </el-button>
+        </span>
+    </el-dialog>
+    <el-dialog  :visible.sync="packageProjectDialog" :close-on-press-escape="false" title="打包项目" center :close-on-click-modal="false" width="80vw" height="40vh">
+        <el-steps :active="packageProjectActive" finish-status="success" style="margin-top: 10px;margin-bottom: 5px;">
+            <el-step title="项目配置"></el-step>
+            <el-step title="初始化打包模板"></el-step>
+            <el-step title="上传项目资源"></el-step>
+            <el-step title="打包资源处理"></el-step>
+            <el-step title="项目打包以及下载"></el-step>
+        </el-steps>
+        <el-scrollbar v-loading="packageProjectStepLoading" style="height: 70vh;width: 100%;" class="hiddenOverflow">
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===0">
+                <el-form :model="packageProject" ref="packageProjectFirst" :rules="packageProjectRules">
+                    <p class="basicInfo">
+                        应用
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="应用名称:" prop="appName" class="delStar flex-1" label-width="100px">
+                                <el-input v-model="packageProject.appName" placeholder="请输入应用名称"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="应用包名:" prop="packageName" class="delStar flex-1" label-width="100px">
+                                <el-input v-model="packageProject.packageName" placeholder="请输入应用包名"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="版本名称:" prop="versionName" class="delStar flex-1" label-width="100px">
+                                <el-input v-model="packageProject.versionName" placeholder="请输入版本名称"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="版本号:" prop="versionCode" class="delStar flex-1" label-width="100px">
+                                <el-input v-model="packageProject.versionCode" placeholder="请输入版本号"
+                                          class="width100" />
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="应用图标:" prop="appIcon" class="delStar" label-width="100px" style="width: 25%;">
+                                <el-input v-model="packageProject.appIcon" placeholder="请输入应用图标路径,不填为默认图"
+                                          class="width100">
+                                    <el-button v-loading="appIconLoading" slot="append" icon="el-icon-search" @click.stop="previewIconByPath(packageProject.appIcon,'appIcon')"></el-button>
+                                </el-input>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        特性
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="CPU架构:" prop="abis" class="flex-1" label-width="100px">
+                                <el-checkbox-group v-model="packageProject.abis">
+                                    <el-checkbox label="arm64-v8a">
+                                        arm64-v8a
+                                    </el-checkbox>
+                                    <el-checkbox label="armeabi-v7a">
+                                        armeabi-v7a
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                            </el-form-item>
+                            <el-form-item label="NodeJs:" prop="openNodeJs" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.openNodeJs" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="图色模块:" prop="openImageModule" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.openImageModule" class="width100"/>
+                            </el-form-item>
+                            <el-form-item label="开机自启动:" prop="autoOpen" class="flex-1" label-width="100px">
+                                <el-switch v-model="packageProject.autoOpen" class="width100"/>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="插件:" prop="plugins" class="width100" label-width="100px">
+                                <el-checkbox-group v-model="packageProject.plugins">
+                                    <el-checkbox label="org.autojs.autojspro.plugin.mlkit.ocr">
+                                        mlkit-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="org.autojs.autojspro.ocr.v2">
+                                        paddle-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.tomato.ocr">
+                                        tomato-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.ocr32">
+                                        hraps32-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.ocr">
+                                        hraps-OCR
+                                    </el-checkbox>
+                                    <el-checkbox label="cn.lzx284.p7zip">
+                                        p7zip
+                                    </el-checkbox>
+                                    <el-checkbox label="com.hraps.pytorch">
+                                        pytorch
+                                    </el-checkbox>
+                                    <el-checkbox label="org.autojs.plugin.ffmpeg">
+                                        ffmpeg
+                                    </el-checkbox>
+                                </el-checkbox-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        运行配置
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center j-start">
+                            <el-form-item label="启动界面文本:" prop="splashText" class="delStar width25" label-width="100px">
+                                <el-input v-model="packageProject.splashText" placeholder="请输入启动界面文本"
+                                          class="width100" />
+                            </el-form-item>
+                            <el-form-item label="启动界面图:" prop="splashIcon" class="delStar width25" label-width="100px">
+                                <el-input v-model="packageProject.splashIcon" placeholder="请输入启动界面图标路径,不填为默认图"
+                                          class="width100" style="margin-top: 4px;" >
+                                    <i v-loading="splashIconLoading" slot="append" style="cursor:pointer;" class="el-icon-search" @click.stop="previewIconByPath(packageProject.splashIcon,'splashIcon')"></i>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="隐藏日志:" prop="hideLogs" class="delStar width25" label-width="100px">
+                                <el-switch v-model="packageProject.hideLogs" class="width100"/>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        混淆加密
+                    </p>
+                    <el-row>
+                        <div class="d-flex" style="width: 100%;flex-direction: column;">
+                            <el-form-item label="开启混淆:" prop="openObfuscator" class="width100" label-width="100px">
+                                <el-switch v-model="packageProject.openObfuscator" class="width100"/>
+                            </el-form-item>
+                            <el-form-item class="width100" v-show="packageProject.openObfuscator">
+                                <el-input type="textarea" v-model="packageProject.obfuscatorIncludePaths" placeholder="请输入混淆排除目录多个使用,分隔"
+                                          class="width100" :rows="4" style="margin-left: 15px;" />
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                    <p class="basicInfo">
+                        签名
+                    </p>
+                    <el-row>
+                        <div class="width100 d-flex a-center">
+                            <el-form-item label="自定义签名:" prop="customSignStorePath" class="width100" label-width="100px" style="margin-left: 20px;">
+                                <el-radio-group v-model="packageProject.customSignStorePath">
+                                    <el-radio :label="item" v-for="(item,index) in keyStoreArr" :key="index">
+                                        {{item}}
+                                    </el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+                    </el-row>
+                </el-form>
+            </div>
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===1">
+                <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
+                    <span style="color:#67c23a;"><i v-show="alreadyInitPackageTemplate" class="el-icon-success"></i><i v-show="!alreadyInitPackageTemplate" class="el-icon-warning"></i>{{alreadyInitPackageTemplate ? '已' : '未'}}检测到打包模板</span>
+                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="initPackageTemplate()"  icon="el-icon-thumb">{{ alreadyInitPackageTemplate ? "点击重置" : "点击初始化"}}</el-button>
+                </div>
+            </div>
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===2">
+                <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
+                    <span style="color:#67c23a;"><i v-show="alreadyUploadProjectRes" class="el-icon-success"></i><i v-show="!alreadyUploadProjectRes" class="el-icon-warning"></i>{{alreadyUploadProjectRes ? '已' : '未'}}检测到项目资源</span>
+                    <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="uploadProjectRes()"  icon="el-icon-thumb">{{ alreadyUploadProjectRes ? "点击重新上传" : "点击上传"}}</el-button>
+                </div>
+            </div>
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===3">
+                <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
+                    <span style="color:#67c23a;"><i v-show="alreadyHandlerPackageRes" class="el-icon-success"></i><i v-show="!alreadyHandlerPackageRes" class="el-icon-warning"></i>{{alreadyHandlerPackageRes ? '已' : '未'}}完成打包资源处理</span>
+                    <div style="margin-top: 5px;">
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" @click.stop="handlerPackageRes()"  icon="el-icon-thumb">{{ alreadyHandlerPackageRes ? "点击重置" : "点击处理"}}</el-button>
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProject"  icon="el-icon-thumb">下载混淆后项目</el-button>
+                        <el-button style="font-size: 25px;margin-top: 5px;" type="text" v-if="alreadyHandlerPackageRes && packageProject.openObfuscator" @click.stop="downloadObscureProjectToPhone"  icon="el-icon-thumb">下载混淆后项目到手机</el-button>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 100%;width: 100%;" v-show="packageProjectActive===4">
+                <div style="display: flex;font-size: 35px; justify-content: center; align-items: center; height: 65vh; flex-direction: column;">
+                    <span style="color:#67c23a;"><i v-show="alreadyCompletePackageProject" class="el-icon-success"></i><i v-show="!alreadyCompletePackageProject" class="el-icon-warning"></i>{{alreadyCompletePackageProject ? '已' : '未'}}完成打包项目</span>
+                    <div style="margin-top: 5px;">
+                        <el-button style="font-size: 25px;" type="text" @click.stop="handlerPackageProject()"  icon="el-icon-thumb">{{ alreadyCompletePackageProject ? "点击重新打包" : "点击打包"}}</el-button>
+                        <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProject" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到本地</el-button>
+                        <el-button style="font-size: 25px;margin-left: 5px;" type="text" @click.stop="downloadPackageProjectToPhone" v-show="alreadyCompletePackageProject" icon="el-icon-download">下载到手机并安装</el-button>
+                    </div>
+                </div>
+            </div>
+        </el-scrollbar>
+        <span slot="footer" class="dialog-footer">
+           <el-button type="primary" v-show="packageProjectActive===0"  @click.stop.native="oneKeyPackage" :disabled="packageProjectStepLoading">
+            一键打包
+          </el-button>
+            <el-button type="primary" v-show="packageProjectActive>0" @click.stop.native="preSteps" :disabled="packageProjectStepLoading">
+            上一步
+          </el-button>
+          <el-button type="primary" v-show="packageProjectActive<4"  @click.stop.native="nextSteps" :disabled="packageProjectStepLoading">
+            下一步
+          </el-button>
+
+        </span>
+    </el-dialog>
+</div>
+

@@ -1,0 +1,27 @@
+<div style="margin-left: 10px;margin-right: 10px;">
+    <div style="background: #ffffff;">
+        <div style="padding: 5px;">
+            <div style="background: #FBEFF9;display: flex;align-items: center;">
+                <div class="flex-1 d-flex">
+                    <img src="../module/single/image/日志.png" style="width: 18px"> 实时日志
+                </div>
+                <div class="d-flex">
+                    <div class="flex-1 d-flex" @click="startOnLineLog">
+                        <img src="../module/single/image/播放.png" style="width: 18px;cursor: pointer;">
+                        <el-link :underline="false" type="info" style="margin-right: 10px;" id="loadPreviewImg" >开始</el-link>
+                    </div>
+                    <div class="flex-1 d-flex"  @click="stopOnLineLog(true)">
+                        <img src="../module/single/image/停止.png" style="width: 18px;cursor: pointer;">
+                        <el-link :underline="false" type="info" style="margin-right: 10px;">停止</el-link>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex a-center" style="flex-direction: column;padding: 5px;">
+            <div style="min-height: 350px;display: flex;justify-content: flex-end;align-items: center;width: 100%;">
+                <div id="logTextEditor" style="width: 100%;height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
