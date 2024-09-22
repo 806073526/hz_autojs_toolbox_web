@@ -609,10 +609,15 @@ window.ZXW_VUE = new Vue({
             this.$nextTick(()=>{
                 // 初始化文件管理
                 this.$refs.phoneFileManage.init();
-                // 初始化预览设备数据
+                // 初始化预览设备
                 this.$refs.previewDevice.init();
-                // 启动实时日志
-                this.$refs.remoteLog.startOnLineLog();
+                let autoStart = window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_autoStart");
+                if(String(autoStart) === 'true'){
+                    // 启动实时日志
+                    this.$refs.remoteLog.startOnLineLog();
+                    // 启动投屏
+                    this.$refs.startPreviewDevice(true);
+                }
             })
         },
         // 验证是否已选设备

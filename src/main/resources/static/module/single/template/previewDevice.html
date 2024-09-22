@@ -6,6 +6,10 @@
                     <img src="../module/single/image/投屏.png" style="width: 18px"> 实时投屏
                 </div>
                 <div class="d-flex">
+                    <div class="flex-1 d-flex"  @click.stop.prevent="allScreenPreviewImg">
+                        <img src="../module/single/image/全屏.png" style="width: 18px;cursor: pointer;">
+                        <el-link :underline="false" type="info" style="margin-right: 10px;" id="allScreenPreviewImg">全屏</el-link>
+                    </div>
                     <div class="flex-1 d-flex" @click="startPreviewDevice(true)">
                         <img src="../module/single/image/播放.png" style="width: 18px;cursor: pointer;" >
                         <el-link :underline="false" type="info" style="margin-right: 10px;" id="loadPreviewImg">
@@ -16,14 +20,112 @@
                         <img src="../module/single/image/停止.png" style="width: 18px;cursor: pointer;" >
                         <el-link :underline="false" type="info" style="margin-right: 10px;">停止</el-link>
                     </div>
-                    <div class="flex-1 d-flex"  @click.stop.prevent="allScreenPreviewImg">
-                        <img src="../module/single/image/全屏.png" style="width: 18px;cursor: pointer;">
-                        <el-link :underline="false" type="info" style="margin-right: 10px;" id="allScreenPreviewImg">全屏</el-link>
-                    </div>
                     <div class="flex-1 d-flex"  @click.stop.prevent="selectPreviewTypeChange">
                         <img src="../module/single/image/切换.png" style="width: 18px;cursor: pointer;">
                         <el-link :underline="false" type="info" style="margin-right: 10px;">{{ selectPreviewType === 'imgInterface' ? '图像' : '布局' }}</el-link>
                     </div>
+                    <el-popover
+                            placement="right"
+                            width="800"
+                            trigger="click"
+                            >
+                        <div>
+                            <el-row class="d-flex">
+                                <el-form-item label="预览类型:" prop="textType" class="width100" style="color: whitesmoke">
+                                    <el-radio-group v-model="selectPreviewType">
+                                        <el-radio label="imgInterface">
+                                            图像画面
+                                        </el-radio>
+                                        <el-radio label="layout">
+                                            控件布局
+                                        </el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </el-row>
+                            <el-row class="d-flex" v-if="selectPreviewType === 'imgInterface'">
+                                <el-form-item label="APP刷新:" prop="appSpace" class="flex-1">
+                                    <el-input type="number" v-model="devicePreviewParam.appSpace" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" min="10" step="10"
+                                              max="5000" @change="autoDevicePreview" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="预览质量:" prop="imgQuality" class="flex-1">
+                                    <el-input type="number" v-model="devicePreviewParam.imgQuality" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="100"
+                                              @change="autoDevicePreview" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="缩放倍数:" prop="scale" class="flex-1">
+                                    <el-input type="number" v-model="devicePreviewParam.imgScale" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" min="0" step="0.1"
+                                              max="1" @change="autoDevicePreview" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                            </el-row>
+                            <el-row class="d-flex">
+                                <el-form-item label="预览阈值:" prop="scale" class="flex-1" v-if="selectPreviewType === 'imgInterface'">
+                                    <el-input type="number" v-model="devicePreviewParam.imgThreshold" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" min="0" max="255"
+                                              @change="autoDevicePreview" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="文本框序号:" prop="textIndex" class="flex-1">
+                                    <el-input type="number" v-model="textIndex" placeholder=""
+                                              oninput="if(value.length>10)value=value.slice(0,10)" step="1"
+                                              max="5000" class="width100">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="传输类型:" prop="textType" class="flex-1">
+                                    <el-radio-group v-model="textType">
+                                        <el-radio label="text">
+                                            覆盖
+                                        </el-radio>
+                                        <el-radio label="input">
+                                            追加
+                                        </el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                            </el-row>
+                            <el-row v-if="selectPreviewType === 'imgInterface'">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
+                                    <span>
+                                        开启adb预览(adb或root)：
+                                    </span>
+                                    <el-switch v-model="openAdbPreviewModel" @change="openAdbPreviewModelChange"/>
+                                </div>
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                    <span>
+                                        开启灵敏模式(adb或root)：
+                                    </span>
+                                    <el-switch v-model="devicePreviewParam.isOpenFastModel" @change="autoDevicePreview"/>
+                                </div>
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;" v-show="!openAdbPreviewModel">
+                                      <span>
+                                        参数变化后自动预览：
+                                      </span>
+                                    <el-switch v-model="devicePreviewParam.valueUpdateAfterAutoPreview" />
+                                </div>
+                            </el-row>
+                            <el-row v-show="!openAdbPreviewModel && selectPreviewType === 'imgInterface'" style="margin-top: 10px;">
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
+                                    <span>
+                                        开启灰度化：
+                                    </span>
+                                    <el-switch v-model="devicePreviewParam.isOpenGray" @change="autoDevicePreview"/>
+                                </div>
+                                <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:10px;">
+                                      <span>
+                                        开启阈值化：
+                                    </span>
+                                    <el-switch v-model="devicePreviewParam.isOpenThreshold" @change="autoDevicePreview"/>
+                                </div>
+                            </el-row>
+                        </div>
+                        <div class="flex-1 d-flex"  slot="reference" @click.stop.prevent="TpSzVisible = !TpSzVisible">
+                            <img src="../module/single/image/设置.png" style="width: 18px;cursor: pointer;">
+                            <el-link :underline="false" type="info" style="margin-right: 10px;">设置</el-link>
+                        </div>
+                    </el-popover>
                 </div>
             </div>
         </div>
@@ -61,48 +163,86 @@
                                 trigger="manual"
                                 v-model="kjVisible">
                             <div>
-                                <el-form-item label="操作代码:" prop="textIndex" class="flex-1">
+                                <el-form-item label="上次操作代码:" prop="textIndex" class="flex-1">
                                     <el-input type="textarea" v-model="devicePreviewParam.operateRecord" placeholder="" rows="5"
                                               class="width80">
                                     </el-input>
                                 </el-form-item>
-                                <el-button type="info" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="quick">
-                                    运行快捷代码
+                                <el-button type="info" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="saveQuickScript">
+                                    ①录制上次操作
                                 </el-button>
-                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="saveQuickScript">
-                                    保存到快捷代码
+                                <el-button type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="quick">
+                                    ②运行录制代码
                                 </el-button>
                             </div>
                             <el-button slot="reference" type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="kjVisible = !kjVisible">
-                                快捷
+                                录制
                             </el-button>
                         </el-popover>
                         <el-popover
-                                placement="right"
-                                width="400"
-                                trigger="manual"
-                                v-model="WbVisible">
-                            <div>
-                                <el-input type="textarea" v-model="textContent" placeholder="请输入文本内容" clearable  style="width: 100%;">
-                                </el-input>
-                                <el-form-item label="传输类型:" prop="textType" class="width100" style="color: whitesmoke">
-                                    <el-radio-group v-model="textType">
-                                        <el-radio label="text">
-                                            覆盖
-                                        </el-radio>
-                                        <el-radio label="input">
-                                            追加
-                                        </el-radio>
-                                    </el-radio-group>
-                                </el-form-item>
-                                <el-button type="info" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="sendTextContent">
-                                    发送
-                                </el-button>
-                            </div>
-                            <el-button slot="reference" type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="WbVisible = !WbVisible">
-                                文本
+                            placement="right"
+                            width="400"
+                            trigger="manual"
+                            v-model="WbVisible">
+                        <div>
+                            <el-input type="textarea" v-model="textContent" placeholder="请输入文本内容" clearable  style="width: 100%;">
+                            </el-input>
+                            <el-form-item label="传输类型:" prop="textType" class="width100" style="color: whitesmoke">
+                                <el-radio-group v-model="textType">
+                                    <el-radio label="text">
+                                        覆盖
+                                    </el-radio>
+                                    <el-radio label="input">
+                                        追加
+                                    </el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-button type="info" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="sendTextContent">
+                                发送
                             </el-button>
-                        </el-popover>
+                        </div>
+                        <el-button slot="reference" type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="WbVisible = !WbVisible">
+                            文本
+                        </el-button>
+                    </el-popover>
+                    <el-popover
+                                placement="right"
+                                width="800"
+                                trigger="manual"
+                                v-model="LbVisible">
+                            <div>
+                                <el-table :data="quickBtnArr"  max-height="300" height="300">
+                                    <el-table-column  property="key" width="150" label="按钮名称">
+                                        <template v-slot="scope1">
+                                            <el-input v-model="scope1.row.btnName" placeholder="请输入按钮名称" size="mini" class="input-width" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column property="name" label="脚本内容">
+                                        <template v-slot="scope1">
+                                            <el-input type="textarea" rows="4" v-model="scope1.row.scriptContent" placeholder="请输入要执行的脚本" size="mini" class="input-width" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column >
+                                        <template slot="header">
+                                            <div class="d-flex a-center">
+                                                <span>操作</span>
+                                                <i class="el-icon-circle-plus" @click="addRow" />
+                                            </div>
+                                        </template>
+                                        <template v-slot="scope1">
+                                            <el-link :underline="false" class="cancel" type="danger" @click="delRow(scope1.$index)">删除</el-link>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <el-button size="mini" class="mt-1" type="primary" @click="saveQuickArr">更新快捷操作</el-button>
+                            </div>
+                            <el-button slot="reference" type="danger" size="mini" style="margin-left:10px;margin-bottom: 5px;" @click.stop.prevent="LbVisible = !LbVisible">
+                                快捷
+                            </el-button>
+                     </el-popover>
+                        <el-button :title="btn.btnName" v-for="(btn,index) in showQuickBtnArr" :key="index" type="primary" size="mini" style="margin-left:10px;margin-bottom: 5px;width: 56px;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;" @click.stop.prevent="fixedOperateQuick(btn.btnName)">
+                            {{ btn.btnName }}
+                        </el-button>
                     </div>
                 </div>
 

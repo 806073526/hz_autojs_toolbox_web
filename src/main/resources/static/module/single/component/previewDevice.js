@@ -42,6 +42,10 @@ export default {
             adbDirectResult: '',
             kjVisible:false,
             WbVisible:false,
+            TpSzVisible:false,
+            LbVisible:false,
+            quickBtnArr:[],
+            showQuickBtnArr:[],
             devicePreviewParam: { // 设备预览参数
                 imgQuality: 10,
                 imgScale: 1,
@@ -172,6 +176,25 @@ export default {
         window.removeEventListener('resize',this.allScreenPreviewChange);
     },
     methods: {
+        // 添加行
+        addRow(){
+            this.quickBtnArr.push({ btnName: '', scriptContent: '' })
+        },
+        // 删除行
+        delRow(index) {
+            // 删除行数据
+            this.quickBtnArr.splice(index, 1)
+        },
+        saveQuickArr(){
+            // 先转json
+            let quickBtnArrJson = JSON.stringify(this.quickBtnArr);
+            // 再编码
+            let quickBtnArrJsonAfter = btoa(encodeURI(quickBtnArrJson));
+            // 缓存数据
+            window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_quickBtnArr",quickBtnArrJsonAfter);
+            // 渲染页面
+            this.showQuickBtnArr = JSON.parse(JSON.stringify(this.quickBtnArr));
+         },
         selectPreviewTypeChange(){
           this.selectPreviewType =   this.selectPreviewType === 'imgInterface' ? "layout" : "imgInterface";
         },
@@ -204,14 +227,22 @@ export default {
                         this.devicePreviewParam = devicePreviewParamObj;
                     }
                 }
+
+                // 获取缓存数据
+               let quickBtnArrJsonBefore =  window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_quickBtnArr") || "";
+               // 解析成json
+               let quickBtnArrJson = quickBtnArrJsonBefore ? decodeURI(atob(quickBtnArrJsonBefore)) : "";
+                // 读取设置
+               this.quickBtnArr = quickBtnArrJson ? JSON.parse(quickBtnArrJson) || [] : [];
+               // 渲染页面
+               this.showQuickBtnArr = JSON.parse(JSON.stringify(this.quickBtnArr));
+
                 // 从缓存读取通知监听规则
                 // this.readForDraft();
                 // 查询脚本
               //  this.queryScript();
                 // 查询定时任务
               //  this.queryTimerTask();
-
-                this.startPreviewDevice(true);
             }
         },
         allScreenPreviewChange() {
@@ -1635,7 +1666,7 @@ let changeScreenCaptureThread = (flag) => {
             // 从缓存读取快捷脚本
             let quickScript = window.localStorage.getItem(this.deviceInfo.deviceUuid + "_quickScript") || "";
             if(!quickScript){
-                window.ZXW_VUE.$message.warning('未设置快捷代码,先进行远程屏幕操作,然后将操作代码保存到快捷代码中！！！');
+                window.ZXW_VUE.$message.warning('未检查到录制代码,先进行远程屏幕(单次)操作,然后点击【录制上次操作】,最后点击【运行录制代码】！！！');
                 return;
             }
             this.devicePreviewParam.operateRecord = quickScript;
@@ -1699,6 +1730,18 @@ let changeScreenCaptureThread = (flag) => {
             let operateCode = operateName + '()';
             this.devicePreviewParam.operateRecord = operateCode;
             this.remoteExecuteScript(operateCode);
+        },
+        // 快捷操作
+        fixedOperateQuick(btnName){
+            if (!this.deviceInfo.startPreview) {
+                return
+            }
+            // 查找匹配的按钮
+            let btn = this.showQuickBtnArr.find(item=>item.btnName === btnName);
+            if(btn){
+                this.devicePreviewParam.operateRecord = btn.scriptContent;
+                this.remoteExecuteScript(btn.scriptContent);
+            }
         },
         // 重置坐标
         resetPosition(){

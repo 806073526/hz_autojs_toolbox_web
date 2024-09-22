@@ -51,7 +51,8 @@ export default {
                 debugModel:true,
                 connectStatus:0,
                 debugSleep:1000
-            }
+            },
+            autoStart:true
         }
     },
     computed:{
@@ -86,6 +87,9 @@ export default {
         this.editorType = window.localStorage.getItem('editorType') || 'ace';
 
         this.deviceInfo.deviceUuid = deviceUuidParam;
+        let autoStart = window.localStorage.getItem("preview_"+this.deviceInfo.deviceUuid+"_autoStart");
+
+        this.autoStart = String(autoStart) === 'true';
 
         setTimeout(() => {
             this.$nextTick(() => {
@@ -95,6 +99,9 @@ export default {
         }, 500);
     },
     methods: {
+        autoStartChange(){
+            window.localStorage.setItem("preview_"+this.deviceInfo.deviceUuid+"_autoStart",this.autoStart);
+        },
         // 强制刷新
         refreshBrowserCache(){
             window.location.reload(true)

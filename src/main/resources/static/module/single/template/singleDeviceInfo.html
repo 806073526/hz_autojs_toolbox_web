@@ -12,6 +12,9 @@
                 <span style="margin-left: 10px;color: #000000;">
                      调试模式: <el-switch  v-model="deviceInfo.debugModel" @change="syncWidthHeightToApp" style="margin-right: 5px;"/>
                 </span>
+                <span style="margin-left: 10px;color: #000000;">
+                     自动投屏: <el-switch  v-model="autoStart" @change="autoStartChange" style="margin-right: 5px;"/>
+                </span>
                 <span style="margin-left: 10px;"  @click="refreshCaptureScreen">
                     <el-link :underline="false" type="info" style="color:blue;">刷新截图权限</el-link>
                 </span>
