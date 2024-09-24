@@ -86,6 +86,11 @@
                                     </el-radio-group>
                                 </el-form-item>
                             </el-row>
+                            <el-row style="margin-top: 10px;">
+                                <el-form-item label="画面比例:" prop="textType" class="flex-1">
+                                    <el-slider style="flex:1;" v-model="previewImageWidth" show-input></el-slider>
+                                </el-form-item>
+                            </el-row>
                             <el-row v-if="selectPreviewType === 'imgInterface'">
                                 <div style="display: inline-flex;justify-content: flex-end;align-items: center;margin-left:20px;">
                                     <span>
