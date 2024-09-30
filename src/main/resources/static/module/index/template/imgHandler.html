@@ -159,7 +159,12 @@
                         <span>清空坐标列表中的全部坐标。</span>
                     </div>
                 </el-popover>
-                <div style="height: 100%;margin-top: 10px;flex: 1;">
+                <div style="margin-top: 10px;height: 50px;">
+                    <el-input type="textarea" v-model="remoteHandler.param1.clipPositionVal" style="height: 100%;"
+                              placeholder="全屏裁剪,自动获取裁剪参数:【x1,y2,w,h】" rows="2" class="width100">
+                    </el-input>
+                </div>
+                <div style="height: calc(100% - 50px);margin-top: 10px;flex: 1;">
                     <el-input type="textarea" v-model="remoteHandler.param1.positionList" style="height: 100%;"
                               placeholder="点击预览图片,获取点击位置的坐标,坐标列表可以用于解析坐标区域,多点找色等"  class="width100 positionInput">
                     </el-input>

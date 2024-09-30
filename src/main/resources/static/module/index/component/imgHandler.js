@@ -87,6 +87,7 @@ export default {
                     showFixedPositionList: false,
                     openSplit:true,
                     positionList: '',// 坐标列表
+                    clipPositionVal:'',
                     operatePositionKey: 'x1',// 操作key
                     operatePositionVal: 100,// 操作坐标值
                 }
@@ -603,6 +604,9 @@ export default {
                 window.reactLeft = e.clientX - areaInfo.x;
                 drawReact.style.top = window.reactTop + 'px';
                 drawReact.style.left = window.reactLeft + 'px';
+
+                // 记录鼠标开始坐标
+                window.startMousePosition = {x:this.imgMousePosition.x,y:this.imgMousePosition.y };
             } else {
                 window.drawFlag = false;
                 // 鼠标弹起的点作为矩形框的终点
@@ -795,6 +799,28 @@ export default {
 
             drawReact.style.width = absoluteWidth + 'px'; // 宽
             drawReact.style.height = absoluteHeight + 'px'; // 高
+
+
+            let drawX1 = window.startMousePosition.x;
+            let drawY1 = window.startMousePosition.y;
+
+            let drawX2 = this.imgMousePosition.x;
+            let drawY2 = this.imgMousePosition.y;
+
+let xml = `<div style="position: absolute;top: -38px;left: -80px;display: flex;justify-content: center;align-items: center;font-weight: 600;background: #b9b977;color: #ffffff;padding: 0 5px;">
+<span style="margin-right: 5px;">x1:${drawX1}</span>
+<span style="margin-right: 5px;">y1:${drawY1}</span>
+<span>w:${drawX2-drawX1}</span>
+</div>
+
+<div style="position: absolute;bottom: -38px;right: -80px;display: flex;justify-content: center;align-items: center;font-weight: 600;background: #b9b977;color: #ffffff;padding: 0 5px;">
+<span style="margin-right: 5px;">x2:${drawX2}</span>
+<span style="margin-right: 5px;">y2:${drawY2}</span>
+<span>h:${drawY2-drawY1}</span>
+</div>`;
+            // 设置html代码
+            drawReact.innerHTML = xml;
+            this.remoteHandler.param1.clipPositionVal = `${drawX1},${drawY1},${drawX2-drawX1},${drawY2-drawY1}`;
         },
         // 保存图片
         saveImage(){
